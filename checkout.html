@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daimara Online Mart | Checkout</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
+    body{background:#f5f5f5}
+
+/* PARA */
+.para{
+ color: #f5f5f5;
+}
+
+    .navbar{display:flex;align-items:center;justify-content:space-between;padding:15px 30px;
+      background:#111;color:#fff;  position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #000000; /* Add your desired background color */
+    z-index: 1000; /* Ensure it's on top of other elements */  }
+    .logo{color:rgb(233, 157, 17);font-size:18px;font-weight:bold}
+    .navbar a{color:#f5f5f5;text-decoration:none;margin-left:15px}
+
+
+.navbar a:hover,
+.navbar a.active {
+  color: rgb(233, 157, 17);
+  border-bottom: 3px solid rgb(233, 157, 17);
+}
+
+    .container{padding:40px 30px;max-width:1000px;margin:auto}
+    h2{text-align:center;font-size:25px;margin-bottom:30px;color: rgb(0, 0, 0);}
+    h3{text-align:center;font-size:25px;margin-left: 125px;color: rgb(0, 0, 0);}
+    table{width:100%;border-collapse:collapse;margin-bottom:30px;color: rgb(233, 157, 17);}
+    table th, table td{padding:15px;border-bottom:1px solid #ddd;text-align:left}
+    table img{width:80px;height:60px;object-fit:cover;border-radius:5px}
+    .total{float:right;font-size:16px;margin-bottom:20px}
+    .checkout-form{background:#fff;padding:20px;border-radius:10px;box-shadow:0 5px 15px rgba(0,0,0,.1)}
+    .checkout-form input, .checkout-form select{width:100%;padding:10px;margin:10px 0;border:1px solid #ccc;border-radius:6px}
+    .checkout-form button{padding:12px 20px;background:#111;color:rgb(233, 157, 17);border:none;border-radius:6px;cursor:pointer;width:100%}
+  </style>
+</head>
+<body>
+
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="logo">
+            <a href="home.html" style="text-decoration: none; color: inherit;"><span>Daimara Online Mart</span></a>
+   </div>
+  <div>
+    <a href="shop.html">Shop</a>
+    <a href="Cart.html"><i class="fa fa-shopping-cart"></i></a>
+  </div>
+</nav>
+
+<div class="container">
+  <h2>Your Cart</h2>
+  <table id="cartTable">
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Details</th>
+        <th>Price</th>
+        <th>Quantity</th>
+        <th>Subtotal</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <div class="total">
+    <div id="subtotalPrice">Subtotal: KES 0</div>
+    <div id="deliveryFeeDisplay" style="display: none; margin-top: 10px;">Delivery Fee: KES 70</div>
+    <div id="totalPrice" style="margin-top: 10px; font-weight: bold; font-size: 20px;">Total: KES 0</div>
+  </div>
+
+
+  <h3>Checkout</h3>
+  <div class="checkout-form">
+    <input type="text" id="name" placeholder="Full Name" required />
+    <input type="email" id="email" placeholder="Email" required />
+    <label for="paymentMethod">Payment Method</label>
+    <select id="paymentMethod" title="Payment Method" aria-label="Payment Method">
+      <option value="mpesa">M-Pesa</option>
+      <option value="googlepay">Google Pay</option>
+      <option value="card">Card</option>
+    </select>
+    <div style="margin: 15px 0; padding: 15px; background: #f9f9f9; border-radius: 6px;">
+      <label for="delivery-option" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+        <input type="checkbox" id="delivery-option" style="width: 18px; height: 18px; cursor: pointer;">
+        <span>Add Delivery (KES 70)</span>
+      </label>
+    </div>
+
+   <button onclick="checkout()">Place Order</button>
+
+    
+  </div>
+</div>
+
+<script src="data-manager.js"></script>
+<script>
+  // Authentication check - Inaccessible unless logged in
+  (function() {
+    const currentUser = DataManager.getCurrentUser();
+    if (!currentUser) {
+      alert("Please login or sign up to proceed with checkout.");
+      window.location.href = "login.html";
+    }
+  })();
+
+  let cart = DataManager.getCart();
+
+  // Pre-fill user details if logged in
+  document.addEventListener("DOMContentLoaded", function() {
+    const currentUser = DataManager.getCurrentUser();
+    if (currentUser) {
+      document.getElementById('name').value = currentUser.name || '';
+      document.getElementById('email').value = currentUser.email || '';
+    }
+    renderCart();
+  });
+
+  function renderCart() {
+    const tbody = document.querySelector('#cartTable tbody');
+    tbody.innerHTML='';
+    let subtotal=0;
+    cart.forEach((item,index)=>{
+      const qty = item.qty || 1;
+      const itemSubtotal = item.price * qty;
+      subtotal+=itemSubtotal;
+      const imageSrc = item.image || 'image-placeholder.jpg';
+      tbody.innerHTML+=`<tr>
+        <td><img src="${imageSrc}" style="width:80px;height:60px;object-fit:cover;border-radius:5px;"></td>
+        <td style="font-size:0.9em;">
+          <p><strong>${item.name}</strong></p>
+          ${item.subcategory ? `<p>Sub-Category: ${item.subcategory}</p>` : ''}
+          ${item.sku ? `<p>SKU: ${item.sku}</p>` : ''}
+          ${item.supplier ? `<p>Supplier: ${item.supplier}</p>` : ''}
+          ${item.createdAt ? `<p>Added: ${item.createdAt}</p>` : ''}
+        </td>
+        <td>KES ${item.price}</td>
+        <td><input type='number' min='1' value='${qty}' onchange='updateQuantity("${item.id}",this.value)'></td>
+        <td>KES ${itemSubtotal}</td>
+        <td><button onclick='removeItem("${item.id}")' style="padding:8px 12px;background:#e74c3c;color:white;border:none;border-radius:4px;cursor:pointer;">Remove</button></td>
+      </tr>`;
+    });
+    document.getElementById('subtotalPrice').innerText = 'Subtotal: KES '+subtotal;
+    updateCheckoutTotal();
+  }
+
+  function updateCheckoutTotal() {
+    const deliveryCheckbox = document.getElementById('delivery-option');
+    const subtotal = cart.reduce((a, b) => a + b.price * (b.qty || 1), 0);
+    const deliveryFee = deliveryCheckbox.checked ? 70 : 0;
+    const total = subtotal + deliveryFee;
+    
+    document.getElementById('deliveryFeeDisplay').style.display = deliveryCheckbox.checked ? 'block' : 'none';
+    document.getElementById('totalPrice').innerText = 'Total: KES ' + total;
+  }
+
+  function updateQuantity(productId, qty){
+    const result = DataManager.updateCartQuantity(productId, parseInt(qty));
+    if(result && result.success){
+      cart = DataManager.getCart();
+      renderCart();
+      updateCheckoutTotal();
+    }
+  }
+
+  function removeItem(productId){
+    const result = DataManager.removeFromCart(productId);
+    if(result && result.success){
+      cart = DataManager.getCart();
+      renderCart();
+      updateCheckoutTotal();
+    }
+  }
+
+  function checkout(){
+    const name=document.getElementById('name').value;
+    const email=document.getElementById('email').value;
+    const paymentMethod=document.getElementById('paymentMethod').value;
+    if(!name||!email){alert('Please fill all fields'); return;}
+
+    const subtotal = cart.reduce((a,b)=>a+b.price*(b.qty||1),0);
+    const deliveryCheckbox = document.getElementById('delivery-option');
+    const deliveryFee = deliveryCheckbox.checked ? 70 : 0;
+    const totalPrice = subtotal + deliveryFee;
+
+    const orderData = {
+      items: cart,
+      subtotal: subtotal,
+      deliveryFee: deliveryFee,
+      totalPrice: totalPrice,
+      paymentMethod,
+      customer: { name, email },
+      customerName: name
+    };
+
+    // Simulate backend call
+    console.log('Placing order...', orderData);
+    
+    // In a real app, you'd fetch here
+    /*
+    fetch('http://localhost:5000/api/orders',{ 
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':'Bearer '+localStorage.getItem('token')
+      },
+      body:JSON.stringify(orderData)
+    })
+    */
+
+    // Simulate successful response
+    const data = {
+      success: true,
+      orderId: 'ORD-' + Date.now(),
+      totalPrice: totalPrice
+    };
+
+    // Save to DataManager orders
+    const currentUser = DataManager.getCurrentUser();
+    const newOrder = {
+      ...orderData,
+      id: data.orderId,
+      date: new Date().toISOString(),
+      status: 'pending',
+      userId: currentUser ? currentUser.id : 'guest',
+      grandTotal: totalPrice // Align with admin-manager.html expectation
+    };
+    
+    const allOrders = DataManager.getAllOrders();
+    allOrders.push(newOrder);
+    DataManager.saveOrders(allOrders);
+
+    // Generate Invoice
+    const invoiceData = {
+      orderId: data.orderId,
+      customerInfo: {
+        name: name,
+        email: email,
+        phone: currentUser ? currentUser.phone : ''
+      },
+      items: cart,
+      subtotal: subtotal,
+      tax: subtotal * 0.16, // 16% VAT
+      shipping: deliveryFee,
+      total: totalPrice
+    };
+    DataManager.addInvoice(invoiceData);
+
+    localStorage.setItem('mpesaOrder', JSON.stringify({
+      orderId: data.orderId,
+      total: totalPrice,
+      items: cart
+    }));
+
+    if (paymentMethod === 'mpesa') {
+      window.location.href = "mpesa-payment.html";
+    } else {
+      alert('Order placed successfully! Order ID: ' + data.orderId);
+      DataManager.clearCart();
+      window.location.href = "home.html";
+    }
+  }
+
+
+  renderCart();
+
+  // Add delivery option listener
+  const deliveryCheckbox = document.getElementById('delivery-option');
+  if (deliveryCheckbox) {
+    deliveryCheckbox.addEventListener('change', updateCheckoutTotal);
+  }
+</script>
+</body>
+</html>

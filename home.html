@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daimara Online Mart | Home</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
+    body{background:#f5f5f5}
+
+/* PARA */
+.para{
+ color: #f5f5f5;
+}
+
+div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 18px; margin-top: 20px; margin-bottom: 20px;}
+
+    /* NAVBAR */
+    .navbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:15px 30px;background:#111;color:#fff;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #000000; /* Add your desired background color */
+    z-index: 1000; /* Ensure it's on top of other elements */
+
+    }
+    .logo{color:rgb(233, 157, 17);font-size:18px;font-weight:bold;
+    display: flex;
+     align-items: center;
+     gap: -5px;
+     display: inline-block;
+      transition: color 0.3s;
+        justify-content: center;
+        padding-right: 10px;
+        margin-right: 10px;
+        right: 10px;
+        cursor: pointer;
+    }
+    .nav-center{display:flex;align-items:center;padding-left: 20px;margin-left:70px;gap:20px}
+    .nav-center a{color:#fff;text-decoration:none;font-size:14px}
+    .nav-center input{padding:7px 10px;border-radius:5px;border:none}
+    .nav-icons a{color:#fff;margin-left:15px;font-size:14px}
+
+.nav-center a:hover,
+.nav-center a.active {
+  color: rgb(233, 157, 17);
+  border-bottom: 3px solid rgb(233, 157, 17);
+}
+
+.nav-icons a:hover,
+.nav-icons a.active {
+  color: rgb(233, 157, 17);
+  border-bottom: 3px solid rgb(233, 157, 17);
+}
+
+ .search-container {
+  position: relative;
+  width: 200px;
+  margin: 20px auto;
+}
+
+#search-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+#search-btn {
+  position: absolute;
+  right: -6px;
+  top: -9px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+#search-results {
+  position: absolute;
+  top: 45px;
+  width: 250px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  display: none;
+  z-index: 1001;
+  max-height: 300px;
+  overflow-y: auto;
+  left: 0;
+}
+
+#search-results div {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  color: #333;
+  transition: 0.2s;
+}
+
+#search-results div:hover {
+  background: #f9f9f9;
+}
+
+#search-results strong {
+  color: #111;
+}
+
+
+    /* SLIDER */
+    .slider{position:relative;width:100%;height:400px;overflow:hidden}
+    .slide{display:none}
+    .slide img{width:100%;height:400px;object-fit:cover}
+    
+
+    /* SECTIONS */
+    section{padding:40px 30px}
+    h2{color: rgb(233, 157, 17);text-align:center;margin-bottom:25px}
+    
+
+    /* DELIVERY */
+    .delivery{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px}
+    .delivery-card{
+      background:#fff;padding:25px;border-radius:10px;
+      box-shadow:0 5px 15px rgba(0,0,0,.1);text-align:center
+      
+    }
+    .delivery-card i{font-size:40px;margin-bottom:15px;color:#111}
+    button{
+      margin-top:10px;padding:8px 15px;border:none;border-radius:5px;
+      background:#111;color:rgb(233, 157, 17);cursor:pointer
+    }
+
+    /* VIDEO */
+    .video-box{display:flex;justify-content:center}
+    video{width:80%;border-radius:12px}
+
+    /* PRODUCTS */
+    .products{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px}
+    .product{
+      background:#fff;padding:20px;border-radius:10px;
+      box-shadow:0 5px 15px rgba(0,0,0,.1);text-align:center
+    }
+    .product img{width:100%;height:160px;object-fit:cover;border-radius:8px}
+    .product button{
+      margin-top:10px;padding:8px 15px;border:none;border-radius:5px;
+      background:#111;color:rgb(233, 157, 17);cursor:pointer
+    }
+
+/* FOOTER */
+footer {
+  background: #0a0a0a;
+  color: white;
+  padding: 50px 20px 20px;
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto 30px;
+  color: rgb(233, 157, 17);
+}
+
+.footer-content h3 {
+  color: rgb(233, 157, 17);
+  margin-bottom: 15px;
+  font-size: 18px;
+}
+
+.footer-content p {
+  color: #bdc3c7;
+  line-height: 1.8;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.copyright {
+  text-align: center;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #333;
+  color: rgb(233, 157, 17);
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 12px 15px;
+  }
+
+  .shop-name {
+    font-size: 18px;
+  }
+
+  .nav-center {
+    display: none;
+  }
+
+  .nav-right a {
+    font-size: 18px;
+    padding: 6px 10px;
+  }
+
+  .slideshow,
+  .slide {
+    height: 300px;
+  }
+
+  .products-preview {
+    padding: 40px 15px;
+  }
+
+  .products-preview h2 {
+    font-size: 24px;
+  }
+
+  #random-products {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 15px;
+    padding: 15px;
+  }
+
+  .footer-content {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+
+ @media(max-width:768px){
+      .nav-center{flex-direction:column;gap:10px}
+      video{width:100%}
+    }
+
+  </style>
+</head>
+<body>
+<div class="h3">Advertise with us!</div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="logo">Daimara Online Mart</div>
+
+  <div class="nav-center">
+    <a href="shop.html">Shop</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+    
+    <!--<input type="text" placeholder="Search products..." />-->
+  </div>
+
+<div class="search-container">
+  <input type="text" id="search-input" placeholder="Search...">
+  <button id="search-btn">🔍</button>
+  <div id="search-results"></div>
+</div>
+
+
+  <div class="nav-icons">
+    <a href="login.html"><i class="fa fa-user"></i></a>
+    <a href="cart.html"><i class="fa fa-shopping-cart"></i></a>
+  </div>
+</nav>
+
+
+
+<!-- SLIDESHOW -->
+<div class="slider">
+  <div class="slide"><img src="https://picsum.photos/1200/400?1"></div>
+  <div class="slide"><img src="https://picsum.photos/1200/400?2"></div>
+  <div class="slide"><img src="https://picsum.photos/1200/400?3"></div>
+</div>
+
+<!-- DELIVERY OPTIONS -->
+<section>
+  <h2>Fast Home Delivery</h2>
+  
+  <div class="delivery">
+      
+      <div class="delivery-card">
+       <i class="fa fa-tint"></i>
+       <h3>Water Refilling & Delivery</h3>
+       <div class="product-card"><img src="https://picsum.photos/300/200?water" alt=""></div>
+       <p>Clean and safe water delivered to your doorstep.</p>
+       <a href="water-refill.html"><button>Order Now</button></a>
+      </div>
+     
+      <div class="delivery-card i">
+       <i class="fa fa-fire"></i>
+       <h3>Gas Refilling & Delivery</h3>
+       <div class="product-card"><img src="lake gas.jpg" alt=""></div>
+       <p>Quick and reliable gas refilling service.</p>
+       <a href="gas-refill.html"><button>Order Now</button></a>
+      </div>
+    
+  </div>
+</section>
+
+<!-- VIDEO AD -->
+<section>
+  
+  <h2>Featured Promotion</h2>
+  
+  <div class="video-box">
+    <video controls autoplay muted loop>
+      <source src="video2.mp4" type="video/mp4">
+    </video>
+  </div>
+
+</section>
+
+<!-- RANDOM PRODUCTS -->
+<section class="products-preview">
+  <h2>Featured Products</h2>
+  <div id="random-products"></div>
+</section>
+
+<!-- FOOTER -->
+<footer id="Contact">
+  <div class="footer-content">
+    <div>
+      <h3>contacts</h3>
+      <p>Email: omondiphelix2003@gmail.com</p>
+      <p>Phone: +254 745431472</p>
+    </div>
+
+    <div id="about">
+      <h3>About us</h3>
+      <p>Daimara Online Mart delivers
+         quality groceries and 
+        food at your convenience.</p>
+    </div>
+
+    <div>
+      <h3>Social platforms</h3>
+      <p>Facebook | Instagram | Twitter</p>
+    </div>
+  </div>
+  <p class="copyright">Copyright © 2026 Daimara Online Mart.All rights reserved.</p>
+</footer>
+
+
+<script src="data-manager.js"></script>
+<script src="auth-check.js"></script>
+<script>
+  // SLIDER
+  let index = 0;
+  const slides = document.querySelectorAll('.slide');
+  function showSlides(){
+    slides.forEach(s => s.style.display='none');
+    index = (index + 1) > slides.length ? 1 : index + 1;
+    slides[index-1].style.display='block';
+    setTimeout(showSlides, 3000);
+  }
+  showSlides();
+
+  // RANDOM PRODUCTS (from DataManager)
+  (function(){
+    const rndContainer = document.getElementById('random-products');
+    function getAllFlattened(){
+      const all = DataManager.getAllProducts();
+      return Object.keys(all).reduce((acc,k)=> acc.concat(all[k]||[]), []);
+    }
+
+    window.addToCartById = function(id){
+      const prod = getAllFlattened().find(p=>p.id===id);
+      if (!prod) { alert('Product not found'); return; }
+      DataManager.addToCart(prod);
+      alert('Added to cart');
+    };
+
+    function renderRandom(n=4){
+      if(!rndContainer) return;
+      const all = getAllFlattened();
+      if(all.length === 0){ rndContainer.innerHTML = '<p>No products available yet.</p>'; return; }
+      const shuffled = all.slice().sort(()=>0.5-Math.random()).slice(0,n);
+      rndContainer.innerHTML = '';
+      shuffled.forEach(p => {
+        const img = p.image || 'https://picsum.photos/300/200';
+        rndContainer.innerHTML += `
+          <div class="product">
+            <img src="${img}">
+            <h4>${p.name}</h4>
+            <p>Ksh ${p.price}</p>
+            <button onclick="addToCartById('${p.id}')">Add to Cart</button>
+          </div>`;
+      });
+    }
+
+    renderRandom(4);
+  })();
+
+// Search functionality
+const searchInput = document.getElementById('search-input');
+const searchBtn = document.getElementById('search-btn');
+const searchResults = document.getElementById('search-results');
+
+function performSearch() {
+  const query = searchInput.value.trim().toLowerCase();
+  if (!query) {
+    searchResults.style.display = 'none';
+    return;
+  }
+
+  const allProducts = [];
+  const products = DataManager.getAllProducts();
+  Object.values(products).forEach(categoryList => {
+    allProducts.push(...categoryList);
+  });
+
+  const results = allProducts.filter(p => 
+    p.name.toLowerCase().includes(query) || 
+    (p.description && p.description.toLowerCase().includes(query))
+  );
+
+  if (results.length > 0) {
+    searchResults.innerHTML = results.map(p => {
+      let url = 'Shop.html?search=' + encodeURIComponent(p.name);
+      if (p.subcategory === 'Gas') url = 'gas-refill.html';
+      if (p.subcategory === 'Water') url = 'water-refill.html';
+      
+      return `
+        <div onclick="window.location.href='${url}'">
+          <strong>${p.name}</strong><br>
+          <span style="font-size: 12px; color: #666;">Ksh ${p.price}</span>
+        </div>
+      `;
+    }).join('');
+    searchResults.style.display = 'block';
+  } else {
+    searchResults.innerHTML = '<div style="padding: 10px;">No products found</div>';
+    searchResults.style.display = 'block';
+  }
+}
+
+searchInput.addEventListener('input', performSearch);
+searchBtn.addEventListener('click', () => {
+  const query = searchInput.value.trim();
+  if (query) {
+    window.location.href = `Shop.html?search=${encodeURIComponent(query)}`;
+  }
+});
+
+// Close search results when clicking outside
+document.addEventListener('click', (e) => {
+  if (!searchInput.contains(e.target) && !searchResults.contains(e.target) && !searchBtn.contains(e.target)) {
+    searchResults.style.display = 'none';
+  }
+});
+
+
+</script>
+</body>
+</html>

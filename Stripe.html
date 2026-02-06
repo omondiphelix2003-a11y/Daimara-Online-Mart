@@ -1,0 +1,39 @@
+<!-- Include Stripe.js -->
+<script src="https://js.stripe.com/v3/"></script>
+
+<input type="text" id="email" placeholder="Enter email" />
+<button id="stripeCheckoutBtn">Checkout with Google Pay / Card</button>
+
+<script>
+const stripe = Stripe('pk_test_yourPublishableKey'); // Replace with your publishable key
+
+document.getElementById('stripeCheckoutBtn').addEventListener('click', async () => {
+  const cart = JSON.parse(localStorage.getItem('cart'));
+  const email = document.getElementById('email').value;
+  const token = localStorage.getItem('token');
+
+  const res = await fetch('http://localhost:5000/api/checkout', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+    body: JSON.stringify({ cart, paymentMethod: 'stripe', email })
+  });
+
+  const data = await res.json();
+
+  // Confirm Card/Google Pay Payment
+  const { error } = await stripe.confirmCardPayment(data.clientSecret, {
+    payment_method: {
+      card: {
+        // Create a card element if you want full card entry form
+      },
+      billing_details: { email }
+    }
+  });
+
+  if(error){
+    alert('Payment failed: ' + error.message);
+  }else{
+    alert('Payment successful! Order ID: ' + data.orderId);
+  }
+});
+</script>

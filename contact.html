@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Daimara Online Mart | Contact Us</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="contact.css">
+
+<style>* {
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+}
+
+body {
+  background: #f5f5f5;
+}
+
+/* PARA */
+.para{
+ color: #f5f5f5;
+}
+
+/* NAVBAR */
+    .navbar{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:15px 30px;background:#111;color:#fff; position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #000000; /* Add your desired background color */
+    z-index: 1000; /* Ensure it's on top of other elements */ 
+    }
+    .logo{color:rgb(233, 157, 17);font-size:18px;font-weight:bold}
+    .nav-center{display:flex;align-items:center;gap:20px}
+    .nav-center a{color:#fff;text-decoration:none;padding-left: 20px;margin-right: 40px;}
+    .nav-center input{padding:7px 10px;border-radius:5px;border:none}
+    .nav-icons a{color:#fff;margin-left:15px;font-size:14px}
+
+.nav-center a:hover,
+.nav-center a.active {
+  color: rgb(233, 157, 17);
+  border-bottom: 3px solid rgb(233, 157, 17);
+}
+
+.nav-icons a:hover,
+.nav-icons a.active {
+  color: rgb(233, 157, 17);
+  border-bottom: 3px solid rgb(233, 157, 17);
+}
+
+/* NAVBAR */
+/*.navbar {
+  background: #0a0a0a;
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.shop-name {
+  color: rgb(233, 157, 17);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.nav-center {
+  list-style: none;
+  display: flex;
+  gap: 35px;
+  margin: 0;
+}
+
+.nav-center a {
+  color: #ecf0f1;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  position: relative;
+  padding-bottom: 5px;
+}
+
+.nav-center a:hover,
+.nav-center a.active {
+  color: rgb(233, 157, 17);
+  border-bottom: 3px solid rgb(233, 157, 17);
+}
+
+.nav-right {
+  display: flex;
+  gap: 20px;
+}
+
+.nav-right a {
+  color: rgb(233, 157, 17);
+  text-decoration: none;
+  font-size: 20px;
+  transition: all 0.3s ease;
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+/* Nav Profile Icon Container */
+/*.nav-profile-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Nav Login Container */
+/*.nav-login {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Nav Cart Container */
+/*.nav-cart {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}*/
+
+/* CONTACT SECTION */
+.contact-container {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 40px 20px;
+}
+
+.contact-container h1 {
+  font-size: 36px;
+  color: #2c3e50;
+  margin-bottom: 15px;
+  font-weight: 700;
+}
+
+.contact-container > p {
+  font-size: 14px;
+  color: #7f8c8d;
+  margin-bottom: 40px;
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+
+/* FORM */
+#contact-form {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+#contact-form input,
+#contact-form textarea {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  border: 1px solid #bdc3c7;
+  font-family: inherit;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+#contact-form input:focus,
+#contact-form textarea:focus {
+  outline: none;
+  border-color: rgb(233, 157, 17);
+  box-shadow: 0 0 5px rgba(233, 157, 17, 0.3);
+}
+
+#contact-form textarea {
+  height: 140px;
+  resize: vertical;
+}
+
+#contact-form button {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, rgb(233, 157, 17) 0%, #e67e22 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+#contact-form button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(233, 157, 17, 0.3);
+}
+
+/* CONTACT INFO */
+.contact-info {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.contact-info h3 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+  font-size: 20px;
+}
+
+.contact-info p {
+  color: #555;
+  margin-bottom: 12px;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.contact-info strong {
+  color: rgb(233, 157, 17);
+}
+
+.social-links {
+  margin-top: 25px;
+  display: flex;
+  gap: 12px;
+}
+
+.social-links a {
+  display: inline-block;
+  padding: 10px 15px;
+  background: rgb(233, 157, 17);
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+.social-links a:hover {
+  background: #e67e22;
+  transform: translateY(-2px);
+}
+
+/* FOOTER */
+.footer {
+  background: #0a0a0a;
+  color: white;
+  padding: 30px 20px;
+  text-align: center;
+}
+
+.footer p {
+  color: rgb(233, 157, 17);
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 12px 15px;
+  }
+
+  .nav-center {
+    display: none;
+  }
+
+  .contact-container {
+    padding: 20px 15px;
+  }
+
+  .contact-grid {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+
+  .contact-container h1 {
+    font-size: 28px;
+  }
+}
+/* Login Button */
+#login-btn {
+  color: white;
+  text-decoration: none;
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  display: none;
+}
+
+#login-btn:hover {
+  color: rgb(233, 157, 17);
+}
+
+/* Profile Dropdown */
+#profile-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(233, 157, 17, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+#profile-icon img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+#dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 70px;
+  right: 20px;
+  background: #1a1a1a;
+  border: 2px solid rgb(233, 157, 17);
+  border-radius: 10px;
+  padding: 10px 0;
+  min-width: 180px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+  z-index: 2000;
+}
+
+#dropdown-menu.show {
+  display: block;
+}
+
+#dropdown-menu a,
+#dropdown-menu button {
+  display: block;
+  width: 100%;
+  padding: 12px 20px;
+  color: #ecf0f1;
+  text-decoration: none;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  text-align: left;
+}
+
+#dropdown-menu a:hover,
+#dropdown-menu button:hover {
+  background: rgba(233, 157, 17, 0.2);
+  color: rgb(233, 157, 17);
+  padding-left: 25px;
+}
+
+#dropdown-menu button {
+  color: #e74c3c;
+  font-weight: 600;
+}
+
+#dropdown-menu button:hover {
+  background: rgba(231, 76, 60, 0.2);
+  color: #ff6b6b;
+}</style>
+
+</head>
+<body>
+
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  
+   <div class="logo">
+            <a href="home.html" style="text-decoration: none; color: inherit;"><span>Daimara Online Mart</span></a>
+   </div>
+  <div class="nav-center">
+    <a href="home.html">Home</a>
+    <a href="shop.html">Shop</a>
+    <a href="about.html">About</a>
+  </div>
+
+  <div class="nav-icons">
+    <a href="login.html"><i class="fa fa-user"></i></a>
+    <a href="cart.html"><i class="fa fa-shopping-cart"></i></a>
+  </div>
+</nav>
+
+<!-- CONTACT SECTION -->
+<section class="contact-container">
+  <h1>Contact Us</h1>
+  <p>We’d love to hear from you. Send us a message below.</p>
+
+  <div class="contact-grid">
+
+    <!-- CONTACT FORM -->
+    <form id="contact-form">
+      <input type="text" id="name" placeholder="Your Name" required>
+      <input type="email" id="email" placeholder="Your Email" required>
+      <input type="text" id="subject" placeholder="Subject" required>
+      <textarea id="message" placeholder="Your Message" required></textarea>
+      <button type="submit">Send Message</button>
+    </form>
+
+    <!-- CONTACT INFO -->
+    <div class="contact-info">
+      <h3>Our Store</h3>
+      <p><strong>Email:</strong> omondiphelix2003@gmail.com</p>
+      <p><strong>Phone:</strong> +254 745431472</p>
+      <p><strong>Location:</strong> Nakuru, Kenya</p>
+
+      <div class="social-links">
+        <a href="#">Facebook</a>
+        <a href="#">Instagram</a>
+        <a href="#">Twitter</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer class="footer">
+  <p>Copyright © 2026 Daimara Online Mart.All rights reserved.</p>
+</footer>
+
+<script src="data-manager.js"></script>
+<script src="auth-check.js"></script>
+<script>
+// OAuth 2.0 credentials provided by user
+const CLIENT_ID = 'Client';
+const CLIENT_SECRET = 'secret';
+const REDIRECT_URI = 'https://www.daimaraonlinemart.co.ke';
+const REFRESH_TOKEN = '45344556'; // Updated with project ID/token provided by user
+
+/**
+ * Sends an email using the Gmail API
+ */
+async function sendEmailViaGmail(name, email, subject, message) {
+  try {
+    // 1. Get Access Token using Refresh Token
+    const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id: CLIENT_ID,
+        client_secret: CLIENT_SECRET,
+        refresh_token: REFRESH_TOKEN,
+        grant_type: 'refresh_token'
+      })
+    });
+
+    const tokenData = await tokenResponse.json();
+    if (!tokenData.access_token) {
+      console.error('Failed to get access token. Check if REFRESH_TOKEN is valid.', tokenData);
+      return false;
+    }
+    const accessToken = tokenData.access_token;
+
+    // 2. Construct the email
+    const ownerEmail = 'omondiphelix2003@gmail.com';
+    const emailContent = [
+      `From: "Daimara Contact Form" <${ownerEmail}>`,
+      `To: ${ownerEmail}`,
+      `Reply-To: "${name}" <${email}>`,
+      `Subject: New Client Message: ${subject}`,
+      'Content-Type: text/plain; charset="UTF-8"',
+      '',
+      `You have a new message from your website:`,
+      `------------------------------------------`,
+      `Name: ${name}`,
+      `Email: ${email}`,
+      `Subject: ${subject}`,
+      `------------------------------------------`,
+      `Message:`,
+      message
+    ].join('\n');
+
+    // Base64url encode the email for Gmail API
+    const encodedEmail = btoa(unescape(encodeURIComponent(emailContent)))
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '');
+
+    // 3. Send via Gmail API
+    const sendResponse = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ raw: encodedEmail })
+    });
+
+    return sendResponse.ok;
+  } catch (error) {
+    console.error('Error in Gmail API flow:', error);
+    return false;
+  }
+}
+
+document.getElementById("contact-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const subject = document.getElementById("subject").value.trim();
+  const message = document.getElementById("message").value.trim();
+
+  if (!name || !email || !subject || !message) {
+    alert("Please fill in all fields.");
+    return;
+  }
+
+  const submitBtn = e.target.querySelector('button');
+  const originalBtnText = submitBtn.textContent;
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Sending...';
+
+  // 1. Save message locally via DataManager (as backup/record)
+  const currentUser = DataManager.getCurrentUser();
+  const userId = currentUser ? currentUser.id : 'guest';
+  DataManager.saveMessage({
+    userId,
+    name,
+    email,
+    subject,
+    message
+  });
+
+  // 2. Attempt to send via Gmail API
+  const success = await sendEmailViaGmail(name, email, subject, message);
+
+  submitBtn.disabled = false;
+  submitBtn.textContent = originalBtnText;
+
+  if (success) {
+    alert("Thank you for contacting us! Your message has been sent successfully.");
+    e.target.reset();
+  } else {
+    // If Gmail fails, we let them know but it was still saved locally for the admin
+    alert("Dear customer,we've received your message and we are working on it.we'll give you our feedback as soon as possible.Thank you!.");
+    e.target.reset();
+  }
+});
+</script>
+  
+
+</body>
+</html>

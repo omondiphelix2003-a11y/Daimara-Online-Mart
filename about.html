@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Daimara Online Mart | About Us</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="about.css">
+
+<style>* {
+  box-sizing: border-box;
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background: #f5f5f5;
+}
+
+/* PARA */
+.para{
+ color: #f5f5f5;
+}
+
+/* NAVBAR */
+    .navbar{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:15px 30px;background:#000000;color:#fff;
+       position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #000000; /* Add your desired background color */
+    z-index: 1000; /* Ensure it's on top of other elements */ 
+    }
+    .logo{color:rgb(233, 157, 17);font-size:18px;font-weight:bold}
+    .nav-center{display:flex;align-items:center;gap:10px}
+    .nav-center a{color:#fff;text-decoration:none;padding-left: 20px;margin-right: 40px;}
+    .nav-center input{padding:7px 10px;border-radius:5px;border:none}
+    .nav-icons a{color:#fff;margin-left:15px;font-size:14px}
+
+.nav-center a:hover,
+.nav-center a.active {
+  color: rgb(233, 157, 17);
+  border-bottom: 3px solid rgb(233, 157, 17);
+}
+
+.nav-icons a:hover,
+.nav-icons a.active {
+  color: rgb(233, 157, 17);
+  border-bottom: 3px solid rgb(233, 157, 17);
+}
+
+/* NAVBAR */
+/*.navbar {
+  background: #0a0a0a;
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.shop-name {
+  color: rgb(233, 157, 17);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/*.nav-center {
+  list-style: none;
+  display: flex;
+  gap: 35px;
+  margin: 0;
+}
+
+.nav-center a {
+  color: #ecf0f1;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  position: relative;
+  padding-bottom: 5px;
+}
+
+.nav-center a:hover,
+.nav-center a.active {
+  color: rgb(233, 157, 17);
+  border-bottom: 3px solid rgb(233, 157, 17);
+}
+
+.nav-right {
+  display: flex;
+  gap: 20px;
+}
+
+.nav-right a {
+  color: rgb(233, 157, 17);
+  text-decoration: none;
+  font-size: 20px;
+  transition: all 0.3s ease;
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+/* Nav Profile Icon Container */
+/*.nav-profile-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}*/
+
+/* Nav Login Container */
+/*.nav-login {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}*/
+
+/* Nav Cart Container */
+/*.nav-cart {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+*/
+
+/* HERO */
+.about-hero {
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+  color: rgb(233, 157, 17);
+  text-align: center;
+  padding: 100px 20px;
+}
+
+.about-hero h1 {
+  font-size: 42px;
+  margin-bottom: 15px;
+  font-weight: 700;
+}
+
+.about-hero p {
+  font-size: 16px;
+  opacity: 0.9;
+  color: rgb(255, 255, 255);
+}
+
+/* ABOUT CONTENT */
+.about-container {
+  max-width: 1000px;
+  margin: 50px auto;
+  padding: 40px 20px;
+  background: white;
+  border-radius: 12px;
+   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.about-text {
+  margin-bottom: 40px;
+}
+
+.about-text h2 {
+  margin-bottom: 15px;
+  color: #2c3e50;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.about-text p {
+  margin-bottom: 20px;
+  color: #555;
+  line-height: 1.8;
+  font-size: 15px;
+}
+
+/* STATS */
+.about-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 25px;
+  margin-top: 40px;
+  color: black;
+}
+
+.stat {
+  background: linear-gradient(135deg, rgb(233, 157, 17) 0%, #e67e22 100%);
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.938);
+  text-align: center;
+  transition: all 0.6s ease;
+  color: rgb(0, 0, 0); 
+}
+
+.stat:hover {
+  transform: translateY(5px);
+  border-top: 6px solid rgb(233, 157, 17);
+  background-color: #f9f9f9;
+}
+
+.stat h3 {
+  font-size: 32px;
+  margin-bottom: 10px;
+  color: #2c3e50;
+}
+
+.stat p {
+  color: white;
+  font-size: 14px;
+}
+
+/* WHY US */
+.why-us {
+  padding: 60px 20px;
+  background: white;
+  text-align: center;
+}
+
+.why-us h2 {
+  font-size: 32px;
+  color: #2c3e50;
+  margin-bottom: 40px;
+  position: relative;
+  display: inline-block;
+}
+
+.why-us h2::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateY(-50%);
+  width: 80px;
+  height: 4px;
+  background: rgb(233, 157, 17);
+  border-radius: 2px;
+}
+
+.why-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+  max-width: 1000px;
+  margin: 40px auto 0;
+  padding: 20px;
+}
+
+.why-card {
+  background: #f9f9f9;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.why-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  border-top: 4px solid rgb(233, 157, 17);
+}
+
+.why-card h3 {
+  color: rgb(233, 157, 17);
+  margin-bottom: 15px;
+  font-size: 20px;
+}
+
+.why-card p {
+  color: #666;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* FOOTER */
+footer {
+  background: #0a0a0a;
+  color: #fff;
+  padding: 30px 20px;
+  text-align: center;
+}
+
+footer p {
+  color: rgb(233, 157, 17);
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 12px 15px;
+  }
+
+  .shop-name {
+    font-size: 18px;
+  }
+
+  .nav-center {
+    display: none;
+  }
+
+  .nav-right a {
+    font-size: 18px;
+    padding: 6px 10px;
+  }
+
+  .slideshow,
+  .slide {
+    height: 300px;
+  }
+
+  .products-preview {
+    padding: 40px 15px;
+  }
+
+  .products-preview h2 {
+    font-size: 24px;
+  }
+
+  #random-products {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 15px;
+    padding: 15px;
+  }
+
+  .footer-content {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 12px 15px;
+  }
+
+  .nav-center {
+    display: none;
+  }
+
+  .about-hero h1 {
+    font-size: 28px;
+  }
+
+  .about-container {
+    padding: 20px 15px;
+  }
+
+  .why-grid {
+    grid-template-columns: 1fr;
+  }
+}
+/* Login Button */
+#login-btn {
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  display: none;
+}
+
+#login-btn:hover {
+  color: rgb(233, 157, 17);
+}
+
+/* Profile Dropdown */
+#profile-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(233, 157, 17, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+#profile-icon img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+#dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 70px;
+  right: 20px;
+  background: #1a1a1a;
+  border: 2px solid rgb(233, 157, 17);
+  border-radius: 10px;
+  padding: 10px 0;
+  min-width: 180px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+  z-index: 2000;
+}
+
+#dropdown-menu.show {
+  display: block;
+}
+
+#dropdown-menu a,
+#dropdown-menu button {
+  display: block;
+  width: 100%;
+  padding: 12px 20px;
+  color: #ecf0f1;
+  text-decoration: none;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  text-align: left;
+}
+
+#dropdown-menu a:hover,
+#dropdown-menu button:hover {
+  background: rgba(233, 157, 17, 0.2);
+  color: rgb(233, 157, 17);
+  padding-left: 25px;
+}
+
+#dropdown-menu button {
+  color: #e74c3c;
+  font-weight: 600;
+}
+
+#dropdown-menu button:hover {
+  background: rgba(231, 76, 60, 0.2);
+  color: #ff6b6b;
+}
+</style>
+  
+
+</head>
+<body>
+
+
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  
+
+ <div class="logo">
+            <a href="home.html" style="text-decoration: none; color: inherit;"><span>Daimara Online Mart</span></a>
+ </div>
+
+  <div class="nav-center">
+    <a href="home.html">Home</a>
+    <a href="shop.html">Shop</a>
+    <a href="contact.html">Contact</a>
+    
+  </div>
+
+  <div class="nav-icons">
+    <a href="login.html"><i class="fa fa-user"></i></a>
+    <a href="cart.html"><i class="fa fa-shopping-cart"></i></a>
+  </div>
+</nav>
+
+
+<!-- HERO -->
+<header class="about-hero">
+  <h1>About Daimara Online Mart</h1>
+  <p>Your trusted online grocery partner</p>
+</header>
+
+<!-- ABOUT CONTENT -->
+<section class="about-container">
+  <div class="about-text">
+    <h2>Who We Are</h2>
+    <p>
+      Daimara Online Mart is an online grocery and food store dedicated to delivering
+      high-quality food, fresh produce, and beverages directly to your doorstep.
+      We focus on convenience, affordability, and reliability.
+    </p>
+
+    <h2>Our Mission</h2>
+    <p>
+      To simplify shopping by offering fresh products, fast delivery,
+      and secure payments through modern technology.
+    </p>
+  </div>
+
+  <div class="about-stats">
+    <div class="stat">
+      <h3>5,000+</h3>
+      <p>Happy Customers</p>
+    </div>
+    <div class="stat">
+      <h3>1,000+</h3>
+      <p>Products Available</p>
+    </div>
+    <div class="stat">
+      <h3>24/7</h3>
+      <p>Customer Support</p>
+    </div>
+  </div>
+</section>
+
+<!-- WHY CHOOSE US -->
+<section class="why-us">
+  <h2>Why Choose Daimara Online Mart?</h2>
+
+  <div class="why-grid">
+    <div class="why-card">
+      <h3>Fresh Products</h3>
+      <p>We source the best quality products every day.</p>
+    </div>
+
+    <div class="why-card">
+      <h3>Fast Delivery</h3>
+      <p>Quick and reliable delivery right to your door.</p>
+    </div>
+
+    <div class="why-card">
+      <h3>Secure Payments</h3>
+      <p>Pay safely using M-Pesa and other secure methods.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <p>Copyright © 2026 Daimara Online Mart.All rights reserved.</p>
+</footer>
+
+
+
+<script src="data-manager.js"></script>
+<script src="auth-check.js"></script>
+<script>// Simple animation when page loads
+document.addEventListener("DOMContentLoaded", () => {
+  const stats = document.querySelectorAll(".stat");
+
+  stats.forEach((stat, index) => {
+    stat.style.opacity = 0;
+    stat.style.transform = "translateY(20px)";
+
+    setTimeout(() => {
+      stat.style.transition = "0.6s";
+      stat.style.opacity = 1;
+      stat.style.transform = "translateY(0)";
+    }, index * 200);
+  });
+});</script>
+</body>
+</html>
+
+
+

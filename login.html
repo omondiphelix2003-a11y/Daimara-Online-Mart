@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Daimara Online Mart | Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="login.css">
+
+<style>* {
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* NAVBAR */
+.navbar {
+  background: #0a0a0a;
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.nav-left {
+  flex: 1;
+}
+
+.shop-name {
+  color: rgb(233, 157, 17);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.nav-center {
+  list-style: none;
+  display: flex;
+  gap: 35px;
+  margin: 0;
+  flex: 1;
+  justify-content: center;
+}
+
+.nav-center a {
+  color: #ecf0f1;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  padding-bottom: 5px;
+  padding-left: -25px;
+  margin-right: 140px;
+}
+
+.nav-center a:hover,
+.nav-center a.active {
+  color: rgb(233, 157, 17);
+  border-bottom: 3px solid rgb(233, 157, 17);
+}
+
+.nav-right {
+  display: flex;
+  gap: 25px;
+  align-items: center;
+}
+
+.nav-right a {
+  color: rgb(233, 157, 17);
+  text-decoration: none;
+  font-size: 20px;
+  transition: all 0.3s ease;
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+/* Nav Profile Icon Container */
+.nav-profile-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Nav Login Container */
+.nav-login {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Nav Cart Container */
+.nav-cart {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Profile Icon Styling */
+#profile-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(233, 157, 17, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+#profile-icon img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Dropdown Menu */
+#dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 70px;
+  right: 20px;
+  background: #1a1a1a;
+  border: 2px solid rgb(233, 157, 17);
+  border-radius: 10px;
+  padding: 10px 0;
+  min-width: 180px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+  z-index: 2000;
+}
+
+#dropdown-menu.show {
+  display: block;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#dropdown-menu a,
+#dropdown-menu button {
+  display: block;
+  width: 100%;
+  padding: 12px 20px;
+  color: #ecf0f1;
+  text-decoration: none;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  text-align: left;
+  font-family: inherit;
+}
+
+#dropdown-menu a:hover,
+#dropdown-menu button:hover {
+  background: rgba(233, 157, 17, 0.2);
+  color: rgb(233, 157, 17);
+  padding-left: 25px;
+}
+
+#dropdown-menu button {
+  color: #e74c3c;
+  font-weight: 600;
+}
+
+#dropdown-menu button:hover {
+  background: rgba(231, 76, 60, 0.2);
+  color: #ff6b6b;
+}
+
+.navbar a {
+  text-decoration: none;
+}
+
+/* AUTH BOX */
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  padding: 20px;
+}
+
+.auth-box {
+  background: white;
+  width: 100%;
+  max-width: 420px;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.4s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.auth-box h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #2c3e50;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.auth-box form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.auth-box input {
+  width: 100%;
+  padding: 13px 15px;
+  border-radius: 6px;
+  border: 1px solid #bdc3c7;
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.3s ease;
+}
+
+.auth-box input:focus {
+  outline: none;
+  border-color: rgb(233, 157, 17);
+  box-shadow: 0 0 8px rgba(233, 157, 17, 0.3);
+}
+
+.profile-image-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.profile-image-group label {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 14px;
+}
+
+.profile-image-group input[type="file"] {
+  padding: 10px;
+  border: 2px solid #ecf0f1;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.profile-image-group input[type="file"]:hover {
+  border-color: rgb(233, 157, 17);
+}
+
+.profile-preview {
+  width: 120px;
+  height: 120px;
+  border: 2px solid #ecf0f1;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f9f9f9;
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+.profile-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.auth-box button {
+  width: 100%;
+  padding: 13px;
+  background: linear-gradient(135deg, rgb(233, 157, 17) 0%, #e67e22 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  margin-top: 5px;
+}
+
+.auth-box button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(233, 157, 17, 0.3);
+}
+
+.auth-box button:active {
+  transform: translateY(0);
+}
+
+.switch {
+  text-align: center;
+  margin-top: 10px;
+  font-size: 14px;
+  color: #555;
+}
+
+.switch span {
+  color: rgb(233, 157, 17);
+  cursor: pointer;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.switch span:hover {
+  color: #e67e22;
+}
+
+/* Login Button */
+#login-btn {
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  display: none;
+}
+
+#login-btn:hover {
+  color: rgb(233, 157, 17);
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    padding: 12px 15px;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .nav-center {
+    display: none;
+  }
+
+  .auth-box {
+    padding: 25px;
+  }
+
+  .auth-box h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+
+  .profile-preview {
+    width: 100px;
+    height: 100px;
+  }
+}
+</style>
+
+</head>
+<body>
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="logo">Daimara Online Mart</div>
+
+  <div class="nav-center">
+    <a href="shop.html">Shop</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+    <!--<input type="text" placeholder="Search products..." />-->
+  </div>
+
+  <div class="nav-icons">
+    <a href="login.html"><i class="fa fa-user"></i></a>
+    <a href="cart.html"><i class="fa fa-shopping-cart"></i></a>
+  </div>
+</nav>
+
+<div class="auth-container">
+  <div class="auth-box">
+    <h2 id="form-title">Login</h2>
+
+    <!-- LOGIN FORM -->
+    <form id="login-form">
+      <input type="email" id="login-email" placeholder="Email" required>
+      <input type="password" id="login-password" placeholder="Password" required>
+      <button type="submit">Login</button>
+      <p class="switch">
+        Don’t have an account?
+        <span onclick="showSignup()">Sign Up</span>
+      </p>
+    </form>
+
+    <!-- SIGNUP FORM -->
+    <form id="signup-form" style="display:none;">
+      <input type="text" id="signup-name" placeholder="Full Name" required>
+      <input type="email" id="signup-email" placeholder="Email" required>
+      <input type="password" id="signup-password" placeholder="Password" required>
+      
+      <div class="profile-image-group">
+        <label for="profile-image">Profile Picture:</label>
+        <input type="file" id="profile-image" accept="image/*" required>
+        <div id="profile-preview" class="profile-preview"></div>
+      </div>
+
+      <button type="submit">Sign Up</button>
+      <p class="switch">
+        Already have an account?
+        <span onclick="showLogin()">Login</span>
+      </p>
+    </form>
+  </div>
+</div>
+
+<script src="data-manager.js"></script>
+<script src="auth-check.js"></script>
+<script>// Profile image preview
+const profileImageInput = document.getElementById("profile-image");
+if (profileImageInput) {
+  profileImageInput.addEventListener("change", function(e) {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const preview = document.getElementById("profile-preview");
+        preview.innerHTML = `<img src="${event.target.result}" alt="Profile Preview">`;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+}
+
+// TOGGLE FORMS
+function showSignup() {
+  document.getElementById("login-form").style.display = "none";
+  document.getElementById("signup-form").style.display = "block";
+  document.getElementById("form-title").textContent = "Sign Up";
+}
+
+function showLogin() {
+  document.getElementById("signup-form").style.display = "none";
+  document.getElementById("login-form").style.display = "block";
+  document.getElementById("form-title").textContent = "Login";
+}
+
+// SIGN UP WITH PROFILE PICTURE
+document.getElementById("signup-form").addEventListener("submit", e => {
+  e.preventDefault();
+
+  const name = document.getElementById("signup-name").value.trim();
+  const email = document.getElementById("signup-email").value.trim();
+  const password = document.getElementById("signup-password").value;
+  const profileImageFile = document.getElementById("profile-image").files[0];
+
+  // Validation
+  if (!name) {
+    alert("Please enter your name");
+    return;
+  }
+
+  if (!email.includes("@")) {
+    alert("Please enter a valid email");
+    return;
+  }
+
+  if (password.length < 6) {
+    alert("Password must be at least 6 characters");
+    return;
+  }
+
+  if (!profileImageFile) {
+    alert("Please select a profile picture");
+    return;
+  }
+
+  // Convert image to base64
+  const reader = new FileReader();
+  reader.onload = function(event) {
+    const profileImage = event.target.result;
+    
+    // Register user using DataManager
+    const result = DataManager.registerUser(name, email, password, profileImage);
+
+    if (!result.success) {
+      alert(result.message);
+      return;
+    }
+
+    alert("Account created! Please login.");
+    showLogin();
+    document.getElementById("signup-form").reset();
+    document.getElementById("profile-preview").innerHTML = "";
+  };
+  reader.readAsDataURL(profileImageFile);
+});
+
+// LOGIN
+document.getElementById("login-form").addEventListener("submit", e => {
+  e.preventDefault();
+
+  const email = document.getElementById("login-email").value.trim();
+  const password = document.getElementById("login-password").value;
+
+  if (!email || !password) {
+    alert("Please enter email and password");
+    return;
+  }
+
+  // Login using DataManager
+  const result = DataManager.loginUser(email, password);
+
+  if (!result.success) {
+    alert(result.message);
+    return;
+  }
+
+  alert(`Welcome ${result.user.name}!`);
+  
+  // Check if it's the admin
+  if (email === "admin@gmail.com") {
+    window.location.href = "admin-manager.html";
+  } else {
+    window.location.href = "home.html";
+  }
+});
+</script>
+</body>
+</html>

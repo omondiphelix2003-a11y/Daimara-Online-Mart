@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Orders Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  font-family:Arial;
+  background:#f5f5f5;
+  padding:20px;
+}
+h2{
+  text-align:center;
+  color:#e99d11;
+}
+.container{
+  max-width:1100px;
+  margin:auto;
+}
+.orders{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:20px;
+}
+.card{
+  background:#fff;
+  border-radius:10px;
+  padding:15px;
+  box-shadow:0 5px 15px rgba(0,0,0,.1);
+  position:relative;
+}
+.card img{
+  width:100%;
+  height:150px;
+  object-fit:cover;
+  border-radius:8px;
+}
+.status{
+  position:absolute;
+  top:10px;
+  right:10px;
+  padding:5px 10px;
+  border-radius:20px;
+  font-size:12px;
+  color:#fff;
+}
+.pending{background:#f39c12}
+.processing{background:#3498db}
+.delivered{background:#2ecc71}
+
+label{
+  display:block;
+  margin-top:10px;
+  font-size:14px;
+}
+input, select{
+  width:100%;
+  padding:8px;
+  margin-top:3px;
+}
+
+.actions{
+  display:flex;
+  gap:10px;
+  margin-top:15px;
+}
+.actions button{
+  flex:1;
+  padding:10px;
+  border:none;
+  border-radius:5px;
+  cursor:pointer;
+}
+.save{background:#111;color:#e99d11}
+.delete{background:#e74c3c;color:#fff}
+</style>
+</head>
+
+<body>
+
+<h2>Admin Orders Dashboard</h2>
+
+<div class="container">
+  <div class="orders" id="orders"></div>
+</div>
+
+<script src="data-manager.js"></script>
+<script src="auth-check.js"></script>
+<script>
+let orders = DataManager.getAllOrders();
+
+function renderOrders(){
+  const container = document.getElementById("orders");
+  container.innerHTML = "";
+
+  if(orders.length === 0){
+    container.innerHTML = "<p>No orders available</p>";
+    return;
+  }
+
+  orders.forEach((order, orderIndex)=>{
+    // Each order might have multiple products
+    const products = order.products || [];
+    
+    products.forEach((pItem, pIndex) => {
+      const allProds = DataManager.getAllProducts();
+      let pDetails = null;
+      for(const cat in allProds) {
+        const found = allProds[cat].find(i => i.id === pItem.product);
+        if(found) { pDetails = found; break; }
+      }
+
+      if(!pDetails) pDetails = { name: "Unknown Product", price: 0, image: "image-placeholder.jpg" };
+
+      container.innerHTML += `
+        <div class="card">
+          <span class="status ${order.status}">${order.status.toUpperCase()}</span>
+          <img src="${pDetails.image || 'image-placeholder.jpg'}">
+          <h3>${pDetails.name}</h3>
+          <p><strong>Order ID:</strong> ${order.id}</p>
+          <p><strong>Customer:</strong> ${order.customer ? order.customer.name : 'Guest'}</p>
+          <p><strong>Payment:</strong> ${order.paymentMethod}</p>
+
+          <label>Quantity</label>
+          <input type="number" value="${pItem.quantity}" 
+            onchange="updateQty(${orderIndex}, ${pIndex}, this.value)">
+
+          <label>Price (KES)</label>
+          <input type="number" value="${pDetails.price}" readonly>
+
+          <label>Status</label>
+          <select onchange="updateStatus(${orderIndex}, this.value)">
+            <option value="pending" ${order.status==="pending"?"selected":""}>Pending</option>
+            <option value="processing" ${order.status==="processing"?"selected":""}>Processing</option>
+            <option value="delivered" ${order.status==="delivered"?"selected":""}>Delivered</option>
+          </select>
+
+          ${pDetails.location ? `
+          <p style="margin-top:10px;font-size:13px;">
+            📍 Lat: ${pDetails.location.lat.toFixed(4)}<br>
+            📍 Lng: ${pDetails.location.lng.toFixed(4)}
+          </p>` : ''}
+
+          <div class="actions">
+            <button class="save" onclick="save()">Save</button>
+            <button class="delete" onclick="deleteOrder(${orderIndex})">Delete</button>
+          </div>
+        </div>
+      `;
+    });
+  });
+}
+
+function updateQty(orderIdx, pIdx, val){ 
+  orders[orderIdx].products[pIdx].quantity = parseInt(val); 
+}
+function updateStatus(orderIdx, val){ 
+  orders[orderIdx].status = val; 
+}
+
+function deleteOrder(i){
+  if(confirm("Delete this order?")){
+    orders.splice(i,1);
+    save();
+    renderOrders();
+  }
+}
+
+function save(){
+  DataManager.saveOrders(orders);
+  alert("Orders updated");
+}
+
+renderOrders();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daimara Online Mart | Shop</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
+    body{background:#f5f5f5}
+   
+   /* PARA */
+.para{
+ color: #f5f5f5;
+}
+
+    .navbar{display:flex;align-items:center;justify-content:space-between;padding:15px 30px;background:#111;color:#fff;
+     position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #000000; /* Add your desired background color */
+    z-index: 1000; /* Ensure it's on top of other elements */ 
+  }
+    .logo {color:rgb(233, 157, 17);font-size:18px;font-weight:bold}
+    .navbar a{color:#fff;text-decoration:none;margin-left:15px;padding-left: 20px;font-size:14px;position:relative}
+    
+.navbar a:hover,
+.navbar a.active {
+  color: rgb(233, 157, 17);
+  border-bottom: 3px solid rgb(233, 157, 17);
+}
+
+.navbar-icons a:hover,
+.navbar-icons a.active {
+  color: rgb(233, 157, 17);
+  border-bottom: 3px solid rgb(233, 157, 17);
+}
+
+
+/* SEARCH BAR */
+#search-container {
+  position: relative;
+}
+
+#search-results {
+  position: absolute;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  display: none;
+  z-index: 1001;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+#search-results div {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  color: #333;
+  transition: background 0.2s;
+  text-align: left;
+}
+
+#search-results div:hover {
+  background: #f9f9f9;
+}
+
+#search-results strong {
+  color: #111;
+}
+
+ /* SLIDER */
+    .slider{position:relative;width:100%;height:400px;overflow:hidden}
+    .slide{display:none}
+    .slide img{width:100%;height:400px;object-fit:cover}
+
+
+    .products{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;padding:0 30px}
+    .product{background:#fff;padding:20px;border-radius:10px;box-shadow:0 5px 15px rgba(0,0,0,.1);text-align:center}
+    .product img{width:100%;height:160px;object-fit:cover;border-radius:8px}
+    .product button{margin-top:10px;padding:8px 15px;border:none;border-radius:5px;background:#111;color:rgb(233, 157, 17);cursor:pointer}
+    @media(max-width:768px){.products{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <!--<div class="logo">Daimara Online Mart</div>-->
+   <div class="nav-left">
+      <a href="home.html" class="home-link"><span><div class="logo">Daimara Online Mart - Shop</div></span></a>
+    </div>
+  <div style="display: flex; align-items: center;">
+    <a href="supermarket.html">Supermarket</a>
+    <a href="second-hand items.html">Second-hand Items</a>
+    
+    <div id="search-container" style="margin: 0 0 0 15px; width: 180px;">
+      <input type="text" id="search-input" placeholder="Search..." style="width: 100%; padding: 5px 10px; border-radius: 5px; border: none;">
+      <div id="search-results" style="top: 35px; width: 220px; right: 0;"></div>
+    </div>
+  </div>
+     <div class="nav-icons">
+    <a href="login.html"><i class="fa fa-user"></i></a>
+    <a href="cart.html"><i class="fa fa-shopping-cart"></i></a>
+  </div>
+
+</nav>
+
+
+
+<!-- SLIDER -->
+<div class="slider">
+  <div class="slide"><img src="https://picsum.photos/1200/300?1"></div>
+  <div class="slide"><img src="https://picsum.photos/1200/300?2"></div>
+  <div class="slide"><img src="https://picsum.photos/1200/300?3"></div>
+</div>
+
+<!-- RANDOM PRODUCTS -->
+<section>
+  <h2 style="text-align:center;margin:20px 0">Random Products</h2>
+  <div class="products" id="productContainer"></div>
+</section>
+
+<script src="data-manager.js"></script>
+<script src="auth-check.js"></script>
+<script>
+  // SLIDER
+  let index=0;
+  const slides=document.querySelectorAll('.slide');
+  function showSlides(){
+    slides.forEach(s=>s.style.display='none');
+    index = (index+1)>slides.length?1:index+1;
+    slides[index-1].style.display='block';
+    setTimeout(showSlides,3000);
+  }
+  showSlides();
+
+  // RANDOM PRODUCTS FROM DataManager
+  function getAllFlattened(){
+    const all = DataManager.getAllProducts();
+    return Object.keys(all).reduce((acc,k)=> acc.concat(all[k]||[]), []);
+  }
+
+  window.addToCartById = function(id){
+    const prod = getAllFlattened().find(p=>p.id===id);
+    if(!prod){ alert('Product not found'); return; }
+    DataManager.addToCart(prod);
+    alert('Added to cart');
+  }
+
+  function renderProducts(productList, title = "Random Products"){
+    const container = document.getElementById('productContainer');
+    const titleEl = document.querySelector('h2');
+    if(titleEl) titleEl.textContent = title;
+    
+    if(!container) return;
+    if(productList.length===0){ container.innerHTML = '<p style="grid-column:1/-1;text-align:center;">No products found</p>'; return; }
+    
+    container.innerHTML='';
+    productList.forEach(p=>{
+      container.innerHTML+=`<div class="product">
+        <img src="${p.image||'https://picsum.photos/300/200'}">
+        <h4>${p.name}</h4>
+        <p>KES ${p.price}</p>
+        <button onclick="addToCartById('${p.id}')">Add to Cart</button>
+      </div>`;
+    });
+  }
+
+  // Handle Search Query
+  const urlParams = new URLSearchParams(window.location.search);
+  const searchMatch = urlParams.get('search');
+  
+  if (searchMatch) {
+    const all = getAllFlattened();
+    const results = all.filter(p => p.name.toLowerCase().includes(searchMatch.toLowerCase()));
+    renderProducts(results, `Search results for "${searchMatch}"`);
+  } else {
+    const all = getAllFlattened();
+    const shuffled = all.slice().sort(()=>0.5-Math.random()).slice(0, 6);
+    renderProducts(shuffled, "Featured Products");
+  }
+
+  // Live Search Bar functionality
+  const searchInput = document.getElementById('search-input');
+  const searchResults = document.getElementById('search-results');
+
+  searchInput.addEventListener('input', () => {
+    const query = searchInput.value.trim().toLowerCase();
+    if (!query) {
+      searchResults.style.display = 'none';
+      return;
+    }
+
+    const all = getAllFlattened();
+    const results = all.filter(p => p.name.toLowerCase().includes(query));
+
+    if (results.length > 0) {
+      searchResults.innerHTML = results.map(p => {
+        let url = 'Shop.html?search=' + encodeURIComponent(p.name);
+        if (p.subcategory === 'Gas') url = 'gas-refill.html';
+        if (p.subcategory === 'Water') url = 'water-refill.html';
+        
+        return `
+          <div onclick="window.location.href='${url}'">
+            <strong>${p.name}</strong><br>
+            <span style="font-size: 12px; color: #666;">Ksh ${p.price}</span>
+          </div>
+        `;
+      }).join('');
+      searchResults.style.display = 'block';
+    } else {
+      searchResults.innerHTML = '<div style="padding: 10px;">No results</div>';
+      searchResults.style.display = 'block';
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+      searchResults.style.display = 'none';
+    }
+  });
+</script>
+</body>
+</html>

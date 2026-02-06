@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Gas Refilling</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+<style>
+body{font-family:Arial;background:#f5f5f5;padding:20px;padding-top: 80px;}
+
+/* NAVBAR */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: #111;
+  color: #fff;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+}
+.logo { color: #e99d11; font-weight: bold; text-decoration: none; font-size: 18px; }
+.nav-links a { color: #fff; text-decoration: none; margin-left: 15px; font-size: 14px; }
+.search-container { position: relative; width: 250px; }
+#search-input { width: 100%; padding: 8px; border-radius: 5px; border: none; }
+#search-results {
+  position: absolute;
+  top: 40px;
+  width: 100%;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  display: none;
+  z-index: 1001;
+  max-height: 300px;
+  overflow-y: auto;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+#search-results div { padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; color: #333; text-align: left; }
+#search-results div:hover { background: #f9f9f9; }
+#search-results strong { color: #111; }
+
+.container{max-width:900px;margin:auto;background:#fff;padding:25px;border-radius:10px}
+h2{text-align:center;color:#e99d11}
+.sizes{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px}
+.card{border:1px solid #ddd;border-radius:10px;padding:15px;text-align:center}
+.card img{width:100%;height:150px;object-fit:cover;border-radius:8px}
+.card button{background:#111;color:#e99d11;border:none;padding:8px 15px;border-radius:5px}
+label{display:block;margin-top:15px}
+input{width:100%;padding:10px}
+button.order{width:100%;margin-top:20px;padding:12px;background:#111;color:#e99d11;border:none;border-radius:5px}
+#map{height:350px;margin-top:20px;border-radius:10px}
+</style>
+</head>
+
+<body>
+
+<nav class="navbar">
+  <a href="home.html" class="logo">Daimara Online Mart</a>
+  <div class="nav-links">
+    <a href="Shop.html">Shop</a>
+    <div class="search-container" style="display: inline-block; vertical-align: middle; margin-left: 15px;">
+      <input type="text" id="search-input" placeholder="Search products...">
+      <div id="search-results"></div>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+<h2>Gas Refilling</h2>
+
+<div class="sizes">
+  <div class="card">
+    <img src="progas.jfif">
+    <h3>Pro Gas – 6 KG</h3>
+    <p>Standard 6kg gas refill</p>
+    <p><strong>Price: KSh 900</strong></p>
+    <button onclick="selectGas('6 KG',900,'progas.jfif')">Select</button>
+  </div>
+
+  <div class="card">
+    <img src="total.jfif">
+    <h3>Total Gas – 13 KG</h3>
+    <p>Medium 13kg gas refill</p>
+    <p><strong>Price: KSh 1800</strong></p>
+    <button onclick="selectGas('13 KG',1800,'total.jfif')">Select</button>
+  </div>
+
+  <div class="card">
+    <img src="lake gas.jpg">
+    <h3>Lake Gas – 50 KG</h3>
+    <p>Large 50kg industrial gas refill</p>
+    <p><strong>Price: KSh 6500</strong></p>
+    <button onclick="selectGas('50 KG',6500,'lake gas.jpg')">Select</button>
+  </div>
+</div>
+
+<label>Selected Gas Size</label>
+<input id="gasSize" readonly>
+
+<label>Quantity</label>
+<input type="number" id="qty" value="1" min="1">
+
+<h3>Select Delivery Location</h3>
+<div id="map"></div>
+
+<button class="order" onclick="placeGasOrder()">Add to Cart</button>
+</div>
+
+<script src="data-manager.js"></script>
+<script src="auth-check.js"></script>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+let selectedGas = null;
+let selectedCoords = null;
+let marker;
+
+// Select gas
+function selectGas(size, price, image){
+  document.getElementById("gasSize").value = size;
+  selectedGas = {
+    id: "gas-" + size.replace(/\s+/g, '-').toLowerCase(),
+    name: "Gas Refill (" + size + ")",
+    size,
+    price,
+    image,
+    subcategory: 'Gas'
+  };
+}
+
+// Map
+const map = L.map('map').setView([-1.286389, 36.817223], 13);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+  attribution: '© OpenStreetMap'
+}).addTo(map);
+
+map.on('click', e=>{
+  if(marker) map.removeLayer(marker);
+  marker = L.marker(e.latlng).addTo(map);
+  selectedCoords = e.latlng;
+});
+
+// Place order
+function placeGasOrder(){
+  if(!selectedGas || !selectedCoords){
+    alert("Please select gas size and delivery location");
+    return;
+  }
+
+  const quantity = parseInt(document.getElementById("qty").value) || 1;
+  
+  // Use DataManager
+  for(let i=0; i<quantity; i++) {
+    DataManager.addToCart({
+      ...selectedGas,
+      location: selectedCoords
+    });
+  }
+
+  alert("Added to cart!");
+  window.location.href = "cart.html";
+}
+
+// Search functionality
+(function() {
+  const searchInput = document.getElementById('search-input');
+  const searchResults = document.getElementById('search-results');
+
+  function getAllFlattened(){
+    const all = DataManager.getAllProducts();
+    return Object.keys(all).reduce((acc,k)=> acc.concat(all[k]||[]), []);
+  }
+
+  searchInput.addEventListener('input', () => {
+    const query = searchInput.value.trim().toLowerCase();
+    if (!query) {
+      searchResults.style.display = 'none';
+      return;
+    }
+
+    const all = getAllFlattened();
+    const results = all.filter(p => p.name.toLowerCase().includes(query));
+
+    if (results.length > 0) {
+      searchResults.innerHTML = results.map(p => {
+        let url = 'Shop.html?search=' + encodeURIComponent(p.name);
+        if (p.subcategory === 'Gas') url = 'gas-refill.html';
+        if (p.subcategory === 'Water') url = 'water-refill.html';
+        
+        return `
+          <div onclick="window.location.href='${url}'">
+            <strong>${p.name}</strong><br>
+            <span style="font-size: 12px; color: #666;">Ksh ${p.price}</span>
+          </div>
+        `;
+      }).join('');
+      searchResults.style.display = 'block';
+    } else {
+      searchResults.innerHTML = '<div style="padding: 10px;">No results</div>';
+      searchResults.style.display = 'block';
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+      searchResults.style.display = 'none';
+    }
+  });
+})();
+</script>
+
+</body>
+</html>

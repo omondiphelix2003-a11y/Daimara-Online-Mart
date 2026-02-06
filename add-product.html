@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daimara Online Mart | Add Product - Supermarket & Second-hand Items</title>
+    <script src="data-manager.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: rgb(233,157,17);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        header {
+            background: rgb(0, 0, 0);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 5px solid #667eea;
+        }
+
+        .form-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="email"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 0.95em;
+            cursor: pointer;
+        }
+
+        input[type="file"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="email"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-add {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-reset {
+            background: #e0e0e0;
+            color: #333;
+            flex: 1;
+        }
+
+        .btn-reset:hover {
+            background: #d0d0d0;
+        }
+
+        .products-section {
+            margin-top: 40px;
+        }
+
+        .products-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .category-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .category-filter button {
+            padding: 10px 20px;
+            background: #f0f0f0;
+            border: 2px solid #e0e0e0;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.95em;
+        }
+
+        .category-filter button.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .product-card:hover {
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border-color: #667eea;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            background: #e0e0e0;
+        }
+
+        .product-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .product-details {
+            color: #666;
+            font-size: 0.95em;
+            margin-bottom: 15px;
+        }
+
+        .product-details p {
+            margin-bottom: 8px;
+        }
+
+        .price {
+            font-size: 1.3em;
+            color: #667eea;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            background: #667eea;
+            color: white;
+            border-radius: 3px;
+            font-size: 0.8em;
+            margin-bottom: 10px;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-edit, .btn-delete {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 0.9em;
+        }
+
+        .btn-edit {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .btn-delete {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #da190b;
+            transform: translateY(-2px);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state p {
+            font-size: 1.1em;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #333;
+            margin: 0;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 2em;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📦 Product Management</h1>
+            <p>Manage your Supermarket & Second-hand Items</p>
+        </header>
+
+        <div class="content">
+            <!-- Add Product Form -->
+            <div class="form-section">
+                <h2>➕ Add New Product</h2>
+                <form id="productForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="productName">Product Name *</label>
+                            <input type="text" id="productName" required placeholder="Enter product name">
+                        </div>
+                        <div class="form-group">
+                            <label for="productCategory">Category *</label>
+                            <select id="productCategory" required onchange="updateSubcategories()">
+                                <option value="">Select Category</option>
+                                <option value="Supermarket">Supermarket</option>
+                                <option value="Second-hand">Second-hand Items</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="productSubcategory">Sub-Category *</label>
+                            <select id="productSubcategory" required>
+                                <option value="">Select Sub-Category</option>
+                            </select>
+                            <small id="subcategoryInfo" style="color: #667eea; display: block; margin-top: 5px; font-weight: 500;"></small>
+                        </div>
+                        <div class="form-group">
+                            <label for="productImage">Product Image *</label>
+                            <input type="file" id="productImage" accept="image/*" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="productPrice">Price ($) *</label>
+                            <input type="number" id="productPrice" required placeholder="0.00" min="0" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="productQuantity">Quantity *</label>
+                            <input type="number" id="productQuantity" required placeholder="0" min="0">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="productDescription">Description</label>
+                        <textarea id="productDescription" placeholder="Enter product description"></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="productSKU">SKU/Code</label>
+                            <input type="text" id="productSKU" placeholder="Enter SKU or product code">
+                        </div>
+                        <div class="form-group">
+                            <label for="productSupplier">Supplier/Seller</label>
+                            <input type="text" id="productSupplier" placeholder="Enter supplier name">
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit" class="btn-add">Add Product</button>
+                        <button type="reset" class="btn-reset">Clear Form</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Products Display Section -->
+            <div class="products-section">
+                <h2>📋 Product List</h2>
+                
+                <div class="category-filter">
+                    <button class="category-btn active" data-category="all">All Products</button>
+                    <button class="category-btn" data-category="Supermarket">Supermarket</button>
+                    <button class="category-btn" data-category="Second-hand">Second-hand Items</button>
+                </div>
+
+                <div id="alertBox"></div>
+
+                <div id="productsContainer" class="products-grid">
+                    <div class="empty-state">
+                        <p>No products added yet. Start by adding your first product!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Product</h2>
+                <button class="close-btn" onclick="closeEditModal()">&times;</button>
+            </div>
+            <form id="editForm">
+                <div class="form-group">
+                    <label for="editProductName">Product Name *</label>
+                    <input type="text" id="editProductName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="editProductCategory">Category *</label>
+                    <select id="editProductCategory" required onchange="updateEditSubcategories()">
+                        <option value="Supermarket">Supermarket</option>
+                        <option value="Second-hand">Second-hand Items</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="editProductSubcategory">Sub-Category *</label>
+                    <select id="editProductSubcategory" required>
+                        <option value="">Select Sub-Category</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="editProductImage">Product Image</label>
+                    <input type="file" id="editProductImage" accept="image/*">
+                    <small style="color: #666; display: block; margin-top: 5px;">Leave empty to keep current image</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Current Image Preview:</label>
+                    <img id="editImagePreview" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 5px; margin-top: 10px;">
+                </div>
+
+                <div class="form-group">
+                    <label for="editProductPrice">Price ($) *</label>
+                    <input type="number" id="editProductPrice" required min="0" step="0.01">
+                </div>
+
+                <div class="form-group">
+                    <label for="editProductQuantity">Quantity *</label>
+                    <input type="number" id="editProductQuantity" required min="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="editProductDescription">Description</label>
+                    <textarea id="editProductDescription"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="editProductSKU">SKU/Code</label>
+                    <input type="text" id="editProductSKU">
+                </div>
+
+                <div class="form-group">
+                    <label for="editProductSupplier">Supplier/Seller</label>
+                    <input type="text" id="editProductSupplier">
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn-add">Save Changes</button>
+                    <button type="button" class="btn-reset" onclick="closeEditModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Subcategories mapping with links to actual page categories
+        const subcategories = {
+            'Supermarket': [
+                { name: 'Fresh food', link: 'supermarket.html', page: 'Supermarket' },
+                { name: 'Grocery', link: 'supermarket.html', page: 'Supermarket' },
+                { name: 'Beverage', link: 'supermarket.html', page: 'Supermarket' },
+                { name: 'Cereal', link: 'supermarket.html', page: 'Supermarket' },
+                { name: 'Liquor', link: 'supermarket.html', page: 'Supermarket' },
+                { name: 'Electronics', link: 'supermarket.html', page: 'Supermarket' },
+                { name: 'Furniture', link: 'supermarket.html', page: 'Supermarket' },
+                { name: 'Clothings', link: 'supermarket.html', page: 'Supermarket' }
+            ],
+            'Second-hand': [
+                { name: 'Household items', link: 'second-hand items.html', page: 'Second-hand' },
+                { name: 'Electronics', link: 'second-hand items.html', page: 'Second-hand' },
+                { name: 'Furniture', link: 'second-hand items.html', page: 'Second-hand' }
+            ]
+        };
+
+        // Product Management System
+        let products = [];
+        let currentFilter = 'all';
+        let editingProductId = null;
+
+        // Update subcategories based on category selection
+        function updateSubcategories() {
+            const category = document.getElementById('productCategory').value;
+            const subcategorySelect = document.getElementById('productSubcategory');
+            subcategorySelect.innerHTML = '<option value="">Select Sub-Category</option>';
+            document.getElementById('subcategoryInfo').textContent = '';
+
+            if (category && subcategories[category]) {
+                subcategories[category].forEach(sub => {
+                    const option = document.createElement('option');
+                    option.value = sub.name;
+                    option.textContent = sub.name;
+                    option.dataset.link = sub.link;
+                    option.dataset.page = sub.page;
+                    subcategorySelect.appendChild(option);
+                });
+            }
+
+            // Listen for subcategory change
+            subcategorySelect.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                const infoElement = document.getElementById('subcategoryInfo');
+                if (selectedOption.value) {
+                    const pageName = selectedOption.dataset.page;
+                    infoElement.textContent = `📍 This product will be added to: ${pageName} (${selectedOption.dataset.link})`;
+                } else {
+                    infoElement.textContent = '';
+                }
+            });
+        }
+
+        // Update subcategories in edit modal
+        function updateEditSubcategories() {
+            const category = document.getElementById('editProductCategory').value;
+            const subcategorySelect = document.getElementById('editProductSubcategory');
+            subcategorySelect.innerHTML = '<option value="">Select Sub-Category</option>';
+
+            if (category && subcategories[category]) {
+                subcategories[category].forEach(sub => {
+                    const option = document.createElement('option');
+                    option.value = sub.name;
+                    option.textContent = sub.name;
+                    option.dataset.link = sub.link;
+                    option.dataset.page = sub.page;
+                    subcategorySelect.appendChild(option);
+                });
+            }
+        }
+
+        // Convert image to base64
+        function convertImageToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // Load products from DataManager and flatten into an array
+        function loadProducts() {
+            const all = DataManager.getAllProducts(); // returns object keyed by sub-category
+            products = [];
+
+            const supermarketSubs = (subcategories['Supermarket'] || []).map(s => s.name);
+            const secondSubs = (subcategories['Second-hand'] || []).map(s => s.name);
+
+            for (const cat in all) {
+                if (Array.isArray(all[cat])) {
+                    all[cat].forEach(p => {
+                        // Derive main category (Supermarket / Second-hand) from subcategory when missing
+                        if (!p.category) {
+                            if (supermarketSubs.includes(cat)) p.category = 'Supermarket';
+                            else if (secondSubs.includes(cat)) p.category = 'Second-hand';
+                            else p.category = 'Supermarket';
+                        }
+                        products.push(p);
+                    });
+                }
+            }
+            renderProducts();
+        }
+
+        // Generate unique ID
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        // Add Product
+        document.getElementById('productForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const imageFile = document.getElementById('productImage').files[0];
+            if (!imageFile) {
+                showAlert('Please select a product image', 'info');
+                return;
+            }
+
+            const imageData = await convertImageToBase64(imageFile);
+
+            const product = {
+                id: generateId(),
+                name: document.getElementById('productName').value,
+                category: document.getElementById('productCategory').value,
+                subcategory: document.getElementById('productSubcategory').value,
+                price: parseFloat(document.getElementById('productPrice').value),
+                quantity: parseInt(document.getElementById('productQuantity').value),
+                description: document.getElementById('productDescription').value,
+                sku: document.getElementById('productSKU').value,
+                supplier: document.getElementById('productSupplier').value,
+                image: imageData,
+                createdAt: new Date().toLocaleDateString()
+            };
+
+            // Add product to DataManager
+            const result = DataManager.addProductFromAddPage(product);
+            
+            if (result.success) {
+                // ADD TO WAREHOUSE AS WELL
+                DataManager.addToWarehouse(product, product.quantity);
+
+                // Refresh local view from DataManager
+                loadProducts();
+                showAlert('✓ Product added successfully! It will appear on the store pages and warehouse.', 'success');
+                this.reset();
+                document.getElementById('productSubcategory').innerHTML = '<option value="">Select Sub-Category</option>';
+                document.getElementById('subcategoryInfo').textContent = '';
+            } else {
+                showAlert('Error adding product: ' + result.message, 'info');
+            }
+        });
+
+        // Render Products
+        function renderProducts() {
+            const container = document.getElementById('productsContainer');
+
+            let filtered = products;
+            if (currentFilter !== 'all') {
+                filtered = products.filter(p => p.category === currentFilter);
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>No products found.</p></div>';
+                return;
+            }
+
+            container.innerHTML = filtered.map(product => `
+                <div class="product-card">
+                    ${product.image ? `<img src="${product.image}" alt="${product.name}" class="product-image">` : '<div class="product-image" style="display: flex; align-items: center; justify-content: center; color: #999;">No Image</div>'}
+                    <span class="category-badge">${product.category}</span>
+                    <div style="font-size: 0.85em; color: #888; margin-top: 5px; margin-bottom: 10px;"><strong>Sub:</strong> ${product.subcategory}</div>
+                    <h3>${product.name}</h3>
+                    <div class="product-details">
+                        <p><strong>SKU:</strong> ${product.sku || 'N/A'}</p>
+                        <p><strong>Supplier:</strong> ${product.supplier || 'N/A'}</p>
+                        <p><strong>Quantity:</strong> ${product.quantity} units</p>
+                        <p><strong>Date Added:</strong> ${product.createdAt}</p>
+                        ${product.description ? `<p><strong>Description:</strong> ${product.description}</p>` : ''}
+                    </div>
+                    <div class="price">$${product.price.toFixed(2)}</div>
+                    <div class="product-actions">
+                        <button class="btn-edit" onclick="openEditModal('${product.id}')">Edit</button>
+                        <button class="btn-delete" onclick="deleteProduct('${product.id}')">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Delete Product
+        function deleteProduct(id) {
+            if (confirm('Are you sure you want to delete this product?')) {
+                // Delete from DataManager and refresh view
+                const res = DataManager.deleteProduct(id);
+                if (res && res.success) {
+                    loadProducts();
+                    showAlert('Product deleted successfully!', 'success');
+                } else {
+                    showAlert('Error deleting product: ' + (res.message||'Unknown'), 'info');
+                }
+            }
+        }
+
+        // Open Edit Modal
+        function openEditModal(id) {
+            const product = products.find(p => p.id === id);
+            if (!product) return;
+
+            editingProductId = id;
+            document.getElementById('editProductName').value = product.name;
+            document.getElementById('editProductCategory').value = product.category;
+            updateEditSubcategories();
+            document.getElementById('editProductSubcategory').value = product.subcategory;
+            document.getElementById('editProductPrice').value = product.price;
+            document.getElementById('editProductQuantity').value = product.quantity;
+            document.getElementById('editProductDescription').value = product.description;
+            document.getElementById('editProductSKU').value = product.sku;
+            document.getElementById('editProductSupplier').value = product.supplier;
+            
+            if (product.image) {
+                document.getElementById('editImagePreview').src = product.image;
+            }
+
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+        // Close Edit Modal
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+            editingProductId = null;
+        }
+
+        // Save Edited Product
+        document.getElementById('editForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const product = products.find(p => p.id === editingProductId);
+            if (!product) return;
+
+            product.name = document.getElementById('editProductName').value;
+            product.category = document.getElementById('editProductCategory').value;
+            product.subcategory = document.getElementById('editProductSubcategory').value;
+            product.price = parseFloat(document.getElementById('editProductPrice').value);
+            product.quantity = parseInt(document.getElementById('editProductQuantity').value);
+            product.description = document.getElementById('editProductDescription').value;
+            product.sku = document.getElementById('editProductSKU').value;
+            product.supplier = document.getElementById('editProductSupplier').value;
+
+            const imageFile = document.getElementById('editProductImage').files[0];
+            if (imageFile) {
+                const imageData = await convertImageToBase64(imageFile);
+                product.image = imageData;
+            }
+
+            // Update in DataManager
+            const res = DataManager.updateProduct(editingProductId, product);
+            if (res && res.success) {
+                loadProducts();
+                closeEditModal();
+                showAlert('✓ Product updated successfully! Changes will appear on store pages.', 'success');
+            } else {
+                showAlert('Error updating product: ' + (res.message||'Unknown'), 'info');
+            }
+        });
+
+        // Category Filter
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.dataset.category;
+                renderProducts();
+            });
+        });
+
+        // Show Alert
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('alertBox');
+            const alertEl = document.createElement('div');
+            alertEl.className = `alert alert-${type}`;
+            alertEl.textContent = message;
+            alertBox.innerHTML = '';
+            alertBox.appendChild(alertEl);
+
+            setTimeout(() => {
+                alertEl.remove();
+            }, 3000);
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('editModal');
+            if (event.target === modal) {
+                closeEditModal();
+            }
+        });
+
+        // Initialize
+        loadProducts();
+
+
+// Duplicate local submit handler removed — DataManager is used instead.
+
+
+
+    </script>
+</body>
+</html>
