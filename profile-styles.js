@@ -427,33 +427,7 @@ const ProfileStyles = `
   justify-content: flex-end;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .profile-card-component {
-    flex-direction: column;
-    text-align: center;
-    padding: 25px;
-  }
 
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .favorites-grid-component {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  }
-
-  .address-card-actions,
-  .favorite-card-actions {
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .address-card-actions .btn,
-  .favorite-card-actions .btn {
-    width: 100%;
-  }
-}
 `;
 
 // Inject styles into page

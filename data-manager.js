@@ -155,6 +155,17 @@ const DataManager = (() => {
         
         try { console.debug('DataManager.updateProduct - updated', productId); } catch (e) {}
 
+        // SYNC WITH WAREHOUSE
+        const warehouse = JSON.parse(localStorage.getItem(STORAGE_KEYS.WAREHOUSE)) || { products: [] };
+        const wIndex = warehouse.products.findIndex(p => p.id === productId);
+        if (wIndex !== -1) {
+          warehouse.products[wIndex] = {
+            ...warehouse.products[wIndex],
+            ...updatedData
+          };
+          localStorage.setItem(STORAGE_KEYS.WAREHOUSE, JSON.stringify(warehouse));
+        }
+
         // Update in added products as well
         const addedProducts = JSON.parse(localStorage.getItem(STORAGE_KEYS.ADDED_PRODUCTS)) || [];
         const addedIndex = addedProducts.findIndex(p => p.id === productId);
@@ -542,6 +553,18 @@ const DataManager = (() => {
     if (product) {
       product.quantity = newQty;
       localStorage.setItem(STORAGE_KEYS.WAREHOUSE, JSON.stringify(warehouse));
+      
+      // SYNC WITH STOREFRONT PRODUCTS
+      const products = getAllProducts();
+      for (const category in products) {
+        const productIndex = products[category].findIndex(p => p.id === productId);
+        if (productIndex !== -1) {
+          products[category][productIndex].quantity = newQty;
+          localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
+          break;
+        }
+      }
+      
       return { success: true };
     }
     return { success: false };

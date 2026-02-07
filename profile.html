@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>My Profile | Daimara Online Mart</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=1200">
   <link rel="stylesheet" href="profile.css">
 
 <style>* {
@@ -17,6 +17,24 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  font-size: 25px;
+  padding-bottom: 100px;
+}
+
+/* FOOTER */
+.footer {
+  background: #0a0a0a;
+  color: white;
+  padding: 30px 20px;
+  text-align: center;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+}
+.footer p {
+  color: rgb(233, 157, 17);
 }
 
 /* NAVBAR */
@@ -269,7 +287,7 @@ body {
   flex: 1;
   display: flex;
   max-width: 1200px;
-  margin: 30px auto;
+  margin: 100px auto 30px auto;
   padding: 20px;
   width: 100%;
   gap: 30px;
@@ -931,121 +949,25 @@ body {
   color: #2c3e50;
 }
 
-/* RESPONSIVE */
-@media (max-width: 768px) {
-  .profile-container {
-    flex-direction: column;
-    gap: 20px;
-  }
 
-  .profile-sidebar {
-    width: 100%;
-    position: static;
-  }
-
-  .profile-header-card {
-    flex-direction: column;
-    text-align: center;
-    padding: 25px;
-  }
-
-  .profile-stats {
-    grid-template-columns: 1fr;
-  }
-
-  .detail-row {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .detail-row .value {
-    text-align: left;
-  }
-
-  .addresses-list {
-    grid-template-columns: 1fr;
-  }
-
-  .favorites-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  }
-
-  .action-buttons {
-    flex-direction: column;
-  }
-
-  .action-buttons .btn {
-    width: 100%;
-  }
-
-  .section-header {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .modal-content {
-    width: 95%;
-  }
-}
 
 /* FOOTER */
-footer {
+.footer {
   background: #0a0a0a;
-  color: rgb(233, 157, 17);
-  text-align: center;
+  color: white;
   padding: 30px 20px;
-  margin-top: auto;
+  text-align: center;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+}
+.footer p {
+  color: rgb(233, 157, 17);
 }
 
-@media (max-width: 768px) {
-  .navbar {
-    padding: 12px 15px;
-    flex-direction: column;
-    gap: 15px;
-  }
 
-  .nav-center {
-    display: none;
-  }
-
-  .profile-container {
-    margin: 20px auto;
-  }
-
-  .profile-header {
-    padding: 25px 20px;
-    flex-direction: column;
-    text-align: center;
-    gap: 20px;
-  }
-
-  .profile-image-large {
-    width: 120px;
-    height: 120px;
-  }
-
-  .profile-details {
-    padding: 20px;
-  }
-
-  .detail-row {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 5px;
-  }
-
-  .detail-row .value {
-    text-align: left;
-  }
-
-  .action-buttons {
-    flex-direction: column;
-  }
-
-  .btn {
-    width: 100%;
-  }
-}
 </style>
 
 </head>
@@ -1080,6 +1002,10 @@ footer {
     </div>
   </div>
 </nav>
+
+<footer class="footer">
+  <p>Copyright © 2026 Daimara Online Mart.All rights reserved.</p>
+</footer>
 
 <!-- PROFILE PAGE -->
 <div class="profile-container">
@@ -1290,10 +1216,7 @@ footer {
   </div>
 </div>
 
-<!-- FOOTER -->
-<footer>
-  <p>Copyright © 2026 Daimara Online Mart.All rights reserved.</p>
-</footer>
+
 
 <script>// Global variables
 let loggedInUser = null;

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Admin Panel | Daimara Online Mart</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=1200">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
     :root {
@@ -187,7 +187,7 @@
         </div>
         <table id="warehouse-table">
           <thead>
-            <tr><th>Image</th><th>Product Name</th><th>Category</th><th>Price</th><th>In Stock</th><th>Action</th></tr>
+            <tr><th>Image</th><th>Product Name</th><th>Sub-Category</th><th>Supplier</th><th>Price</th><th>In Stock</th><th>Added Date</th><th>Action</th></tr>
           </thead>
           <tbody></tbody>
         </table>
@@ -357,11 +357,13 @@
           <td><img src="${p.image || ''}" class="product-thumb"></td>
           <td>${p.name || 'Unknown'}</td>
           <td>${p.subcategory || 'General'}</td>
+          <td>${p.supplier || 'N/A'}</td>
           <td>KSH ${(p.price || 0).toLocaleString()}</td>
           <td><span class="quantity-badge ${p.quantity < 10 ? 'qty-low' : 'qty-ok'}">${p.quantity || 0}</span></td>
+          <td>${p.createdAt || p.addedDate || 'N/A'}</td>
           <td><button class="btn btn-primary" style="padding:4px 8px" onclick="editStock('${p.id}')">Adjust</button></td>
         </tr>
-      `).join('') || '<tr><td colspan="6" style="text-align:center">Warehouse is empty</td></tr>';
+      `).join('') || '<tr><td colspan="8" style="text-align:center">Warehouse is empty</td></tr>';
     }
 
     function renderInvoices() {

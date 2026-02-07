@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Daimara Online Mart | Contact Us</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=1200">
   <link rel="stylesheet" href="contact.css">
 
 <style>* {
@@ -14,6 +14,24 @@
 
 body {
   background: #f5f5f5;
+  font-size: 25px;
+  padding-bottom: 100px;
+}
+
+/* FOOTER */
+.footer {
+  background: #0a0a0a;
+  color: white;
+  padding: 30px 20px;
+  text-align: center;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+}
+.footer p {
+  color: rgb(233, 157, 17);
 }
 
 /* PARA */
@@ -49,87 +67,12 @@ body {
   border-bottom: 3px solid rgb(233, 157, 17);
 }
 
-/* NAVBAR */
-/*.navbar {
-  background: #0a0a0a;
-  padding: 15px 30px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-}
 
-.shop-name {
-  color: rgb(233, 157, 17);
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-}
-
-.nav-center {
-  list-style: none;
-  display: flex;
-  gap: 35px;
-  margin: 0;
-}
-
-.nav-center a {
-  color: #ecf0f1;
-  text-decoration: none;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  position: relative;
-  padding-bottom: 5px;
-}
-
-.nav-center a:hover,
-.nav-center a.active {
-  color: rgb(233, 157, 17);
-  border-bottom: 3px solid rgb(233, 157, 17);
-}
-
-.nav-right {
-  display: flex;
-  gap: 20px;
-}
-
-.nav-right a {
-  color: rgb(233, 157, 17);
-  text-decoration: none;
-  font-size: 20px;
-  transition: all 0.3s ease;
-  padding: 8px 12px;
-  border-radius: 8px;
-}
-
-/* Nav Profile Icon Container */
-/*.nav-profile-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Nav Login Container */
-/*.nav-login {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Nav Cart Container */
-/*.nav-cart {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}*/
 
 /* CONTACT SECTION */
 .contact-container {
   max-width: 1000px;
-  margin: 40px auto;
+  margin: 100px auto 40px auto;
   padding: 40px 20px;
 }
 
@@ -250,7 +193,7 @@ body {
 }
 
 /* FOOTER */
-.footer {
+.footer-old {
   background: #0a0a0a;
   color: white;
   padding: 30px 20px;
@@ -261,28 +204,7 @@ body {
   color: rgb(233, 157, 17);
 }
 
-@media (max-width: 768px) {
-  .navbar {
-    padding: 12px 15px;
-  }
 
-  .nav-center {
-    display: none;
-  }
-
-  .contact-container {
-    padding: 20px 15px;
-  }
-
-  .contact-grid {
-    grid-template-columns: 1fr;
-    gap: 25px;
-  }
-
-  .contact-container h1 {
-    font-size: 28px;
-  }
-}
 /* Login Button */
 #login-btn {
   color: white;

@@ -3,12 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <title>Gas Refilling</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=1200">
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 
 <style>
-body{font-family:Arial;background:#f5f5f5;padding:20px;padding-top: 80px;}
+body{font-family:Arial;background:#f5f5f5;padding:20px;padding-top: 160px; font-size: 25px; padding-bottom: 100px;}
+
+/* FOOTER */
+.footer {
+  background: #0a0a0a;
+  color: white;
+  padding: 30px 20px;
+  text-align: center;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+}
+.footer p {
+  color: rgb(233, 157, 17);
+}
 
 /* NAVBAR */
 .navbar {
@@ -26,8 +42,8 @@ body{font-family:Arial;background:#f5f5f5;padding:20px;padding-top: 80px;}
 }
 .logo { color: #e99d11; font-weight: bold; text-decoration: none; font-size: 18px; }
 .nav-links a { color: #fff; text-decoration: none; margin-left: 15px; font-size: 14px; }
-.search-container { position: relative; width: 250px; }
-#search-input { width: 100%; padding: 8px; border-radius: 5px; border: none; }
+.search-container { position: fixed; top: 80px; left: 0; width: 450px; margin: 0 0 0 30px; text-align: left; z-index: 1001; }
+#search-input { width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ddd; font-size: 25px; }
 #search-results {
   position: absolute;
   top: 40px;
@@ -64,12 +80,17 @@ button.order{width:100%;margin-top:20px;padding:12px;background:#111;color:#e99d
   <a href="home.html" class="logo">Daimara Online Mart</a>
   <div class="nav-links">
     <a href="Shop.html">Shop</a>
-    <div class="search-container" style="display: inline-block; vertical-align: middle; margin-left: 15px;">
-      <input type="text" id="search-input" placeholder="Search products...">
-      <div id="search-results"></div>
-    </div>
   </div>
 </nav>
+
+<footer class="footer">
+  <p>Copyright © 2026 Daimara Online Mart.All rights reserved.</p>
+</footer>
+
+<div class="search-container">
+  <input type="text" id="search-input" placeholder="Search products...">
+  <div id="search-results"></div>
+</div>
 
 <div class="container">
 <h2>Gas Refilling</h2>
