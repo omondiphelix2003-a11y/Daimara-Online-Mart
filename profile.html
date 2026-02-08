@@ -5,6 +5,7 @@
   <title>My Profile | Daimara Online Mart</title>
   <meta name="viewport" content="width=1200">
   <link rel="stylesheet" href="profile.css">
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Barcode+39&display=swap" rel="stylesheet">
 
 <style>* {
   box-sizing: border-box;
@@ -82,6 +83,11 @@ body {
 .nav-center a.active {
   color: rgb(233, 157, 17);
   border-bottom: 3px solid rgb(233, 157, 17);
+}
+
+@media (max-width: 768px) {
+  .nav-center a { font-size: 18px; }
+  .nav-right a { font-size: 18px; }
 }
 
 .nav-right {
@@ -910,12 +916,12 @@ body {
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   animation: fadeIn 0.3s ease;
+  align-items: center;
+  justify-content: center;
 }
 
 .modal.show {
   display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .modal-content {
@@ -926,6 +932,8 @@ body {
   max-width: 500px;
   box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
   position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .close {
@@ -937,10 +945,99 @@ body {
   color: #7f8c8d;
   cursor: pointer;
   transition: all 0.3s ease;
+  z-index: 10;
 }
 
 .close:hover {
   color: #2c3e50;
+}
+
+/* RECEIPT STYLES */
+.receipt {
+  color: #333;
+  background: #fff;
+}
+.receipt-header {
+  text-align: center;
+  margin-bottom: 20px;
+  border-bottom: 2px dashed #ddd;
+  padding-bottom: 15px;
+}
+.receipt-header h1 {
+  color: rgb(233, 157, 17);
+  font-size: 24px;
+  margin-bottom: 5px;
+}
+.receipt-info {
+  margin-bottom: 20px;
+  line-height: 1.6;
+  font-size: 14px;
+}
+.receipt-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+.receipt-table th {
+  text-align: left;
+  border-bottom: 1px solid #eee;
+  padding: 8px 0;
+}
+.receipt-table td {
+  padding: 8px 0;
+  border-bottom: 1px solid #f9f9f9;
+  vertical-align: middle;
+}
+.receipt-prod-img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-right: 10px;
+}
+.receipt-total {
+  text-align: right;
+  font-size: 18px;
+  font-weight: bold;
+  border-top: 2px solid #333;
+  padding-top: 10px;
+}
+.qr-container {
+  text-align: center;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px dashed #ddd;
+}
+.qr-code {
+  width: 150px;
+  height: 150px;
+  margin: 0 auto;
+}
+.qr-text {
+  font-size: 12px;
+  color: #777;
+  margin-top: 10px;
+}
+.print-btn {
+  display: block;
+  width: 100%;
+  margin-top: 20px;
+  padding: 12px;
+  background: #111;
+  color: rgb(233, 157, 17);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+@media print {
+  body * { visibility: hidden; }
+  .modal, .modal-content, .receipt, .receipt * { visibility: visible; }
+  .modal { position: absolute; left: 0; top: 0; background: white; display: flex !important; }
+  .close, .print-btn, .navbar, .footer, .profile-sidebar { display: none !important; }
+  .modal-content { box-shadow: none; border: none; width: 100%; max-width: 100%; padding: 0; }
 }
 
 .modal-content h2 {
@@ -1184,6 +1281,16 @@ body {
   </main>
 </div>
 
+<!-- RECEIPT MODAL -->
+<div id="receiptModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeReceiptModal()">&times;</span>
+    <div id="receipt-content">
+      <!-- Receipt content injected here -->
+    </div>
+  </div>
+</div>
+
 <!-- ADD ADDRESS MODAL -->
 <div id="addAddressModal" class="modal">
   <div class="modal-content">
@@ -1318,7 +1425,7 @@ function loadUserOrders() {
   const ordersList = document.getElementById("orders-list");
 
   if (orders.length === 0) {
-    ordersList.innerHTML = '<div class="no-data"><p>📦 No orders yet</p><button class="btn btn-primary" onclick="location.href=\'shop.html\'">Start Shopping</button></div>';
+    ordersList.innerHTML = '<div class="no-data"><p>📦 No current orders in the last 24 hours.</p><button class="btn btn-primary" onclick="location.href=\'shop.html\'">Start Shopping</button></div>';
     return;
   }
 
@@ -1350,11 +1457,80 @@ function loadUserOrders() {
             <span class="order-detail-value">${order.shippingAddress ? order.shippingAddress.label : 'Standard'}</span>
           </div>
         </div>
+        <div style="margin-top: 15px; text-align: right;">
+          <button class="btn btn-secondary" onclick="showReceipt('${order.id}')">📄 View Receipt</button>
+        </div>
       </div>
     `;
   });
 
   ordersList.innerHTML = html;
+}
+
+// Receipt Functions
+function showReceipt(orderId) {
+  const orders = DataManager.getUserOrders(loggedInUser.id);
+  const order = orders.find(o => o.id === orderId);
+  if (!order) return;
+
+  const receiptContent = document.getElementById("receipt-content");
+  const items = order.items || order.products || [];
+  
+  // Get phone from loggedInUser if not in order
+  const phone = order.customerPhone || order.customer?.phone || loggedInUser.phone || 'Not provided';
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(order.id)}`;
+
+  receiptContent.innerHTML = `
+    <div class="receipt">
+      <div class="receipt-header">
+        <h1>Daimara Online Mart</h1>
+        <p>Official Order Receipt</p>
+      </div>
+      <div class="receipt-info">
+        <p><strong>Order ID:</strong> ${order.id}</p>
+        <p><strong>Date:</strong> ${new Date(order.date).toLocaleString()}</p>
+        <p><strong>Customer:</strong> ${order.customerName || loggedInUser.name}</p>
+        <p><strong>Phone:</strong> ${phone}</p>
+        <p><strong>Status:</strong> ${order.status.toUpperCase()}</p>
+        ${order.deliveryLocation ? `<p style="margin-top:5px; color:#e67e22;"><strong>📍 Delivery Location:</strong><br>${order.deliveryLocation}</p>` : ''}
+      </div>
+      <table class="receipt-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th style="text-align:center;">Qty</th>
+            <th style="text-align:right;">Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${items.map(item => `
+            <tr>
+              <td style="display:flex; align-items:center;">
+                <img src="${item.image || 'image-placeholder.jpg'}" class="receipt-prod-img">
+                <span>${item.name}</span>
+              </td>
+              <td style="text-align:center;">${item.qty || item.quantity || 1}</td>
+              <td style="text-align:right;">KSH ${item.price.toLocaleString()}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+      <div class="receipt-total">
+        TOTAL: KSH ${(order.grandTotal || order.totalPrice || 0).toLocaleString()}
+      </div>
+      <div class="qr-container">
+        <img src="${qrUrl}" class="qr-code" alt="Order QR Code">
+        <div class="qr-text">Scan to verify order details</div>
+        <div style="font-size:10px; color:#999; margin-top:5px;">${order.id}</div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById("receiptModal").classList.add("show");
+}
+
+function closeReceiptModal() {
+  document.getElementById("receiptModal").classList.remove("show");
 }
 
 // Load favorite products

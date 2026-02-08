@@ -406,6 +406,7 @@
                                 <option value="">Select Category</option>
                                 <option value="Supermarket">Supermarket</option>
                                 <option value="Second-hand">Second-hand Items</option>
+                                <option value="Refilling">Refilling Services</option>
                             </select>
                         </div>
                     </div>
@@ -466,6 +467,7 @@
                     <button class="category-btn active" data-category="all">All Products</button>
                     <button class="category-btn" data-category="Supermarket">Supermarket</button>
                     <button class="category-btn" data-category="Second-hand">Second-hand Items</button>
+                    <button class="category-btn" data-category="Refilling">Refilling</button>
                 </div>
 
                 <div id="alertBox"></div>
@@ -497,6 +499,7 @@
                     <select id="editProductCategory" required onchange="updateEditSubcategories()">
                         <option value="Supermarket">Supermarket</option>
                         <option value="Second-hand">Second-hand Items</option>
+                        <option value="Refilling">Refilling Services</option>
                     </select>
                 </div>
 
@@ -568,6 +571,10 @@
                 { name: 'Household items', link: 'second-hand items.html', page: 'Second-hand' },
                 { name: 'Electronics', link: 'second-hand items.html', page: 'Second-hand' },
                 { name: 'Furniture', link: 'second-hand items.html', page: 'Second-hand' }
+            ],
+            'Refilling': [
+                { name: 'Gas', link: 'gas-refill.html', page: 'Gas Refilling' },
+                { name: 'Water', link: 'water-refill.html', page: 'Water Refilling' }
             ]
         };
 
@@ -642,14 +649,16 @@
 
             const supermarketSubs = (subcategories['Supermarket'] || []).map(s => s.name);
             const secondSubs = (subcategories['Second-hand'] || []).map(s => s.name);
+            const refillSubs = (subcategories['Refilling'] || []).map(s => s.name);
 
             for (const cat in all) {
                 if (Array.isArray(all[cat])) {
                     all[cat].forEach(p => {
-                        // Derive main category (Supermarket / Second-hand) from subcategory when missing
+                        // Derive main category (Supermarket / Second-hand / Refilling) from subcategory when missing
                         if (!p.category) {
                             if (supermarketSubs.includes(cat)) p.category = 'Supermarket';
                             else if (secondSubs.includes(cat)) p.category = 'Second-hand';
+                            else if (refillSubs.includes(cat)) p.category = 'Refilling';
                             else p.category = 'Supermarket';
                         }
                         products.push(p);
@@ -694,9 +703,6 @@
             const result = DataManager.addProductFromAddPage(product);
             
             if (result.success) {
-                // ADD TO WAREHOUSE AS WELL
-                DataManager.addToWarehouse(product, product.quantity);
-
                 // Refresh local view from DataManager
                 loadProducts();
                 showAlert('✓ Product added successfully! It will appear on the store pages and warehouse.', 'success');

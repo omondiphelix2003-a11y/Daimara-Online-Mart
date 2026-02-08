@@ -15,7 +15,8 @@ const DataManager = (() => {
     FAVORITES: 'ecommerce_favorites',
     MESSAGES: 'ecommerce_messages',
     WAREHOUSE: 'ecommerce_warehouse',
-    INVOICES: 'ecommerce_invoices'
+    INVOICES: 'ecommerce_invoices',
+    ONLINE_USERS: 'ecommerce_online_users'
   };
 
   // Initialize default products from both supermarket and second-hand categories
@@ -119,6 +120,9 @@ const DataManager = (() => {
 
     products[category].push(product);
     localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
+
+    // SYNC WITH WAREHOUSE - Ensure every added product is in warehouse
+    addToWarehouse(product, product.quantity || 10);
 
     try { console.debug('DataManager.addProduct - added to', category, 'id=', product.id); } catch (e) {}
 
@@ -417,7 +421,23 @@ const DataManager = (() => {
 
   function getUserOrders(userId) {
     const allOrders = JSON.parse(localStorage.getItem(STORAGE_KEYS.ORDERS)) || [];
-    return allOrders.filter(o => o.userId === userId);
+    const userOrders = allOrders.filter(o => o.userId === userId);
+    if (userOrders.length === 0) return [];
+
+    // Sort by date descending to get the current (latest) one
+    userOrders.sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    const latestOrder = userOrders[0];
+    const orderTime = new Date(latestOrder.date).getTime();
+    const now = Date.now();
+    const twentyFourHours = 24 * 60 * 60 * 1000;
+
+    // Only return if it's within the last 24 hours
+    if (now - orderTime < twentyFourHours) {
+      return [latestOrder];
+    }
+    
+    return [];
   }
 
   function getAllOrders() {
@@ -717,8 +737,48 @@ const DataManager = (() => {
     return { success: true };
   }
 
+  /**
+   * Update online status for current user
+   */
+  function updateOnlineStatus() {
+    const user = getCurrentUser();
+    const onlineUsers = JSON.parse(localStorage.getItem(STORAGE_KEYS.ONLINE_USERS)) || {};
+    const sessionId = user ? user.id : 'anon_' + (sessionStorage.getItem('anon_id') || generateId());
+    
+    if (!user && !sessionStorage.getItem('anon_id')) {
+      sessionStorage.setItem('anon_id', sessionId);
+    }
+
+    onlineUsers[sessionId] = Date.now();
+    localStorage.setItem(STORAGE_KEYS.ONLINE_USERS, JSON.stringify(onlineUsers));
+  }
+
+  /**
+   * Get number of online users (active in last 5 minutes)
+   */
+  function getOnlineUserCount() {
+    const onlineUsers = JSON.parse(localStorage.getItem(STORAGE_KEYS.ONLINE_USERS)) || {};
+    const now = Date.now();
+    const fiveMinutes = 5 * 60 * 1000;
+    
+    let count = 0;
+    for (const id in onlineUsers) {
+      if (now - onlineUsers[id] < fiveMinutes) {
+        count++;
+      } else {
+        // Clean up old entries
+        delete onlineUsers[id];
+      }
+    }
+    localStorage.setItem(STORAGE_KEYS.ONLINE_USERS, JSON.stringify(onlineUsers));
+    return count;
+  }
+
   // Initialize on load
   initializeStorage();
+  updateOnlineStatus();
+  // Update status every 2 minutes while page is open
+  setInterval(updateOnlineStatus, 2 * 60 * 1000);
 
   // Public API
   return {
@@ -766,6 +826,7 @@ const DataManager = (() => {
     deleteInvoice,
     getProfitLossAnalysis,
     getAdminDashboardStats,
+    getOnlineUserCount,
     getClientEmails,
     markEmailAsRead,
     addEmailResponse,

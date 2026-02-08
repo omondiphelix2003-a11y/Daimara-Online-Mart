@@ -5,8 +5,6 @@
 <title>Gas Refilling</title>
 <meta name="viewport" content="width=1200">
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-
 <style>
 body{font-family:Arial;background:#f5f5f5;padding:20px;padding-top: 160px; font-size: 25px; padding-bottom: 100px;}
 
@@ -42,7 +40,10 @@ body{font-family:Arial;background:#f5f5f5;padding:20px;padding-top: 160px; font-
 }
 .logo { color: #e99d11; font-weight: bold; text-decoration: none; font-size: 18px; }
 .nav-links a { color: #fff; text-decoration: none; margin-left: 15px; font-size: 14px; }
-.search-container { position: fixed; top: 80px; left: 0; width: 450px; margin: 0 0 0 30px; text-align: left; z-index: 1001; }
+@media (max-width: 768px) {
+  .nav-links a { font-size: 18px; }
+}
+.search-container { position: fixed; top: 80px; left: 0; width: 450px; margin: 0 0 0 30px; text-align: left; z-index: 1001; background:#111;padding:5px;border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,.1); }
 #search-input { width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ddd; font-size: 25px; }
 #search-results {
   position: absolute;
@@ -68,9 +69,8 @@ h2{text-align:center;color:#e99d11}
 .card img{width:100%;height:150px;object-fit:cover;border-radius:8px}
 .card button{background:#111;color:#e99d11;border:none;padding:8px 15px;border-radius:5px}
 label{display:block;margin-top:15px}
-input{width:100%;padding:10px}
+#qty{width:100%;padding:10px}
 button.order{width:100%;margin-top:20px;padding:12px;background:#111;color:#e99d11;border:none;border-radius:5px}
-#map{height:350px;margin-top:20px;border-radius:10px}
 </style>
 </head>
 
@@ -95,30 +95,8 @@ button.order{width:100%;margin-top:20px;padding:12px;background:#111;color:#e99d
 <div class="container">
 <h2>Gas Refilling</h2>
 
-<div class="sizes">
-  <div class="card">
-    <img src="progas.jfif">
-    <h3>Pro Gas – 6 KG</h3>
-    <p>Standard 6kg gas refill</p>
-    <p><strong>Price: KSh 900</strong></p>
-    <button onclick="selectGas('6 KG',900,'progas.jfif')">Select</button>
-  </div>
-
-  <div class="card">
-    <img src="total.jfif">
-    <h3>Total Gas – 13 KG</h3>
-    <p>Medium 13kg gas refill</p>
-    <p><strong>Price: KSh 1800</strong></p>
-    <button onclick="selectGas('13 KG',1800,'total.jfif')">Select</button>
-  </div>
-
-  <div class="card">
-    <img src="lake gas.jpg">
-    <h3>Lake Gas – 50 KG</h3>
-    <p>Large 50kg industrial gas refill</p>
-    <p><strong>Price: KSh 6500</strong></p>
-    <button onclick="selectGas('50 KG',6500,'lake gas.jpg')">Select</button>
-  </div>
+<div class="sizes" id="gas-products-container">
+  <!-- Dynamic content from DataManager -->
 </div>
 
 <label>Selected Gas Size</label>
@@ -127,21 +105,51 @@ button.order{width:100%;margin-top:20px;padding:12px;background:#111;color:#e99d
 <label>Quantity</label>
 <input type="number" id="qty" value="1" min="1">
 
-<h3>Select Delivery Location</h3>
-<div id="map"></div>
-
 <button class="order" onclick="placeGasOrder()">Add to Cart</button>
 </div>
 
 <script src="data-manager.js"></script>
 <script src="auth-check.js"></script>
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
 let selectedGas = null;
-let selectedCoords = null;
-let marker;
+
+// Render Gas Products
+function renderGasProducts() {
+  const container = document.getElementById('gas-products-container');
+  const allProducts = DataManager.getAllProducts();
+  const gasProducts = allProducts['Gas'] || [];
+
+  if (gasProducts.length === 0) {
+    container.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No gas products available.</p>';
+    return;
+  }
+
+  container.innerHTML = gasProducts.map(p => `
+    <div class="card">
+      <img src="${p.image || 'https://picsum.photos/300/200?gas'}">
+      <h3>${p.name}</h3>
+      <p>${p.description || 'Gas refill service'}</p>
+      <p><strong>Price: KSh ${p.price}</strong></p>
+      <button onclick="selectGasById('${p.id}')">Select</button>
+    </div>
+  `).join('');
+}
 
 // Select gas
+function selectGasById(id){
+  const allProducts = DataManager.getAllProducts();
+  const gasProducts = allProducts['Gas'] || [];
+  const product = gasProducts.find(p => p.id === id);
+  if(!product) return;
+
+  document.getElementById("gasSize").value = product.name;
+  selectedGas = { ...product };
+  
+  // Ensure product is in warehouse for admin to see
+  DataManager.addToWarehouse(selectedGas, 1);
+}
+
+// Select gas (legacy support)
 function selectGas(size, price, image){
   document.getElementById("gasSize").value = size;
   selectedGas = {
@@ -152,24 +160,18 @@ function selectGas(size, price, image){
     image,
     subcategory: 'Gas'
   };
+  
+  // Ensure product is in warehouse for admin to see
+  DataManager.addToWarehouse(selectedGas, 1);
 }
 
-// Map
-const map = L.map('map').setView([-1.286389, 36.817223], 13);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-  attribution: '© OpenStreetMap'
-}).addTo(map);
-
-map.on('click', e=>{
-  if(marker) map.removeLayer(marker);
-  marker = L.marker(e.latlng).addTo(map);
-  selectedCoords = e.latlng;
-});
+// Initialize
+renderGasProducts();
 
 // Place order
 function placeGasOrder(){
-  if(!selectedGas || !selectedCoords){
-    alert("Please select gas size and delivery location");
+  if(!selectedGas){
+    alert("Please select gas size");
     return;
   }
 
@@ -178,8 +180,7 @@ function placeGasOrder(){
   // Use DataManager
   for(let i=0; i<quantity; i++) {
     DataManager.addToCart({
-      ...selectedGas,
-      location: selectedCoords
+      ...selectedGas
     });
   }
 

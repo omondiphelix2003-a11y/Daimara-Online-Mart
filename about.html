@@ -16,6 +16,13 @@ body {
   background: #f5f5f5;
   font-size: 25px;
   padding-bottom: 100px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content-wrapper {
+  flex: 1;
 }
 
 /* FOOTER */
@@ -65,6 +72,11 @@ body {
 .nav-icons a.active {
   color: rgb(233, 157, 17);
   border-bottom: 3px solid rgb(233, 157, 17);
+}
+
+@media (max-width: 768px) {
+  .nav-center a { font-size: 18px; }
+  .nav-icons a { font-size: 18px; }
 }
 
 /* NAVBAR */
@@ -446,6 +458,7 @@ footer {
   </div>
 </nav>
 
+<div class="main-content-wrapper">
 
 <!-- HERO -->
 <header class="about-hero">
@@ -458,15 +471,14 @@ footer {
   <div class="about-text">
     <h2>Who We Are</h2>
     <p>
-      Daimara Online Mart is an online grocery and food store dedicated to delivering
-      high-quality food, fresh produce, and beverages directly to your doorstep.
-      We focus on convenience, affordability, and reliability.
+     Daimara Online Mart is an online grocery and food store dedicated to delivering high‑quality food, fresh produce, and beverages directly to your doorstep. We focus on convenience, affordability, and reliability, positioning ourselves as your trusted online grocery partner that sources the best products to meet everyday needs.
+
     </p>
 
     <h2>Our Mission</h2>
     <p>
-      To simplify shopping by offering fresh products, fast delivery,
-      and secure payments through modern technology.
+      To simplify shopping by offering fresh products, fast delivery, and secure payments through modern technology. We strive to make grocery shopping effortless and dependable, ensuring customers enjoy quick, reliable service and safe transaction methods that enhance their overall experience.
+
     </p>
   </div>
 
@@ -507,6 +519,8 @@ footer {
     </div>
   </div>
 </section>
+
+</div> <!-- End main-content-wrapper -->
 
 <!-- FOOTER -->
 <footer id="Contact">
