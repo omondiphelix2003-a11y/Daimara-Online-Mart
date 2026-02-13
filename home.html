@@ -64,8 +64,8 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
 
  .search-container {
   position: fixed;
-  top: 80px;
-  left: 0;
+  top: 65px;
+  left: -28px;
   width: 450px;
   margin: 0 0 0 30px;
   z-index: 1001;
@@ -75,11 +75,11 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
 #search-input {
   width: 100%;
   padding: 10px;
-  border: 1px solid #0000009a;
+  border: none;
   background-color: #0000009a;
   border-radius: 5px;
   color:#000000;
-  font-size: 25px;
+   font-size: 18px;
 }
 
 #search-btn {
@@ -112,14 +112,16 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
   cursor: pointer;
   color: #333;
   transition: 0.2s;
+  background-color: #f9f9f9;
 }
 
 #search-results div:hover {
-  background: #f9f9f9;
+  background: #000000;
+  color: #ffffff;
 }
 
 #search-results strong {
-  color: #111;
+  color: #1d1c1c;
 }
 
 
@@ -152,8 +154,8 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
     video{width:80%;border-radius:12px}
 
 
-    .products{display:grid;grid-template-columns:repeat(4, 1fr);gap:20px;padding:0 30px}
-    .product{background:#fff;width:25%;padding:20px;border-radius:10px;box-shadow:0 5px 15px rgba(0,0,0,.1);text-align:center}
+    .products{display:grid;justify-content: space-between;grid-template-columns:repeat(4, 1fr);gap:20px;padding:0 30px}
+    .product{background:#ffffff;width:25%;padding:20px;border-radius:10px;box-shadow:0 5px 15px rgba(0,0,0,.1);text-align:center;}
     .product img{width:100%;height:160px;object-fit:cover;border-radius:8px}
     .product button{margin-top:10px;padding:8px 15px;border:none;border-radius:5px;background:#111;color:rgb(233, 157, 17);cursor:pointer}
     
