@@ -43,7 +43,7 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
     .nav-center{display:flex;align-items:center;padding-left: 20px;margin-left:70px;gap:20px}
     .nav-center a{color:#fff;text-decoration:none;font-size:25px}
     .nav-center input{padding:7px 10px;border-radius:5px;border:none}
-    .nav-icons a{color:#fff;margin-left:15px;font-size:18px}
+    .nav-icons a{color:#fff;margin-left:15px;font-size:25px}
 
 .nav-center a:hover,
 .nav-center a.active {
@@ -64,7 +64,7 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
 
  .search-container {
   position: fixed;
-  top: 65px;
+  top: 120px;
   left: -28px;
   width: 450px;
   margin: 0 0 0 30px;
@@ -89,6 +89,7 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
   background: none;
   border: none;
   cursor: pointer;
+  
 }
 
 #search-results {
@@ -123,6 +124,40 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
 #search-results strong {
   color: #1d1c1c;
 }
+
+ .shop-icon {
+            position: relative;
+            width: 40px;
+            height: 35px;
+            background-color: transparent;
+            border: 3px solid rgb(233, 157, 17);
+            border-radius: 4px;
+            margin: 20px;
+        }
+
+        .shop-icon::before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 18px;
+            height: 12px;
+            border: 3px solid rgb(233, 157, 17);
+            border-bottom: none;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .shop-icon::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 8px;
+            width: 24px;
+            height: 2px;
+            background-color: #ffffff;
+            box-shadow: 0 6px 0 #a7884f;
+        }
 
 
     /* SLIDER */
@@ -201,7 +236,7 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
   <div class="logo">Daimara Online Mart</div>
 
   <div class="nav-center">
-    <a href="shop.html">Shop</a>
+    <a href="shop.html"><div class="shop-icon"></div></a>
     <a href="about.html">About</a>
     <a href="contact.html">Contact</a>
     
@@ -216,7 +251,7 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
 
 <div class="search-container">
   <input type="text" id="search-input" placeholder="Search...">
-  <button id="search-btn">🔍</button>
+  <!--<button id="search-btn">🔍</button>-->
   <div id="search-results"></div>
 </div>
 

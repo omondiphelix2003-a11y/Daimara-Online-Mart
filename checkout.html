@@ -30,15 +30,15 @@
  color: #f5f5f5;
 }
 
-    .navbar{display:flex;align-items:center;justify-content:space-between;padding:15px 30px;
+    .navbar{display:flex;align-items:center;justify-content:space-between;padding:-8px 40px;
       background:#111;color:#fff;  position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     background-color: #000000; /* Add your desired background color */
     z-index: 1000; /* Ensure it's on top of other elements */  }
-    .logo{color:rgb(233, 157, 17);font-size:18px;font-weight:bold}
-    .navbar a{color:#f5f5f5;text-decoration:none;margin-left:15px}
+    .logo{color:rgb(233, 157, 17);font-size:25px;font-weight:bold}
+    .navbar a{color:#f5f5f5;text-decoration:none;font-size: 25px;margin-left:15px;}
 
 
 .navbar a:hover,
@@ -50,16 +50,16 @@
   .navbar a { font-size: 18px; }
 }
 
-    .container{padding:40px 30px;max-width:1000px;margin:auto; margin-top: 20px;}
-    h2{text-align:center;font-size:25px;margin-bottom:30px;color: rgb(0, 0, 0);}
-    h3{text-align:center;font-size:25px;margin-left: 125px;color: rgb(0, 0, 0);}
+    .container{padding:40px 30px;max-width:1000px;margin:auto; margin-top: 40px;}
+    h2{text-align:center;font-size:27px;margin-bottom:20px;color: rgb(0, 0, 0);}
+    h3{text-align:center;font-size:27px;margin-left: 125px;color: rgb(0, 0, 0);}
     table{width:100%;border-collapse:collapse;margin-bottom:30px;color: rgb(233, 157, 17);}
-    table th, table td{padding:15px;border-bottom:1px solid #ddd;text-align:left}
-    table img{width:80px;height:60px;object-fit:cover;border-radius:5px}
-    .total{float:right;font-size:16px;margin-bottom:20px}
-    .checkout-form{background:#fff;margin-top: 75px;padding:80px 80px;border-radius:10px;box-shadow:0 5px 15px rgba(0,0,0,.1)}
-    .checkout-form input, .checkout-form select{width:100%;padding:10px;margin:10px 0;border:1px solid #ccc;border-radius:6px}
-    .checkout-form button{padding:12px 20px;background:#111;color:rgb(233, 157, 17);border:none;border-radius:6px;cursor:pointer;width:100%}
+    table th, table td{padding:15px;border-bottom:1px solid #ddd;text-align:left;font-size: 27;}
+    table img{width:90px;height:70px;object-fit:cover;border-radius:5px}
+    .total{float:right;font-size:30px;margin-bottom:20px}
+    .checkout-form{background:#fff;margin-top: 75px;padding:80px 80px;border-radius:10px;font-size: 32px;box-shadow:0 5px 15px rgba(0,0,0,.1)}
+    .checkout-form input, .checkout-form select{width:100%;padding:10px;font-size: 27px;margin:10px 0;border:1px solid #ccc;border-radius:6px}
+    .checkout-form button{padding:12px 20px;font-size: 27px;background:#111;color:rgb(233, 157, 17);border:none;border-radius:6px;cursor:pointer;width:100%}
 
     /* MAP BOX */
     #map-container {
@@ -75,6 +75,7 @@
       width: 100%;
       border-radius: 8px;
       margin-top: 10px;
+      font-size: 27px;
     }
     .map-btn {
       background: #111;
@@ -83,9 +84,48 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
-      font-size: 14px;
+      font-size: 25px;
       margin-bottom: 10px;
     }
+
+.shop-icon {
+            position: relative;
+            width: 30px;
+            height: 30px;
+            background-color: transparent;
+            border: 3px solid rgb(233, 157, 17);
+            border-radius: 4px;
+            margin: 20px;
+            left: -8px;
+            top: -5px;
+        }
+
+        .shop-icon::before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 12px;
+            border: 3px solid rgb(233, 157, 17);
+            border-bottom: none;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .shop-icon::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 8px;
+            width: 14px;
+            height: 2px;
+            background-color: #ffffff;
+            box-shadow: 0 6px 0 #a7884f;
+        }
+
+
+
   </style>
 </head>
 <body>
@@ -94,10 +134,10 @@
 <!-- NAVBAR -->
 <nav class="navbar">
   <div class="logo">
-            <a href="home.html" style="text-decoration: none; color: inherit;"><span>Daimara Online Mart</span></a>
+           <!-- <a href="home.html" style="text-decoration: none; color: inherit; font-size: 25px;"><span>Checkout</span></a>-->
    </div>
   <div>
-    <a href="shop.html">Shop</a>
+    <a href="shop.html"><div class="shop-icon"></div></a>
     <a href="Cart.html"><i class="fa fa-shopping-cart"></i></a>
   </div>
 </nav>

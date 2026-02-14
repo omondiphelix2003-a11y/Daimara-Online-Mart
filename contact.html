@@ -294,7 +294,43 @@ body {
 #dropdown-menu button:hover {
   background: rgba(231, 76, 60, 0.2);
   color: #ff6b6b;
-}</style>
+}
+
+.shop-icon {
+            position: relative;
+            width: 40px;
+            height: 35px;
+            background-color: transparent;
+            border: 3px solid rgb(233, 157, 17);
+            border-radius: 4px;
+            margin: 20px;
+        }
+
+        .shop-icon::before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 18px;
+            height: 12px;
+            border: 3px solid rgb(233, 157, 17);
+            border-bottom: none;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .shop-icon::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 8px;
+            width: 24px;
+            height: 2px;
+            background-color: #ffffff;
+            box-shadow: 0 6px 0 #a7884f;
+        }
+
+</style>
 
 </head>
 <body>
@@ -308,7 +344,7 @@ body {
    </div>
   <div class="nav-center">
     <a href="home.html">Home</a>
-    <a href="shop.html">Shop</a>
+    <a href="shop.html"><div class="shop-icon"></div></a>
     <a href="about.html">About</a>
   </div>
 

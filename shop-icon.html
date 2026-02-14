@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Shop Icon</title>
+    <style>
+        .shop-icon {
+            position: relative;
+            width: 40px;
+            height: 35px;
+            background-color: transparent;
+            border: 3px solid #333;
+            border-radius: 4px;
+            margin: 20px;
+        }
+
+        .shop-icon::before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 18px;
+            height: 12px;
+            border: 3px solid #333;
+            border-bottom: none;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .shop-icon::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 8px;
+            width: 24px;
+            height: 2px;
+            background-color: #333;
+            box-shadow: 0 6px 0 #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="shop-icon"></div>
+</body>
+</html>

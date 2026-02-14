@@ -116,7 +116,7 @@ body {
 }
 
     .nav-links a{color:#fff;text-decoration:none;}
-    .nav-icons a{color:#fff;margin-left:15px;font-size:18px}
+    .nav-icons a{color:#fff;margin-left:15px;font-size:25px}
 
 .nav-links a:hover,
 .nav-links a.active {
@@ -146,6 +146,11 @@ body {
   background-color:#0000009a ;
   border-radius: 5px;
    font-size: 18px;
+}
+
+#search-input::placeholder {
+  color: #000000;
+  opacity: 1;
 }
 
 #search-btn {
@@ -703,6 +708,43 @@ body {
   color: #ff6b6b;
 }
 
+       .shop-icon {
+            position: relative;
+            width: 40px;
+            height: 35px;
+            background-color: transparent;
+            border: 3px solid rgb(233, 157, 17);
+            border-radius: 4px;
+            margin: 20px;
+            padding-left: 50%;
+            left: -50%;
+        }
+
+        .shop-icon::before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 18px;
+            height: 12px;
+            border: 3px solid rgb(233, 157, 17);
+            border-bottom: none;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .shop-icon::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 8px;
+            width: 24px;
+            height: 2px;
+            background-color: #ffffff;
+            box-shadow: 0 6px 0 #a7884f;
+        }
+
+
 </style>
 
 </head>
@@ -713,7 +755,7 @@ body {
  <!-- NAVBAR -->
 <nav class="navbar">
    <div class="nav-left">
-      <a href="home.html" class="home-link"><span><div class="logo">Daimara Online Mart</div></span></a>
+      <a href="shop.html" class="home-link"><span><div class="logo"><div class="shop-icon"></div></div></span></a>
     </div>
   <ul class="nav-links">
     <li><a href="#" data-category="Fresh food">Fresh food</a></li>
@@ -740,7 +782,7 @@ body {
 
 <div class="search-container">
   <input type="text" id="search-input" placeholder="Search...">
-  <button id="search-btn">🔍</button>
+ <!---<button id="search-btn">🔍</button>-->
   <div id="search-results"></div>
 </div>
 

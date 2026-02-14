@@ -12,6 +12,41 @@
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+ .shop-icon {
+            position: relative;
+            width: 40px;
+            height: 35px;
+            background-color: transparent;
+            border: 3px solid rgb(233, 157, 17);
+            border-radius: 4px;
+            margin: 20px;
+        }
+
+        .shop-icon::before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 18px;
+            height: 12px;
+            border: 3px solid rgb(233, 157, 17);
+            border-bottom: none;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .shop-icon::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 8px;
+            width: 24px;
+            height: 2px;
+            background-color: #ffffff;
+            box-shadow: 0 6px 0 #a7884f;
+        }
+
+
 body {
   background: #f5f5f5;
   font-size: 25px;
@@ -161,7 +196,7 @@ body {
   color: rgb(233, 157, 17);
   text-align: center;
   padding: 100px 20px;
-  margin-top: 60px;
+  margin-top: 160px;
 }
 
 .about-hero h1 {
@@ -171,7 +206,7 @@ body {
 }
 
 .about-hero p {
-  font-size: 19px;
+  font-size: 20px;
   opacity: 0.9;
   color: rgb(255, 255, 255);
 }
@@ -185,6 +220,9 @@ body {
   border-radius: 12px;
    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+     margin-top: 15%;
+
+  
 }
 
 .about-text {
@@ -202,7 +240,7 @@ body {
   margin-bottom: 20px;
   color: #555;
   line-height: 1.8;
-  font-size: 17px;
+  font-size: 19px;
 }
 
 /* STATS */
@@ -212,6 +250,7 @@ body {
   gap: 25px;
   margin-top: 40px;
   color: black;
+  
 }
 
 .stat {
@@ -222,6 +261,7 @@ body {
   text-align: center;
   transition: all 0.6s ease;
   color: rgb(0, 0, 0); 
+  
 }
 
 .stat:hover {
@@ -238,7 +278,7 @@ body {
 
 .stat p {
   color: white;
-  font-size: 18px;
+  font-size: 20px;
 }
 
 /* WHY US */
@@ -249,7 +289,7 @@ body {
 }
 
 .why-us h2 {
-  font-size: 32px;
+  font-size: 33px;
   color: #2c3e50;
   margin-bottom: 40px;
   position: relative;
@@ -294,12 +334,12 @@ body {
 .why-card h3 {
   color: rgb(233, 157, 17);
   margin-bottom: 15px;
-  font-size: 22px;
+  font-size: 25px;
 }
 
 .why-card p {
   color: #666;
-  font-size: 18px;
+  font-size: 21px;
   line-height: 1.6;
 }
 
@@ -308,6 +348,8 @@ footer {
   background: #0a0a0a;
   color: white;
   padding: 50px 20px 20px;
+  margin-top: 15%;
+  margin-bottom: -12%;
 }
 
 .footer-content {
@@ -322,14 +364,14 @@ footer {
 .footer-content h3 {
   color: rgb(233, 157, 17);
   margin-bottom: 15px;
-  font-size: 22px;
+  font-size: 24px;
 }
 
 .footer-content p {
   color: #bdc3c7;
   line-height: 1.8;
   margin-bottom: 10px;
-  font-size: 18px;
+  font-size: 21px;
 }
 
 .copyright {
@@ -445,7 +487,7 @@ footer {
 
   <div class="nav-center">
     <a href="home.html">Home</a>
-    <a href="shop.html">Shop</a>
+    <a href="shop.html"><div class="shop-icon"></div></a>
     <a href="contact.html">Contact</a>
     
   </div>
