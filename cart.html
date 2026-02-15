@@ -125,6 +125,9 @@ h4 {
 #cart-items {
   margin-bottom: 20px;
   min-height: 100px;
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: 10px;
   font-size: 30;
 }
 
@@ -383,7 +386,74 @@ h4 {
 #dropdown-menu button:hover {
   background: rgba(231, 76, 60, 0.2);
   color: #ff6b6b;
-}</style>
+}/* SLIDER */
+.slider {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  overflow: hidden;
+  margin-top: 30px;
+}
+.slide {
+  display: none;
+}
+.slide img {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+}
+
+/* RANDOM PRODUCTS */
+.products-preview {
+  padding: 40px 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.products-preview h2 {
+  color: rgb(233, 157, 17);
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 35px;
+}
+#random-products {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+.product {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, .1);
+  text-align: center;
+}
+.product img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.product h4 {
+  font-size: 24px;
+  margin: 10px 0;
+  text-align: center;
+}
+.product p {
+  font-size: 22px;
+  color: #e74c3c;
+  font-weight: bold;
+}
+.product button {
+  margin-top: 10px;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  background: #111;
+  color: rgb(233, 157, 17);
+  cursor: pointer;
+  font-size: 20px;
+}
+</style>
 </head>
 <body>
 
@@ -428,6 +498,19 @@ h4 {
             <a href="shop.html">Continue Shopping</a>
         </nav>
     </div>
+
+    <!-- SLIDESHOW -->
+    <div class="slider">
+        <div class="slide"><img src="https://picsum.photos/1200/400?1"></div>
+        <div class="slide"><img src="https://picsum.photos/1200/400?2"></div>
+        <div class="slide"><img src="https://picsum.photos/1200/400?3"></div>
+    </div>
+
+    <!-- RANDOM PRODUCTS -->
+    <section class="products-preview">
+        <h2>Recommended for You</h2>
+        <div id="random-products"></div>
+    </section>
     
     <script src="data-manager.js"></script>
     <script src="auth-check.js"></script>
@@ -583,6 +666,54 @@ window.addEventListener('focus', function() {
   cart = DataManager.getCart();
   renderCart();
 });
+
+// SLIDER
+let sliderIndex = 0;
+const slides = document.querySelectorAll('.slide');
+function showSlides() {
+  slides.forEach(s => s.style.display = 'none');
+  sliderIndex = (sliderIndex + 1) > slides.length ? 1 : sliderIndex + 1;
+  if (slides[sliderIndex - 1]) slides[sliderIndex - 1].style.display = 'block';
+  setTimeout(showSlides, 3000);
+}
+showSlides();
+
+// RANDOM PRODUCTS
+(function() {
+  const rndContainer = document.getElementById('random-products');
+  function getAllFlattened() {
+    const all = DataManager.getAllProducts();
+    return Object.keys(all).reduce((acc, k) => acc.concat(all[k] || []), []);
+  }
+
+  window.addToCartById = function(id) {
+    const prod = getAllFlattened().find(p => p.id === id);
+    if (!prod) { alert('Product not found'); return; }
+    DataManager.addToCart(prod);
+    cart = DataManager.getCart();
+    renderCart();
+    alert('Added to cart');
+  };
+
+  function renderRandom(n = 8) {
+    if (!rndContainer) return;
+    const all = getAllFlattened();
+    if (all.length === 0) { rndContainer.innerHTML = '<p>No products available yet.</p>'; return; }
+    const shuffled = all.slice().sort(() => 0.5 - Math.random()).slice(0, n);
+    rndContainer.innerHTML = '';
+    shuffled.forEach(p => {
+      const img = p.image || 'https://picsum.photos/300/200';
+      rndContainer.innerHTML += `
+        <div class="product">
+          <img src="${img}">
+          <h4>${p.name}</h4>
+          <p>Ksh ${p.price}</p>
+          <button onclick="addToCartById('${p.id}')">Add to Cart</button>
+        </div>`;
+    });
+  }
+  renderRandom(8);
+})();
 
 renderCart();
 
