@@ -1364,7 +1364,7 @@ function loadUserProfile() {
 
   // Display member since
   const memberDate = new Date(loggedInUser.registeredDate || Date.now());
-  document.getElementById("member-since").textContent = `Registered on ${memberDate.toLocaleDateString()}`;
+  document.getElementById("member-since").textContent = `signed-in on ${memberDate.toLocaleDateString()}`;
 
   // Calculate and display stats
   const userOrders = DataManager.getUserOrders(loggedInUser.id);
