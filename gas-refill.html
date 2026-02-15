@@ -43,7 +43,7 @@ body{font-family:Arial;background:#f5f5f5;padding:20px;padding-top: 160px; font-
 @media (max-width: 768px) {
   .nav-links a { font-size: 18px; }
 }
- .search-container {
+ /*.search-container {
   position: fixed;
   top: 65px;
   left: -28px;
@@ -106,10 +106,10 @@ body{font-family:Arial;background:#f5f5f5;padding:20px;padding-top: 160px; font-
 
 #search-results strong {
   color: #1d1c1c;
-}
+}*/
 
 
-.container{max-width:900px;margin:auto;background:#fff;padding:25px;border-radius:10px}
+.container{max-width:900px;margin:auto;background:#fff;padding:25px;border-radius:10px;top: auto;}
 h2{text-align:center;color:#e99d11}
 .sizes{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px}
 .card{border:1px solid #ddd;border-radius:10px;padding:15px;text-align:center}
@@ -118,6 +118,41 @@ h2{text-align:center;color:#e99d11}
 label{display:block;margin-top:15px}
 #qty{width:100%;padding:10px}
 button.order{width:100%;margin-top:20px;padding:12px;background:#111;color:#e99d11;border:none;border-radius:5px}
+
+
+.shop-icon {
+            position: relative;
+            width: 40px;
+            height: 35px;
+            background-color: transparent;
+            border: 3px solid rgb(233, 157, 17);
+            border-radius: 4px;
+            margin: 20px;
+        }
+
+        .shop-icon::before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 18px;
+            height: 12px;
+            border: 3px solid rgb(233, 157, 17);
+            border-bottom: none;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .shop-icon::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 8px;
+            width: 24px;
+            height: 2px;
+            background-color: #ffffff;
+            box-shadow: 0 6px 0 #a7884f;
+        }
 </style>
 </head>
 
@@ -126,7 +161,7 @@ button.order{width:100%;margin-top:20px;padding:12px;background:#111;color:#e99d
 <nav class="navbar">
   <a href="home.html" class="logo">Daimara Online Mart</a>
   <div class="nav-links">
-    <a href="Shop.html">Shop</a>
+    <a href="Shop.html"><div class="shop-icon"></div></a>
   </div>
 </nav>
 
@@ -134,10 +169,10 @@ button.order{width:100%;margin-top:20px;padding:12px;background:#111;color:#e99d
   <p>Copyright © 2026 Daimara Online Mart.All rights reserved.</p>
 </footer>
 
-<div class="search-container">
+<!--<div class="search-container">
   <input type="text" id="search-input" placeholder="Search products...">
   <div id="search-results"></div>
-</div>
+</div>-->
 
 <div class="container">
 <h2>Gas Refilling</h2>
