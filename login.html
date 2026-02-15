@@ -80,12 +80,14 @@ body {
 }
 
 .auth-box {
-  background: white;
-  width: 100%;
-  max-width: 420px;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+  width: 200%;
+  max-width: 820px;
+
+
   padding: 40px;
   border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  /*box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);*/
   animation: slideUp 0.4s ease;
 }
 
@@ -104,22 +106,22 @@ body {
   text-align: center;
   margin-bottom: 30px;
   color: #2c3e50;
-  font-size: 24px;
+  font-size: 86px;
   font-weight: 700;
 }
 
 .auth-box form {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 35px;
 }
 
 .auth-box input {
   width: 100%;
-  padding: 13px 15px;
+  padding: 43px 55px;
   border-radius: 6px;
   border: 1px solid #bdc3c7;
-  font-size: 14px;
+  font-size: 45px;
   font-family: inherit;
   transition: all 0.3s ease;
 }
@@ -139,8 +141,8 @@ body {
 
 .profile-image-group label {
   font-weight: 600;
-  color: #2c3e50;
-  font-size: 14px;
+  color: rgb(233, 157, 17);
+  font-size: 54px;
 }
 
 .profile-image-group input[type="file"] {
@@ -150,6 +152,7 @@ body {
   background: white;
   cursor: pointer;
   transition: all 0.3s ease;
+  font-size: 35px;
 }
 
 .profile-image-group input[type="file"]:hover {
@@ -157,8 +160,8 @@ body {
 }
 
 .profile-preview {
-  width: 120px;
-  height: 120px;
+  width: 320px;
+  height: 320px;
   border: 2px solid #ecf0f1;
   border-radius: 50%;
   display: flex;
@@ -184,7 +187,7 @@ body {
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 16px;
+  font-size: 35px;
   transition: all 0.3s ease;
   margin-top: 5px;
 }
@@ -201,7 +204,7 @@ body {
 .switch {
   text-align: center;
   margin-top: 10px;
-  font-size: 14px;
+  font-size: 31px;
   color: #555;
 }
 
@@ -249,7 +252,7 @@ body {
       <button type="submit">Login</button>
       <p class="switch">
         Don’t have an account?
-        <span onclick="showSignup()">Sign Up</span>
+        <span onclick="showSignup()">Sign up</span>
       </p>
     </form>
 
