@@ -1114,7 +1114,7 @@ body {
     </div>
     <nav class="sidebar-menu">
       <a href="#" class="menu-item active" onclick="showTab('overview', this); return false;">📊 Overview</a>
-      <a href="#" class="menu-item" onclick="showTab('orders', this); return false;">📦 Orders</a>
+      <a href="#" class="menu-item" onclick="showTab('orders', this); return false;">📦 Order(s)</a>
       <a href="#" class="menu-item" onclick="showTab('addresses', this); return false;">📍 Addresses</a>
       <a href="#" class="menu-item" onclick="showTab('settings', this); return false;">⚙️ Settings</a>
       <a href="#" class="menu-item" onclick="showTab('favorites', this); return false;">❤️ Favorites</a>
@@ -1364,13 +1364,13 @@ function loadUserProfile() {
 
   // Display member since
   const memberDate = new Date(loggedInUser.registeredDate || Date.now());
-  document.getElementById("member-since").textContent = `Member since ${memberDate.toLocaleDateString()}`;
+  document.getElementById("member-since").textContent = `Registered on ${memberDate.toLocaleDateString()}`;
 
   // Calculate and display stats
   const userOrders = DataManager.getUserOrders(loggedInUser.id);
   const totalOrders = userOrders.length;
   const totalSpent = userOrders.reduce((sum, order) => sum + (order.grandTotal || order.total || 0), 0);
-  const loyaltyPoints = Math.floor(totalSpent / 100) * 10;
+  const loyaltyPoints = Math.floor(totalSpent / 100) * 1;
 
   document.getElementById("total-orders").textContent = totalOrders;
   document.getElementById("total-spent").textContent = `KSH ${totalSpent.toLocaleString()}`;
@@ -1457,7 +1457,7 @@ function loadUserOrders() {
           </div>
         </div>
         <div style="margin-top: 15px; text-align: right;">
-          <button class="btn btn-secondary" onclick="showReceipt('${order.id}')">📄 View Receipt</button>
+          <button class="btn btn-secondary" onclick="showReceipt('${order.id}')" style="background-color:black;color:rgb(233, 157, 17);" >📄 View Receipt </button>
         </div>
       </div>
     `;
@@ -1481,19 +1481,19 @@ function showReceipt(orderId) {
 
   receiptContent.innerHTML = `
     <div class="receipt">
-      <div class="receipt-header">
+      <div class="receipt-header" style="font-size:30px">
         <h1>Daimara Online Mart</h1>
         <p>Official Order Receipt</p>
       </div>
-      <div class="receipt-info">
+      <div class="receipt-info" style="font-size:25px">
         <p><strong>Order ID:</strong> ${order.id}</p>
         <p><strong>Date:</strong> ${new Date(order.date).toLocaleString()}</p>
         <p><strong>Customer:</strong> ${order.customerName || loggedInUser.name}</p>
         <p><strong>Phone:</strong> ${phone}</p>
         <p><strong>Status:</strong> ${order.status.toUpperCase()}</p>
-        ${order.deliveryLocation ? `<p style="margin-top:5px; color:#e67e22;"><strong>📍 Delivery Location:</strong><br>${order.deliveryLocation}</p>` : ''}
+        ${order.deliveryLocation ? `<p style="margin-top:5px; color:#e67e22;font-size:20px"><strong>📍 Delivery Location:</strong><br>${order.deliveryLocation}</p>` : ''}
       </div>
-      <table class="receipt-table">
+      <table class="receipt-table" style="font-size:22px">
         <thead>
           <tr>
             <th>Item</th>
@@ -1509,18 +1509,18 @@ function showReceipt(orderId) {
                 <span>${item.name}</span>
               </td>
               <td style="text-align:center;">${item.qty || item.quantity || 1}</td>
-              <td style="text-align:right;">KSH ${item.price.toLocaleString()}</td>
+              <td style="text-align:right;"  style="font-size:20px">KSH ${item.price.toLocaleString()}</td>
             </tr>
           `).join('')}
         </tbody>
       </table>
-      <div class="receipt-total">
+      <div class="receipt-total"  style="font-size:23px">
         TOTAL: KSH ${(order.grandTotal || order.totalPrice || 0).toLocaleString()}
       </div>
-      <div class="qr-container">
+      <div class="qr-container" >
         <img src="${qrUrl}" class="qr-code" alt="Order QR Code">
-        <div class="qr-text">Scan to verify order details</div>
-        <div style="font-size:10px; color:#999; margin-top:5px;">${order.id}</div>
+        <div class="qr-text" style="font-size:20px">Scan to verify order details</div>
+        <div style="font-size:16px; color:#999; margin-top:5px;">${order.id}</div>
       </div>
     </div>
   `;
