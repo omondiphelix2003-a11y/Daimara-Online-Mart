@@ -16,7 +16,8 @@ const DataManager = (() => {
     MESSAGES: 'ecommerce_messages',
     WAREHOUSE: 'ecommerce_warehouse',
     INVOICES: 'ecommerce_invoices',
-    ONLINE_USERS: 'ecommerce_online_users'
+    ONLINE_USERS: 'ecommerce_online_users',
+    CAMPAIGNS: 'ecommerce_campaigns'
   };
 
   // Initialize default products from both supermarket and second-hand categories
@@ -774,6 +775,38 @@ const DataManager = (() => {
     return count;
   }
 
+  /**
+   * Campaigns Management
+   */
+  function getAllCampaigns() {
+    return JSON.parse(localStorage.getItem(STORAGE_KEYS.CAMPAIGNS)) || [];
+  }
+
+  function saveCampaign(campaign) {
+    const campaigns = getAllCampaigns();
+    if (campaign.id) {
+      const index = campaigns.findIndex(c => c.id === campaign.id);
+      if (index !== -1) {
+        campaigns[index] = { ...campaigns[index], ...campaign, updatedAt: new Date().toISOString() };
+      } else {
+        campaigns.push(campaign);
+      }
+    } else {
+      campaign.id = 'CAMP' + Date.now();
+      campaign.createdAt = new Date().toISOString();
+      campaigns.push(campaign);
+    }
+    localStorage.setItem(STORAGE_KEYS.CAMPAIGNS, JSON.stringify(campaigns));
+    return { success: true, campaign };
+  }
+
+  function deleteCampaign(id) {
+    let campaigns = getAllCampaigns();
+    campaigns = campaigns.filter(c => c.id !== id);
+    localStorage.setItem(STORAGE_KEYS.CAMPAIGNS, JSON.stringify(campaigns));
+    return { success: true };
+  }
+
   // Initialize on load
   initializeStorage();
   updateOnlineStatus();
@@ -830,6 +863,9 @@ const DataManager = (() => {
     getClientEmails,
     markEmailAsRead,
     addEmailResponse,
-    clearAllData
+    clearAllData,
+    getAllCampaigns,
+    saveCampaign,
+    deleteCampaign
   };
 })();

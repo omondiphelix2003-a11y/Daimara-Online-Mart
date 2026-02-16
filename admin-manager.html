@@ -177,8 +177,8 @@
       <li><a href="#" onclick="showTab('invoices', this)"><i class="fas fa-file-invoice-dollar"></i> Invoices</a></li>
       <li><a href="#" onclick="showTab('emails', this)"><i class="fas fa-envelope"></i> Client Emails</a></li>
       <li><a href="#" onclick="showTab('profits', this)"><i class="fas fa-chart-line"></i> Profits & Loss</a></li>
-      <li><a href="#" onclick="showTab('users', this)"><i class="fas fa-users"></i> User Signups</a></li>
-
+      <li><a href="#" onclick="showTab('users', this)"><i class="fas fa-users"></i> User Signups</a></li>    
+      <li><a href="Daimara Department Head – Marketing.html"><i class="fas fa-bullhorn"></i> Marketing Dept</a></li>
     </ul>
     <div class="sidebar-footer">
       <button class="logout-btn" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
@@ -342,6 +342,9 @@
         </table>
       </div>
     </div>
+
+     
+
   </main>
 
   <!-- DETAILS MODAL -->
@@ -536,11 +539,94 @@
       tbody.innerHTML = users.map(u => `
         <tr>
           <td>${(u.id || '').slice(0, 8)}</td>
-          <td>${u.name || 'N/A'}</td>
+          <td><span class="clickable-name" onclick="viewUserProfile('${u.id}')">${u.name || 'N/A'}</span></td>
           <td>${u.email || 'N/A'}</td>
           <td>${(u.registeredDate || u.createdAt) ? new Date(u.registeredDate || u.createdAt).toLocaleDateString() : 'N/A'}</td>
         </tr>
       `).join('') || '<tr><td colspan="4" style="text-align:center">No users registered</td></tr>';
+    }
+
+    function viewUserProfile(userId) {
+      const users = DataManager.getAllUsers();
+      const user = users.find(u => u.id === userId);
+      if (!user) return alert("User not found");
+
+      const body = document.getElementById('modal-body');
+      const isRestricted = user.status === 'restricted';
+      
+      body.innerHTML = `
+        <div class="modal-header">
+          <h2>User Profile: ${user.name}</h2>
+        </div>
+        <div style="display:flex; gap:30px; padding:20px;">
+          <div style="flex: 0 0 150px;">
+            <img src="${user.profileImage || 'https://via.placeholder.com/150'}" style="width:150px; height:150px; border-radius:12px; object-fit:cover; border:3px solid var(--primary-color);">
+            <div style="margin-top:20px; display:flex; flex-direction:column; gap:10px;">
+              <button class="btn ${isRestricted ? 'btn-success' : 'btn-danger'}" onclick="toggleUserRestriction('${user.id}')" style="width:100%;">
+                <i class="fas ${isRestricted ? 'fa-unlock' : 'fa-ban'}"></i> ${isRestricted ? 'Unrestrict' : 'Restrict'}
+              </button>
+              <button class="btn btn-danger" onclick="deleteUserAccount('${user.id}')" style="width:100%; background:#333;">
+                <i class="fas fa-trash"></i> Delete Account
+              </button>
+            </div>
+          </div>
+          <div style="flex:1;">
+            <h3 style="margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">Account Information</h3>
+            <div style="display:grid; grid-template-columns: 150px 1fr; gap:10px; font-size:20px;">
+              <strong>Full Name:</strong> <span>${user.name}</span>
+              <strong>Email:</strong> <span>${user.email}</span>
+              <strong>Account ID:</strong> <span>${user.id}</span>
+              <strong>Status:</strong> <span class="status-pill ${isRestricted ? 'status-unread' : 'status-completed'}" style="display:inline-block;">${user.status || 'Active'}</span>
+              <strong>Registered:</strong> <span>${new Date(user.registeredDate || user.createdAt).toLocaleString()}</span>
+            </div>
+            
+            <h3 style="margin-top:25px; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">User Activity</h3>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+              <div style="background:#f8f9fa; padding:15px; border-radius:8px; text-align:center;">
+                <h4 style="margin-bottom:5px;">Orders</h4>
+                <div style="font-size:32px; font-weight:bold; color:var(--primary-color);">
+                  ${(DataManager.getAllOrders() || []).filter(o => (o.customerEmail || o.customer?.email) === user.email).length}
+                </div>
+              </div>
+              <div style="background:#f8f9fa; padding:15px; border-radius:8px; text-align:center;">
+                <h4 style="margin-bottom:5px;">Messages</h4>
+                <div style="font-size:32px; font-weight:bold; color:var(--info);">
+                  ${(DataManager.getClientEmails() || []).filter(e => e.email === user.email).length}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      document.getElementById('details-modal').style.display = 'flex';
+    }
+
+    function toggleUserRestriction(userId) {
+      const users = DataManager.getAllUsers();
+      const user = users.find(u => u.id === userId);
+      if (!user) return;
+
+      const isRestricted = user.status === 'restricted';
+      const action = isRestricted ? "unrestrict" : "restrict";
+      
+      if (!confirm(`Are you sure you want to ${action} this user?`)) return;
+
+      user.status = isRestricted ? 'active' : 'restricted';
+      localStorage.setItem('ecommerce_all_users', JSON.stringify(users));
+      
+      alert(`User account has been ${action}ed.`);
+      viewUserProfile(userId); // Refresh modal
+      renderUsers(); // Refresh table
+    }
+
+    function deleteUserAccount(userId) {
+      if (!confirm("CRITICAL: Permanently delete this user account? This action cannot be undone.")) return;
+      
+      DataManager.deleteUser(userId);
+      closeModal();
+      renderUsers();
+      renderDashboard();
+      alert("User account has been permanently deleted.");
     }
 
     // MODAL FUNCTIONS
