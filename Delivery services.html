@@ -8,7 +8,7 @@
 <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 <style>
 :root{
-  --primary:#0f172a;
+  --primary:rgb(233, 157, 17);
   --accent:#2563eb;
   --bg:#f4f6f9;
   --card:#ffffff;
@@ -22,7 +22,7 @@ body{
 
 .topbar{
   background:var(--primary);
-  color:white;
+  color:rgb(0, 0, 0);
   padding:16px 24px;
   display:flex;
   justify-content:space-between;
@@ -44,11 +44,11 @@ body{
   background:var(--card);
   border-radius:12px;
   padding:20px;
-  box-shadow:0 3px 10px rgba(0,0,0,0.06);
+  box-shadow:0 6px 15px rgba(0, 0, 0, 0.904);
 }
 
 .section{
-  margin-top:30px;
+  margin-top:30px;color: #064e1f;
 }
 
 .table{
@@ -63,6 +63,7 @@ body{
   padding:12px;
   border-bottom:1px solid #eee;
   text-align:left;
+  color: black;
 }
 
 .action-btn{
@@ -73,13 +74,14 @@ body{
   color:white;
 }
 
-.dispatch{background:#2563eb}
-.delivered{background:#16a34a}
+.dispatch{background:#2564ebd8}
+.delivered{background:#16a34ae0}
 
 #reader{
   width:100%;
   max-width:400px;
   margin-top:20px;
+  border-radius: 5px;
 }
 
 .scan-result{
