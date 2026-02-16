@@ -25,7 +25,7 @@ display: flex;
 }
 
 .sidebar{
-width:250px;
+width:120px;
 height:100vh;
 background:#e99d11;
 position:fixed;
@@ -38,6 +38,8 @@ z-index: 1000;
 .sidebar h2{
 color:black;
 margin-bottom: 30px;
+font-size: 16px;
+
 }
 
 .sidebar a{
@@ -47,21 +49,23 @@ gap: 10px;
 color: white;
 text-decoration:none;
 margin:15px 0;
-padding: 10px;
+padding: 3px;
+padding-left: -64%;
+
 border-radius: 5px;
 transition: 0.3s;
 font-weight: 600;
+font-size: 12px;
 }
 
 .sidebar a:hover, .sidebar a.active{
-background: rgba(0,0,0,0.1);
 color: black;
 }
 
 .main{
-margin-left:250px;
+margin-left:120px;
 padding:20px;
-width: calc(100% - 250px);
+width: calc(60% - 250px);
 box-sizing: border-box;
 }
 
@@ -86,7 +90,7 @@ padding:20px;
 border-radius:10px;
 box-shadow:0 4px 8px rgba(0,0,0,0.4);
 cursor: pointer;
-transition: transform 0.2s;
+transition:  0.2s;
 }
 
 .card:hover {
@@ -95,7 +99,7 @@ background: #2d3748;
 }
 
 .card h3{
-font-size:28px;
+font-size:24px;
 margin:0;
 color: #e99d11;
 }
@@ -128,6 +132,7 @@ border-radius: 5px;
 cursor: pointer;
 font-weight: bold;
 border: none;
+
 }
 
 .chart-box{
@@ -147,6 +152,7 @@ margin-bottom:20px;
     margin-bottom: 5px;
     font-weight: 600;
     color: #000000;
+    font-size: 16px;
 }
 .ad-form input, .ad-form textarea {
     width: 100%;
@@ -156,17 +162,19 @@ margin-bottom:20px;
     border: 1px solid #2d3748;
     background: #0f172a;
     color: white;
-    font-size: 16px;
+    font-size: 14px;
 }
 .ad-form input[type="file"] {
     padding: 8px;
     cursor: pointer;
+    font-size: 14px;
 }
 .platform-btn {
-    font-size: 30px;
+    font-size: 28px;
     cursor: pointer;
     transition: 0.3s;
     opacity: 0.5;
+    
 }
 .platform-btn.selected {
     opacity: 1;
@@ -198,12 +206,12 @@ margin-bottom:20px;
 }
 .campaign-title {
     color: #e99d11;
-    font-size: 20px;
+    font-size: 17px;
     margin: 0 0 10px 0;
 }
 .campaign-msg {
     color: #cbd5e1;
-    font-size: 14px;
+    font-size: 12px;
     line-height: 1.4;
     height: 60px;
     overflow: hidden;
@@ -226,7 +234,8 @@ margin-bottom:20px;
     transition: 0.2s;
 }
 .delete-ad-btn:hover {
-    background: #c0392b;
+    background: #000000;
+    color: #EA4335;
 }
 
 /* MODAL STYLES */
@@ -257,7 +266,7 @@ margin-bottom:20px;
   position: absolute;
   top: 15px;
   right: 15px;
-  font-size: 30px;
+  font-size: 25px;
   cursor: pointer;
   color: #7f8c8d;
 }
@@ -266,6 +275,16 @@ th { text-align: left; padding: 12px; background: #0f172a; color: #e99d11; }
 td { padding: 12px; border-bottom: 1px solid #2d3748; }
 .user-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
 .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+
+    @media print {
+      body * { visibility: hidden; }
+      #details-modal, #details-modal * { visibility: visible; }
+      #details-modal { position: absolute; left: 0; top: 0; width: 100%; height: auto; display: block !important; }
+      .close-modal, .btn-info { display: none !important; }
+      .modal-content { box-shadow: none; border: none; width: 100%; max-width: 100%; padding: 0; }
+    }
+
 </style>
 </head>
 
