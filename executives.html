@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daimara Executive Dispatch</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{
+  --primary:#0f172a;
+  --accent:#2563eb;
+  --bg:#f4f6f9;
+  --card:#ffffff;
+}
+
+body{
+  margin:0;
+  font-family:Arial, Helvetica, sans-serif;
+  background:var(--bg);
+}
+
+.topbar{
+  background:var(--primary);
+  color:white;
+  padding:16px 24px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.topbar h1{
+  margin:0;
+  font-size:20px;
+}
+
+.container{
+  padding:24px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+  gap:20px;
+  margin-bottom:25px;
+}
+
+.card{
+  background:var(--card);
+  border-radius:12px;
+  padding:20px;
+  box-shadow:0 3px 10px rgba(0,0,0,0.06);
+}
+
+.section{
+  margin-top:30px;
+}
+
+.table{
+  width:100%;
+  border-collapse:collapse;
+  background:white;
+  border-radius:12px;
+  overflow:hidden;
+}
+
+.table th, .table td{
+  padding:12px;
+  border-bottom:1px solid #eee;
+  text-align:left;
+}
+
+.action-btn{
+  border:none;
+  padding:8px 12px;
+  border-radius:6px;
+  cursor:pointer;
+  color:white;
+}
+
+.send{background:#16a34a}
+.dispatch{background:#2563eb}
+
+.status{
+  padding:5px 10px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:bold;
+}
+
+.pending{background:#fde68a}
+.sent{background:#bfdbfe}
+.dispatched{background:#bbf7d0}
+
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>Daimara Executive Dispatch Panel</h1>
+</div>
+
+<div class="container">
+
+  <!-- SUMMARY -->
+  <div class="grid">
+    <div class="card">
+      <h3>Orders Awaiting Packaging</h3>
+      <strong>18</strong>
+    </div>
+    <div class="card">
+      <h3>Ready for Dispatch</h3>
+      <strong>10</strong>
+    </div>
+    <div class="card">
+      <h3>Dispatched Today</h3>
+      <strong>27</strong>
+    </div>
+    <div class="card">
+      <h3>Urgent Deliveries</h3>
+      <strong>4</strong>
+    </div>
+  </div>
+
+  <!-- PACKAGING & DISPATCH QUEUE -->
+  <div class="section">
+    <h2>Packaging & Dispatch Queue</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Client</th>
+          <th>Products</th>
+          <th>Destination</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>#DM2041</td>
+          <td>Mercy Wanjiku</td>
+          <td>Rice 2kg (5), Cooking Oil (2)</td>
+          <td>Westlands</td>
+          <td><span class="status pending">Awaiting Packaging</span></td>
+          <td>
+            <button class="action-btn send">Send for Packaging</button>
+          </td>
+        </tr>
+        <tr>
+          <td>#DM2042</td>
+          <td>Peter Otieno</td>
+          <td>Sugar 1kg (10)</td>
+          <td>Karen</td>
+          <td><span class="status sent">Packaged</span></td>
+          <td>
+            <button class="action-btn dispatch">Dispatch</button>
+          </td>
+        </tr>
+        <tr>
+          <td>#DM2043</td>
+          <td>Grace Njeri</td>
+          <td>Flour 2kg (8)</td>
+          <td>Kilimani</td>
+          <td><span class="status dispatched">Dispatched</span></td>
+          <td>Completed</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+</body>
+</html>
