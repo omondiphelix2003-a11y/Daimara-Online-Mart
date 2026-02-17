@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Delivery Manager System</title>
+
+<style>
+:root{
+  --primary:#f59e0b;
+  --bg:#f4f6f9;
+}
+
+body{
+  margin:0;
+  font-family:Arial, Helvetica, sans-serif;
+  background:var(--bg);
+}
+
+.topbar{
+  background:var(--primary);
+  padding:16px 24px;
+  font-weight:bold;
+  font-size:20px;
+}
+
+.container{ padding:24px; }
+
+.card{
+  background:white;
+  padding:20px;
+  border-radius:12px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.2);
+  margin-bottom:25px;
+}
+
+input{
+  padding:10px;
+  margin:5px;
+  width:200px;
+}
+
+button, select{
+  padding:8px;
+  border-radius:6px;
+  border:none;
+}
+
+.add{ background:#16a34a; color:white;}
+.remove{ background:#dc2626; color:white;}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:15px;
+}
+
+th, td{
+  padding:12px;
+  border-bottom:1px solid #eee;
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">Delivery Manager System</div>
+
+<div class="container">
+
+  <!-- RECEIVE ORDERS -->
+  <div class="card">
+    <h3>Receive New Order</h3>
+
+    <input type="text" id="client" placeholder="Client Name">
+    <input type="text" id="destination" placeholder="Delivery Location">
+    <input type="text" id="phone" placeholder="Phone Number">
+
+    <button class="add" onclick="receiveOrder()">Receive Order</button>
+  </div>
+
+  <!-- DELIVERY QUEUE -->
+  <div class="card">
+    <h3>Incoming Delivery Queue</h3>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Client</th>
+          <th>Destination</th>
+          <th>Phone</th>
+          <th>Assign & Dispatch</th>
+          <th>Remove</th>
+        </tr>
+      </thead>
+      <tbody id="queueTable"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+
+const employees = [
+  "James Otieno",
+  "Brian Mwangi",
+  "Mercy Wanjiku",
+  "Kevin Kiptoo",
+  "Faith Achieng"
+];
+
+let queue = JSON.parse(localStorage.getItem("deliveryQueue")) || [];
+
+function generateID(){
+  return "DM" + Math.floor(Math.random()*9000 + 1000);
+}
+
+function saveQueue(){
+  localStorage.setItem("deliveryQueue", JSON.stringify(queue));
+}
+
+function receiveOrder(){
+  const client = document.getElementById("client").value;
+  const destination = document.getElementById("destination").value;
+  const phone = document.getElementById("phone").value;
+
+  if(!client || !destination || !phone){
+    alert("Fill all fields");
+    return;
+  }
+
+  queue.push({
+    id: generateID(),
+    client,
+    destination,
+    phone
+  });
+
+  saveQueue();
+  displayQueue();
+
+  document.getElementById("client").value="";
+  document.getElementById("destination").value="";
+  document.getElementById("phone").value="";
+}
+
+function dispatchOrder(index, rider){
+
+  if(!rider){
+    alert("Select delivery employee");
+    return;
+  }
+
+  const dispatchList = JSON.parse(localStorage.getItem("deliveryOrders")) || [];
+
+  dispatchList.push({
+    ...queue[index],
+    rider: rider,
+    status: "Out for Delivery"
+  });
+
+  localStorage.setItem("deliveryOrders", JSON.stringify(dispatchList));
+
+  queue.splice(index,1);
+  saveQueue();
+  displayQueue();
+
+  window.open("Delivery services.html","_blank");
+}
+
+function removeOrder(index){
+  queue.splice(index,1);
+  saveQueue();
+  displayQueue();
+}
+
+function displayQueue(){
+  const table = document.getElementById("queueTable");
+  table.innerHTML="";
+
+  queue.forEach((order, index)=>{
+
+    let employeeOptions = `<option value="">Select Rider</option>`;
+    employees.forEach(emp=>{
+      employeeOptions += `<option value="${emp}">${emp}</option>`;
+    });
+
+    table.innerHTML += `
+      <tr>
+        <td>${order.id}</td>
+        <td>${order.client}</td>
+        <td>${order.destination}</td>
+        <td>${order.phone}</td>
+        <td>
+          <select id="emp${index}">
+            ${employeeOptions}
+          </select>
+          <button onclick="dispatchOrder(${index}, document.getElementById('emp${index}').value)">
+            Dispatch
+          </button>
+        </td>
+        <td>
+          <button class="remove" onclick="removeOrder(${index})">Remove</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+displayQueue();
+
+</script>
+</body>
+</html>

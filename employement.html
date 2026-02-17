@@ -3,11 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Daimara Employment & Role Assignment</title>
+<title>Daimara Employment Manager</title>
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 <style>
 :root{
-  --primary:rgb(233, 157, 17);
+  --primary:#e99d11;
   --accent:#2563eb;
   --bg:#f4f6f9;
   --card:#ffffff;
@@ -21,32 +23,27 @@ body{
 
 .topbar{
   background:var(--primary);
-  color:rgb(0, 0, 0);
   padding:16px 24px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+  font-weight:bold;
 }
 
-.container{
-  padding:24px;
-}
+.container{ padding:24px; }
 
 .grid{
   display:grid;
-  grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
-  gap:20px;
+  grid-template-columns: repeat(auto-fit,minmax(180px,1fr));
+  gap:15px;
   margin-bottom:25px;
 }
 
 .card{
   background:var(--card);
   border-radius:12px;
-  padding:20px;
-  box-shadow:0 6px 15px rgba(0, 0, 0, 0.897);
+  padding:18px;
+  box-shadow:0 4px 10px rgba(0,0,0,0.08);
 }
 
-.section{margin-top:30px;color: #064e1f;}
+.section{ margin-top:25px; }
 
 .table{
   width:100%;
@@ -57,84 +54,302 @@ body{
 }
 
 .table th,.table td{
-  padding:12px;
+  padding:10px;
   border-bottom:1px solid #eee;
   text-align:left;
-  color: #000000;
 }
 
 .role-badge{
-  padding:6px 10px;
+  padding:5px 10px;
   border-radius:20px;
   font-size:12px;
-  font-weight:bold;
   color:white;
+  font-weight:bold;
 }
 
-.manager{background:#111827}
 .operator{background:#2563eb}
-.executive{background:#f59e0b}
-.delivery{background:#16a34a}
-.admin{background:#7c3aed}
+.executives{background:#f59e0b}
+.deliverystaff{background:#16a34a}
+.supportstaff{background:#7c3aed}
 
 .assign-box{
   display:flex;
-  gap:10px;
   flex-wrap:wrap;
-  margin-top:15px;
+  gap:10px;
 }
 
-.assign-box input, .assign-box select{
-  padding:10px;
+.assign-box input,
+.assign-box select{
+  padding:8px;
   border-radius:8px;
   border:1px solid #ccc;
 }
 
 .btn{
   background:var(--accent);
-  border:none;
   color:white;
-  padding:10px 16px;
+  border:none;
+  padding:8px 14px;
   border-radius:8px;
   cursor:pointer;
 }
 
+.action-btn{
+  background:rgb(230, 52, 52);
+  color:#ffffff;
+  border:none;
+  padding:6px 10px;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+.profile-preview img{
+  width:60px;
+  height:60px;
+  border-radius:50%;
+  margin-top:5px;
+}
+
+.btn{
+    background-color: black;
+    color: #e99d11;
+}
+.btn:hover{
+    background-color: #ccc;
+    color: black;
+}
+@media(max-width:600px){
+  .assign-box input{ width:100%; }
+}
 </style>
 </head>
 <body>
 
-<div class="topbar">
-  <h2>Daimara Employment & Role Assignment</h2>
-</div>
+<div class="topbar">Daimara Employment & Role Assignment</div>
 
 <div class="container">
 
-  <!-- SUMMARY -->
-  <div class="grid">
-    <div class="card">
-      <h3>Total Employees</h3>
-      <strong id="totalEmployees">0</strong>
-    </div>
-    <div class="card">
-      <h3>Operators</h3>
-      <strong id="operatorsCount">0</strong>
-    </div>
-    <div class="card">
-      <h3>Executives</h3>
-      <strong id="executivesCount">0</strong>
-    </div>
-    <div class="card">
-      <h3>Delivery Staff</h3>
-      <strong id="deliveryCount">0</strong>
-    </div>
-  </div>
+<!-- SEARCH -->
+<div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:15px;">
+  <input type="text" id="searchBox" placeholder="Search employee...">
+  <select id="filterRole">
+    <option value="All">All Roles</option>
+    <option value="Operator">Operator</option>
+    <option value="Executives">Executives</option>
+    <option value="Delivery Staff">Delivery Staff</option>
+    <option value="Support Staff">Support Staff</option>
+  </select>
+</div>
 
-  <!-- ASSIGN ROLE -->
-  <div class="section card">
-    <h3>Assign Employee Role</h3>
-    <div class="assign-box">
-      <input type="text" id="employeeName" placeholder="Employee Name">
-      <input type="email" id="employeeEmail" placeholder="Email">
-      <select id="employeeRole">
-        <option value="Operator">Operator</option>
-        <option value="Executi
+<!-- SUMMARY -->
+<div class="grid">
+  <div class="card">Total<br><strong id="totalEmployees">0</strong></div>
+  <div class="card">Operators<br><strong id="operatorsCount">0</strong></div>
+  <div class="card">Executives<br><strong id="executivesCount">0</strong></div>
+  <div class="card">Delivery<br><strong id="deliveryCount">0</strong></div>
+  <div class="card">Support<br><strong id="supportCount">0</strong></div>
+</div>
+
+<!-- FORM -->
+<div class="card section">
+<h3>Add / Edit Employee</h3>
+<div class="assign-box">
+
+<input id="employeeName" placeholder="Name">
+<input id="employeeEmail" placeholder="Email">
+<input id="phoneNumber" placeholder="Phone">
+<input id="employeeSalary" type="number" placeholder="Salary">
+<input id="bankname" placeholder="Bank Name">
+<input id="bankaccountnumber" placeholder="Account Number">
+
+<div>
+<label>Photo</label><br>
+<input type="file" id="profile-image">
+<div id="profile-preview" class="profile-preview"></div>
+</div>
+
+<select id="employeeRole">
+  <option value="Operator">Operator</option>
+  <option value="Executives">Executives</option>
+  <option value="Delivery Staff">Delivery Staff</option>
+  <option value="Support Staff">Support Staff</option>
+</select>
+
+<button class="btn" id="employBtn">Employ</button>
+
+</div>
+</div>
+
+<!-- TABLE -->
+<div class="card section">
+<h3>Employee Records</h3>
+<table class="table">
+<thead>
+<tr>
+<th>Photo</th>
+<th>Name</th>
+<th>Email</th>
+<th>Phone</th>
+<th>Role</th>
+<th>Salary</th>
+<th>Bank</th>
+<th>Account</th>
+<th>Actions</th>
+</tr>
+</thead>
+<tbody id="employeeTable"></tbody>
+</table>
+</div>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+let employees = JSON.parse(localStorage.getItem("employees")) || [];
+let editId = null;
+let imageData = "";
+
+const tableBody = document.getElementById("employeeTable");
+const preview = document.getElementById("profile-preview");
+
+/* IMAGE PREVIEW */
+document.getElementById("profile-image").addEventListener("change", e=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev=>{
+    imageData = ev.target.result;
+    preview.innerHTML = `<img src="${imageData}">`;
+  };
+  reader.readAsDataURL(file);
+});
+
+/* SAVE */
+document.getElementById("employBtn").addEventListener("click", ()=>{
+
+  const emp = {
+    id: editId || Date.now(),
+    name: employeeName.value.trim(),
+    email: employeeEmail.value.trim(),
+    phone: phoneNumber.value.trim(),
+    role: employeeRole.value,
+    salary: employeeSalary.value,
+    bank: bankname.value,
+    account: bankaccountnumber.value,
+    image: imageData
+  };
+
+  if(!emp.name || !emp.email || !emp.phone){
+    alert("Name, Email & Phone required");
+    return;
+  }
+
+  if(editId){
+    const index = employees.findIndex(e=>e.id===editId);
+    employees[index] = emp;
+    editId = null;
+  } else {
+    employees.push(emp);
+  }
+
+  save();
+  clearForm();
+});
+
+/* RENDER */
+function render(){
+
+  const search = searchBox.value.toLowerCase();
+  const roleFilter = filterRole.value;
+
+  tableBody.innerHTML = "";
+
+  employees
+  .filter(e =>
+    (roleFilter==="All" || e.role===roleFilter) &&
+    (e.name.toLowerCase().includes(search) ||
+     e.email.toLowerCase().includes(search) ||
+     e.phone.includes(search))
+  )
+  .forEach(e=>{
+
+    const roleClass = e.role.replace(/\s/g,'').toLowerCase();
+
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${e.image ? `<img src="${e.image}" width="40" style="border-radius:50%">`:""}</td>
+      <td>${e.name}</td>
+      <td>${e.email}</td>
+      <td>${e.phone}</td>
+      <td><span class="role-badge ${roleClass}">${e.role}</span></td>
+      <td>${e.salary||"-"}</td>
+      <td>${e.bank||"-"}</td>
+      <td>${e.account||"-"}</td>
+      <td>
+        <button class="btn" onclick="editEmployee(${e.id})">Edit</button>
+        <button class="action-btn" onclick="deleteEmployee(${e.id})">Delete</button>
+      </td>
+    `;
+    tableBody.appendChild(row);
+  });
+
+  updateCounts();
+}
+
+/* EDIT */
+window.editEmployee = id =>{
+  const e = employees.find(x=>x.id===id);
+  employeeName.value = e.name;
+  employeeEmail.value = e.email;
+  phoneNumber.value = e.phone;
+  employeeSalary.value = e.salary;
+  bankname.value = e.bank;
+  bankaccountnumber.value = e.account;
+  employeeRole.value = e.role;
+  imageData = e.image;
+  preview.innerHTML = e.image ? `<img src="${e.image}">` : "";
+  editId = id;
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* DELETE */
+window.deleteEmployee = id =>{
+  if(confirm("Delete employee?")){
+    employees = employees.filter(e=>e.id!==id);
+    save();
+  }
+}
+
+/* SAVE STORAGE */
+function save(){
+  localStorage.setItem("employees", JSON.stringify(employees));
+  render();
+}
+
+/* COUNTS */
+function updateCounts(){
+  totalEmployees.textContent = employees.length;
+  operatorsCount.textContent = employees.filter(e=>e.role==="Operator").length;
+  executivesCount.textContent = employees.filter(e=>e.role==="Executives").length;
+  deliveryCount.textContent = employees.filter(e=>e.role==="Delivery Staff").length;
+  supportCount.textContent = employees.filter(e=>e.role==="Support Staff").length;
+}
+
+/* CLEAR */
+function clearForm(){
+  document.querySelectorAll(".assign-box input").forEach(i=>i.value="");
+  preview.innerHTML="";
+  imageData="";
+}
+
+/* SEARCH & FILTER */
+searchBox.oninput = render;
+filterRole.onchange = render;
+
+render();
+
+});
+</script>
+</body>
+</html>

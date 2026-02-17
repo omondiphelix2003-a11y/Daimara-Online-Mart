@@ -93,6 +93,17 @@ iframe{
   
 }
 
+.employment {
+  background-color: black;
+  color: rgb(233, 157, 17);
+  border-radius: 50px;
+  width: 60%;
+  height: 35%;
+  cursor: pointer;
+}
+
+.employment:hover{background-color: azure;color: black;}
+
 </style>
 </head>
 <body>
@@ -121,6 +132,9 @@ iframe{
       <h3>Completed Deliveries</h3>
       <strong>31 Today</strong>
     </div>
+
+<button class="employment" onclick="loadPanel('employement.html')">Employment panel</button>
+
   </div>
 
   <!-- TEAM MANAGEMENT -->
@@ -140,19 +154,19 @@ iframe{
           <td>Warehouse</td>
           <td>Operators</td>
           <td><span class="status active">Active</span></td>
-          <td><button class="view-btn" onclick="loadPanel('operators.html')">View</button></td>
+          <td><button class="view-btn" onclick="loadPanel('Daimara-operator.html')">View</button></td>
         </tr>
         <tr>
           <td>Packaging</td>
           <td>Executives</td>
           <td><span class="status pending">Packaging Orders</span></td>
-          <td><button class="view-btn" onclick="loadPanel('executive.html')">View</button></td>
+          <td><button class="view-btn" onclick="loadPanel('executives.html')">View</button></td>
         </tr>
         <tr>
           <td>Delivery</td>
           <td>Delivery Services</td>
           <td><span class="status active">On Route</span></td>
-          <td><button class="view-btn" onclick="loadPanel('delivery-services.html')">View</button></td>
+          <td><button class="view-btn" onclick="loadPanel('delivery manager system.html')">View</button></td>
         </tr>
       </tbody>
     </table>
@@ -172,6 +186,125 @@ function loadPanel(panel){
   document.getElementById('panelViewer').src = panel;
 }
 </script>
+
+<script>
+/* =========================
+   PANEL LOADER
+========================= */
+function loadPanel(panel, btn = null) {
+  const viewer = document.getElementById("panelViewer");
+
+  if (!panel) {
+    alert("Panel not available.");
+    return;
+  }
+
+  viewer.src = panel;
+
+  // highlight selected button
+  document.querySelectorAll(".view-btn").forEach(b => {
+    b.style.opacity = "0.6";
+  });
+
+  if (btn) {
+    btn.style.opacity = "1";
+  }
+
+  showUpdate("Loaded: " + panel);
+}
+
+/* =========================
+   REAL-TIME DASHBOARD DATA
+========================= */
+
+// simulated data
+let stats = {
+  stock: 2450,
+  orders: 42,
+  delivery: 18,
+  completed: 31
+};
+
+function updateStats() {
+  // simulate real-time changes
+  stats.stock += Math.floor(Math.random() * 5 - 2);
+  stats.orders += Math.floor(Math.random() * 3 - 1);
+  stats.delivery += Math.floor(Math.random() * 3 - 1);
+  stats.completed += Math.floor(Math.random() * 2);
+
+  // prevent negatives
+  Object.keys(stats).forEach(key => {
+    if (stats[key] < 0) stats[key] = 0;
+  });
+
+  const cards = document.querySelectorAll(".card strong");
+
+  cards[0].textContent = stats.stock.toLocaleString() + " Units";
+  cards[1].textContent = stats.orders + " Active";
+  cards[2].textContent = stats.delivery;
+  cards[3].textContent = stats.completed + " Today";
+
+  showUpdate("Dashboard updated");
+}
+
+// update every 5 seconds
+setInterval(updateStats, 5000);
+
+
+/* =========================
+   STATUS COLOR AUTO UPDATE
+========================= */
+function refreshStatuses() {
+  document.querySelectorAll(".status").forEach(status => {
+    const text = status.textContent.toLowerCase();
+
+    status.classList.remove("active", "pending", "alert");
+
+    if (text.includes("active") || text.includes("route")) {
+      status.classList.add("active");
+    } else if (text.includes("packaging") || text.includes("pending")) {
+      status.classList.add("pending");
+    } else {
+      status.classList.add("alert");
+    }
+  });
+}
+
+refreshStatuses();
+
+
+/* =========================
+   LAST UPDATE INDICATOR
+========================= */
+function showUpdate(message) {
+  let note = document.getElementById("updateNote");
+
+  if (!note) {
+    note = document.createElement("div");
+    note.id = "updateNote";
+    note.style.marginTop = "10px";
+    note.style.fontSize = "12px";
+    note.style.color = "#555";
+    document.querySelector(".container").appendChild(note);
+  }
+
+  const time = new Date().toLocaleTimeString();
+  note.textContent = message + " • " + time;
+}
+
+
+/* =========================
+   BUTTON BINDING (for highlight)
+========================= */
+document.querySelectorAll(".view-btn").forEach(btn => {
+  btn.addEventListener("click", function () {
+    loadPanel(this.getAttribute("onclick").match(/'(.*?)'/)[1], this);
+  });
+});
+
+</script>
+
+
 
 </body>
 </html>

@@ -144,18 +144,19 @@ body{
           <td>Rice 2kg (5), Cooking Oil (2)</td>
           <td>Westlands</td>
           <td><span class="status pending">Awaiting Packaging</span></td>
-          <td>
+          <td class="action-cell">
             <button class="action-btn send">Send for Packaging</button>
           </td>
+
         </tr>
         <tr>
           <td>#DM2042</td>
           <td>Peter Otieno</td>
           <td>Sugar 1kg (10)</td>
           <td>Karen</td>
-          <td><span class="status sent">Packaged</span></td>
+          <td><span class="status sent">Under Packaging</span></td>
           <td>
-            <button class="action-btn dispatch">Dispatch</button>
+            <button class="action-btn dispatch">Dispatch.......</button>
           </td>
         </tr>
         <tr>
@@ -171,6 +172,182 @@ body{
   </div>
 
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+
+  const summaryCards = {
+    packaging: document.querySelectorAll(".card strong")[0],
+    ready: document.querySelectorAll(".card strong")[1],
+    dispatched: document.querySelectorAll(".card strong")[2],
+    urgent: document.querySelectorAll(".card strong")[3]
+  };
+
+  function updateCounts() {
+    let awaiting = document.querySelectorAll(".pending").length;
+    let underPackaging = document.querySelectorAll(".sent").length;
+    let dispatched = document.querySelectorAll(".dispatched").length;
+
+    summaryCards.packaging.textContent = awaiting;
+    summaryCards.ready.textContent = underPackaging;
+    summaryCards.dispatched.textContent = dispatched;
+  }
+
+  document.querySelectorAll(".send").forEach(button => {
+    button.addEventListener("click", () => {
+      const row = button.closest("tr");
+      const status = row.querySelector(".status");
+
+      status.textContent = "Under Packaging";
+      status.className = "status sent";
+
+      button.textContent = "Dispatch";
+      button.classList.remove("send");
+      button.classList.add("dispatch");
+
+      attachDispatchHandler(button);
+      updateCounts();
+    });
+  });
+
+  function attachDispatchHandler(button) {
+    button.addEventListener("click", () => {
+      const row = button.closest("tr");
+      const status = row.querySelector(".status");
+
+      status.textContent = "Dispatched";
+      status.className = "status dispatched";
+
+      row.cells[5].textContent = "Completed";
+      updateCounts();
+    });
+  }
+
+  document.querySelectorAll(".dispatch").forEach(btn => {
+    attachDispatchHandler(btn);
+  });
+
+  updateCounts();
+});
+
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  // 👥 Packaging staff
+  const packagers = [
+    "James Mwangi",
+    "Lucy Achieng",
+    "Brian Kiptoo",
+    "Faith Wambui"
+  ];
+
+  // 📊 Update dashboard summary
+  function updateCounts() {
+    const awaiting = document.querySelectorAll(".pending").length;
+    const packaging = document.querySelectorAll(".sent").length;
+    const dispatched = document.querySelectorAll(".dispatched").length;
+
+    const cards = document.querySelectorAll(".card strong");
+    cards[0].textContent = awaiting;
+    cards[1].textContent = packaging;
+    cards[2].textContent = dispatched;
+  }
+
+  // 📦 Show packager selector
+  function showPackagerSelector(cell, row) {
+
+    const select = document.createElement("select");
+    select.style.padding = "6px";
+    select.style.borderRadius = "6px";
+
+    const defaultOption = document.createElement("option");
+    defaultOption.textContent = "Select Packager";
+    defaultOption.disabled = true;
+    defaultOption.selected = true;
+    select.appendChild(defaultOption);
+
+    packagers.forEach(name => {
+      const option = document.createElement("option");
+      option.value = name;
+      option.textContent = name;
+      select.appendChild(option);
+    });
+
+    const confirmBtn = document.createElement("button");
+    confirmBtn.textContent = "Confirm";
+    confirmBtn.className = "action-btn send";
+    confirmBtn.style.marginLeft = "8px";
+    confirmBtn.disabled = true;
+
+    // replace button
+    cell.innerHTML = "";
+    cell.appendChild(select);
+    cell.appendChild(confirmBtn);
+
+    // enable confirm when selected
+    select.addEventListener("change", () => {
+      confirmBtn.disabled = false;
+    });
+
+    confirmBtn.addEventListener("click", () => {
+      const selectedName = select.value;
+      if (!selectedName) return;
+
+      const status = row.querySelector(".status");
+
+      // ✅ status changes ONLY after confirmation
+      status.textContent = "Under Packaging";
+      status.className = "status sent";
+
+      cell.innerHTML = `
+        Assigned to <strong>${selectedName}</strong><br>
+        <button class="action-btn dispatch">Dispatch</button>
+      `;
+
+      const dispatchBtn = cell.querySelector(".dispatch");
+
+      dispatchBtn.addEventListener("click", () => {
+        status.textContent = "Dispatched";
+        status.className = "status dispatched";
+        cell.textContent = "Completed";
+        updateCounts();
+      });
+
+      updateCounts();
+    });
+  }
+
+  // attach send buttons
+  document.querySelectorAll(".send").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const row = btn.closest("tr");
+      const cell = btn.closest("td");
+      showPackagerSelector(cell, row);
+    });
+  });
+
+  // existing dispatch buttons
+  document.querySelectorAll(".dispatch").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const row = btn.closest("tr");
+      const status = row.querySelector(".status");
+
+      status.textContent = "Dispatched";
+      status.className = "status dispatched";
+      btn.parentElement.textContent = "Completed";
+      updateCounts();
+    });
+  });
+
+  updateCounts();
+
+});
+</script>
+
+
 
 </body>
 </html>
