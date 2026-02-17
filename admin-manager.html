@@ -22,7 +22,7 @@
     body { background: #0f172a; display: flex; min-height: 100vh; }
 
     /* SIDEBAR */
-    .sidebar { width: 270px; background: var(--sidebar-bg); color: rgb(255, 255, 255); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; transition: all 0.3s; }
+    .sidebar {  width: 270px; background: var(--sidebar-bg); color: rgb(255, 255, 255); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; transition: all 0.3s; overflow-y: scroll; }
     .sidebar-header { padding: 30px 20px; text-align: center; border-bottom: 1px solid #333; }
     .sidebar-header h2 { color: black; font-size: 33px; letter-spacing: 1px; }
     .nav-links { list-style: none; padding: 20px 0; flex: 1; }
@@ -69,7 +69,7 @@
     th { text-align: left; padding: 15px; background: #f8f9fa; color: var(--text-muted); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
     td { padding: 15px; border-bottom: 1px solid #f0f0f0; font-size: 20px; color: var(--text-main); }
     .status-pill { padding: 4px 10px; border-radius: 20px; font-size: 18px; font-weight: 600; text-transform: capitalize; }
-    .status-pending { background: #fff3e0; color: #ff9800; }
+    .status-in-transit { background: #fff3e0; color: #ff9800; }
     .status-completed { background: #e8f5e9; color: #4caf50; }
     .status-unread { background: #e3f2fd; color: #2196f3; }
 
@@ -179,7 +179,7 @@
       <li><a href="#" onclick="showTab('profits', this)"><i class="fas fa-chart-line"></i> Profits & Loss</a></li>
       <li><a href="#" onclick="showTab('users', this)"><i class="fas fa-users"></i> User Signups</a></li>    
       <li><a href="Daimara Department Head – Marketing.html"><i class="fas fa-bullhorn"></i> Marketing Department</a></li>
-    <li><a href="Daimara-operator.html"><i class="fas fa-bullhorn"></i> Operator Dept</a></li>
+    <li><a href="Daimara-operator-updated.html"><i class="fas fa-bullhorn"></i> Operator Dept</a></li>
     <li><a href="Delivery services.html"><i class="fas fa-bullhorn"></i> Delivery Services Dept</a></li>
     <li><a href="employement.html"><i class="fas fa-bullhorn"></i> Employment Dept</a></li>
     <li><a href="executives.html"><i class="fas fa-bullhorn"></i> Exercutive Dept</a></li>
@@ -803,7 +803,7 @@
       const orders = DataManager.getAllOrders();
       const order = orders.find(o => o.id === id);
       if (order) {
-        const statuses = ['pending', 'completed', 'cancelled', 'returned'];
+        const statuses = ['in-transit', 'completed', 'under packaging', 'returned'];
         let currentIdx = statuses.indexOf(order.status);
         let nextIdx = (currentIdx + 1) % (statuses.length - 1); // Cycle through first 3
         order.status = statuses[nextIdx];

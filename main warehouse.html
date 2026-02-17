@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel | Daimara Online Mart</title>
+  <meta name="viewport" content="width=1200">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    :root {
+      --primary-color: rgb(233, 157, 17);
+      --dark-bg: #0a0a0a;
+      --sidebar-bg: rgb(233, 157, 17);
+      --card-bg: #ffffff;
+      --text-main: #2c3e50;
+      --text-muted: #7f8c8d;
+      --success: #27ae60;
+      --danger: #e74c3c;
+      --info: #3498db;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background: #0f172a; display: flex; min-height: 100vh; }
+
+    /* SIDEBAR */
+    .sidebar {  width: 270px; background: var(--sidebar-bg); color: rgb(255, 255, 255); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; transition: all 0.3s; overflow-y: scroll; }
+    .sidebar-header { padding: 30px 20px; text-align: center; border-bottom: 1px solid #333; }
+    .sidebar-header h2 { color: black; font-size: 33px; letter-spacing: 1px; }
+    .nav-links { list-style: none; padding: 20px 0; flex: 1; }
+    .nav-links li { padding: 5px 20px; }
+    .nav-links a { color: #bdc3c7; text-decoration: none; display: flex; align-items: center; padding: 12px 15px; border-radius: 8px; transition: all 0.3s; gap: 16px; font-size: 23px; }
+    .nav-links a:hover, .nav-links a.active { background: rgba(233, 157, 17, 0.15); color: black }
+    .nav-links i { width: 20px; font-size: 25px; }
+    .sidebar-footer { padding: 20px; border-top: 1px solid #333; }
+    .logout-btn { background: var(--danger); color: white; border: none;font-size: 27; width: 100%; padding: 12px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 600; }
+
+    /* MAIN CONTENT */
+    .main-content { flex: 1; margin-left: 260px; padding: 30px; }
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+    .page-title h1 { font-size: 25px; color: var(--text-main); }
+    .admin-profile { display: flex; align-items: center; gap: 15px; }
+    .admin-info { text-align: right; }
+    .admin-info p { font-weight: 700; font-size: 23px; }
+    .admin-info span { font-size: 21px; color: var(--text-muted); }
+    .admin-avatar { width: 45px; height: 45px; border-radius: 50%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+
+    /* DASHBOARD CARDS */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 30px; }
+    .stat-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 20px; }
+    .stat-icon { width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+    .stat-info h3 { font-size: 25px; color: var(--text-main); margin-bottom: 5px; }
+    .stat-info p { color: var(--text-muted); font-size: 23px; font-weight: 500; }
+
+    /* TAB CONTENT */
+    .tab-content { display: none; animation: fadeIn 0.3s ease; }
+    .tab-content.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* DATA TABLES */
+    .data-card { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 30px; }
+    .card-header {display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #f0f0f0; }
+    .card-title { font-size: 48px; font-weight: 700; color: var(--text-main); }
+    .btn { padding: 8px 16px; border-radius: 6px; cursor: pointer; border: none; font-weight: 600; font-size: 18px; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
+    .btn-primary { background: var(--primary-color); color: white; }
+    .btn-success { background: var(--success); color: white; }
+    .btn-info { background: var(--info); color: white; }
+    .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th { text-align: left; padding: 15px; background: #f8f9fa; color: var(--text-muted); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+    td { padding: 15px; border-bottom: 1px solid #f0f0f0; font-size: 20px; color: var(--text-main); }
+    .status-pill { padding: 4px 10px; border-radius: 20px; font-size: 18px; font-weight: 600; text-transform: capitalize; }
+    .status-in-transit { background: #fff3e0; color: #ff9800; }
+    .status-completed { background: #e8f5e9; color: #4caf50; }
+    .status-unread { background: #e3f2fd; color: #2196f3; }
+
+    /* WAREHOUSE IMAGES */
+    .product-thumb { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; }
+    .quantity-badge { padding: 2px 8px; border-radius: 4px; font-weight: bold; }
+    .qty-low { background: #ffebee; color: #c62828; }
+    .qty-ok { background: #e8f5e9; color: #2e7d32; }
+
+    /* PROFIT & LOSS */
+    .pl-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+    .pl-item { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px dashed #eee; }
+    .pl-label { font-weight: 600; color: var(--text-muted); }
+    .pl-value { font-weight: 700; }
+    .pl-positive { color: var(--success); }
+    .pl-negative { color: var(--danger); }
+
+    /* MODAL STYLES */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-content {
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+    }
+    .close-modal {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 30px;
+      cursor: pointer;
+      color: var(--text-muted);
+    }
+    .modal-header {
+      margin-bottom: 20px;
+      border-bottom: 1px solid #f0f0f0;
+      padding-bottom: 10px;
+    }
+    .clickable-name {
+      color: var(--info);
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .clickable-name:hover {
+      text-decoration: underline;
+    }
+
+    /* RECEIPT STYLES */
+    .receipt { color: #333; background: #fff; padding: 10px; }
+    .receipt-header { text-align: center; margin-bottom: 20px; border-bottom: 2px dashed #ddd; padding-bottom: 15px; }
+    .receipt-header h1 { color: var(--primary-color); font-size: 24px; margin-bottom: 5px; }
+    .receipt-info { margin-bottom: 20px; line-height: 1.6; font-size: 23px; }
+    .receipt-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px; }
+    .receipt-table th { text-align: left; border-bottom: 1px solid #eee; padding: 8px 0; }
+    .receipt-table td { padding: 8px 0; border-bottom: 1px solid #f9f9f9; vertical-align: middle; }
+    .receipt-total { text-align: right; font-size: 27px; font-weight: bold; border-top: 2px solid #333; padding-top: 10px; }
+    .print-btn {
+      display: block;
+      width: 100%;
+      margin-top: 20px;
+      padding: 12px;
+      background: #111;
+      color: rgb(233, 157, 17);
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    @media print {
+      body * { visibility: hidden; }
+      #details-modal, #details-modal * { visibility: visible; }
+      #details-modal { position: absolute; left: 0; top: 0; width: 100%; height: auto; display: block !important; }
+      .close-modal, .btn-info { display: none !important; }
+      .modal-content { box-shadow: none; border: none; width: 100%; max-width: 100%; padding: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>Main Warehouse</h2>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#" class="active" onclick="showTab('dashboard', this)"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+      <li><a href="#" onclick="showTab('orders', this)"><i class="fas fa-shopping-cart"></i> Orders</a></li>
+      <li><a href="#" onclick="showTab('warehouse', this)"><i class="fas fa-warehouse"></i> Warehouse</a></li>
+      <li><a href="#" onclick="showTab('emails', this)"><i class="fas fa-envelope"></i> Client Emails</a></li>
+     
+    
+   
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    <header class="page-header">
+      <div class="page-title">
+        <h1 id="tab-title">Dashboard Overview</h1>
+      </div>
+      <div class="admin-profile">
+        <div class="admin-info" style="font-size: 25px;">
+          <p>Operator</p>
+          <span>Main Office</span>
+        </div>
+        <div class="admin-avatar">OP</div>
+      </div>
+    </header>
+
+    <!-- DASHBOARD TAB -->
+    <div id="dashboard" class="tab-content active">
+      <div class="card-header">
+        <h2 class="card-title">Business Overview</h2>
+        
+      </div>
+      <div class="stats-grid">
+        
+        <div class="stat-card">
+          <div class="stat-icon" style="background: rgba(39,174,96,0.1); color: var(--success);"><i class="fas fa-shopping-bag"></i></div>
+          <div class="stat-info"><h3 id="stat-orders">0</h3><p>Total Orders</p></div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon" style="background: rgba(155,89,182,0.1); color: #9b59b6;"><i class="fas fa-box"></i></div>
+          <div class="stat-info"><h3 id="stat-warehouse">0</h3><p>Warehouse Items</p></div>
+        </div>
+        
+      </div>
+
+      <div class="data-card">
+        <div class="card-header">
+          <h2 class="card-title">Recent Orders</h2>
+          <button class="btn btn-primary" onclick="showTab('orders')">View All</button>
+        </div>
+        <table id="recent-orders-table">
+          <thead>
+            <tr><th>Order ID</th><th>Customer</th><th>Amount</th><th>Status</th><th>Date</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ORDERS TAB -->
+    <div id="orders" class="tab-content">
+      <div class="data-card">
+        <div class="card-header">
+          <h2 class="card-title">All Customer Orders</h2>
+        </div>
+        <table id="all-orders-table">
+          <thead>
+            <tr><th>Order ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th><th>Action</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- WAREHOUSE TAB -->
+    <div id="warehouse" class="tab-content">
+      <div class="data-card">
+        <div class="card-header">
+          <h2 class="card-title">Inventory Management</h2>
+          <div style="display: flex; gap: 10px;">
+            <a href="add-product.html" class="btn btn-success"><i class="fas fa-plus"></i> Add New Product</a>
+          </div>
+        </div>
+        <table id="warehouse-table">
+          <thead>
+            <tr><th>Image</th><th>Product Name</th><th>Sub-Category</th><th>Supplier</th><th>Price</th><th>In Stock</th><th>Added Date</th><th>Action</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+   
+
+    <!-- EMAILS TAB -->
+    <div id="emails" class="tab-content">
+      <div class="data-card">
+        <div class="card-header">
+          <h2 class="card-title">Client Messages</h2>
+        </div>
+        <table id="emails-table">
+          <thead>
+            <tr><th>From</th><th>Subject</th><th>Message</th><th>Date</th><th>Status</th><th>Action</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PROFITS TAB -->
+    <div id="profits" class="tab-content">
+      <div class="data-card">
+        <div class="card-header">
+          <h2 class="card-title">Financial Analysis</h2>
+          <p style="color: #666; font-size: 80%;">Loading analysis...</p>
+        </div>
+        <div class="pl-summary">
+          <div>
+            <div class="pl-item"><span class="pl-label">Gross Revenue:</span><span class="pl-value" id="pl-revenue">KSH 0</span></div>
+            <div class="pl-item"><span class="pl-label">Inventory Value:</span><span class="pl-value" id="pl-warehouse">KSH 0</span></div>
+            <div class="pl-item"><span class="pl-label">Estimated Operating Costs (15%):</span><span class="pl-value pl-negative" id="pl-costs">-KSH 0</span></div>
+            <div class="pl-item" style="border-top: 2px solid #333; margin-top: 10px; padding-top: 20px;"><span class="pl-label" style="font-size: 35px;">Net Profit:</span><span class="pl-value pl-positive" id="pl-profit" style="font-size: 18px;">KSH 0</span></div>
+          </div>
+          <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+            <h3>Margin Analysis</h3>
+            <div style="font-size: 48px; font-weight: 800; color: var(--primary-color); margin: 20px 0;" id="pl-margin">0%</div>
+            <p>Your current profit margin based on total sales and operating costs.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- USERS TAB -->
+    <div id="users" class="tab-content">
+      <div class="data-card">
+        <div class="card-header"><h2 class="card-title">Registered Users</h2></div>
+        <table id="users-table">
+          <thead>
+            <tr><th>User ID</th><th>Name</th><th>Email</th><th>Signup Date</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+     
+
+  </main>
+
+  <!-- DETAILS MODAL -->
+  <div id="details-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal" onclick="closeModal()">&times;</span>
+      <div id="modal-body">
+        <!-- Content injected here -->
+      </div>
+    </div>
+  </div>
+
+  <script src="data-manager.js"></script>
+  <script>
+    // TAB SWITCHING
+    function showTab(tabId, el) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      
+      if (el) {
+        document.querySelectorAll('.nav-links a').forEach(link => link.classList.remove('active'));
+        el.classList.add('active');
+      }
+
+      const titleMap = {
+        'dashboard': 'Dashboard Overview',
+        'orders': 'Order Management',
+        'warehouse': 'Warehouse & Inventory',
+        'invoices': 'Billing & Invoices',
+        'emails': 'Customer Communications',
+        'profits': 'Profit & Loss Analysis',
+        'users': 'User Base Growth'
+      };
+      document.getElementById('tab-title').innerText = titleMap[tabId];
+      
+      // Load specific tab data
+      loadTabData(tabId);
+
+      // Auto refresh dashboard if on it
+      if (tabId === 'dashboard') {
+        if (window.dashboardInterval) clearInterval(window.dashboardInterval);
+        window.dashboardInterval = setInterval(renderDashboard, 30000); // 30 seconds
+      } else {
+        if (window.dashboardInterval) clearInterval(window.dashboardInterval);
+      }
+    }
+
+    function loadTabData(tabId) {
+      try {
+        switch(tabId) {
+          case 'dashboard': renderDashboard(); break;
+          case 'orders': renderOrders(); break;
+          case 'warehouse': renderWarehouse(); break;
+          case 'invoices': renderInvoices(); break;
+          case 'emails': renderEmails(); break;
+          case 'profits': renderProfits(); break;
+          case 'users': renderUsers(); break;
+        }
+      } catch (err) {
+        console.error('Error loading tab data:', err);
+      }
+    }
+
+    // RENDER FUNCTIONS
+    function renderDashboard() {
+      const stats = DataManager.getAdminDashboardStats();
+      document.getElementById('stat-revenue').innerText = 'KSH ' + (stats.totalRevenue || 0).toLocaleString();
+      document.getElementById('stat-orders').innerText = stats.totalOrders || 0;
+      document.getElementById('stat-users').innerText = stats.totalUsers || 0;
+      document.getElementById('stat-warehouse').innerText = stats.warehouseProducts || 0;
+      
+      // Update online users
+      if (document.getElementById('stat-online')) {
+        document.getElementById('stat-online').innerText = DataManager.getOnlineUserCount() || 0;
+      }
+
+      const orders = (DataManager.getAllOrders() || []).slice(0, 5);
+      const tbody = document.querySelector('#recent-orders-table tbody');
+      if (!tbody) return;
+      tbody.innerHTML = orders.map(o => `
+        <tr>
+          <td>#${(o.id || '').slice(-6)}</td>
+          <td><span class="clickable-name" onclick="viewOrderDetails('${o.id}')">${o.customerName || o.customer?.name || 'Guest'}</span></td>
+          <td>KSH ${(o.grandTotal || o.totalPrice || 0).toLocaleString()}</td>
+          <td><span class="status-pill status-${o.status || 'pending'}">${o.status || 'pending'}</span></td>
+          <td>${o.date ? new Date(o.date).toLocaleDateString() : 'N/A'}</td>
+        </tr>
+      `).join('') || '<tr><td colspan="5" style="text-align:center">No recent orders</td></tr>';
+    }
+
+    function renderOrders() {
+      const orders = DataManager.getAllOrders() || [];
+      const tbody = document.querySelector('#all-orders-table tbody');
+      if (!tbody) return;
+      tbody.innerHTML = orders.map(o => `
+        <tr>
+          <td>#${(o.id || '').slice(-8)}</td>
+          <td><span class="clickable-name" onclick="viewOrderDetails('${o.id}')">${o.customerName || o.customer?.name || 'N/A'}</span></td>
+          <td>${(o.items || o.products || []).length} items</td>
+          <td>KSH ${(o.grandTotal || o.totalPrice || 0).toLocaleString()}</td>
+          <td><span class="status-pill status-${o.status || 'pending'}">${o.status || 'pending'}</span></td>
+          <td>${o.date ? new Date(o.date).toLocaleDateString() : 'N/A'}</td>
+          <td>
+            <div style="display:flex; gap:5px;">
+              <button class="btn btn-info" style="padding:4px 8px; font-size:25px;" onclick="updateOrderStatus('${o.id}')">Status</button>
+              <button class="btn btn-primary" style="padding:4px 8px; font-size:25px; background:#6c5ce7;" onclick="showAdminReceipt('${o.id}')">Receipt</button>
+              <button class="btn btn-danger" style="padding:4px 8px; font-size:25px;" onclick="returnOrder('${o.id}')">Return</button>
+              <button class="btn btn-danger" style="padding:4px 8px; background:#333;" onclick="deleteOrder('${o.id}')"><i class="fas fa-trash"></i></button>
+            </div>
+          </td>
+        </tr>
+      `).join('') || '<tr><td colspan="7" style="text-align:center">No orders found</td></tr>';
+    }
+
+    function renderWarehouse() {
+      const warehouse = DataManager.getWarehouse() || [];
+      const tbody = document.querySelector('#warehouse-table tbody');
+      if (!tbody) return;
+      tbody.innerHTML = warehouse.map(p => `
+        <tr>
+          <td><img src="${p.image || ''}" class="product-thumb"></td>
+          <td>${p.name || 'Unknown'}</td>
+          <td>${p.subcategory || 'General'}</td>
+          <td>${p.supplier || 'N/A'}</td>
+          <td>KSH ${(p.price || 0).toLocaleString()}</td>
+          <td><span class="quantity-badge ${p.quantity < 10 ? 'qty-low' : 'qty-ok'}">${p.quantity || 0}</span></td>
+          <td>${p.createdAt || p.addedDate || 'N/A'}</td>
+          <td><button class="btn btn-primary" style="padding:4px 8px" onclick="editStock('${p.id}')">Adjust</button></td>
+        </tr>
+      `).join('') || '<tr><td colspan="8" style="text-align:center">Warehouse is empty</td></tr>';
+    }
+
+    function renderInvoices() {
+      const invoices = DataManager.getInvoices() || [];
+      const tbody = document.querySelector('#invoices-table tbody');
+      if (!tbody) return;
+      tbody.innerHTML = invoices.map(inv => `
+        <tr>
+          <td>${inv.id || 'N/A'}</td>
+          <td><span class="clickable-name" onclick="viewOrderDetails('${inv.orderId}')">${inv.customerName || inv.customerInfo?.name || 'Guest'}</span></td>
+          <td>#${(inv.orderId || '').slice(-6)}</td>
+          <td>KSH ${(inv.total || inv.amount || 0).toLocaleString()}</td>
+          <td>${inv.createdDate ? new Date(inv.createdDate).toLocaleDateString() : 'N/A'}</td>
+          <td>
+            <button class="btn btn-success" style="padding:4px 8px" onclick="downloadInvoiceExcel('${inv.id}')"><i class="fas fa-download"></i> Excel</button>
+            <button class="btn btn-danger" style="padding:4px 8px; background:#333;" onclick="deleteInvoice('${inv.id}')"><i class="fas fa-trash"></i></button>
+          </td>
+        </tr>
+      `).join('') || '<tr><td colspan="6" style="text-align:center">No invoices generated yet</td></tr>';
+    }
+
+    function renderEmails() {
+      const emails = DataManager.getClientEmails() || [];
+      const tbody = document.querySelector('#emails-table tbody');
+      if (!tbody) return;
+      tbody.innerHTML = emails.map(e => `
+        <tr>
+          <td>${e.email || 'N/A'}</td>
+          <td>${e.subject || 'No Subject'}</td>
+          <td style="cursor:pointer; color:var(--info);" onclick="viewEmailMessage('${e.id}')">
+            ${(e.message || '').slice(0, 30)}...
+          </td>
+          <td>${e.receivedDate ? new Date(e.receivedDate).toLocaleDateString() : 'N/A'}</td>
+          <td><span class="status-pill status-${e.status || 'unread'}">${e.status || 'unread'}</span></td>
+          <td>
+            <button class="btn btn-danger" style="padding:4px 8px; background:#333;" onclick="deleteEmail('${e.id}')"><i class="fas fa-trash"></i></button>
+          </td>
+        </tr>
+      `).join('') || '<tr><td colspan="6" style="text-align:center">No messages</td></tr>';
+    }
+
+    function renderProfits() {
+      const pl = DataManager.getProfitLossAnalysis();
+      if (!pl) return;
+      document.getElementById('pl-revenue').innerText = 'KSH ' + (pl.totalRevenue || 0).toLocaleString();
+      document.getElementById('pl-warehouse').innerText = 'KSH ' + (pl.warehouseValue || 0).toLocaleString();
+      document.getElementById('pl-costs').innerText = '-KSH ' + (pl.operatingCosts || 0).toLocaleString();
+      document.getElementById('pl-profit').innerText = 'KSH ' + (pl.profit || 0).toLocaleString();
+      document.getElementById('pl-margin').innerText = pl.profitMargin || '0%';
+      
+      // Update P&L summary info
+      const plSummary = document.querySelector('#profits .card-header p');
+      if (plSummary) {
+        plSummary.innerText = `Analysis based on ${pl.ordersCount || 0} orders (${pl.returnedOrders || 0} returned). Last updated: ${new Date(pl.analysisDate).toLocaleTimeString()}`;
+      }
+    }
+
+    function renderUsers() {
+      const users = DataManager.getAllUsers() || [];
+      const tbody = document.querySelector('#users-table tbody');
+      if (!tbody) return;
+      tbody.innerHTML = users.map(u => `
+        <tr>
+          <td>${(u.id || '').slice(0, 8)}</td>
+          <td><span class="clickable-name" onclick="viewUserProfile('${u.id}')">${u.name || 'N/A'}</span></td>
+          <td>${u.email || 'N/A'}</td>
+          <td>${(u.registeredDate || u.createdAt) ? new Date(u.registeredDate || u.createdAt).toLocaleDateString() : 'N/A'}</td>
+        </tr>
+      `).join('') || '<tr><td colspan="4" style="text-align:center">No users registered</td></tr>';
+    }
+
+    function viewUserProfile(userId) {
+      const users = DataManager.getAllUsers();
+      const user = users.find(u => u.id === userId);
+      if (!user) return alert("User not found");
+
+      const body = document.getElementById('modal-body');
+      const isRestricted = user.status === 'restricted';
+      
+      body.innerHTML = `
+        <div class="modal-header">
+          <h2>User Profile: ${user.name}</h2>
+        </div>
+        <div style="display:flex; gap:30px; padding:20px;">
+          <div style="flex: 0 0 150px;">
+            <img src="${user.profileImage || 'https://via.placeholder.com/150'}" style="width:150px; height:150px; border-radius:12px; object-fit:cover; border:3px solid var(--primary-color);">
+            <div style="margin-top:20px; display:flex; flex-direction:column; gap:10px;">
+              <button class="btn ${isRestricted ? 'btn-success' : 'btn-danger'}" onclick="toggleUserRestriction('${user.id}')" style="width:100%;">
+                <i class="fas ${isRestricted ? 'fa-unlock' : 'fa-ban'}"></i> ${isRestricted ? 'Unrestrict' : 'Restrict'}
+              </button>
+              <button class="btn btn-danger" onclick="deleteUserAccount('${user.id}')" style="width:100%; background:#333;">
+                <i class="fas fa-trash"></i> Delete Account
+              </button>
+            </div>
+          </div>
+          <div style="flex:1;">
+            <h3 style="margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">Account Information</h3>
+            <div style="display:grid; grid-template-columns: 150px 1fr; gap:10px; font-size:20px;">
+              <strong>Full Name:</strong> <span>${user.name}</span>
+              <strong>Email:</strong> <span>${user.email}</span>
+              <strong>Account ID:</strong> <span>${user.id}</span>
+              <strong>Status:</strong> <span class="status-pill ${isRestricted ? 'status-unread' : 'status-completed'}" style="display:inline-block;">${user.status || 'Active'}</span>
+              <strong>Registered:</strong> <span>${new Date(user.registeredDate || user.createdAt).toLocaleString()}</span>
+            </div>
+            
+            <h3 style="margin-top:25px; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">User Activity</h3>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+              <div style="background:#f8f9fa; padding:15px; border-radius:8px; text-align:center;">
+                <h4 style="margin-bottom:5px;">Orders</h4>
+                <div style="font-size:32px; font-weight:bold; color:var(--primary-color);">
+                  ${(DataManager.getAllOrders() || []).filter(o => (o.customerEmail || o.customer?.email) === user.email).length}
+                </div>
+              </div>
+              <div style="background:#f8f9fa; padding:15px; border-radius:8px; text-align:center;">
+                <h4 style="margin-bottom:5px;">Messages</h4>
+                <div style="font-size:32px; font-weight:bold; color:var(--info);">
+                  ${(DataManager.getClientEmails() || []).filter(e => e.email === user.email).length}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      document.getElementById('details-modal').style.display = 'flex';
+    }
+
+    function toggleUserRestriction(userId) {
+      const users = DataManager.getAllUsers();
+      const user = users.find(u => u.id === userId);
+      if (!user) return;
+
+      const isRestricted = user.status === 'restricted';
+      const action = isRestricted ? "unrestrict" : "restrict";
+      
+      if (!confirm(`Are you sure you want to ${action} this user?`)) return;
+
+      user.status = isRestricted ? 'active' : 'restricted';
+      localStorage.setItem('ecommerce_all_users', JSON.stringify(users));
+      
+      alert(`User account has been ${action}ed.`);
+      viewUserProfile(userId); // Refresh modal
+      renderUsers(); // Refresh table
+    }
+
+    function deleteUserAccount(userId) {
+      if (!confirm("CRITICAL: Permanently delete this user account? This action cannot be undone.")) return;
+      
+      DataManager.deleteUser(userId);
+      closeModal();
+      renderUsers();
+      renderDashboard();
+      alert("User account has been permanently deleted.");
+    }
+
+    // MODAL FUNCTIONS
+    function viewOrderDetails(orderId) {
+      const orders = DataManager.getAllOrders();
+      const order = orders.find(o => o.id === orderId);
+      if (!order) return alert("Order not found");
+
+      const items = order.items || order.products || [];
+      const body = document.getElementById('modal-body');
+      
+      body.innerHTML = `
+        <div class="modal-header">
+          <h2>Order Details: #${order.id.slice(-8)}</h2>
+        </div>
+        <div style="margin-bottom:20px;">
+          <p><strong>Customer:</strong> ${order.customerName || order.customer?.name}</p>
+          <p><strong>Email:</strong> ${order.customerEmail || order.customer?.email || 'N/A'}</p>
+          <p><strong>Phone:</strong> ${order.customerPhone || order.customer?.phone || 'Not provided'}</p>
+          <p><strong>Date:</strong> ${new Date(order.date).toLocaleString()}</p>
+          <p><strong>Payment Method:</strong> ${order.paymentMethod || 'N/A'}</p>
+          <p><strong>Status:</strong> ${order.status}</p>
+          ${order.deliveryLocation ? `<p style="margin-top:10px; color:#e67e22;"><strong>📍 Delivery Location:</strong><br>${order.deliveryLocation}</p>` : ''}
+        </div>
+        <h3>Items:</h3>
+        <table style="width:100%; border-collapse: collapse; margin-top:10px;">
+          <thead style="background:#f8f9fa;">
+            <tr>
+              <th style="padding:10px; border:1px solid #ddd; text-align:left;">Product</th>
+              <th style="padding:10px; border:1px solid #ddd; text-align:center;">Qty</th>
+              <th style="padding:10px; border:1px solid #ddd; text-align:right;">Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${items.map(i => `
+              <tr>
+                <td style="padding:10px; border:1px solid #ddd; display:flex; align-items:center; gap:10px;">
+                  <img src="${i.image || 'image-placeholder.jpg'}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;">
+                  <span>${i.name}</span>
+                </td>
+                <td style="padding:10px; border:1px solid #ddd; text-align:center;">${i.qty || i.quantity || 1}</td>
+                <td style="padding:10px; border:1px solid #ddd; text-align:right;">KES ${i.price.toLocaleString()}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+        <div style="margin-top:20px; text-align:right; font-weight:bold; font-size:1.2em;">
+          Total: KES ${(order.grandTotal || order.totalPrice || 0).toLocaleString()}
+        </div>
+      `;
+      document.getElementById('details-modal').style.display = 'flex';
+    }
+
+    function showAdminReceipt(orderId) {
+      const orders = DataManager.getAllOrders();
+      const order = orders.find(o => o.id === orderId);
+      if (!order) return alert("Order not found");
+
+      const items = order.items || order.products || [];
+      const phone = order.customerPhone || order.customer?.phone || 'Not provided';
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(order.id)}`;
+      const body = document.getElementById('modal-body');
+
+      // Process delivery location to be clickable if it exists
+      let locationLink = '';
+      if (order.deliveryLocation) {
+        const loc = order.deliveryLocation.trim();
+        if (loc.startsWith('http')) {
+          locationLink = `<a href="${loc}" target="_blank" style="color:#e67e22; text-decoration:underline;">${loc}</a>`;
+        } else {
+          // If it's coordinates or text, link to Google Maps search
+          locationLink = `<a href="https://www.google.com/maps/search/${encodeURIComponent(loc)}" target="_blank" style="color:#e67e22; text-decoration:underline;">${loc}</a>`;
+        }
+      }
+
+      body.innerHTML = `
+        <div class="receipt">
+          <div class="receipt-header"style="font-size:27px">
+            <h1>Daimara Online Mart</h1>
+            <p>Official Order Receipt</p>
+          </div>
+          <div class="receipt-info">
+            <p><strong>Order ID:</strong> ${order.id}</p>
+            <p><strong>Date:</strong> ${new Date(order.date).toLocaleString()}</p>
+            <p><strong>Customer:</strong> ${order.customerName || order.customer?.name || 'Guest'}</p>
+            <p><strong>Phone:</strong> ${phone}</p>
+            <p><strong>Status:</strong> ${order.status.toUpperCase()}</p>
+            ${order.deliveryLocation ? `<p style="margin-top:5px; color:#e67e22;"><strong>📍 Delivery Location:</strong><br>${locationLink}</p>` : ''}
+          </div>
+          <table class="receipt-table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th style="text-align:center;">Qty</th>
+                <th style="text-align:right;">Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${items.map(item => `
+                <tr>
+                  <td style="display:flex; align-items:center; gap:10px;">
+                    <img src="${item.image || 'image-placeholder.jpg'}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;">
+                    <span>${item.name}</span>
+                  </td>
+                  <td style="text-align:center;">${item.qty || item.quantity || 1}</td>
+                  <td style="text-align:right;">KSH ${item.price.toLocaleString()}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          <div class="receipt-total">
+            TOTAL: KSH ${(order.grandTotal || order.totalPrice || 0).toLocaleString()}
+          </div>
+          <div style="text-align:center; margin-top:20px;">
+            <img src="${qrUrl}" style="width:120px; height:120px;" alt="Order QR Code">
+            <div style="font-size:25px; color:#666; margin-top:5px;">Scan to verify order details</div>
+            <div style="font-size:18px; color:#999; margin-top:5px;">${order.id}</div>
+          </div>
+          <div style="margin-top:30px; text-align:center;">
+             <button class="print-btn" onclick="window.print()"><i class="fas fa-print"></i> Print Receipt</button>
+          </div>
+        </div>
+      `;
+      document.getElementById('details-modal').style.display = 'flex';
+    }
+
+    function viewEmailMessage(emailId) {
+      const emails = DataManager.getClientEmails();
+      const email = emails.find(e => e.id === emailId);
+      if (!email) return alert("Message not found");
+
+      const body = document.getElementById('modal-body');
+      body.innerHTML = `
+        <div class="modal-header">
+          <h2>Client Message</h2>
+        </div>
+        <div style="margin-bottom:15px;">
+          <p><strong>From:</strong> ${email.email}</p>
+          <p><strong>Subject:</strong> ${email.subject || 'No Subject'}</p>
+          <p><strong>Date:</strong> ${new Date(email.receivedDate).toLocaleString()}</p>
+        </div>
+        <div style="background:#f8f9fa; padding:15px; border-radius:8px; line-height:1.6; white-space:pre-wrap;">
+          ${email.message}
+        </div>
+      `;
+      document.getElementById('details-modal').style.display = 'flex';
+      
+      // Mark as read
+      if (email.status === 'unread') {
+        DataManager.markMessageAsRead(emailId);
+        renderEmails();
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('details-modal').style.display = 'none';
+    }
+
+    // Close modal on background click
+    window.onclick = function(event) {
+      const modal = document.getElementById('details-modal');
+      if (event.target == modal) {
+        closeModal();
+      }
+    }
+
+    // ACTIONS
+    function updateOrderStatus(id) {
+      const orders = DataManager.getAllOrders();
+      const order = orders.find(o => o.id === id);
+      if (order) {
+        const statuses = ['in-transit', 'completed', 'under packaging', 'returned'];
+        let currentIdx = statuses.indexOf(order.status);
+        let nextIdx = (currentIdx + 1) % (statuses.length - 1); // Cycle through first 3
+        order.status = statuses[nextIdx];
+        DataManager.saveOrders(orders);
+        renderOrders();
+        renderDashboard();
+      }
+    }
+
+    function returnOrder(id) {
+      if (!confirm("Are you sure you want to mark this order as returned? Stock will be added back to warehouse.")) return;
+      
+      const orders = DataManager.getAllOrders();
+      const order = orders.find(o => o.id === id);
+      
+      if (order && order.status !== 'returned') {
+        const warehouse = DataManager.getWarehouse();
+        const items = order.items || order.products || [];
+        
+        // Add items back to warehouse
+        items.forEach(item => {
+          // Handle both old 'product' (ID) and new 'id' field
+          const itemId = item.id || item.product;
+          const wItem = warehouse.find(p => p.id === itemId || p.name === item.name);
+          if (wItem) {
+            wItem.quantity += (item.qty || item.quantity || 1);
+          }
+        });
+        
+        order.status = 'returned';
+        localStorage.setItem('ecommerce_warehouse', JSON.stringify({ products: warehouse }));
+        DataManager.saveOrders(orders);
+        
+        alert("Order marked as returned. Warehouse updated.");
+        renderOrders();
+        renderDashboard();
+      }
+    }
+
+    function deleteOrder(id) {
+      if (!confirm("Permanently delete this order record?")) return;
+      DataManager.deleteOrder(id);
+      renderOrders();
+      renderDashboard();
+    }
+
+    function deleteInvoice(id) {
+      if (!confirm("Permanently delete this invoice?")) return;
+      DataManager.deleteInvoice(id);
+      renderInvoices();
+    }
+
+    function deleteEmail(id) {
+      if (!confirm("Delete this message?")) return;
+      DataManager.deleteMessage(id);
+      renderEmails();
+      renderDashboard();
+    }
+
+    function editStock(id) {
+      const warehouse = DataManager.getWarehouse();
+      const p = warehouse.find(x => x.id === id);
+      if (!p) return;
+
+      const newQty = prompt(`Enter new stock quantity for ${p.name}:`, p.quantity);
+      if (newQty !== null && !isNaN(newQty)) {
+        DataManager.updateWarehouseQuantity(id, parseInt(newQty));
+        renderWarehouse();
+        renderDashboard();
+      }
+    }
+
+    function downloadInvoiceExcel(invoiceId) {
+      const invoices = DataManager.getInvoices();
+      const inv = invoices.find(i => i.id === invoiceId);
+      if (!inv) return alert("Invoice not found");
+
+      let csv = "Invoice Details\n";
+      csv += `Invoice ID,${inv.id}\n`;
+      csv += `Customer Name,${inv.customerName || inv.customerInfo?.name}\n`;
+      csv += `Customer Email,${inv.customerEmail || inv.customerInfo?.email}\n`;
+      csv += `Order ID,${inv.orderId}\n`;
+      csv += `Date,${new Date(inv.createdDate).toLocaleString()}\n\n`;
+      
+      csv += "Items\n";
+      csv += "Product,Price,Quantity,Subtotal\n";
+      
+      if (inv.items) {
+        inv.items.forEach(item => {
+          csv += `"${item.name}",${item.price},${item.qty || 1},${item.price * (item.qty || 1)}\n`;
+        });
+      }
+      
+      csv += `\nSubtotal,,KES,${inv.subtotal || 0}\n`;
+      csv += `Tax (16%),,KES,${inv.tax || 0}\n`;
+      csv += `Shipping,,KES,${inv.shipping || 0}\n`;
+      csv += `Total,,KES,${inv.total || inv.amount || 0}\n`;
+
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.setAttribute('hidden', '');
+      a.setAttribute('href', url);
+      a.setAttribute('download', `invoice_${inv.id}.csv`);
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    function exportInvoicesToExcel() {
+      const invoices = DataManager.getInvoices();
+      if (invoices.length === 0) return alert("No invoices to export");
+
+      let csv = "Invoice ID,Customer,Order ID,Amount,Date\n";
+      invoices.forEach(inv => {
+        csv += `${inv.id},${inv.customerName},${inv.orderId},${inv.amount},${inv.createdDate}\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.setAttribute('hidden', '');
+      a.setAttribute('href', url);
+      a.setAttribute('download', 'invoices_export.csv');
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    function adminLogout() {
+      window.location.href = "login.html";
+    }
+
+    // Initialize
+    window.onload = () => {
+      if (typeof DataManager === 'undefined') {
+        alert("Error: DataManager not loaded. Please refresh the page.");
+        return;
+      }
+      renderDashboard();
+    };
+  </script>
+</body>
+</html>

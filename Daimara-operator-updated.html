@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daimara Operators</title>
+
+<style>
+body{margin:0;font-family:Arial;background:#f4f6f9;}
+.topbar{background:#e99d11;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;}
+.btn{background:black;color:white;border:none;padding:10px 16px;border-radius:8px;cursor:pointer;}
+.container{padding:24px;}
+.card{background:white;border-radius:12px;padding:20px;margin-bottom:15px;box-shadow:0 6px 15px rgba(0,0,0,0.1);}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px;}
+.table{width:100%;border-collapse:collapse;margin-top:10px;}
+.table th,.table td{padding:10px;border-bottom:1px solid #eee;}
+.move-btn{background:#16a34a;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;}
+.dropdown{position:absolute;background:white;border:1px solid #ddd;padding:10px;border-radius:8px;}
+.hidden{display:none;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h2>Daimara Operators</h2>
+  <div>
+    <button class="btn" onclick="createSubWarehouse()">Create Sub-Warehouse</button>
+    <button class="btn" onclick="togglePlatformDropdown()">Open Platform</button>
+  </div>
+</div>
+
+<div class="container">
+
+<div class="card" onclick="toggleWarehouseView()" style="cursor:pointer">
+<h3>Main Warehouse Stock</h3>
+<strong id="totalStock"></strong>
+</div>
+
+<div id="warehouseSection" class="hidden">
+<table class="table">
+<thead>
+<tr><th>Product</th><th>Stock</th><th>Move</th><th></th></tr>
+</thead>
+<tbody id="warehouseTable"></tbody>
+</table>
+</div>
+
+<h3>Sub Warehouses</h3>
+<div class="grid" id="subWarehouseList"></div>
+
+<div id="platformDropdown" class="dropdown hidden"></div>
+
+</div>
+
+<script>
+let warehouse=[
+{id:1,name:"Cooking Oil 5L",stock:120},
+{id:2,name:"Rice 2kg",stock:50}
+];
+
+let subWarehouses=[];
+
+function renderWarehouse(){
+const table=document.getElementById("warehouseTable");
+table.innerHTML="";
+warehouse.forEach(p=>{
+table.innerHTML+=`
+<tr>
+<td>${p.name}</td>
+<td>${p.stock}</td>
+<td><input type="number" id="qty-${p.id}" style="width:60px"></td>
+<td><button class="move-btn" onclick="showMoveOptions(${p.id},this)">Move</button></td>
+</tr>`;
+});
+updateTotal();
+}
+
+function showMoveOptions(id,btn){
+if(subWarehouses.length===0){
+alert("Create sub warehouse first");
+return;
+}
+
+const old=document.querySelector(".dropdown-move");
+if(old) old.remove();
+
+const box=document.createElement("div");
+box.className="dropdown dropdown-move";
+
+box.innerHTML=`
+<strong>Select destination</strong><br><br>
+${subWarehouses.map((sw,i)=>
+`<label><input type="checkbox" value="${i}"> ${sw.name}</label><br>`
+).join("")}
+<br>
+<button onclick="confirmMove(${id})">Confirm</button>
+`;
+
+btn.parentElement.appendChild(box);
+}
+
+function confirmMove(id){
+const qty=parseInt(document.getElementById(`qty-${id}`).value);
+const checks=document.querySelectorAll(".dropdown-move input:checked");
+
+if(!qty || qty<=0){alert("Enter quantity");return;}
+if(checks.length===0){alert("Select warehouse");return;}
+
+const product=warehouse.find(p=>p.id===id);
+if(qty>product.stock){alert("Not enough stock");return;}
+
+product.stock-=qty;
+const share=Math.floor(qty/checks.length);
+
+checks.forEach(c=>{
+const sw=subWarehouses[c.value];
+let item=sw.stock.find(p=>p.name===product.name);
+if(item) item.qty+=share;
+else sw.stock.push({name:product.name,qty:share});
+});
+
+document.querySelector(".dropdown-move").remove();
+renderWarehouse();
+renderSubWarehouses();
+}
+
+function createSubWarehouse(){
+const name=prompt("Enter warehouse name");
+if(!name) return;
+subWarehouses.push({name:name,stock:[]});
+renderSubWarehouses();
+}
+
+function renderSubWarehouses(){
+const list=document.getElementById("subWarehouseList");
+list.innerHTML="";
+subWarehouses.forEach((sw,i)=>{
+list.innerHTML+=`
+<div class="card" onclick="viewWarehouse(${i})" style="cursor:pointer">
+<strong>${sw.name}</strong><br>
+${sw.stock.length} products
+</div>`;
+});
+}
+
+function viewWarehouse(i){
+const sw=subWarehouses[i];
+if(sw.stock.length===0){alert("No products");return;}
+
+alert(
+sw.name + "\\n\\n" +
+sw.stock.map(p=>p.name+" — "+p.qty).join("\\n")
+);
+}
+
+function togglePlatformDropdown(){
+const box=document.getElementById("platformDropdown");
+box.classList.toggle("hidden");
+
+box.innerHTML=subWarehouses.map((sw,i)=>
+`<div style="cursor:pointer;padding:5px" onclick="viewWarehouse(${i})">${sw.name}</div>`
+).join("");
+}
+
+function toggleWarehouseView(){
+document.getElementById("warehouseSection").classList.toggle("hidden");
+}
+
+function updateTotal(){
+document.getElementById("totalStock").innerText=
+warehouse.reduce((s,p)=>s+p.stock,0)+" Units";
+}
+
+renderWarehouse();
+</script>
+</body>
+</html>

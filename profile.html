@@ -305,9 +305,11 @@ body {
   border-radius: 12px;
   padding: 25px;
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
-  height: fit-content;
+  height: auto;
+  max-height: calc(100vh - 120px);
   position: sticky;
   top: 100px;
+  overflow-y: scroll;
 }
 
 .sidebar-profile {
