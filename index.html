@@ -418,9 +418,9 @@ function performSearch() {
 
   if (results.length > 0) {
     searchResults.innerHTML = results.map(p => {
-      let url = 'Shop.html?search=' + encodeURIComponent(p.name);
+      let url = 'store.html?search=' + encodeURIComponent(p.name);
       if (p.subcategory === 'Gas') url = 'gas-refill.html';
-      if (p.subcategory === 'Water') url = 'water-refill.html';
+      if (p.subcategory === 'Water') url = 'water-refilling services.html';
       
       return `
         <div onclick="window.location.href='${url}'">
@@ -440,7 +440,7 @@ searchInput.addEventListener('input', performSearch);
 searchBtn.addEventListener('click', () => {
   const query = searchInput.value.trim();
   if (query) {
-    window.location.href = `Shop.html?search=${encodeURIComponent(query)}`;
+    window.location.href = `store.html?search=${encodeURIComponent(query)}`;
   }
 });
 
