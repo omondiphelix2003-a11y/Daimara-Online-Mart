@@ -1074,7 +1074,7 @@ body {
 <!-- NAVBAR -->
 <nav class="navbar">
   <div class="nav-left">
-    <a href="home.html" style="text-decoration: none; color: inherit;">
+    <a href="index.html" style="text-decoration: none; color: inherit;">
       <span class="shop-name">Daimara Online Mart</span>
     </a>
   </div>
@@ -1096,7 +1096,7 @@ body {
       <a id="login-btn" href="login.html">Login</a>
     </div>
     <div class="nav-cart">
-      <a href="shop.html" style="text-decoration: none; color: inherit;">shop</a>
+      <a href="store.html" style="text-decoration: none; color: inherit;">shop</a>
     </div>
   </div>
 </nav>
@@ -1187,7 +1187,7 @@ body {
         <div class="detail-section">
           <h3>Quick Actions</h3>
           <div class="action-buttons">
-            <button class="btn btn-primary" onclick="location.href='shop.html'">🛍️ Continue Shopping</button>
+            <button class="btn btn-primary" onclick="location.href='store.html'">🛍️ Continue Shopping</button>
             <button class="btn btn-secondary" onclick="showTab('settings')">✏️ Edit Profile</button>
           </div>
         </div>
@@ -1200,7 +1200,7 @@ body {
       <div id="orders-list" class="orders-list">
         <div class="no-data">
           <p>📦 No orders yet</p>
-          <button class="btn btn-primary" onclick="location.href='shop.html'">Start Shopping</button>
+          <button class="btn btn-primary" onclick="location.href='store.html'">Start Shopping</button>
         </div>
       </div>
     </div>
@@ -1275,7 +1275,7 @@ body {
       <div id="favorites-list" class="favorites-grid">
         <div class="no-data">
           <p>❤️ No favorite products yet</p>
-          <button class="btn btn-primary" onclick="location.href='shop.html'">Browse Products</button>
+          <button class="btn btn-primary" onclick="location.href='store.html'">Browse Products</button>
         </div>
       </div>
     </div>
@@ -1543,7 +1543,7 @@ function loadFavoriteProducts() {
   const favoritesList = document.getElementById("favorites-list");
 
   if (favorites.length === 0) {
-    favoritesList.innerHTML = '<div class="no-data"><p>❤️ No favorite products yet</p><button class="btn btn-primary" onclick="location.href=\'shop.html\'">Browse Products</button></div>';
+    favoritesList.innerHTML = '<div class="no-data"><p>❤️ No favorite products yet</p><button class="btn btn-primary" onclick="location.href=\'store.html\'">Browse Products</button></div>';
     return;
   }
 
@@ -1812,7 +1812,7 @@ function logout() {
   if (confirm("Are you sure you want to logout?")) {
     DataManager.logoutUser();
     alert("You have been logged out");
-    window.location.href = "home.html";
+    window.location.href = "index.html";
   }
 }
 

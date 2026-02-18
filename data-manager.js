@@ -807,6 +807,19 @@ const DataManager = (() => {
     return { success: true };
   }
 
+  // Real-time synchronization across tabs
+  window.addEventListener('storage', (event) => {
+    if (Object.values(STORAGE_KEYS).includes(event.key)) {
+      try {
+        console.log(`Data changed in another tab: ${event.key}`);
+        // Dispatch a custom event for the UI to respond
+        window.dispatchEvent(new CustomEvent('dataChanged', { 
+          detail: { key: event.key, newValue: event.newValue } 
+        }));
+      } catch (e) {}
+    }
+  });
+
   // Initialize on load
   initializeStorage();
   updateOnlineStatus();

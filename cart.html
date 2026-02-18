@@ -496,7 +496,7 @@ h4 {
 
         <nav class="checkout">
             <a href="checkout.html" id="checkout">Checkout</a>
-            <a href="shop.html">Continue Shopping</a>
+            <a href="store.html">Continue Shopping</a>
         </nav>
     </div>
 
@@ -666,6 +666,14 @@ document.addEventListener('visibilitychange', function() {
 window.addEventListener('focus', function() {
   cart = DataManager.getCart();
   renderCart();
+});
+
+// Real-time synchronization
+window.addEventListener('dataChanged', (event) => {
+  if (event.detail.key === DataManager.STORAGE_KEYS.CART) {
+    cart = DataManager.getCart();
+    renderCart();
+  }
 });
 
 // SLIDER

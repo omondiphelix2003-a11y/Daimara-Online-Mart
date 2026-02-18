@@ -4,6 +4,13 @@
  */
 
 const ProfileComponent = {
+  // Callback registry to avoid function stringification in onclick handlers
+  callbacks: {},
+  registerCallback(name, fn) {
+    this.callbacks[name] = fn;
+    return `ProfileComponent.callbacks['${name}']`;
+  },
+
   // Display user profile card
   renderProfileCard(container, user) {
     const defaultImage = ProfileService.getDefaultProfilePicture();
@@ -96,6 +103,9 @@ const ProfileComponent = {
       return;
     }
 
+    const editCb = onEdit ? this.registerCallback('editAddress', onEdit) : null;
+    const delCb = onDelete ? this.registerCallback('deleteAddress', onDelete) : null;
+
     let html = '';
     addresses.forEach((address, index) => {
       html += `
@@ -105,8 +115,8 @@ const ProfileComponent = {
           <div class="address-card-city">${address.city}, ${address.postal}</div>
           <div class="address-card-phone">📞 ${address.phone}</div>
           <div class="address-card-actions">
-            <button class="btn btn-small" onclick="if(${onEdit})${onEdit}(${index})">Edit</button>
-            <button class="btn btn-small btn-danger" onclick="if(${onDelete})${onDelete}(${index})">Delete</button>
+            ${onEdit ? `<button class="btn btn-small" onclick="${editCb}(${index})">Edit</button>` : ''}
+            ${onDelete ? `<button class="btn btn-small btn-danger" onclick="${delCb}(${index})">Delete</button>` : ''}
           </div>
         </div>
       `;
@@ -121,6 +131,9 @@ const ProfileComponent = {
       return;
     }
 
+    const addCartCb = onAddCart ? this.registerCallback('addFavToCart', onAddCart) : null;
+    const removeCb = onRemove ? this.registerCallback('removeFavorite', onRemove) : null;
+
     let html = '<div class="favorites-grid-component">';
     favorites.forEach((product, index) => {
       html += `
@@ -132,8 +145,8 @@ const ProfileComponent = {
             <div class="favorite-card-name">${product.name}</div>
             <div class="favorite-card-price">KSH ${(product.price || 0).toLocaleString()}</div>
             <div class="favorite-card-actions">
-              <button class="btn btn-small" onclick="if(${onAddCart})${onAddCart}(${index})">Cart</button>
-              <button class="btn btn-small btn-danger" onclick="if(${onRemove})${onRemove}(${index})">Remove</button>
+              ${onAddCart ? `<button class="btn btn-small" onclick="${addCartCb}(${index})">Cart</button>` : ''}
+              ${onRemove ? `<button class="btn btn-small btn-danger" onclick="${removeCb}(${index})">Remove</button>` : ''}
             </div>
           </div>
         </div>
@@ -145,8 +158,9 @@ const ProfileComponent = {
 
   // Display profile form
   renderProfileForm(container, user, onSubmit) {
+    const submitCb = onSubmit ? this.registerCallback('submitProfile', onSubmit) : null;
     const html = `
-      <form class="profile-form-component" onsubmit="if(${onSubmit})${onSubmit}(event)">
+      <form class="profile-form-component" onsubmit="${submitCb ? `${submitCb}(event)` : 'event.preventDefault()'}">
         <div class="form-group">
           <label>Full Name:</label>
           <input type="text" id="profile-form-name" value="${user.name}" required>
@@ -168,8 +182,9 @@ const ProfileComponent = {
   // Display address form
   renderAddressForm(container, address = null, onSubmit) {
     const defaultValues = address || { label: '', street: '', city: '', postal: '', phone: '' };
+    const submitCb = onSubmit ? this.registerCallback('submitAddress', onSubmit) : null;
     const html = `
-      <form class="address-form-component" onsubmit="if(${onSubmit})${onSubmit}(event)">
+      <form class="address-form-component" onsubmit="${submitCb ? `${submitCb}(event)` : 'event.preventDefault()'}">
         <div class="form-group">
           <label>Address Label:</label>
           <input type="text" id="address-label" value="${defaultValues.label}" required>
@@ -232,6 +247,7 @@ const ProfileComponent = {
 
   // Show modal
   showModal(title, content, onConfirm) {
+    const confirmCb = onConfirm ? this.registerCallback('modalConfirm', onConfirm) : null;
     const modal = document.createElement('div');
     modal.className = 'custom-modal';
     modal.innerHTML = `
@@ -239,7 +255,7 @@ const ProfileComponent = {
         <h2>${title}</h2>
         <div class="custom-modal-body">${content}</div>
         <div class="custom-modal-actions">
-          <button class="btn btn-primary" onclick="this.closest('.custom-modal').remove(); if(${onConfirm})${onConfirm}()">Confirm</button>
+          <button class="btn btn-primary" onclick="this.closest('.custom-modal').remove(); if(${confirmCb})${confirmCb}()">Confirm</button>
           <button class="btn btn-secondary" onclick="this.closest('.custom-modal').remove()">Cancel</button>
         </div>
       </div>
