@@ -296,9 +296,9 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
       <div class="delivery-card">
        <i class="fa fa-tint"></i>
        <h3>Water Refilling & Delivery</h3>
-       <div class="product-card"><img src="water.jpg" alt="Water"></div>
+       <div class="product-card"><img src="water2.jpg" alt="Water"></div>
        <p>Clean and safe water delivered to your doorstep.</p>
-       <a href="water-refilling services.html"><button>Order Now</button></a>
+       <a href="water refilling.html"><button>Order Now</button></a>
       </div>
      
       <div class="delivery-card">
@@ -420,7 +420,7 @@ function performSearch() {
     searchResults.innerHTML = results.map(p => {
       let url = 'store.html?search=' + encodeURIComponent(p.name);
       if (p.subcategory === 'Gas') url = 'gas-refill.html';
-      if (p.subcategory === 'Water') url = 'water-refilling services.html';
+      if (p.subcategory === 'Water') url = 'water refilling.html';
       
       return `
         <div onclick="window.location.href='${url}'">
