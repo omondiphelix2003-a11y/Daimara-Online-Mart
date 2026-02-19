@@ -445,6 +445,16 @@
     allOrders.push(newOrder);
     DataManager.saveOrders(allOrders);
 
+    // REDUCE WAREHOUSE STOCK
+    const warehouse = DataManager.getWarehouse();
+    cart.forEach(item => {
+      const wProduct = warehouse.find(p => p.id === item.id || p.name === item.name);
+      if (wProduct) {
+        const newQty = Math.max(0, (wProduct.quantity || 0) - (item.qty || 1));
+        DataManager.updateWarehouseQuantity(wProduct.id, newQty);
+      }
+    });
+
     // Generate Invoice
     const invoiceData = {
       orderId: data.orderId,

@@ -17,7 +17,8 @@ const DataManager = (() => {
     WAREHOUSE: 'ecommerce_warehouse',
     INVOICES: 'ecommerce_invoices',
     ONLINE_USERS: 'ecommerce_online_users',
-    CAMPAIGNS: 'ecommerce_campaigns'
+    CAMPAIGNS: 'ecommerce_campaigns',
+    SUB_WAREHOUSES: 'ecommerce_sub_warehouses'
   };
 
   // Initialize default products from both supermarket and second-hand categories
@@ -686,16 +687,32 @@ const DataManager = (() => {
   }
 
   function getClientEmails() {
-    return getAllMessages().map(m => ({
-      id: m.id,
-      subject: m.subject || 'Customer Message',
-      userId: m.userId || 'Guest',
-      email: m.email || '',
-      message: m.message,
-      status: m.status,
-      receivedDate: m.timestamp,
-      adminNotes: m.adminNotes
-    }));
+    const messages = getAllMessages();
+    const users = getAllUsers();
+    
+    return messages.map(m => {
+      let phone = m.phone || m.phoneNumber || '';
+      
+      // If no phone in message, try to find in user profile
+      if (!phone && m.userId && m.userId !== 'Guest') {
+        const user = users.find(u => u.id === m.userId || u.email === m.email);
+        if (user) {
+          phone = user.phone || user.phoneNumber || '';
+        }
+      }
+      
+      return {
+        id: m.id,
+        subject: m.subject || 'Customer Message',
+        userId: m.userId || 'Guest',
+        email: m.email || '',
+        phone: phone,
+        message: m.message,
+        status: m.status,
+        receivedDate: m.timestamp,
+        adminNotes: m.adminNotes
+      };
+    });
   }
 
   function markEmailAsRead(emailId) {
@@ -807,6 +824,49 @@ const DataManager = (() => {
     return { success: true };
   }
 
+  /**
+   * Sub Warehouse Management
+   */
+  function getSubWarehouses() {
+    return JSON.parse(localStorage.getItem(STORAGE_KEYS.SUB_WAREHOUSES)) || [];
+  }
+
+  function saveSubWarehouses(subWarehouses) {
+    localStorage.setItem(STORAGE_KEYS.SUB_WAREHOUSES, JSON.stringify(subWarehouses));
+    return { success: true };
+  }
+
+  function addSubWarehouse(name) {
+    const subWarehouses = getSubWarehouses();
+    const newSW = {
+      id: 'SW' + Date.now(),
+      name: name,
+      stock: [],
+      createdAt: new Date().toISOString()
+    };
+    subWarehouses.push(newSW);
+    saveSubWarehouses(subWarehouses);
+    return { success: true, subWarehouse: newSW };
+  }
+
+  function updateSubWarehouse(swId, updatedData) {
+    const subWarehouses = getSubWarehouses();
+    const index = subWarehouses.findIndex(sw => sw.id === swId);
+    if (index !== -1) {
+      subWarehouses[index] = { ...subWarehouses[index], ...updatedData };
+      saveSubWarehouses(subWarehouses);
+      return { success: true };
+    }
+    return { success: false };
+  }
+
+  function deleteSubWarehouse(id) {
+    let subWarehouses = getSubWarehouses();
+    subWarehouses = subWarehouses.filter(sw => sw.id !== id);
+    saveSubWarehouses(subWarehouses);
+    return { success: true };
+  }
+
   // Real-time synchronization across tabs
   window.addEventListener('storage', (event) => {
     if (Object.values(STORAGE_KEYS).includes(event.key)) {
@@ -879,6 +939,11 @@ const DataManager = (() => {
     clearAllData,
     getAllCampaigns,
     saveCampaign,
-    deleteCampaign
+    deleteCampaign,
+    getSubWarehouses,
+    saveSubWarehouses,
+    addSubWarehouse,
+    updateSubWarehouse,
+    deleteSubWarehouse
   };
 })();

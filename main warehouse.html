@@ -79,6 +79,17 @@
     .qty-low { background: #ffebee; color: #c62828; }
     .qty-ok { background: #e8f5e9; color: #2e7d32; }
 
+    .blurry-text {
+      filter: blur(5px);
+      transition: filter 0.3s;
+      user-select: none;
+      pointer-events: none;
+    }
+    .blurry-text.revealed {
+      filter: blur(0);
+      user-select: auto;
+    }
+
     /* PROFIT & LOSS */
     .pl-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
     .pl-item { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px dashed #eee; }
@@ -202,17 +213,14 @@
         
       </div>
       <div class="stats-grid">
-        
         <div class="stat-card">
           <div class="stat-icon" style="background: rgba(39,174,96,0.1); color: var(--success);"><i class="fas fa-shopping-bag"></i></div>
           <div class="stat-info"><h3 id="stat-orders">0</h3><p>Total Orders</p></div>
         </div>
-        
         <div class="stat-card">
           <div class="stat-icon" style="background: rgba(155,89,182,0.1); color: #9b59b6;"><i class="fas fa-box"></i></div>
           <div class="stat-info"><h3 id="stat-warehouse">0</h3><p>Warehouse Items</p></div>
         </div>
-        
       </div>
 
       <div class="data-card">
@@ -272,7 +280,7 @@
         </div>
         <table id="emails-table">
           <thead>
-            <tr><th>From</th><th>Subject</th><th>Message</th><th>Date</th><th>Status</th><th>Action</th></tr>
+            <tr><th>From</th><th>Subject</th><th>Message</th><th>Date</th><th>Status</th></tr>
           </thead>
           <tbody></tbody>
         </table>
@@ -383,10 +391,18 @@
     // RENDER FUNCTIONS
     function renderDashboard() {
       const stats = DataManager.getAdminDashboardStats();
-      document.getElementById('stat-revenue').innerText = 'KSH ' + (stats.totalRevenue || 0).toLocaleString();
-      document.getElementById('stat-orders').innerText = stats.totalOrders || 0;
-      document.getElementById('stat-users').innerText = stats.totalUsers || 0;
-      document.getElementById('stat-warehouse').innerText = stats.warehouseProducts || 0;
+      
+      const revenueEl = document.getElementById('stat-revenue');
+      if (revenueEl) revenueEl.innerText = 'KSH ' + (stats.totalRevenue || 0).toLocaleString();
+      
+      const ordersEl = document.getElementById('stat-orders');
+      if (ordersEl) ordersEl.innerText = stats.totalOrders || 0;
+      
+      const usersEl = document.getElementById('stat-users');
+      if (usersEl) usersEl.innerText = stats.totalUsers || 0;
+      
+      const warehouseEl = document.getElementById('stat-warehouse');
+      if (warehouseEl) warehouseEl.innerText = stats.warehouseProducts || 0;
       
       // Update online users
       if (document.getElementById('stat-online')) {
@@ -421,7 +437,6 @@
           <td>${o.date ? new Date(o.date).toLocaleDateString() : 'N/A'}</td>
           <td>
             <div style="display:flex; gap:5px;">
-              <button class="btn btn-info" style="padding:4px 8px; font-size:25px;" onclick="updateOrderStatus('${o.id}')">Status</button>
               <button class="btn btn-primary" style="padding:4px 8px; font-size:25px; background:#6c5ce7;" onclick="showAdminReceipt('${o.id}')">Receipt</button>
               <button class="btn btn-danger" style="padding:4px 8px; font-size:25px;" onclick="returnOrder('${o.id}')">Return</button>
               <button class="btn btn-danger" style="padding:4px 8px; background:#333;" onclick="deleteOrder('${o.id}')"><i class="fas fa-trash"></i></button>
@@ -472,20 +487,26 @@
       const emails = DataManager.getClientEmails() || [];
       const tbody = document.querySelector('#emails-table tbody');
       if (!tbody) return;
-      tbody.innerHTML = emails.map(e => `
-        <tr>
-          <td>${e.email || 'N/A'}</td>
-          <td>${e.subject || 'No Subject'}</td>
-          <td style="cursor:pointer; color:var(--info);" onclick="viewEmailMessage('${e.id}')">
-            ${(e.message || '').slice(0, 30)}...
-          </td>
-          <td>${e.receivedDate ? new Date(e.receivedDate).toLocaleDateString() : 'N/A'}</td>
-          <td><span class="status-pill status-${e.status || 'unread'}">${e.status || 'unread'}</span></td>
-          <td>
-            <button class="btn btn-danger" style="padding:4px 8px; background:#333;" onclick="deleteEmail('${e.id}')"><i class="fas fa-trash"></i></button>
-          </td>
-        </tr>
-      `).join('') || '<tr><td colspan="6" style="text-align:center">No messages</td></tr>';
+      tbody.innerHTML = emails.map(e => {
+        const isRead = e.status === 'read';
+        return `
+          <tr>
+            <td>${e.email || 'N/A'}</td>
+            <td>${e.subject || 'No Subject'}</td>
+            <td class="blurry-text ${isRead ? 'revealed' : ''}">
+              ${(e.message || '')}
+            </td>
+            <td>${e.receivedDate ? new Date(e.receivedDate).toLocaleDateString() : 'N/A'}</td>
+            <td><span class="status-pill status-${e.status || 'unread'}">${e.status || 'unread'}</span></td>
+          </tr>
+        `;
+      }).join('') || '<tr><td colspan="5" style="text-align:center">No messages</td></tr>';
+    }
+
+    function revealMessage(id, el) {
+      el.classList.add('revealed');
+      DataManager.markEmailAsRead(id);
+      renderEmails(); // Refresh to update status pill
     }
 
     function renderProfits() {
@@ -911,6 +932,16 @@
         return;
       }
       renderDashboard();
+
+      // Sync with other tabs
+      window.addEventListener('dataChanged', (e) => {
+        renderDashboard();
+        const activeTab = document.querySelector('.nav-links a.active');
+        if (activeTab) {
+          const tabId = activeTab.getAttribute('onclick').match(/'([^']+)'/)[1];
+          loadTabData(tabId);
+        }
+      });
     };
   </script>
 </body>

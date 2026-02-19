@@ -79,6 +79,16 @@
     .qty-low { background: #ffebee; color: #c62828; }
     .qty-ok { background: #e8f5e9; color: #2e7d32; }
 
+    .blurry-text {
+      filter: blur(5px);
+      transition: filter 0.3s;
+      user-select: none;
+    }
+    .blurry-text.revealed {
+      filter: blur(0);
+      user-select: auto;
+    }
+
     /* PROFIT & LOSS */
     .pl-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
     .pl-item { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px dashed #eee; }
@@ -305,7 +315,7 @@
         </div>
         <table id="emails-table">
           <thead>
-            <tr><th>From</th><th>Subject</th><th>Message</th><th>Date</th><th>Status</th><th>Action</th></tr>
+            <tr><th>From</th><th>Subject</th><th>Message</th><th>Date</th><th>Status</th></tr>
           </thead>
           <tbody></tbody>
         </table>
@@ -454,7 +464,6 @@
           <td>${o.date ? new Date(o.date).toLocaleDateString() : 'N/A'}</td>
           <td>
             <div style="display:flex; gap:5px;">
-              <button class="btn btn-info" style="padding:4px 8px; font-size:25px;" onclick="updateOrderStatus('${o.id}')">Status</button>
               <button class="btn btn-primary" style="padding:4px 8px; font-size:25px; background:#6c5ce7;" onclick="showAdminReceipt('${o.id}')">Receipt</button>
               <button class="btn btn-danger" style="padding:4px 8px; font-size:25px;" onclick="returnOrder('${o.id}')">Return</button>
               <button class="btn btn-danger" style="padding:4px 8px; background:#333;" onclick="deleteOrder('${o.id}')"><i class="fas fa-trash"></i></button>
@@ -505,20 +514,22 @@
       const emails = DataManager.getClientEmails() || [];
       const tbody = document.querySelector('#emails-table tbody');
       if (!tbody) return;
-      tbody.innerHTML = emails.map(e => `
-        <tr>
-          <td>${e.email || 'N/A'}</td>
-          <td>${e.subject || 'No Subject'}</td>
-          <td style="cursor:pointer; color:var(--info);" onclick="viewEmailMessage('${e.id}')">
-            ${(e.message || '').slice(0, 30)}...
-          </td>
-          <td>${e.receivedDate ? new Date(e.receivedDate).toLocaleDateString() : 'N/A'}</td>
-          <td><span class="status-pill status-${e.status || 'unread'}">${e.status || 'unread'}</span></td>
-          <td>
-            <button class="btn btn-danger" style="padding:4px 8px; background:#333;" onclick="deleteEmail('${e.id}')"><i class="fas fa-trash"></i></button>
-          </td>
-        </tr>
-      `).join('') || '<tr><td colspan="6" style="text-align:center">No messages</td></tr>';
+      tbody.innerHTML = emails.map(e => {
+        const isRead = e.status === 'read';
+        return `
+          <tr>
+            <td>${e.email || 'N/A'}</td>
+            <td>${e.subject || 'No Subject'}</td>
+            <td class="blurry-text ${isRead ? 'revealed' : ''}" 
+                onclick="${isRead ? `viewEmailMessage('${e.id}')` : ''}"
+                style="cursor: ${isRead ? 'pointer' : 'not-allowed'};">
+              ${(e.message || '')}
+            </td>
+            <td>${e.receivedDate ? new Date(e.receivedDate).toLocaleDateString() : 'N/A'}</td>
+            <td><span class="status-pill status-${e.status || 'unread'}">${e.status || 'unread'}</span></td>
+          </tr>
+        `;
+      }).join('') || '<tr><td colspan="5" style="text-align:center">No messages</td></tr>';
     }
 
     function renderProfits() {
@@ -856,13 +867,6 @@
       renderInvoices();
     }
 
-    function deleteEmail(id) {
-      if (!confirm("Delete this message?")) return;
-      DataManager.deleteMessage(id);
-      renderEmails();
-      renderDashboard();
-    }
-
     function editStock(id) {
       const warehouse = DataManager.getWarehouse();
       const p = warehouse.find(x => x.id === id);
@@ -944,6 +948,16 @@
         return;
       }
       renderDashboard();
+
+      // Sync with other tabs
+      window.addEventListener('dataChanged', (e) => {
+        renderDashboard();
+        const activeTab = document.querySelector('.nav-links a.active');
+        if (activeTab) {
+          const tabId = activeTab.getAttribute('onclick').match(/'([^']+)'/)[1];
+          loadTabData(tabId);
+        }
+      });
     };
   </script>
 </body>

@@ -30,15 +30,67 @@ input[type='number']{width:70px;padding:5px;}
 .whatsapp{background:#25D366;color:black;}
 .gmail{background:#EA4335;color:black;}
 .hidden{display:none;}
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  align-items: center;
+  justify-content: center;
+}
+.modal-content {
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+  color: black;
+}
+.close-modal {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 30px;
+  cursor: pointer;
+  color: #777;
+}
+.delete-btn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  float: right;
+  font-size: 12px;
+}
+.blurry-text {
+  filter: blur(5px);
+  cursor: pointer;
+  transition: filter 0.3s;
+  user-select: none;
+}
+.blurry-text:hover {
+  filter: blur(2px);
+}
+.blurry-text.revealed {
+  filter: blur(0);
+  user-select: auto;
+}
 </style>
-</head>
 <body>
 
 <div class="topbar">
   <h1>Daimara Operators Panel</h1>
   <div>
     <button class="btn" onclick="createSubWarehouse()">Create Sub-Warehouse</button>
-    <button class="btn" onclick="openPlatform()">Open Platform</button>
   </div>
 </div>
 
@@ -61,7 +113,7 @@ input[type='number']{width:70px;padding:5px;}
     <div class="section-header"><h2>Main Warehouse Contents</h2></div>
     <table class="table">
       <thead>
-        <tr><th>Product</th><th>Stock</th><th>Move Qty</th><th>Action</th></tr>
+        <tr><th>Product</th><th>Stock</th><th>Moved Qty</th><th>Move Qty</th><th>Action</th></tr>
       </thead>
       <tbody id="warehouseTable"></tbody>
     </table>
@@ -80,43 +132,56 @@ input[type='number']{width:70px;padding:5px;}
     <div class="section-header"><h2>Client Emails</h2></div>
     <table class="table">
       <thead>
-        <tr><th>Email</th><th>Phone</th><th>Message</th><th>Reply</th></tr>
+        <tr><th>Email</th><th>Phone</th><th>Message</th><th>Reply</th><th>Delete</th></tr>
       </thead>
-      <tbody>
-        <tr>
-          <td>customer@email.com</td>
-          <td>+254742120329</td>
-          <td>Where is my delivery?</td>
-          <td class="email-actions">
-            <button class="whatsapp" onclick="window.location.href='https://wa.me/254742120329'"><i class="fab fa-whatsapp"></i></button>
-            <button class="gmail" onclick="window.location.href='mailto:omondiphelix2003@gmail.com'"><i class="fas fa-envelope"></i></button>
-          </td>
-        </tr>
+      <tbody id="clientEmailsTable">
+        <!-- Data will be injected here -->
       </tbody>
     </table>
   </div>
 
 </div>
+
+<!-- SUB WAREHOUSE MODAL -->
+<div id="subWarehouseModal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal" onclick="closeSubModal()">&times;</span>
+    <h2 id="modalSWName">Sub Warehouse</h2>
+    <hr>
+    <table class="table">
+      <thead>
+        <tr><th>Product</th><th>Quantity</th><th>Action</th></tr>
+      </thead>
+      <tbody id="modalSWTable"></tbody>
+    </table>
+  </div>
+</div>
+<script src="data-manager.js"></script>
 <script>
-let warehouse=[
-  {id:1,name:'Cooking Oil 5L',stock:120},
-  {id:2,name:'Rice 2kg',stock:50}
-];
+let warehouse = [];
+let subWarehouses = [];
 
-let subWarehouses=[];
+function renderWarehouse() {
+  warehouse = DataManager.getWarehouse();
+  subWarehouses = DataManager.getSubWarehouses();
+  const table = document.getElementById('warehouseTable');
+  table.innerHTML = '';
 
-function renderWarehouse(){
-  const table=document.getElementById('warehouseTable');
-  table.innerHTML='';
+  warehouse.forEach(p => {
+    // Calculate total moved quantity for this product across all sub-warehouses
+    const totalMoved = subWarehouses.reduce((sum, sw) => {
+      const item = sw.stock.find(i => String(i.id) === String(p.id) || i.name === p.name);
+      return sum + (item ? (item.qty || 0) : 0);
+    }, 0);
 
-  warehouse.forEach(p=>{
-    table.innerHTML+=`
+    table.innerHTML += `
     <tr>
       <td>${p.name}</td>
-      <td>${p.stock}</td>
+      <td>${p.quantity || p.stock || 0}</td>
+      <td><span style="color:var(--primary); font-weight:bold;">${totalMoved}</span></td>
       <td><input type="number" id="move-${p.id}" min="1" style="width:60px"></td>
       <td>
-        <button class="move-btn" onclick="showWarehouseDropdown(${p.id},this)">
+        <button class="move-btn" onclick="showWarehouseDropdown('${p.id}',this)">
           Move
         </button>
       </td>
@@ -126,29 +191,29 @@ function renderWarehouse(){
   updateTotalStock();
 }
 
-function showWarehouseDropdown(productId,btn){
-
-  if(subWarehouses.length===0){
+function showWarehouseDropdown(productId, btn) {
+  subWarehouses = DataManager.getSubWarehouses();
+  if (subWarehouses.length === 0) {
     alert("Create a sub warehouse first");
     return;
   }
 
-  const old=document.querySelector('.dropdown-select');
-  if(old) old.remove();
+  const old = document.querySelector('.dropdown-select');
+  if (old) old.remove();
 
-  const select=document.createElement('select');
-  select.className='dropdown-select';
+  const select = document.createElement('select');
+  select.className = 'dropdown-select';
 
-  select.innerHTML=`
+  select.innerHTML = `
     <option value="">Select warehouse</option>
-    ${subWarehouses.map((sw,i)=>
-      `<option value="${i}">${sw.name}</option>`
-    ).join('')}
+    ${subWarehouses.map((sw) =>
+    `<option value="${sw.id}">${sw.name}</option>`
+  ).join('')}
   `;
 
-  select.onchange=function(){
-    if(this.value!==""){
-      moveStockToWarehouse(productId,this.value);
+  select.onchange = function () {
+    if (this.value !== "") {
+      moveStockToWarehouse(productId, this.value);
       this.remove();
     }
   };
@@ -156,65 +221,240 @@ function showWarehouseDropdown(productId,btn){
   btn.parentElement.appendChild(select);
 }
 
-function moveStockToWarehouse(productId,warehouseIndex){
+function moveStockToWarehouse(productId, swId) {
+  const product = warehouse.find(p => String(p.id) === String(productId));
+  const qtyInput = document.getElementById(`move-${productId}`);
+  const qty = parseInt(qtyInput.value);
 
-  const product=warehouse.find(p=>p.id===productId);
-  const qtyInput=document.getElementById(`move-${productId}`);
-  const qty=parseInt(qtyInput.value);
+  const currentStock = product.quantity || product.stock || 0;
 
-  if(!qty || qty<=0 || qty>product.stock){
+  if (!qty || qty <= 0 || qty > currentStock) {
     alert("Invalid quantity");
     return;
   }
 
-  const selectedWarehouse=subWarehouses[warehouseIndex];
+  subWarehouses = DataManager.getSubWarehouses();
+  const selectedWarehouse = subWarehouses.find(sw => sw.id === swId);
 
-  product.stock-=qty;
+  if (!selectedWarehouse) {
+    alert("Sub warehouse not found");
+    return;
+  }
 
-  selectedWarehouse.stock.push({
-    name:product.name,
-    qty:qty
-  });
+  // Update Main Warehouse
+  if (product.quantity !== undefined) {
+    product.quantity -= qty;
+    DataManager.updateWarehouseQuantity(productId, product.quantity);
+  } else if (product.stock !== undefined) {
+    product.stock -= qty;
+    DataManager.updateWarehouseQuantity(productId, product.stock);
+  }
 
-  qtyInput.value="";
+  // Update Sub Warehouse
+  const existingItem = selectedWarehouse.stock.find(i => String(i.id) === String(product.id) || i.name === product.name);
+  if (existingItem) {
+    existingItem.qty += qty;
+  } else {
+    selectedWarehouse.stock.push({
+      id: product.id,
+      name: product.name,
+      qty: qty
+    });
+  }
 
+  DataManager.updateSubWarehouse(swId, { stock: selectedWarehouse.stock });
+
+  qtyInput.value = "";
   renderWarehouse();
   renderSubWarehouses();
 
-  alert(qty+" units moved to "+selectedWarehouse.name);
+  alert(qty + " units moved to " + selectedWarehouse.name);
 }
 
-function createSubWarehouse(){
-  const name=prompt("Enter Sub Warehouse Name:");
-  if(!name) return;
+function createSubWarehouse() {
+  const name = prompt("Enter Sub Warehouse Name:");
+  if (!name) return;
 
-  subWarehouses.push({name:name,stock:[]});
+  DataManager.addSubWarehouse(name);
   renderSubWarehouses();
 }
 
-function renderSubWarehouses(){
-  const list=document.getElementById('subWarehouseList');
-  list.innerHTML='';
+function deleteSubWarehouse(id, event) {
+  event.stopPropagation();
+  if (!confirm("Are you sure you want to delete this sub-warehouse? All stock will be returned to the main warehouse.")) return;
+  
+  const sw = subWarehouses.find(s => s.id === id);
+  if (sw && sw.stock.length > 0) {
+    const mainWarehouse = DataManager.getWarehouse();
+    sw.stock.forEach(item => {
+      const mainProduct = mainWarehouse.find(p => String(p.id) === String(item.id) || p.name === item.name);
+      if (mainProduct) {
+        const currentQty = mainProduct.quantity || 0;
+        DataManager.updateWarehouseQuantity(mainProduct.id, currentQty + (item.qty || 0));
+      }
+    });
+  }
 
-  subWarehouses.forEach(sw=>{
-    list.innerHTML+=`
-      <div class="card">
+  DataManager.deleteSubWarehouse(id);
+  renderWarehouse();
+  renderSubWarehouses();
+}
+
+function viewSubWarehouse(id) {
+  const sw = subWarehouses.find(s => s.id === id);
+  if (!sw) return;
+
+  document.getElementById('modalSWName').innerText = sw.name;
+  const tbody = document.getElementById('modalSWTable');
+  tbody.innerHTML = sw.stock.length > 0
+    ? sw.stock.map((item, index) => `
+      <tr>
+        <td>${item.name}</td>
+        <td>
+          <input type="number" id="sw-qty-${id}-${index}" value="${item.qty}" 
+                 style="width:70px; color: ${item.qty <= 5 ? 'red' : 'black'}; font-weight: ${item.qty <= 5 ? 'bold' : 'normal'};">
+        </td>
+        <td>
+          <button class="sub-btn" onclick="saveSubWarehouseQty('${id}', ${index})">Update</button>
+        </td>
+      </tr>`).join('')
+    : '<tr><td colspan="3" style="text-align:center">No products in this warehouse</td></tr>';
+
+  document.getElementById('subWarehouseModal').style.display = 'flex';
+}
+
+function saveSubWarehouseQty(swId, itemIndex) {
+  const sw = subWarehouses.find(s => s.id === swId);
+  if (!sw) return;
+
+  const item = sw.stock[itemIndex];
+  const oldQty = item.qty || 0;
+  const newQty = parseInt(document.getElementById(`sw-qty-${swId}-${itemIndex}`).value);
+  
+  if (isNaN(newQty) || newQty < 0) {
+    alert("Please enter a valid quantity");
+    return;
+  }
+
+  const diff = newQty - oldQty; // positive = more to sub, negative = return to main
+
+  if (diff !== 0) {
+    const mainWarehouse = DataManager.getWarehouse();
+    const mainProduct = mainWarehouse.find(p => String(p.id) === String(item.id) || p.name === item.name);
+    
+    if (mainProduct) {
+      const currentMainQty = mainProduct.quantity || 0;
+      if (diff > 0 && currentMainQty < diff) {
+        alert("Insufficient stock in main warehouse");
+        return;
+      }
+      DataManager.updateWarehouseQuantity(mainProduct.id, currentMainQty - diff);
+    }
+  }
+
+  // Update Sub Warehouse
+  if (newQty === 0) {
+    sw.stock.splice(itemIndex, 1);
+    alert("Product removed from sub-warehouse and stock returned to main.");
+  } else {
+    item.qty = newQty;
+  }
+  
+  DataManager.updateSubWarehouse(swId, { stock: sw.stock });
+  
+  renderWarehouse(); 
+  renderSubWarehouses();
+  
+  if (newQty === 0) {
+    closeSubModal();
+  } else {
+    viewSubWarehouse(swId); 
+  }
+}
+
+function closeSubModal() {
+  document.getElementById('subWarehouseModal').style.display = 'none';
+}
+
+function renderSubWarehouses() {
+  subWarehouses = DataManager.getSubWarehouses();
+  const list = document.getElementById('subWarehouseList');
+  const countDisplay = document.getElementById('subCount');
+  list.innerHTML = '';
+  countDisplay.innerText = subWarehouses.length + " Active";
+
+  subWarehouses.forEach(sw => {
+    list.innerHTML += `
+      <div class="card" onclick="viewSubWarehouse('${sw.id}')" style="cursor:pointer; position:relative;">
+        <button class="delete-btn" onclick="deleteSubWarehouse('${sw.id}', event)">Delete</button>
         <strong>${sw.name}</strong><br>
-        ${sw.stock.length} products
+        <span style="font-size:14px; color:#555;">${sw.stock.length} products</span>
       </div>`;
   });
 }
 
-function toggleWarehouseView(){
+function renderEmails() {
+  const emails = DataManager.getClientEmails() || [];
+  const tbody = document.getElementById('clientEmailsTable');
+  if (!tbody) return;
+
+  tbody.innerHTML = emails.map(e => {
+    const isRead = e.status === 'read';
+    return `
+      <tr>
+        <td>${e.email}</td>
+        <td>${e.phone || 'N/A'}</td>
+        <td class="blurry-text ${isRead ? 'revealed' : ''}" 
+            onclick="revealMessage('${e.id}', this)" 
+            style="cursor: ${isRead ? 'default' : 'pointer'};">
+          ${e.message}
+        </td>
+        <td class="email-actions">
+          ${e.phone && e.phone !== 'N/A' ? `
+            <button class="whatsapp" onclick="window.location.href='https://wa.me/${e.phone.replace(/\+/g, '').replace(/\s/g, '')}'"><i class="fab fa-whatsapp"></i></button>
+          ` : ''}
+          <button class="gmail" onclick="window.location.href='mailto:omondiphelix2003@gmail.com'"><i class="fas fa-envelope"></i></button>
+        </td>
+        <td>
+          <button class="btn" style="background:#ef4444; padding:5px 10px;" onclick="deleteOperatorEmail('${e.id}')"><i class="fas fa-trash"></i></button>
+        </td>
+      </tr>
+    `;
+  }).join('') || '<tr><td colspan="5" style="text-align:center">No messages</td></tr>';
+}
+
+function revealMessage(id, el) {
+  el.classList.add('revealed');
+  DataManager.markMessageAsRead(id);
+  renderEmails(); // Refresh local UI
+}
+
+function deleteOperatorEmail(id) {
+  if (!confirm("Are you sure you want to delete this message?")) return;
+  DataManager.deleteMessage(id);
+  renderEmails();
+}
+
+function toggleWarehouseView() {
   document.getElementById('warehouseSection').classList.toggle('hidden');
 }
 
-function updateTotalStock(){
-  const total=warehouse.reduce((sum,p)=>sum+p.stock,0);
-  document.getElementById('totalStock').innerText=total+" Units";
+function updateTotalStock() {
+  const total = warehouse.reduce((sum, p) => sum + (p.quantity || p.stock || 0), 0);
+  document.getElementById('totalStock').innerText = total + " Units";
 }
 
+// Initial renders
 renderWarehouse();
+renderSubWarehouses();
+renderEmails();
+
+// Real-time synchronization
+window.addEventListener('dataChanged', (e) => {
+  renderWarehouse();
+  renderSubWarehouses();
+  renderEmails();
+});
 </script>
 
 </body>
