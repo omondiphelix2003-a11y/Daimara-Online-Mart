@@ -802,30 +802,16 @@
     }
 
     function returnOrder(id) {
-      if (!confirm("Are you sure you want to mark this order as returned? Stock will be added back to warehouse.")) return;
+      if (!confirm("Are you sure you want to mark this order as returned?")) return;
       
       const orders = DataManager.getAllOrders();
       const order = orders.find(o => o.id === id);
       
       if (order && order.status !== 'returned') {
-        const warehouse = DataManager.getWarehouse();
-        const items = order.items || order.products || [];
-        
-        // Add items back to warehouse
-        items.forEach(item => {
-          // Handle both old 'product' (ID) and new 'id' field
-          const itemId = item.id || item.product;
-          const wItem = warehouse.find(p => p.id === itemId || p.name === item.name);
-          if (wItem) {
-            wItem.quantity += (item.qty || item.quantity || 1);
-          }
-        });
-        
         order.status = 'returned';
-        localStorage.setItem('ecommerce_warehouse', JSON.stringify({ products: warehouse }));
         DataManager.saveOrders(orders);
         
-        alert("Order marked as returned. Warehouse updated.");
+        alert("Order marked as returned.");
         renderOrders();
         renderDashboard();
       }

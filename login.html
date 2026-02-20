@@ -70,14 +70,76 @@ body {
   text-decoration: none;
 }
 
-/* AUTH BOX */
-.auth-container {
+/* NAVBAR */
+.navbar {
   display: flex;
-  justify-content: center;
   align-items: center;
-  flex: 1;
-  padding: 20px;
+  justify-content: space-between;
+  padding: 25px 30px;
+  background: #000;
+  color: #fff;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
 }
+
+.logo {
+  color: rgb(233, 157, 17);
+  font-size: 35px;
+  font-weight: bold;
+}
+
+.nav-center {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.nav-icons {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.nav-icons a {
+  color: #fff;
+  font-size: 55px;
+  position: relative;
+}
+
+.nav-icons a:hover {
+  color: rgb(233, 157, 17);
+}
+
+.shop-icon {
+  position: relative;
+  width: 50px;
+  height: 45px;
+  background-color: transparent;
+  border: 3px solid rgb(233, 157, 17);
+  border-radius: 4px;
+}
+
+.shop-icon::before {
+  content: '';
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 12px;
+  border: 3px solid rgb(233, 157, 17);
+  border-bottom: none;
+  border-radius: 10px 10px 0 0;
+}
+
+/* AUTH BOX OFFSET FOR NAVBAR */
+.auth-container {
+  margin-top: 120px;
+}
+
 
 .auth-box {
     background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
@@ -239,6 +301,20 @@ body {
 
 </head>
 <body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="logo">Daimara Online Mart</div>
+
+  <div class="nav-center">
+    <a href="store.html"><div class="shop-icon"></div></a>
+  </div>
+
+  <div class="nav-icons">
+    <a href="login.html"><i class="fa fa-user"></i></a>
+    <a href="cart.html" class="cart-link"><i class="fa fa-shopping-cart"></i><span class="cart-count">0</span></a>
+  </div>
+</nav>
 
 
 <div class="auth-container">

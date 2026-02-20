@@ -84,6 +84,36 @@ input[type='number']{width:70px;padding:5px;}
   filter: blur(0);
   user-select: auto;
 }
+
+/* Store Management Styles */
+.store-card {
+  background: #f0f0f0;
+  border-left: 4px solid var(--primary);
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 4px;
+  position: relative;
+}
+
+.store-card:hover {
+  background: #e8e8e8;
+}
+
+input[type='text'] {
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+select {
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 16px;
+  background: white;
+  cursor: pointer;
+}
 </style>
 <body>
 
@@ -113,7 +143,7 @@ input[type='number']{width:70px;padding:5px;}
     <div class="section-header"><h2>Main Warehouse Contents</h2></div>
     <table class="table">
       <thead>
-        <tr><th>Product</th><th>Stock</th><th>Moved Qty</th><th>Move Qty</th><th>Action</th></tr>
+        <tr><th>Product</th><th>Stock</th><th>Moved Qty</th><th>Move Qty</th><th></th></tr>
       </thead>
       <tbody id="warehouseTable"></tbody>
     </table>
@@ -147,7 +177,12 @@ input[type='number']{width:70px;padding:5px;}
   <div class="modal-content">
     <span class="close-modal" onclick="closeSubModal()">&times;</span>
     <h2 id="modalSWName">Sub Warehouse</h2>
+    <button class="btn" style="margin-bottom: 15px;" onclick="openCreateStoreModal(getCurrentSubWarehouseId())"><i class="fas fa-plus"></i> Create Store</button>
     <hr>
+    <h3>Stores in this Sub Warehouse:</h3>
+    <div id="storesListInModal"></div>
+    <hr>
+    <h3>Products in this Sub Warehouse:</h3>
     <table class="table">
       <thead>
         <tr><th>Product</th><th>Quantity</th><th>Action</th></tr>
@@ -156,10 +191,45 @@ input[type='number']{width:70px;padding:5px;}
     </table>
   </div>
 </div>
+
+<!-- CREATE STORE MODAL -->
+<div id="createStoreModal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal" onclick="closeCreateStoreModal()">&times;</span>
+    <h2>Create New Store</h2>
+    <hr>
+    <input type="text" id="storeName" placeholder="Store Name" style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #ddd;">
+    <button class="btn" style="width: 100%; background: #16a34a;" onclick="saveNewStore()">Create Store</button>
+  </div>
+</div>
+
+<!-- VIEW STORE MODAL -->
+<div id="viewStoreModal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal" onclick="closeViewStoreModal()">&times;</span>
+    <h2 id="storeModalName">Store Contents</h2>
+    <hr>
+    <table class="table">
+      <thead>
+        <tr><th>Product</th><th>Store Qty</th><th>Sub Warehouse Qty</th><th>Action</th></tr>
+      </thead>
+      <tbody id="storeModalTable"></tbody>
+    </table>
+    <hr>
+    <h3>Add Products to Store:</h3>
+    <select id="productSelectForStore" style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #ddd;">
+      <option value="">Select Product</option>
+    </select>
+    <input type="number" id="productQtyForStore" placeholder="Quantity" min="1" style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #ddd;">
+    <button class="btn" style="width: 100%; background: #16a34a;" onclick="addProductToStore()">Add Product</button>
+  </div>
+</div>
 <script src="data-manager.js"></script>
 <script>
 let warehouse = [];
 let subWarehouses = [];
+let currentSubWarehouseId = null;
+let currentStoreId = null;
 
 function renderWarehouse() {
   warehouse = DataManager.getWarehouse();
@@ -301,20 +371,38 @@ function deleteSubWarehouse(id, event) {
 }
 
 function viewSubWarehouse(id) {
+  // Reload sub warehouses from DataManager to get latest data
+  subWarehouses = DataManager.getSubWarehouses();
+
   const sw = subWarehouses.find(s => s.id === id);
   if (!sw) return;
 
+  currentSubWarehouseId = id;
   document.getElementById('modalSWName').innerText = sw.name;
+  
+  // Display stores list
+  const storesList = document.getElementById('storesListInModal');
+  const stores = sw.stores || [];
+  storesList.innerHTML = stores.length > 0
+    ? stores.map(store => `
+      <div class="card" style="margin-bottom: 10px; cursor: pointer;" onclick="viewStoreContents('${id}', '${store.id}')">
+        <strong>${store.name}</strong><br>
+        <span style="font-size:12px; color:#555;">${store.products ? store.products.length : 0} products</span>
+        <button class="delete-btn" onclick="deleteStore('${id}', '${store.id}', event)">Delete</button>
+      </div>`).join('')
+    : '<p style="color: #999;">No stores created yet. Click "Create Store" to add one.</p>';
+
   const tbody = document.getElementById('modalSWTable');
-  tbody.innerHTML = sw.stock.length > 0
+  tbody.innerHTML = sw.stock && sw.stock.length > 0
     ? sw.stock.map((item, index) => `
       <tr>
         <td>${item.name}</td>
+        <td style="font-weight: bold; color: ${item.qty <= 5 ? 'red' : 'green'};">
+          ${item.qty} units
+        </td>
         <td>
           <input type="number" id="sw-qty-${id}-${index}" value="${item.qty}" 
                  style="width:70px; color: ${item.qty <= 5 ? 'red' : 'black'}; font-weight: ${item.qty <= 5 ? 'bold' : 'normal'};">
-        </td>
-        <td>
           <button class="sub-btn" onclick="saveSubWarehouseQty('${id}', ${index})">Update</button>
         </td>
       </tr>`).join('')
@@ -384,11 +472,15 @@ function renderSubWarehouses() {
   countDisplay.innerText = subWarehouses.length + " Active";
 
   subWarehouses.forEach(sw => {
+    const storeCount = sw.stores ? sw.stores.length : 0;
     list.innerHTML += `
       <div class="card" onclick="viewSubWarehouse('${sw.id}')" style="cursor:pointer; position:relative;">
         <button class="delete-btn" onclick="deleteSubWarehouse('${sw.id}', event)">Delete</button>
         <strong>${sw.name}</strong><br>
-        <span style="font-size:14px; color:#555;">${sw.stock.length} products</span>
+        <span style="font-size:14px; color:#555;">${sw.stock.length} products | ${storeCount} store(s)</span><br>
+        <button class="sub-btn" style="margin-top: 10px; width: 100%;" onclick="openCreateStoreModal('${sw.id}'); event.stopPropagation();">
+          <i class="fas fa-plus"></i> Create Store
+        </button>
       </div>`;
   });
 }
@@ -442,6 +534,360 @@ function toggleWarehouseView() {
 function updateTotalStock() {
   const total = warehouse.reduce((sum, p) => sum + (p.quantity || p.stock || 0), 0);
   document.getElementById('totalStock').innerText = total + " Units";
+}
+
+// STORE MANAGEMENT FUNCTIONS
+function getCurrentSubWarehouseId() {
+  return currentSubWarehouseId;
+}
+
+function liveUpdateSubWarehouseQty(swId, storeId, itemIndex, newValue) {
+  // Reload latest data to get current quantities
+  subWarehouses = DataManager.getSubWarehouses();
+
+  const sw = subWarehouses.find(s => s.id === swId);
+  if (!sw) return;
+
+  const store = sw.stores ? sw.stores.find(st => st.id === storeId) : null;
+  if (!store || !store.products || !store.products[itemIndex]) return;
+
+  const item = store.products[itemIndex];
+  const newQty = parseInt(newValue) || 0;
+
+  // Get the original quantity from the input's data attribute
+  const inputElement = document.getElementById(`store-qty-${storeId}-${itemIndex}`);
+  if (!inputElement) return;
+  
+  const originalQtyValue = parseInt(inputElement.getAttribute('data-original-qty'));
+
+  // Find the sub warehouse product
+  const subWarehouseProduct = sw.stock.find(p => String(p.id) === String(item.id) || p.name === item.name);
+  if (!subWarehouseProduct) return;
+
+  // Calculate total available (unallocated in SW + currently allocated to this store)
+  const totalAvailable = subWarehouseProduct.qty + originalQtyValue;
+  
+  // Calculate what the sub warehouse quantity would be after this change
+  // Formula: Total Available - New Store Allocation = Remaining Unallocated SW Qty
+  const resultingSubWarehouseQty = totalAvailable - newQty;
+
+  // Update the display in real-time
+  const swQtyDisplay = document.getElementById(`sw-qty-value-${itemIndex}`);
+  if (swQtyDisplay) {
+    if (resultingSubWarehouseQty < 0) {
+      swQtyDisplay.style.fontWeight = 'bold';
+      swQtyDisplay.style.color = 'darkred';
+      swQtyDisplay.textContent = '⚠ INSUFFICIENT STOCK';
+    } else {
+      swQtyDisplay.style.fontWeight = resultingSubWarehouseQty <= 5 ? 'bold' : 'normal';
+      swQtyDisplay.style.color = resultingSubWarehouseQty <= 5 ? 'red' : 'green';
+      swQtyDisplay.textContent = resultingSubWarehouseQty + ' units';
+    }
+  }
+}
+
+function openCreateStoreModal(swId) {
+  currentSubWarehouseId = swId;
+  document.getElementById('storeName').value = '';
+  document.getElementById('createStoreModal').style.display = 'flex';
+}
+
+function closeCreateStoreModal() {
+  document.getElementById('createStoreModal').style.display = 'none';
+}
+
+function saveNewStore() {
+  const storeName = document.getElementById('storeName').value.trim();
+  if (!storeName) {
+    alert('Please enter a store name');
+    return;
+  }
+
+  const sw = subWarehouses.find(s => s.id === currentSubWarehouseId);
+  if (!sw) {
+    alert('Sub warehouse not found');
+    return;
+  }
+
+  if (!sw.stores) {
+    sw.stores = [];
+  }
+
+  const newStore = {
+    id: 'store_' + Date.now(),
+    name: storeName,
+    products: []
+  };
+
+  sw.stores.push(newStore);
+  DataManager.updateSubWarehouse(currentSubWarehouseId, { stores: sw.stores });
+
+  alert('Store "' + storeName + '" created successfully');
+  closeCreateStoreModal();
+  viewSubWarehouse(currentSubWarehouseId);
+  renderSubWarehouses();
+}
+
+function viewStoreContents(swId, storeId) {
+  currentSubWarehouseId = swId;
+  currentStoreId = storeId;
+
+  // Reload sub warehouses from DataManager to get latest data
+  subWarehouses = DataManager.getSubWarehouses();
+
+  const sw = subWarehouses.find(s => s.id === swId);
+  if (!sw) return;
+
+  const store = sw.stores ? sw.stores.find(st => st.id === storeId) : null;
+  if (!store) return;
+
+  document.getElementById('storeModalName').innerText = store.name + ' (Contents)';
+
+  // Display store products with real-time updating
+  const tbody = document.getElementById('storeModalTable');
+  const storeProducts = store.products || [];
+  tbody.innerHTML = storeProducts.length > 0
+    ? storeProducts.map((item, index) => `
+      <tr>
+        <td>${item.name}</td>
+        <td>
+          <input type="number" id="store-qty-${storeId}-${index}" value="${item.qty}" 
+                 data-original-qty="${item.qty}"
+                 data-product-id="${item.id}"
+                 onchange="updateStoreProductQty('${swId}', '${storeId}', ${index})"
+                 oninput="liveUpdateSubWarehouseQty('${swId}', '${storeId}', ${index}, this.value)"
+                 style="width:70px; color: ${item.qty <= 2 ? 'red' : 'black'}; font-weight: ${item.qty <= 2 ? 'bold' : 'normal'};">
+        </td>
+        <td id="sw-qty-display-${index}" style="font-weight: bold;">
+          Sub WH: <span id="sw-qty-value-${index}">-</span>
+        </td>
+        <td>
+          <button class="delete-btn" style="margin-left: 5px;" onclick="removeProductFromStore('${swId}', '${storeId}', ${index})">Remove</button>
+        </td>
+      </tr>`).join('')
+    : '<tr><td colspan="4" style="text-align:center">No products in this store yet</td></tr>';
+
+  // Initialize sub warehouse quantity display
+  storeProducts.forEach((item, index) => {
+    const subWarehouseProduct = sw.stock.find(p => String(p.id) === String(item.id) || p.name === item.name);
+    const swQtyDisplay = document.getElementById(`sw-qty-value-${index}`);
+    if (swQtyDisplay && subWarehouseProduct) {
+      swQtyDisplay.textContent = subWarehouseProduct.qty + ' units';
+      swQtyDisplay.style.color = subWarehouseProduct.qty <= 5 ? 'red' : 'green';
+    }
+  });
+
+  // Populate product dropdown
+  const availableProducts = sw.stock || [];
+  const productSelect = document.getElementById('productSelectForStore');
+  productSelect.innerHTML = '<option value="">Select Product</option>' +
+    availableProducts.map(p => `<option value="${p.id}">${p.name} (Available: ${p.qty})</option>`).join('');
+
+  document.getElementById('viewStoreModal').style.display = 'flex';
+}
+
+function closeViewStoreModal() {
+  document.getElementById('viewStoreModal').style.display = 'none';
+}
+
+function addProductToStore() {
+  const productSelect = document.getElementById('productSelectForStore');
+  const productQtyInput = document.getElementById('productQtyForStore');
+
+  const selectedProductId = productSelect.value;
+  const qty = parseInt(productQtyInput.value);
+
+  if (!selectedProductId) {
+    alert('Please select a product');
+    return;
+  }
+
+  if (!qty || qty <= 0) {
+    alert('Please enter a valid quantity');
+    return;
+  }
+
+  // Reload latest data
+  subWarehouses = DataManager.getSubWarehouses();
+
+  const sw = subWarehouses.find(s => s.id === currentSubWarehouseId);
+  if (!sw) return;
+
+  if (!sw.stores) {
+    sw.stores = [];
+  }
+
+  const store = sw.stores.find(st => st.id === currentStoreId);
+  if (!store) return;
+
+  // Check if sub warehouse has enough stock
+  const subWarehouseProduct = sw.stock.find(p => String(p.id) === String(selectedProductId));
+  if (!subWarehouseProduct || subWarehouseProduct.qty < qty) {
+    alert('Insufficient stock in sub warehouse');
+    return;
+  }
+
+  // Initialize products array if not exists
+  if (!store.products) {
+    store.products = [];
+  }
+
+  // Check if product already in store
+  const existingProduct = store.products.find(p => String(p.id) === String(selectedProductId));
+  if (existingProduct) {
+    existingProduct.qty += qty;
+  } else {
+    store.products.push({
+      id: subWarehouseProduct.id,
+      name: subWarehouseProduct.name,
+      qty: qty
+    });
+  }
+
+  // Deduct from sub warehouse stock
+  subWarehouseProduct.qty -= qty;
+
+  DataManager.updateSubWarehouse(currentSubWarehouseId, { 
+    stores: sw.stores,
+    stock: sw.stock 
+  });
+
+  productQtyInput.value = '';
+  productSelect.value = '';
+  alert('Product added to store');
+  
+  // Refresh both store and sub warehouse views
+  renderWarehouse();
+  renderSubWarehouses();
+  viewStoreContents(currentSubWarehouseId, currentStoreId);
+}
+
+function updateStoreProductQty(swId, storeId, itemIndex) {
+  // Reload latest data
+  subWarehouses = DataManager.getSubWarehouses();
+
+  const sw = subWarehouses.find(s => s.id === swId);
+  if (!sw) return;
+
+  const store = sw.stores ? sw.stores.find(st => st.id === storeId) : null;
+  if (!store) return;
+
+  if (!store.products || !store.products[itemIndex]) return;
+
+  const item = store.products[itemIndex];
+  const oldQty = item.qty;
+  const newQty = parseInt(document.getElementById(`store-qty-${storeId}-${itemIndex}`).value);
+
+  if (isNaN(newQty) || newQty < 0) {
+    alert('Please enter a valid quantity');
+    return;
+  }
+
+  if (newQty === 0) {
+    alert('Quantity cannot be 0. Remove the product instead.');
+    return;
+  }
+
+  const diff = newQty - oldQty;
+
+  if (diff !== 0) {
+    const subWarehouseProduct = sw.stock.find(p => String(p.id) === String(item.id) || p.name === item.name);
+    if (subWarehouseProduct) {
+      if (diff > 0 && subWarehouseProduct.qty < diff) {
+        alert('Insufficient stock in sub warehouse');
+        return;
+      }
+      subWarehouseProduct.qty -= diff;
+    }
+  }
+
+  item.qty = newQty;
+  DataManager.updateSubWarehouse(swId, { 
+    stores: sw.stores,
+    stock: sw.stock 
+  });
+
+  alert('Quantity updated');
+  
+  // Refresh both store and sub warehouse views
+  renderWarehouse();
+  renderSubWarehouses();
+  viewStoreContents(swId, storeId);
+}
+
+function removeProductFromStore(swId, storeId, itemIndex) {
+  if (!confirm('Remove this product from store?')) return;
+
+  // Reload latest data
+  subWarehouses = DataManager.getSubWarehouses();
+
+  const sw = subWarehouses.find(s => s.id === swId);
+  if (!sw) return;
+
+  const store = sw.stores ? sw.stores.find(st => st.id === storeId) : null;
+  if (!store) return;
+
+  if (!store.products || !store.products[itemIndex]) return;
+
+  const item = store.products[itemIndex];
+
+  // Return stock to sub warehouse
+  const subWarehouseProduct = sw.stock.find(p => String(p.id) === String(item.id) || p.name === item.name);
+  if (subWarehouseProduct) {
+    subWarehouseProduct.qty += item.qty;
+  }
+
+  store.products.splice(itemIndex, 1);
+
+  DataManager.updateSubWarehouse(swId, { 
+    stores: sw.stores,
+    stock: sw.stock 
+  });
+
+  alert('Product removed from store');
+  
+  // Refresh both store and sub warehouse views
+  renderWarehouse();
+  renderSubWarehouses();
+  viewStoreContents(swId, storeId);
+}
+
+function deleteStore(swId, storeId, event) {
+  event.stopPropagation();
+  if (!confirm('Delete this store? All products will be returned to sub warehouse.')) return;
+
+  // Reload latest data
+  subWarehouses = DataManager.getSubWarehouses();
+
+  const sw = subWarehouses.find(s => s.id === swId);
+  if (!sw) return;
+
+  const store = sw.stores ? sw.stores.find(st => st.id === storeId) : null;
+  if (store && store.products) {
+    // Return all products to sub warehouse
+    store.products.forEach(storeProduct => {
+      const swProduct = sw.stock.find(p => String(p.id) === String(storeProduct.id) || p.name === storeProduct.name);
+      if (swProduct) {
+        swProduct.qty += storeProduct.qty;
+      }
+    });
+  }
+
+  if (sw.stores) {
+    sw.stores = sw.stores.filter(st => st.id !== storeId);
+  }
+
+  DataManager.updateSubWarehouse(swId, { 
+    stores: sw.stores,
+    stock: sw.stock 
+  });
+
+  alert('Store deleted');
+  
+  // Refresh all views
+  renderWarehouse();
+  renderSubWarehouses();
+  viewSubWarehouse(swId);
 }
 
 // Initial renders

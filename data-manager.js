@@ -867,11 +867,59 @@ const DataManager = (() => {
     return { success: true };
   }
 
+  /**
+   * Deduct quantity from sub-warehouses
+   * Returns remaining quantity if sub-warehouses don't have enough
+   */
+  function deductFromSubWarehouses(productId, productName, quantity, specificSwId = null) {
+    let remaining = quantity;
+    const subWarehouses = getSubWarehouses();
+    let changed = false;
+
+    for (const sw of subWarehouses) {
+      if (specificSwId && sw.id !== specificSwId) continue;
+
+      const item = sw.stock.find(i => String(i.id) === String(productId) || i.name === productName);
+      if (item && item.qty > 0) {
+        const deduct = Math.min(item.qty, remaining);
+        item.qty -= deduct;
+        remaining -= deduct;
+        changed = true;
+      }
+      if (remaining <= 0) break;
+    }
+
+    if (changed) {
+      saveSubWarehouses(subWarehouses);
+    }
+
+    return remaining;
+  }
+
+  /**
+   * Update Cart UI across all pages
+   */
+  function updateCartUI() {
+    const cart = JSON.parse(localStorage.getItem(STORAGE_KEYS.CART)) || [];
+    const totalItems = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
+    
+    const cartCounts = document.querySelectorAll('.cart-count');
+    cartCounts.forEach(el => {
+      el.textContent = totalItems;
+      el.style.display = totalItems > 0 ? 'inline-block' : 'none';
+    });
+  }
+
   // Real-time synchronization across tabs
   window.addEventListener('storage', (event) => {
     if (Object.values(STORAGE_KEYS).includes(event.key)) {
       try {
         console.log(`Data changed in another tab: ${event.key}`);
+        
+        if (event.key === STORAGE_KEYS.CART) {
+          updateCartUI();
+        }
+
         // Dispatch a custom event for the UI to respond
         window.dispatchEvent(new CustomEvent('dataChanged', { 
           detail: { key: event.key, newValue: event.newValue } 
@@ -880,9 +928,33 @@ const DataManager = (() => {
     }
   });
 
+  // Inject CSS for cart count
+  const style = document.createElement('style');
+  style.textContent = `
+    .cart-link { position: relative; display: inline-block; }
+    .cart-count {
+      position: absolute;
+      top: -12px;
+      right: -12px;
+      background: #e74c3c;
+      color: white;
+      border-radius: 50%;
+      padding: 4px 8px;
+      font-size: 16px;
+      font-weight: bold;
+      min-width: 24px;
+      text-align: center;
+      line-height: 1;
+      border: 2px solid #000;
+      z-index: 1001;
+    }
+  `;
+  document.head.appendChild(style);
+
   // Initialize on load
   initializeStorage();
   updateOnlineStatus();
+  updateCartUI();
   // Update status every 2 minutes while page is open
   setInterval(updateOnlineStatus, 2 * 60 * 1000);
 
@@ -894,10 +966,26 @@ const DataManager = (() => {
     updateProduct,
     deleteProduct,
     getCart,
-    addToCart,
-    removeFromCart,
-    updateCartQuantity,
-    clearCart,
+    addToCart: function(p) {
+      const res = addToCart(p);
+      updateCartUI();
+      return res;
+    },
+    removeFromCart: function(id) {
+      const res = removeFromCart(id);
+      updateCartUI();
+      return res;
+    },
+    updateCartQuantity: function(id, q) {
+      const res = updateCartQuantity(id, q);
+      updateCartUI();
+      return res;
+    },
+    clearCart: function() {
+      const res = clearCart();
+      updateCartUI();
+      return res;
+    },
     getCurrentUser,
     setCurrentUser,
     registerUser,
@@ -944,6 +1032,8 @@ const DataManager = (() => {
     saveSubWarehouses,
     addSubWarehouse,
     updateSubWarehouse,
-    deleteSubWarehouse
+    deleteSubWarehouse,
+    deductFromSubWarehouses,
+    updateCartUI
   };
 })();

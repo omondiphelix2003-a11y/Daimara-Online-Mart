@@ -189,11 +189,11 @@
       <li><a href="#" onclick="showTab('profits', this)"><i class="fas fa-chart-line"></i> Profits & Loss</a></li>
       <li><a href="#" onclick="showTab('users', this)"><i class="fas fa-users"></i> User Signups</a></li>    
       <li><a href="Daimara Department Head – Marketing.html"><i class="fas fa-bullhorn"></i> Marketing Department</a></li>
-    <li><a href="Daimara-operator.html"><i class=""></i> Operator Dept</a></li>
-    <li><a href="delivery manager system.html"><i class=""></i> Delivery manager system</a></li>
-    <li><a href="employement.html"><i class=""></i> Employment Dept</a></li>
-    <li><a href="executives.html"><i class=""></i> Exercutive Dept</a></li>
-    <li><a href="manager.html"><i class=""></i> Manager Dept</a></li>
+      <li><a href="Daimara-operator.html"><i class="fas fa-headset"></i> Operator Dept</a></li>
+      <li><a href="delivery manager system.html"><i class="fas fa-truck-fast"></i> Delivery Manager System</a></li>
+      <li><a href="employement.html"><i class="fas fa-user-plus"></i> Employment Dept</a></li>
+      <li><a href="executives.html"><i class="fas fa-user-tie"></i> Executive Dept</a></li>
+      <li><a href="manager.html"><i class="fas fa-users-cog"></i> Manager Dept</a></li>
 
     <div class="sidebar-footer">
       <button class="logout-btn" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
@@ -242,6 +242,42 @@
           <div class="stat-icon" style="background: rgba(231,76,60,0.1); color: #e74c3c;"><i class="fas fa-signal"></i></div>
           <div class="stat-info"><h3 id="stat-online">0</h3><p>Online Users</p></div>
         </div>
+      </div>
+
+      <div class="card-header" style="margin-top: 30px;">
+        <h2 class="card-title">Department Portals</h2>
+      </div>
+      <div class="stats-grid">
+        <a href="Daimara-operator.html" style="text-decoration: none;">
+          <div class="stat-card" style="cursor: pointer; border: 1px solid #f0f0f0;">
+            <div class="stat-icon" style="background: rgba(52,152,219,0.1); color: #3498db;"><i class="fas fa-headset"></i></div>
+            <div class="stat-info"><h3>Operator</h3><p>Dept</p></div>
+          </div>
+        </a>
+        <a href="delivery manager system.html" style="text-decoration: none;">
+          <div class="stat-card" style="cursor: pointer; border: 1px solid #f0f0f0;">
+            <div class="stat-icon" style="background: rgba(39,174,96,0.1); color: #27ae60;"><i class="fas fa-truck-fast"></i></div>
+            <div class="stat-info"><h3>Delivery</h3><p>System</p></div>
+          </div>
+        </a>
+        <a href="employement.html" style="text-decoration: none;">
+          <div class="stat-card" style="cursor: pointer; border: 1px solid #f0f0f0;">
+            <div class="stat-icon" style="background: rgba(155,89,182,0.1); color: #9b59b6;"><i class="fas fa-user-plus"></i></div>
+            <div class="stat-info"><h3>Employment</h3><p>Dept</p></div>
+          </div>
+        </a>
+        <a href="executives.html" style="text-decoration: none;">
+          <div class="stat-card" style="cursor: pointer; border: 1px solid #f0f0f0;">
+            <div class="stat-icon" style="background: rgba(231,76,60,0.1); color: #e74c3c;"><i class="fas fa-user-tie"></i></div>
+            <div class="stat-info"><h3>Executive</h3><p>Dept</p></div>
+          </div>
+        </a>
+        <a href="manager.html" style="text-decoration: none;">
+          <div class="stat-card" style="cursor: pointer; border: 1px solid #f0f0f0;">
+            <div class="stat-icon" style="background: rgba(241,196,15,0.1); color: #f1c40f;"><i class="fas fa-users-cog"></i></div>
+            <div class="stat-info"><h3>Manager</h3><p>Dept</p></div>
+          </div>
+        </a>
       </div>
 
       <div class="data-card">
@@ -825,30 +861,16 @@
     }
 
     function returnOrder(id) {
-      if (!confirm("Are you sure you want to mark this order as returned? Stock will be added back to warehouse.")) return;
+      if (!confirm("Are you sure you want to mark this order as returned?")) return;
       
       const orders = DataManager.getAllOrders();
       const order = orders.find(o => o.id === id);
       
       if (order && order.status !== 'returned') {
-        const warehouse = DataManager.getWarehouse();
-        const items = order.items || order.products || [];
-        
-        // Add items back to warehouse
-        items.forEach(item => {
-          // Handle both old 'product' (ID) and new 'id' field
-          const itemId = item.id || item.product;
-          const wItem = warehouse.find(p => p.id === itemId || p.name === item.name);
-          if (wItem) {
-            wItem.quantity += (item.qty || item.quantity || 1);
-          }
-        });
-        
         order.status = 'returned';
-        localStorage.setItem('ecommerce_warehouse', JSON.stringify({ products: warehouse }));
         DataManager.saveOrders(orders);
         
-        alert("Order marked as returned. Warehouse updated.");
+        alert("Order marked as returned.");
         renderOrders();
         renderDashboard();
       }

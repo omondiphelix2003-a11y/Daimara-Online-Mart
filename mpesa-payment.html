@@ -245,19 +245,6 @@ function payNow(){
   setTimeout(() => {
     alert("Payment successful! Thank you for shopping with Daimara Online Mart.");
     
-    // REDUCE WAREHOUSE STOCK
-    const warehouse = DataManager.getWarehouse();
-    if (orderData.items) {
-      orderData.items.forEach(item => {
-        // Find product in warehouse by ID or Name
-        const wProduct = warehouse.find(p => p.id === item.id || p.name === item.name);
-        if (wProduct) {
-          const newQty = Math.max(0, wProduct.quantity - (item.qty || 1));
-          DataManager.updateWarehouseQuantity(wProduct.id, newQty);
-        }
-      });
-    }
-
     // UPDATE ORDER STATUS TO COMPLETED
     const allOrders = DataManager.getAllOrders();
     const currentOrder = allOrders.find(o => o.id === orderData.orderId);
@@ -271,7 +258,7 @@ function payNow(){
       DataManager.clearCart();
     }
     localStorage.removeItem('mpesaOrder');
-    window.location.href = "home.html";
+    window.location.href = "index.html";
   }, 3000);
 }
 </script>

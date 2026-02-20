@@ -206,9 +206,13 @@
   <div class="logo">
            <!-- <a href="home.html" style="text-decoration: none; color: inherit; font-size: 25px;"><span>Checkout</span></a>-->
    </div>
-  <div>
+  <div class="nav-center">
     <a href="store.html"><div class="shop-icon"></div></a>
-    
+  </div>
+
+  <div class="nav-icons">
+    <a href="login.html"><i class="fa fa-user"></i></a>
+    <a href="cart.html" class="cart-link"><i class="fa fa-shopping-cart"></i><span class="cart-count">0</span></a>
   </div>
 </nav>
 
@@ -247,6 +251,12 @@
       <option value="mpesa">M-Pesa</option>
       <!--<option value="googlepay">Google Pay</option>
       <option value="card">Card</option>-->
+    </select>
+    
+    <label for="warehouseSelect">Select Fulfillment Branch</label>
+    <select id="warehouseSelect" title="Warehouse" aria-label="Warehouse" required>
+      <option value="">-- Select Branch --</option>
+      <!-- Sub Warehouses will be injected here -->
     </select>
     <div style="margin: 15px 0; padding: 15px; background: #f9f9f9; border-radius: 6px;">
       <label for="delivery-option" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
@@ -317,7 +327,19 @@
       document.getElementById('email').value = currentUser.email || '';
     }
     renderCart();
+    populateWarehouses();
   });
+
+  function populateWarehouses() {
+    const select = document.getElementById('warehouseSelect');
+    const subWarehouses = DataManager.getSubWarehouses();
+    subWarehouses.forEach(sw => {
+      const option = document.createElement('option');
+      option.value = sw.id;
+      option.textContent = sw.name;
+      select.appendChild(option);
+    });
+  }
 
   function renderCart() {
     const tbody = document.querySelector('#cartTable tbody');
@@ -380,7 +402,10 @@
     const name=document.getElementById('name').value;
     const email=document.getElementById('email').value;
     const paymentMethod=document.getElementById('paymentMethod').value;
+    const warehouseId = document.getElementById('warehouseSelect').value;
+    
     if(!name||!email){alert('Please fill all fields'); return;}
+    if(!warehouseId){alert('Please select a branch for fulfillment'); return;}
 
     const subtotal = cart.reduce((a,b)=>a+b.price*(b.qty||1),0);
     const deliveryCheckbox = document.getElementById('delivery-option');
@@ -399,6 +424,7 @@
       deliveryFee: deliveryFee,
       totalPrice: totalPrice,
       paymentMethod,
+      warehouseId: warehouseId,
       customer: { 
         name, 
         email, 
@@ -445,14 +471,11 @@
     allOrders.push(newOrder);
     DataManager.saveOrders(allOrders);
 
-    // REDUCE WAREHOUSE STOCK
-    const warehouse = DataManager.getWarehouse();
+    // REDUCE STOCK (SUB-WAREHOUSE ONLY)
     cart.forEach(item => {
-      const wProduct = warehouse.find(p => p.id === item.id || p.name === item.name);
-      if (wProduct) {
-        const newQty = Math.max(0, (wProduct.quantity || 0) - (item.qty || 1));
-        DataManager.updateWarehouseQuantity(wProduct.id, newQty);
-      }
+      let remainingQty = item.qty || 1;
+      // Deduct strictly from the SELECTED sub-warehouse
+      DataManager.deductFromSubWarehouses(item.id, item.name, remainingQty, warehouseId);
     });
 
     // Generate Invoice
