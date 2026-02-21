@@ -140,7 +140,10 @@ select {
 
   <!-- MAIN WAREHOUSE CONTENT ONLY -->
   <div id="warehouseSection" class="section hidden">
-    <div class="section-header"><h2>Main Warehouse Contents</h2></div>
+    <div class="section-header">
+      <h2>Main Warehouse Contents</h2>
+      <button class="btn" onclick="openTransferModal()" style="background: var(--primary); color: black;"><i class="fas fa-exchange-alt"></i> Transfer Product</button>
+    </div>
     <table class="table">
       <thead>
         <tr><th>Product</th><th>Stock</th><th>Moved Qty</th><th>Move Qty</th><th></th></tr>
@@ -155,6 +158,21 @@ select {
       <h2>Sub Warehouses Platforms</h2>
     </div>
     <div class="grid" id="subWarehouseList"></div>
+  </div>
+
+  <!-- ORDERS SECTION -->
+  <div class="section" style="border: 2px solid var(--primary); background: #fffbf0;">
+    <div class="section-header">
+      <h2>📦 Pending Orders for Packaging <span id="orderCount" style="background: var(--primary); color: black; padding: 2px 8px; border-radius: 50%; font-size: 14px; margin-left: 10px;">0</span></h2>
+    </div>
+    <table class="table">
+      <thead>
+        <tr><th>Order ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Action</th></tr>
+      </thead>
+      <tbody id="ordersTable">
+        <!-- Orders will be injected here -->
+      </tbody>
+    </table>
   </div>
 
   <!-- CLIENT EMAILS -->
@@ -224,6 +242,50 @@ select {
     <button class="btn" style="width: 100%; background: #16a34a;" onclick="addProductToStore()">Add Product</button>
   </div>
 </div>
+
+<!-- TRANSFER MODAL -->
+<div id="transfer-modal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <span class="close-modal" onclick="closeTransferModal()">&times;</span>
+    <div class="modal-header">
+      <h2>Transfer Product Between Sub-Warehouses</h2>
+    </div>
+    <form onsubmit="executeTransfer(event)">
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; margin-bottom: 8px; font-weight: 600;">From Sub-Warehouse:</label>
+        <select id="transfer-from" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px;" onchange="updateProductsDropdown()">
+          <option value="">Select source sub-warehouse...</option>
+        </select>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Product:</label>
+        <select id="transfer-product" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px;" onchange="updateAvailableQuantity()">
+          <option value="">Select product...</option>
+        </select>
+        <div id="available-qty" style="margin-top: 8px; font-size: 14px; color: #666;"></div>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Quantity to Transfer:</label>
+        <input type="number" id="transfer-qty" required min="1" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px;" />
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; margin-bottom: 8px; font-weight: 600;">To Sub-Warehouse:</label>
+        <select id="transfer-to" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px;">
+          <option value="">Select destination sub-warehouse...</option>
+        </select>
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-top: 25px;">
+        <button type="submit" class="btn" style="flex: 1; background: #16a34a;"><i class="fas fa-check"></i> Transfer</button>
+        <button type="button" class="btn" style="flex: 1; background: #ccc; color: #000;" onclick="closeTransferModal()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script src="data-manager.js"></script>
 <script>
 let warehouse = [];
@@ -890,16 +952,210 @@ function deleteStore(swId, storeId, event) {
   viewSubWarehouse(swId);
 }
 
+function openTransferModal() {
+  const modal = document.getElementById('transfer-modal');
+  const fromSelect = document.getElementById('transfer-from');
+  const toSelect = document.getElementById('transfer-to');
+  
+  subWarehouses = DataManager.getSubWarehouses();
+  fromSelect.innerHTML = '<option value="">Select source sub-warehouse...</option>';
+  toSelect.innerHTML = '<option value="">Select destination sub-warehouse...</option>';
+  
+  subWarehouses.forEach(sw => {
+    fromSelect.innerHTML += `<option value="${sw.id}">${sw.name}</option>`;
+    toSelect.innerHTML += `<option value="${sw.id}">${sw.name}</option>`;
+  });
+  
+  document.getElementById('transfer-product').innerHTML = '<option value="">Select product...</option>';
+  document.getElementById('transfer-qty').value = '';
+  modal.style.display = 'flex';
+}
+
+function closeTransferModal() {
+  document.getElementById('transfer-modal').style.display = 'none';
+}
+
+function updateProductsDropdown() {
+  const fromId = document.getElementById('transfer-from').value;
+  const productSelect = document.getElementById('transfer-product');
+  
+  if (!fromId) {
+    productSelect.innerHTML = '<option value="">Select product...</option>';
+    document.getElementById('available-qty').textContent = '';
+    return;
+  }
+  
+  subWarehouses = DataManager.getSubWarehouses();
+  const sourceSW = subWarehouses.find(sw => sw.id === fromId);
+  
+  if (!sourceSW) return;
+  
+  productSelect.innerHTML = '<option value="">Select product...</option>';
+  sourceSW.stock.forEach(item => {
+    productSelect.innerHTML += `<option value="${item.id}">${item.name} (${item.qty} available)</option>`;
+  });
+}
+
+function updateAvailableQuantity() {
+  const fromId = document.getElementById('transfer-from').value;
+  const productId = document.getElementById('transfer-product').value;
+  
+  if (!fromId || !productId) {
+    document.getElementById('available-qty').textContent = '';
+    return;
+  }
+  
+  subWarehouses = DataManager.getSubWarehouses();
+  const sourceSW = subWarehouses.find(sw => sw.id === fromId);
+  
+  if (!sourceSW) return;
+  
+  const product = sourceSW.stock.find(item => String(item.id) === String(productId));
+  if (product) {
+    document.getElementById('available-qty').textContent = `Available: ${product.qty} units`;
+  }
+}
+
+function executeTransfer(event) {
+  event.preventDefault();
+  
+  const productId = document.getElementById('transfer-product').value;
+  const fromId = document.getElementById('transfer-from').value;
+  const toId = document.getElementById('transfer-to').value;
+  const qty = parseInt(document.getElementById('transfer-qty').value);
+  
+  if (!productId || !fromId || !toId || !qty) {
+    alert('Please fill in all fields');
+    return;
+  }
+  
+  const result = DataManager.transferProductBetweenSubWarehouses(productId, fromId, toId, qty);
+  
+  if (result.success) {
+    alert(result.message);
+    closeTransferModal();
+    renderWarehouse();
+    renderSubWarehouses();
+  } else {
+    alert('Transfer failed: ' + result.message);
+  }
+}
+
+// Close modal on background click
+window.onclick = function(event) {
+  const transferModal = document.getElementById('transfer-modal');
+  if (event.target == transferModal) {
+    closeTransferModal();
+  }
+}
+
+// RENDER ORDERS FOR PACKAGING
+let previousOrderCount = 0;
+
+function renderOrders() {
+  const orders = DataManager.getAllOrders() || [];
+  const pendingOrders = orders.filter(o => o.status === 'pending');
+  
+  const tbody = document.getElementById('ordersTable');
+  const orderCountBadge = document.getElementById('orderCount');
+  
+  // Update badge count
+  if (orderCountBadge) {
+    orderCountBadge.textContent = pendingOrders.length;
+  }
+  
+  tbody.innerHTML = '';
+  
+  // Check if new orders arrived
+  if (pendingOrders.length > previousOrderCount) {
+    console.log('New orders received! Count:', pendingOrders.length);
+    scrollToOrdersSection();
+  }
+  previousOrderCount = pendingOrders.length;
+  
+  if (pendingOrders.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #666;">No pending orders</td></tr>';
+    return;
+  }
+  
+  pendingOrders.forEach(order => {
+    const itemsText = order.items ? order.items.map(i => `${i.name} (${i.qty || 1})`).join(', ') : 'N/A';
+    const amount = order.grandTotal || order.totalPrice || 0;
+    
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td><strong>${order.id || 'N/A'}</strong></td>
+      <td><span class="blurry-text">${order.customerName || 'N/A'}</span></td>
+      <td>${itemsText}</td>
+      <td>KES ${amount.toLocaleString()}</td>
+      <td><button class="btn" style="padding: 6px 12px; background: #16a34a;" onclick="sendOrderForPackaging('${order.id}')"><i class="fas fa-send"></i> Send for Packaging</button></td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+function scrollToOrdersSection() {
+  const ordersSection = document.querySelector('h2');
+  const allH2s = Array.from(document.querySelectorAll('h2'));
+  const ordersH2 = allH2s.find(h => h.textContent === 'Pending Orders for Packaging');
+  
+  if (ordersH2) {
+    ordersH2.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    ordersH2.parentElement.parentElement.style.backgroundColor = '#fffacd';
+    setTimeout(() => {
+      ordersH2.parentElement.parentElement.style.backgroundColor = '';
+    }, 3000);
+  }
+}
+
+// SEND ORDER FOR PACKAGING
+function sendOrderForPackaging(orderId) {
+  const orders = DataManager.getAllOrders() || [];
+  const order = orders.find(o => o.id === orderId);
+  
+  if (!order) {
+    alert('Order not found');
+    return;
+  }
+  
+  if (confirm(`Send order ${order.id} for packaging?`)) {
+    order.status = 'in-packaging';
+    DataManager.saveOrders(orders);
+    renderOrders();
+    alert('Order sent to Packaging Queue for Executive Review');
+  }
+}
+
 // Initial renders
 renderWarehouse();
 renderSubWarehouses();
 renderEmails();
+renderOrders();
 
 // Real-time synchronization
 window.addEventListener('dataChanged', (e) => {
   renderWarehouse();
   renderSubWarehouses();
   renderEmails();
+  renderOrders();
+});
+
+// Listen for storage changes (orders created from checkout)
+window.addEventListener('storage', (e) => {
+  if (e.key === 'ecommerce_orders') {
+    console.log('New orders detected from checkout');
+    renderOrders();
+  }
+});
+
+// Check for new orders every 2 seconds
+setInterval(() => {
+  renderOrders();
+}, 2000);
+
+// Refresh when page regains focus
+window.addEventListener('focus', () => {
+  renderOrders();
 });
 </script>
 

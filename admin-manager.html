@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Admin Panel | Daimara Online Mart</title>
-  <meta name="viewport" content="width=1200">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
     :root {
@@ -23,18 +23,41 @@
 
     /* SIDEBAR */
     .sidebar {  width: 270px; background: var(--sidebar-bg); color: rgb(255, 255, 255); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; transition: all 0.3s; overflow-y: scroll; }
-    .sidebar-header { padding: 30px 20px; text-align: center; border-bottom: 1px solid #333; }
-    .sidebar-header h2 { color: black; font-size: 33px; letter-spacing: 1px; }
-    .nav-links { list-style: none; padding: 20px 0; flex: 1; }
-    .nav-links li { padding: 5px 20px; }
-    .nav-links a { color: #bdc3c7; text-decoration: none; display: flex; align-items: center; padding: 12px 15px; border-radius: 8px; transition: all 0.3s; gap: 16px; font-size: 23px; }
+    .sidebar-header { padding: 20px 15px; text-align: center; border-bottom: 1px solid #333; }
+    .sidebar-header h2 { color: black; font-size: 20px; letter-spacing: 1px; }
+    .nav-links { list-style: none; padding: 15px 0; flex: 1; }
+    .nav-links li { padding: 5px 10px; }
+    .nav-links a { color: #bdc3c7; text-decoration: none; display: flex; align-items: center; padding: 10px 12px; border-radius: 8px; transition: all 0.3s; gap: 12px; font-size: 14px; }
     .nav-links a:hover, .nav-links a.active { background: rgba(233, 157, 17, 0.15); color: black }
+    
+    @media (min-width: 768px) {
+      .sidebar-header h2 { font-size: 24px; }
+      .nav-links a { font-size: 18px; gap: 14px; }
+    }
+    
+    @media (min-width: 1200px) {
+      .sidebar-header { padding: 30px 20px; }
+      .sidebar-header h2 { font-size: 33px; }
+      .nav-links li { padding: 5px 20px; }
+      .nav-links a { font-size: 23px; gap: 16px; padding: 12px 15px; }
+    }
     .nav-links i { width: 20px; font-size: 25px; }
     .sidebar-footer { padding: 20px; border-top: 1px solid #333; }
     .logout-btn { background: var(--danger); color: white; border: none;font-size: 27; width: 100%; padding: 12px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 600; }
 
     /* MAIN CONTENT */
-    .main-content { flex: 1; margin-left: 260px; padding: 30px; }
+    .main-content { flex: 1; margin-left: 260px; padding: 20px; }
+    
+    @media (max-width: 768px) {
+      .main-content { margin-left: 0; padding: 15px; }
+      .sidebar { width: 100%; height: auto; position: relative; }
+      body { flex-direction: column; }
+    }
+    
+    @media (min-width: 768px) and (max-width: 1199px) {
+      .main-content { margin-left: 200px; padding: 25px; }
+      .sidebar { width: 200px; }
+    }
     .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
     .page-title h1 { font-size: 25px; color: var(--text-main); }
     .admin-profile { display: flex; align-items: center; gap: 15px; }
@@ -87,6 +110,18 @@
     .blurry-text.revealed {
       filter: blur(0);
       user-select: auto;
+    }
+
+    /* CHECKBOX STYLES */
+    input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: var(--primary-color);
+    }
+
+    .btn-danger:hover {
+      background: #c0392b !important;
     }
 
     /* PROFIT & LOSS */
@@ -194,6 +229,7 @@
       <li><a href="employement.html"><i class="fas fa-user-plus"></i> Employment Dept</a></li>
       <li><a href="executives.html"><i class="fas fa-user-tie"></i> Executive Dept</a></li>
       <li><a href="manager.html"><i class="fas fa-users-cog"></i> Manager Dept</a></li>
+      <li><a href="order fulfillment specialists.html"><i class="fas fa-box"></i> Order Packaging</a></li>
 
     <div class="sidebar-footer">
       <button class="logout-btn" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
@@ -300,9 +336,12 @@
         <div class="card-header">
           <h2 class="card-title">All Customer Orders</h2>
         </div>
+        <div style="margin-bottom: 10px; display: none;" id="ordersSelectActions">
+          <button class="btn btn-danger" onclick="bulkDeleteOrders()"><i class="fas fa-trash"></i> Delete Selected</button>
+        </div>
         <table id="all-orders-table">
           <thead>
-            <tr><th>Order ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th><th>Action</th></tr>
+            <tr><th><input type="checkbox" onclick="toggleAllOrders(this)"></th><th>Order ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th><th>Action</th></tr>
           </thead>
           <tbody></tbody>
         </table>
@@ -325,6 +364,18 @@
           <tbody></tbody>
         </table>
       </div>
+
+      <div class="data-card">
+        <div class="card-header">
+          <h2 class="card-title">Sub-Warehouse Stock</h2>
+        </div>
+        <table id="subwarehouse-table">
+          <thead>
+            <tr><th>Sub-Warehouse</th><th>Product</th><th>Quantity</th><th>Price</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
 
     <!-- INVOICES TAB -->
@@ -334,9 +385,12 @@
           <h2 class="card-title">Invoice History</h2>
           <button class="btn btn-info" onclick="exportInvoicesToExcel()"><i class="fas fa-file-excel"></i> Export to Excel (CSV)</button>
         </div>
+        <div style="margin-bottom: 10px; display: none;" id="invoicesSelectActions">
+          <button class="btn btn-danger" onclick="bulkDeleteInvoices()"><i class="fas fa-trash"></i> Delete Selected</button>
+        </div>
         <table id="invoices-table">
           <thead>
-            <tr><th>Invoice #</th><th>Customer</th><th>Order ID</th><th>Amount</th><th>Date</th><th>Action</th></tr>
+            <tr><th><input type="checkbox" onclick="toggleAllInvoices(this)"></th><th>Invoice #</th><th>Customer</th><th>Order ID</th><th>Amount</th><th>Date</th><th>Action</th></tr>
           </thead>
           <tbody></tbody>
         </table>
@@ -349,9 +403,12 @@
         <div class="card-header">
           <h2 class="card-title">Client Messages</h2>
         </div>
+        <div style="margin-bottom: 10px; display: none;" id="emailsSelectActions">
+          <button class="btn btn-danger" onclick="bulkDeleteEmails()"><i class="fas fa-trash"></i> Delete Selected</button>
+        </div>
         <table id="emails-table">
           <thead>
-            <tr><th>From</th><th>Subject</th><th>Message</th><th>Date</th><th>Status</th></tr>
+            <tr><th><input type="checkbox" onclick="toggleAllEmails(this)"></th><th>From</th><th>Subject</th><th>Message</th><th>Date</th><th>Status</th></tr>
           </thead>
           <tbody></tbody>
         </table>
@@ -491,8 +548,9 @@
       const tbody = document.querySelector('#all-orders-table tbody');
       if (!tbody) return;
       tbody.innerHTML = orders.map(o => `
-        <tr>
-          <td>#${(o.id || '').slice(-8)}</td>
+        <tr data-order-id="${o.id}">
+          <td><input type="checkbox" class="order-checkbox" onchange="checkOrdersSelection()"></td>
+          <td>${o.id}</td>
           <td><span class="clickable-name" onclick="viewOrderDetails('${o.id}')">${o.customerName || o.customer?.name || 'N/A'}</span></td>
           <td>${(o.items || o.products || []).length} items</td>
           <td>KSH ${(o.grandTotal || o.totalPrice || 0).toLocaleString()}</td>
@@ -506,7 +564,7 @@
             </div>
           </td>
         </tr>
-      `).join('') || '<tr><td colspan="7" style="text-align:center">No orders found</td></tr>';
+      `).join('') || '<tr><td colspan="8" style="text-align:center">No orders found</td></tr>';
     }
 
     function renderWarehouse() {
@@ -525,6 +583,89 @@
           <td><button class="btn btn-primary" style="padding:4px 8px" onclick="editStock('${p.id}')">Adjust</button></td>
         </tr>
       `).join('') || '<tr><td colspan="8" style="text-align:center">Warehouse is empty</td></tr>';
+
+      const swTbody = document.querySelector('#subwarehouse-table tbody');
+      if (!swTbody) return;
+      
+      const subWarehouses = DataManager.getSubWarehouses();
+      const rows = [];
+      subWarehouses.forEach(sw => {
+        sw.stock.forEach(item => {
+          rows.push(`
+            <tr>
+              <td>${sw.name}</td>
+              <td>${item.name || 'Unknown'}</td>
+              <td><span class="quantity-badge ${item.qty < 10 ? 'qty-low' : 'qty-ok'}">${item.qty || 0}</span></td>
+              <td>KSH ${(item.price || 0).toLocaleString()}</td>
+            </tr>
+          `);
+        });
+      });
+      
+      swTbody.innerHTML = rows.length > 0 ? rows.join('') : '<tr><td colspan="4" style="text-align:center">No products in sub-warehouses</td></tr>';
+
+      // Render stores for each sub-warehouse
+      const storesHtml = subWarehouses.map(sw => {
+        const storesDetail = (sw.stores || []).map(store => {
+          const stockList = (store.stock || []).map(item => 
+            `<tr style="font-size: 13px;"><td>${item.name}</td><td><span class="quantity-badge ${item.qty < 5 ? 'qty-low' : 'qty-ok'}">${item.qty}</span></td><td>KSH ${(item.price || 0).toLocaleString()}</td></tr>`
+          ).join('');
+          
+          return `
+            <div style="background: #f9f9f9; padding: 12px; margin-bottom: 10px; border-radius: 6px; border-left: 3px solid var(--primary-color);">
+              <p style="margin: 0 0 8px 0; font-weight: 600; color: var(--text-main);">${store.name}</p>
+              <table style="width: 100%; font-size: 12px; margin-bottom: 8px;">
+                <thead style="background: #f0f0f0;">
+                  <tr><th style="padding: 4px; text-align: left;">Product</th><th style="padding: 4px; text-align: left;">Qty</th><th style="padding: 4px; text-align: left;">Price</th></tr>
+                </thead>
+                <tbody>
+                  ${stockList || '<tr><td colspan="3" style="padding: 4px; text-align: center; color: var(--text-muted);">No inventory</td></tr>'}
+                </tbody>
+              </table>
+            </div>
+          `;
+        }).join('');
+
+        return `
+          <div style="background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; border-left: 4px solid var(--primary-color); box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+              <h4 style="margin: 0; color: var(--text-main);">${sw.name}</h4>
+              <button class="btn btn-success" style="padding: 6px 12px; font-size: 14px;" onclick="addStoreToWarehouse('${sw.id}', '${sw.name}')">
+                <i class="fas fa-plus"></i> Add Store
+              </button>
+            </div>
+            <div style="margin-top: 10px;">
+              ${storesDetail || '<p style="color: var(--text-muted); margin: 0;">No stores created yet</p>'}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      const storesContainer = document.querySelector('#warehouse .data-card:last-of-type');
+      if (storesContainer) {
+        const existingStoresSection = storesContainer.querySelector('[data-stores-section]');
+        if (existingStoresSection) {
+          existingStoresSection.innerHTML = storesHtml;
+        } else {
+          const section = document.createElement('div');
+          section.setAttribute('data-stores-section', 'true');
+          section.innerHTML = `<h3 style="margin-top: 30px; color: var(--text-main);">Sub-Warehouse Stores & Inventory</h3>${storesHtml}`;
+          storesContainer.appendChild(section);
+        }
+      }
+    }
+
+    function addStoreToWarehouse(swId, swName) {
+      const storeName = prompt(`Enter store name for "${swName}":`);
+      if (storeName && storeName.trim()) {
+        const result = DataManager.addStoreToSubWarehouse(swId, storeName.trim());
+        if (result.success) {
+          alert('Store added successfully!');
+          renderWarehouse();
+        } else {
+          alert('Error adding store: ' + result.message);
+        }
+      }
     }
 
     function renderInvoices() {
@@ -532,10 +673,11 @@
       const tbody = document.querySelector('#invoices-table tbody');
       if (!tbody) return;
       tbody.innerHTML = invoices.map(inv => `
-        <tr>
+        <tr data-invoice-id="${inv.id}">
+          <td><input type="checkbox" class="invoice-checkbox" onchange="checkInvoicesSelection()"></td>
           <td>${inv.id || 'N/A'}</td>
           <td><span class="clickable-name" onclick="viewOrderDetails('${inv.orderId}')">${inv.customerName || inv.customerInfo?.name || 'Guest'}</span></td>
-          <td>#${(inv.orderId || '').slice(-6)}</td>
+          <td>${inv.orderId || 'N/A'}</td>
           <td>KSH ${(inv.total || inv.amount || 0).toLocaleString()}</td>
           <td>${inv.createdDate ? new Date(inv.createdDate).toLocaleDateString() : 'N/A'}</td>
           <td>
@@ -543,7 +685,7 @@
             <button class="btn btn-danger" style="padding:4px 8px; background:#333;" onclick="deleteInvoice('${inv.id}')"><i class="fas fa-trash"></i></button>
           </td>
         </tr>
-      `).join('') || '<tr><td colspan="6" style="text-align:center">No invoices generated yet</td></tr>';
+      `).join('') || '<tr><td colspan="7" style="text-align:center">No invoices generated yet</td></tr>';
     }
 
     function renderEmails() {
@@ -553,7 +695,8 @@
       tbody.innerHTML = emails.map(e => {
         const isRead = e.status === 'read';
         return `
-          <tr>
+          <tr data-email-id="${e.id}">
+            <td><input type="checkbox" class="email-checkbox" onchange="checkEmailsSelection()"></td>
             <td>${e.email || 'N/A'}</td>
             <td>${e.subject || 'No Subject'}</td>
             <td class="blurry-text ${isRead ? 'revealed' : ''}" 
@@ -565,7 +708,7 @@
             <td><span class="status-pill status-${e.status || 'unread'}">${e.status || 'unread'}</span></td>
           </tr>
         `;
-      }).join('') || '<tr><td colspan="5" style="text-align:center">No messages</td></tr>';
+      }).join('') || '<tr><td colspan="6" style="text-align:center">No messages</td></tr>';
     }
 
     function renderProfits() {
@@ -692,7 +835,7 @@
       
       body.innerHTML = `
         <div class="modal-header">
-          <h2>Order Details: #${order.id.slice(-8)}</h2>
+          <h2>Order Details: ${order.id}</h2>
         </div>
         <div style="margin-bottom:20px;">
           <p><strong>Customer:</strong> ${order.customerName || order.customer?.name}</p>
@@ -961,6 +1104,112 @@
 
     function adminLogout() {
       window.location.href = "login.html";
+    }
+
+    // BULK DELETE FUNCTIONS
+    function toggleAllOrders(checkbox) {
+      const checkboxes = document.querySelectorAll('.order-checkbox');
+      checkboxes.forEach(cb => cb.checked = checkbox.checked);
+      checkOrdersSelection();
+    }
+
+    function checkOrdersSelection() {
+      const selectedCheckboxes = document.querySelectorAll('.order-checkbox:checked');
+      const actionButton = document.getElementById('ordersSelectActions');
+      if (selectedCheckboxes.length > 0) {
+        actionButton.style.display = 'block';
+      } else {
+        actionButton.style.display = 'none';
+      }
+    }
+
+    function bulkDeleteOrders() {
+      const selectedCheckboxes = document.querySelectorAll('.order-checkbox:checked');
+      const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.closest('tr').getAttribute('data-order-id'));
+      
+      if (selectedIds.length === 0) {
+        alert('Please select orders to delete');
+        return;
+      }
+      
+      if (confirm(`Delete ${selectedIds.length} order(s)?`)) {
+        const allOrders = DataManager.getAllOrders();
+        const filteredOrders = allOrders.filter(o => !selectedIds.includes(o.id));
+        DataManager.saveOrders(filteredOrders);
+        renderOrders();
+        checkOrdersSelection();
+        alert(`${selectedIds.length} order(s) deleted successfully`);
+      }
+    }
+
+    function toggleAllInvoices(checkbox) {
+      const checkboxes = document.querySelectorAll('.invoice-checkbox');
+      checkboxes.forEach(cb => cb.checked = checkbox.checked);
+      checkInvoicesSelection();
+    }
+
+    function checkInvoicesSelection() {
+      const selectedCheckboxes = document.querySelectorAll('.invoice-checkbox:checked');
+      const actionButton = document.getElementById('invoicesSelectActions');
+      if (selectedCheckboxes.length > 0) {
+        actionButton.style.display = 'block';
+      } else {
+        actionButton.style.display = 'none';
+      }
+    }
+
+    function bulkDeleteInvoices() {
+      const selectedCheckboxes = document.querySelectorAll('.invoice-checkbox:checked');
+      const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.closest('tr').getAttribute('data-invoice-id'));
+      
+      if (selectedIds.length === 0) {
+        alert('Please select invoices to delete');
+        return;
+      }
+      
+      if (confirm(`Delete ${selectedIds.length} invoice(s)?`)) {
+        const allInvoices = DataManager.getInvoices() || [];
+        const filteredInvoices = allInvoices.filter(inv => !selectedIds.includes(inv.id));
+        DataManager.saveInvoices(filteredInvoices);
+        renderInvoices();
+        checkInvoicesSelection();
+        alert(`${selectedIds.length} invoice(s) deleted successfully`);
+      }
+    }
+
+    function toggleAllEmails(checkbox) {
+      const checkboxes = document.querySelectorAll('.email-checkbox');
+      checkboxes.forEach(cb => cb.checked = checkbox.checked);
+      checkEmailsSelection();
+    }
+
+    function checkEmailsSelection() {
+      const selectedCheckboxes = document.querySelectorAll('.email-checkbox:checked');
+      const actionButton = document.getElementById('emailsSelectActions');
+      if (selectedCheckboxes.length > 0) {
+        actionButton.style.display = 'block';
+      } else {
+        actionButton.style.display = 'none';
+      }
+    }
+
+    function bulkDeleteEmails() {
+      const selectedCheckboxes = document.querySelectorAll('.email-checkbox:checked');
+      const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.closest('tr').getAttribute('data-email-id'));
+      
+      if (selectedIds.length === 0) {
+        alert('Please select emails to delete');
+        return;
+      }
+      
+      if (confirm(`Delete ${selectedIds.length} email(s)?`)) {
+        const allEmails = DataManager.getClientEmails() || [];
+        const filteredEmails = allEmails.filter(e => !selectedIds.includes(e.id));
+        DataManager.saveClientEmails(filteredEmails);
+        renderEmails();
+        checkEmailsSelection();
+        alert(`${selectedIds.length} email(s) deleted successfully`);
+      }
     }
 
     // Initialize

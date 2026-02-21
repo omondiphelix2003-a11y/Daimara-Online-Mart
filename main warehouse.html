@@ -472,7 +472,7 @@
         <tr>
           <td>${inv.id || 'N/A'}</td>
           <td><span class="clickable-name" onclick="viewOrderDetails('${inv.orderId}')">${inv.customerName || inv.customerInfo?.name || 'Guest'}</span></td>
-          <td>#${(inv.orderId || '').slice(-6)}</td>
+          <td>${inv.orderId || 'N/A'}</td>
           <td>KSH ${(inv.total || inv.amount || 0).toLocaleString()}</td>
           <td>${inv.createdDate ? new Date(inv.createdDate).toLocaleDateString() : 'N/A'}</td>
           <td>
@@ -633,7 +633,7 @@
       
       body.innerHTML = `
         <div class="modal-header">
-          <h2>Order Details: #${order.id.slice(-8)}</h2>
+          <h2>Order Details: ${order.id}</h2>
         </div>
         <div style="margin-bottom:20px;">
           <p><strong>Customer:</strong> ${order.customerName || order.customer?.name}</p>

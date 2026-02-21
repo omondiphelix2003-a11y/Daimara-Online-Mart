@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Order Fulfillment Specialists | Daimara Online Mart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    :root {
+      --primary-color: rgb(233, 157, 17);
+      --dark-bg: #0a0a0a;
+      --sidebar-bg: rgb(233, 157, 17);
+      --card-bg: #ffffff;
+      --text-main: #2c3e50;
+      --text-muted: #7f8c8d;
+      --success: #27ae60;
+      --danger: #e74c3c;
+      --info: #3498db;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background: #0f172a; display: flex; min-height: 100vh; color: var(--text-main); }
+
+    /* TOPBAR */
+    .topbar {
+      background: white;
+      padding: 20px 30px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+    }
+
+    .topbar h1 {
+      font-size: 28px;
+      color: var(--primary-color);
+      font-weight: 700;
+    }
+
+    .topbar-actions {
+      display: flex;
+      gap: 15px;
+    }
+
+    .back-btn {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: 0.3s;
+    }
+
+    .back-btn:hover {
+      background: #d4941a;
+    }
+
+    /* CONTAINER */
+    .container {
+      flex: 1;
+      margin-top: 80px;
+      padding: 30px;
+      max-width: 1400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* SECTION STYLES */
+    .section {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    .section-header h2 {
+      font-size: 24px;
+      color: var(--text-main);
+      margin: 0;
+    }
+
+    /* TABLE STYLES */
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 15px;
+    }
+
+    .table thead {
+      background: #f8f9fa;
+    }
+
+    .table th {
+      padding: 15px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--text-main);
+      border-bottom: 2px solid #e0e0e0;
+    }
+
+    .table td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .table tbody tr:hover {
+      background: #f8f9fa;
+    }
+
+    /* BUTTONS */
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #229954;
+    }
+
+    .btn-primary {
+      background: var(--primary-color);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #d4941a;
+    }
+
+    .btn-info {
+      background: var(--info);
+      color: white;
+    }
+
+    .btn-info:hover {
+      background: #2980b9;
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #c0392b;
+    }
+
+    /* STATUS PILLS */
+    .status-pill {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: capitalize;
+    }
+
+    .status-pending {
+      background: #fff3e0;
+      color: #ff9800;
+    }
+
+    .status-in-packaging {
+      background: #e3f2fd;
+      color: #1976d2;
+    }
+
+    .status-in-transit {
+      background: #f3e5f5;
+      color: #7b1fa2;
+    }
+
+    .status-completed {
+      background: #e8f5e9;
+      color: #388e3c;
+    }
+
+    /* GRID */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 25px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      text-align: center;
+    }
+
+    .card h3 {
+      font-size: 16px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .card strong {
+      font-size: 32px;
+      color: var(--primary-color);
+    }
+
+    /* MODAL */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 30px;
+      cursor: pointer;
+      color: var(--text-muted);
+    }
+
+    .close-modal:hover {
+      color: var(--text-main);
+    }
+
+    /* BLURRY TEXT */
+    .blurry-text {
+      filter: blur(5px);
+      cursor: not-allowed;
+      user-select: none;
+      transition: filter 0.3s;
+    }
+
+    .blurry-text.revealed {
+      filter: blur(0);
+      user-select: auto;
+      cursor: auto;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+    }
+
+    .empty-state i {
+      font-size: 48px;
+      margin-bottom: 15px;
+      color: #ccc;
+    }
+
+    .action-btn {
+      padding: 6px 12px;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    .action-btn:hover {
+      background: #d4941a;
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <h1><i class="fas fa-box"></i> Order Packaging</h1>
+  <div class="topbar-actions">
+    <button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Back</button>
+  </div>
+</div>
+
+<!-- MAIN CONTAINER -->
+<div class="container">
+
+  <!-- SUMMARY CARDS -->
+  <div class="grid">
+    <div class="card">
+      <h3>Total Orders to Package</h3>
+      <strong id="totalOrdersCount">0</strong>
+    </div>
+    <div class="card">
+      <h3>Packaged Today</h3>
+      <strong id="completedTodayCount">0</strong>
+    </div>
+    <div class="card">
+      <h3>Pending Packaging</h3>
+      <strong id="pendingFulfillmentCount">0</strong>
+    </div>
+  </div>
+
+  <!-- ORDERS FOR PACKAGING -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Orders Awaiting Packaging</h2>
+    </div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Products</th>
+          <th>Store</th>
+          <th>Quantity</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="fulfillmentTable">
+        <tr>
+          <td colspan="7" style="text-align: center; padding: 30px; color: var(--text-muted);">
+            <i class="fas fa-box" style="font-size: 32px; margin-bottom: 10px; display: block;"></i>
+            Loading orders...
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- ORDER DETAILS MODAL -->
+<div id="orderDetailsModal" class="modal">
+  <div class="modal-content">
+    <div id="orderDetailsContent"></div>
+  </div>
+</div>
+
+<script src="data-manager.js"></script>
+<script>
+let allOrders = [];
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadOrdersForFulfillment();
+  updateStats();
+});
+
+function goBack() {
+  window.history.back();
+}
+
+function loadOrdersForFulfillment() {
+  allOrders = DataManager.getAllOrders();
+  
+  const fulfillmentOrders = allOrders.filter(o => o.status === 'awaiting-fulfillment');
+  
+  const tbody = document.getElementById('fulfillmentTable');
+  tbody.innerHTML = '';
+  
+  if (fulfillmentOrders.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7" style="text-align: center; padding: 30px; color: var(--text-muted);">
+          <i class="fas fa-check-circle" style="font-size: 32px; margin-bottom: 10px; display: block;"></i>
+          No orders awaiting fulfillment
+        </td>
+      </tr>
+    `;
+    return;
+  }
+  
+  fulfillmentOrders.forEach(order => {
+    const itemsText = order.items ? order.items.map(i => i.name).join(', ') : 'N/A';
+    const itemsCount = order.items ? order.items.length : 0;
+    const storeLocation = order.storeId || 'N/A';
+    
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td><strong>${order.id || 'N/A'}</strong></td>
+      <td><span class="blurry-text">${order.customerName || 'N/A'}</span></td>
+      <td>${itemsText}</td>
+      <td>${storeLocation}</td>
+      <td><strong>${itemsCount}</strong></td>
+      <td><span class="status-pill status-in-packaging">Awaiting Packaging</span></td>
+      <td>
+        <button class="action-btn" onclick="viewOrderDetails('${order.id}')">View</button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+function updateStats() {
+  const orders = DataManager.getAllOrders();
+  
+  const awaitingPackagingOrders = orders.filter(o => o.status === 'awaiting-fulfillment').length;
+  const packagedOrders = orders.filter(o => o.status === 'in-delivery').length;
+  const pendingOrders = orders.filter(o => o.status === 'pending').length;
+  
+  document.getElementById('totalOrdersCount').textContent = awaitingPackagingOrders;
+  document.getElementById('completedTodayCount').textContent = packagedOrders;
+  document.getElementById('pendingFulfillmentCount').textContent = pendingOrders;
+}
+
+function viewOrderDetails(orderId) {
+  const order = allOrders.find(o => o.id === orderId);
+  
+  if (!order) {
+    alert('Order not found');
+    return;
+  }
+  
+  order.status = 'under-packaging';
+  DataManager.saveOrders(allOrders);
+  
+  const itemsHtml = order.items ? order.items.map(item => `
+    <tr>
+      <td>${item.name}</td>
+      <td>${item.qty || 1}</td>
+      <td>KES ${(item.price || 0).toLocaleString()}</td>
+    </tr>
+  `).join('') : '<tr><td colspan="3">No items</td></tr>';
+  
+  const html = `
+    <div style="text-align: center; margin-bottom: 20px;">
+      <h2>Order Details</h2>
+    </div>
+    
+    <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+      <p><strong>Order ID:</strong> ${order.id || 'N/A'}</p>
+      <p><strong>Customer:</strong> <span class="blurry-text">${order.customerName || 'N/A'}</span></p>
+      <p><strong>Phone:</strong> <span class="blurry-text">${order.customerPhone || 'N/A'}</span></p>
+      <p><strong>Store:</strong> ${order.storeId || 'N/A'}</p>
+    </div>
+    
+    <h4>Items to Package</h4>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Qty</th>
+          <th>Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${itemsHtml}
+      </tbody>
+    </table>
+    
+    <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #ddd;">
+      <p><strong>Subtotal:</strong> KES ${(order.subtotal || 0).toLocaleString()}</p>
+      <p><strong>Delivery Fee:</strong> KES ${(order.deliveryFee || 0).toLocaleString()}</p>
+      <p><strong>Total:</strong> KES ${(order.grandTotal || order.totalPrice || 0).toLocaleString()}</p>
+    </div>
+    
+    <div style="margin-top: 20px; display: flex; gap: 10px;">
+      <button class="btn btn-success" style="flex: 1;" onclick="markAsFulfilled('${order.id}')"><i class="fas fa-check"></i> Mark as Packaged</button>
+    </div>
+  `;
+  
+  document.getElementById('orderDetailsContent').innerHTML = html;
+  document.getElementById('orderDetailsModal').style.display = 'flex';
+}
+
+
+
+function markAsFulfilled(orderId) {
+  const order = allOrders.find(o => o.id === orderId);
+  
+  if (!order) {
+    alert('Order not found');
+    return;
+  }
+  
+  if (confirm('Mark this order as packaged and send to delivery?')) {
+    const deliveryQueue = JSON.parse(localStorage.getItem("deliveryQueue")) || [];
+    
+    deliveryQueue.push({
+      id: order.id,
+      client: order.customerName || 'Guest',
+      destination: order.deliveryLocation || 'Pickup',
+      phone: order.customerPhone || 'N/A',
+      items: order.items,
+      amount: order.grandTotal || order.totalPrice || 0
+    });
+    
+    localStorage.setItem("deliveryQueue", JSON.stringify(deliveryQueue));
+    
+    order.status = 'in-delivery';
+    DataManager.saveOrders(allOrders);
+    
+    document.getElementById('orderDetailsModal').style.display = 'none';
+    loadOrdersForFulfillment();
+    updateStats();
+    alert('Order marked as packaged and sent to Delivery Management System');
+  }
+}
+
+
+</script>
+
+</body>
+</html>

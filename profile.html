@@ -1421,7 +1421,7 @@ function loadUserOrders() {
     html += `
       <div class="order-card">
         <div class="order-header">
-          <div class="order-id">Order #${order.id.slice(-4).toUpperCase()}</div>
+          <div class="order-id">Order ${order.id}</div>
           <span class="order-status ${statusClass}">${order.status || 'Pending'}</span>
         </div>
         <div class="order-details">

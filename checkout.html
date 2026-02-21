@@ -2,12 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=1200">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Daimara Online Mart | Checkout</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
     *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
-    body{background:#f5f5f5; font-size: 22px; padding-bottom: 100px; padding-top: 80px;}
+    body{background:#f5f5f5; font-size: 14px; padding-bottom: 100px; padding-top: 60px;}
+    
+    @media (min-width: 768px) {
+      body{font-size: 16px; padding-top: 70px;}
+    }
+    
+    @media (min-width: 1200px) {
+      body{font-size: 22px; padding-top: 80px;}
+    }
 
 /* FOOTER */
 .footer {
@@ -50,16 +58,48 @@
   .navbar a { font-size: 18px; }
 }
 
-    .container{padding:40px 30px;max-width:1000px;margin:auto; margin-top: 40px;}
-    h2{text-align:center;font-size:27px;margin-bottom:20px;color: rgb(0, 0, 0);}
-    h3{text-align:center;font-size:27px;margin-left: 125px;color: rgb(0, 0, 0);}
-    table{width:100%;border-collapse:collapse;margin-bottom:30px;color: rgb(233, 157, 17);}
-    table th, table td{padding:15px;border-bottom:1px solid #ddd;text-align:left;font-size: 30;}
-    table img{width:90px;height:70px;object-fit:cover;border-radius:5px}
-    .total{float:right;font-size:29px;margin-bottom:20px}
-    .checkout-form{background:#fff;margin-top: 95px;padding:80px 80px;border-radius:10px;font-size: 32px;box-shadow:0 5px 15px rgba(0,0,0,.1)}
-    .checkout-form input, .checkout-form select{width:100%;padding:10px;font-size: 27px;margin:10px 0;border:1px solid #ccc;border-radius:6px}
-    .checkout-form button{padding:12px 20px;font-size: 27px;background:#111;color:rgb(233, 157, 17);border:none;border-radius:6px;cursor:pointer;width:100%}
+    .container{padding:15px;max-width:100%;margin:auto; margin-top: 20px;}
+    h2{text-align:center;font-size:18px;margin-bottom:20px;color: rgb(0, 0, 0);}
+    h3{text-align:center;font-size:16px;margin-left: 0;color: rgb(0, 0, 0);}
+    table{width:100%;border-collapse:collapse;margin-bottom:30px;color: rgb(233, 157, 17);font-size:14px;}
+    table th, table td{padding:8px;border-bottom:1px solid #ddd;text-align:left;}
+    table img{width:60px;height:50px;object-fit:cover;border-radius:5px}
+    .total{float:right;font-size:16px;margin-bottom:20px}
+    
+    @media (min-width: 768px) {
+      .container{padding:30px;}
+      h2{font-size:24px;}
+      h3{font-size:20px;}
+      table{font-size:16px;}
+      table th, table td{padding:12px;}
+      table img{width:80px;height:60px;}
+      .total{font-size:22px;}
+    }
+    
+    @media (min-width: 1200px) {
+      .container{padding:40px 30px;max-width:1000px;}
+      h2{font-size:27px;}
+      h3{font-size:27px; margin-left: 125px;}
+      table{font-size:18px;}
+      table th, table td{padding:15px;}
+      table img{width:90px;height:70px;}
+      .total{font-size:29px;}
+    }
+    .checkout-form{background:#fff;margin-top: 20px;padding:20px;border-radius:10px;font-size: 16px;box-shadow:0 5px 15px rgba(0,0,0,.1)}
+    .checkout-form input, .checkout-form select{width:100%;padding:12px;font-size: 16px;margin:10px 0;border:1px solid #ccc;border-radius:6px}
+    .checkout-form button{padding:12px 20px;font-size: 18px;background:#111;color:rgb(233, 157, 17);border:none;border-radius:6px;cursor:pointer;width:100%}
+    
+    @media (min-width: 768px) {
+      .checkout-form{padding:40px 40px;}
+      .checkout-form input, .checkout-form select{font-size: 18px;}
+      .checkout-form button{font-size: 20px;}
+    }
+    
+    @media (min-width: 1200px) {
+      .checkout-form{padding:80px 80px; font-size: 18px;}
+      .checkout-form input, .checkout-form select{font-size: 20px;}
+      .checkout-form button{font-size: 22px;}
+    }
 
     /* MAP BOX */
     #map-container {
@@ -210,10 +250,7 @@
     <a href="store.html"><div class="shop-icon"></div></a>
   </div>
 
-  <div class="nav-icons">
-    <a href="login.html"><i class="fa fa-user"></i></a>
-    <a href="cart.html" class="cart-link"><i class="fa fa-shopping-cart"></i><span class="cart-count">0</span></a>
-  </div>
+
 </nav>
 
 <footer class="footer">
@@ -254,9 +291,15 @@
     </select>
     
     <label for="warehouseSelect">Select Fulfillment Branch</label>
-    <select id="warehouseSelect" title="Warehouse" aria-label="Warehouse" required>
+    <select id="warehouseSelect" title="Warehouse" aria-label="Warehouse" required onchange="populateStores()">
       <option value="">-- Select Branch --</option>
       <!-- Sub Warehouses will be injected here -->
+    </select>
+
+    <label for="storeSelect" style="margin-top: 15px;">Select Store</label>
+    <select id="storeSelect" title="Store" aria-label="Store" required>
+      <option value="">-- Select Store --</option>
+      <!-- Stores will be injected here -->
     </select>
     <div style="margin: 15px 0; padding: 15px; background: #f9f9f9; border-radius: 6px;">
       <label for="delivery-option" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
@@ -341,6 +384,35 @@
     });
   }
 
+  function populateStores() {
+    const warehouseId = document.getElementById('warehouseSelect').value;
+    const storeSelect = document.getElementById('storeSelect');
+    
+    storeSelect.innerHTML = '<option value="">-- Select Store --</option>';
+    
+    if (!warehouseId) {
+      return;
+    }
+    
+    const stores = DataManager.getStoresForSubWarehouse(warehouseId);
+    
+    if (stores.length === 0) {
+      const option = document.createElement('option');
+      option.value = '';
+      option.textContent = 'No stores available';
+      option.disabled = true;
+      storeSelect.appendChild(option);
+      return;
+    }
+    
+    stores.forEach(store => {
+      const option = document.createElement('option');
+      option.value = store.id;
+      option.textContent = store.name;
+      storeSelect.appendChild(option);
+    });
+  }
+
   function renderCart() {
     const tbody = document.querySelector('#cartTable tbody');
     tbody.innerHTML='';
@@ -403,9 +475,11 @@
     const email=document.getElementById('email').value;
     const paymentMethod=document.getElementById('paymentMethod').value;
     const warehouseId = document.getElementById('warehouseSelect').value;
+    const storeId = document.getElementById('storeSelect').value;
     
     if(!name||!email){alert('Please fill all fields'); return;}
     if(!warehouseId){alert('Please select a branch for fulfillment'); return;}
+    if(!storeId){alert('Please select a store for fulfillment'); return;}
 
     const subtotal = cart.reduce((a,b)=>a+b.price*(b.qty||1),0);
     const deliveryCheckbox = document.getElementById('delivery-option');
@@ -425,6 +499,7 @@
       totalPrice: totalPrice,
       paymentMethod,
       warehouseId: warehouseId,
+      storeId: storeId,
       customer: { 
         name, 
         email, 
@@ -467,15 +542,21 @@
       grandTotal: totalPrice // Align with admin-manager.html expectation
     };
     
-    const allOrders = DataManager.getAllOrders();
+    const allOrders = DataManager.getAllOrders() || [];
     allOrders.push(newOrder);
     DataManager.saveOrders(allOrders);
+    
+    console.log('Order saved successfully:', newOrder);
+    console.log('All orders after save:', DataManager.getAllOrders());
 
-    // REDUCE STOCK (SUB-WAREHOUSE ONLY)
+    // REDUCE STOCK FROM SELECTED STORE
     cart.forEach(item => {
-      let remainingQty = item.qty || 1;
-      // Deduct strictly from the SELECTED sub-warehouse
-      DataManager.deductFromSubWarehouses(item.id, item.name, remainingQty, warehouseId);
+      const qty = item.qty || 1;
+      // Deduct from the specific store's inventory
+      const result = DataManager.deductFromStoreInventory(warehouseId, storeId, item.id, item.name, qty);
+      if (!result.success) {
+        console.warn(`Failed to deduct ${item.name} from store: ${result.message}`);
+      }
     });
 
     // Generate Invoice

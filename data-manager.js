@@ -21,6 +21,23 @@ const DataManager = (() => {
     SUB_WAREHOUSES: 'ecommerce_sub_warehouses'
   };
 
+  const ALLOWED_BADGE_PAGES = ['index.html', 'store.html', 'supermarket.html', 'second-hand items.html'];
+
+  function isAllowedBadgePage() {
+    const pathname = window.location.pathname.toLowerCase();
+    const pageName = pathname.split('/').pop() || 'index.html';
+    return ALLOWED_BADGE_PAGES.includes(pageName) || pathname.endsWith('/');
+  }
+
+  if (!isAllowedBadgePage()) {
+    document.addEventListener('DOMContentLoaded', function() {
+      const cartCounts = document.querySelectorAll('.cart-count');
+      cartCounts.forEach(el => {
+        el.style.display = 'none';
+      });
+    });
+  }
+
   // Initialize default products from both supermarket and second-hand categories
   const DEFAULT_PRODUCTS = {
     'Fresh food': [
@@ -85,6 +102,9 @@ const DataManager = (() => {
     }
     if (!localStorage.getItem(STORAGE_KEYS.ADDED_PRODUCTS)) {
       localStorage.setItem(STORAGE_KEYS.ADDED_PRODUCTS, JSON.stringify([]));
+    }
+    if (!localStorage.getItem(STORAGE_KEYS.ORDERS)) {
+      localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify([]));
     }
   }
 
@@ -842,11 +862,161 @@ const DataManager = (() => {
       id: 'SW' + Date.now(),
       name: name,
       stock: [],
+      stores: [],
       createdAt: new Date().toISOString()
     };
     subWarehouses.push(newSW);
     saveSubWarehouses(subWarehouses);
     return { success: true, subWarehouse: newSW };
+  }
+
+  /**
+   * Add a store to a sub-warehouse
+   * @param {string} swId - Sub-warehouse ID
+   * @param {string} storeName - Store name
+   * @returns {object} Result with success status
+   */
+  function addStoreToSubWarehouse(swId, storeName) {
+    const subWarehouses = getSubWarehouses();
+    const sw = subWarehouses.find(s => s.id === swId);
+    
+    if (!sw) {
+      return { success: false, message: 'Sub-warehouse not found' };
+    }
+    
+    if (!sw.stores) {
+      sw.stores = [];
+    }
+    
+    const newStore = {
+      id: 'ST' + Date.now(),
+      name: storeName,
+      stock: [],
+      createdAt: new Date().toISOString()
+    };
+    
+    sw.stores.push(newStore);
+    saveSubWarehouses(subWarehouses);
+    return { success: true, store: newStore };
+  }
+
+  /**
+   * Get stores for a specific sub-warehouse
+   * @param {string} swId - Sub-warehouse ID
+   * @returns {array} Array of stores
+   */
+  function getStoresForSubWarehouse(swId) {
+    const subWarehouses = getSubWarehouses();
+    const sw = subWarehouses.find(s => s.id === swId);
+    return sw && sw.stores ? sw.stores : [];
+  }
+
+  /**
+   * Add product to a specific store's inventory
+   * @param {string} swId - Sub-warehouse ID
+   * @param {string} storeId - Store ID
+   * @param {object} product - Product object with id, name, price, qty
+   * @returns {object} Result with success status
+   */
+  function addProductToStore(swId, storeId, product) {
+    const subWarehouses = getSubWarehouses();
+    const sw = subWarehouses.find(s => s.id === swId);
+    
+    if (!sw) {
+      return { success: false, message: 'Sub-warehouse not found' };
+    }
+    
+    const store = sw.stores.find(s => s.id === storeId);
+    if (!store) {
+      return { success: false, message: 'Store not found' };
+    }
+    
+    if (!store.stock) {
+      store.stock = [];
+    }
+    
+    const existingProduct = store.stock.find(p => String(p.id) === String(product.id));
+    if (existingProduct) {
+      existingProduct.qty += product.qty || 1;
+    } else {
+      store.stock.push({
+        id: product.id,
+        name: product.name,
+        qty: product.qty || 1,
+        price: product.price || 0
+      });
+    }
+    
+    saveSubWarehouses(subWarehouses);
+    return { success: true };
+  }
+
+  /**
+   * Deduct quantity from a specific store's inventory
+   * @param {string} swId - Sub-warehouse ID
+   * @param {string} storeId - Store ID
+   * @param {string} productId - Product ID
+   * @param {string} productName - Product name
+   * @param {number} quantity - Quantity to deduct
+   * @returns {object} Result with success status and remaining qty
+   */
+  function deductFromStoreInventory(swId, storeId, productId, productName, quantity) {
+    const subWarehouses = getSubWarehouses();
+    const sw = subWarehouses.find(s => s.id === swId);
+    
+    if (!sw) {
+      return { success: false, message: 'Sub-warehouse not found', remaining: quantity };
+    }
+    
+    const store = sw.stores.find(s => s.id === storeId);
+    if (!store) {
+      return { success: false, message: 'Store not found', remaining: quantity };
+    }
+    
+    if (!store.stock) {
+      store.stock = [];
+    }
+    
+    let product = store.stock.find(p => String(p.id) === String(productId));
+    
+    // If product doesn't exist in store, get it from main warehouse first
+    if (!product) {
+      const products = getAllProducts();
+      let mainProduct = null;
+      
+      for (const category in products) {
+        mainProduct = products[category].find(p => String(p.id) === String(productId));
+        if (mainProduct) break;
+      }
+      
+      if (!mainProduct) {
+        return { success: false, message: 'Product not found in system', remaining: quantity };
+      }
+      
+      // Add product to store from main warehouse
+      product = {
+        id: mainProduct.id,
+        name: mainProduct.name,
+        qty: mainProduct.quantity || 0,
+        price: mainProduct.price || 0
+      };
+      store.stock.push(product);
+    }
+    
+    // Check if store has enough quantity
+    if (product.qty < quantity) {
+      return { success: false, message: `Insufficient stock. Available: ${product.qty}, Requested: ${quantity}`, remaining: quantity };
+    }
+    
+    // Deduct the quantity
+    product.qty -= quantity;
+    if (product.qty <= 0) {
+      const idx = store.stock.indexOf(product);
+      store.stock.splice(idx, 1);
+    }
+    
+    saveSubWarehouses(subWarehouses);
+    return { success: true, remaining: 0 };
   }
 
   function updateSubWarehouse(swId, updatedData) {
@@ -865,6 +1035,96 @@ const DataManager = (() => {
     subWarehouses = subWarehouses.filter(sw => sw.id !== id);
     saveSubWarehouses(subWarehouses);
     return { success: true };
+  }
+
+  /**
+   * Transfer product between sub-warehouses
+   * @param {string} productId - Product ID or name
+   * @param {string} fromSubWarehouseId - Source sub-warehouse ID
+   * @param {string} toSubWarehouseId - Destination sub-warehouse ID
+   * @param {number} quantity - Quantity to transfer
+   * @returns {object} Result with success status and message
+   */
+  function transferProductBetweenSubWarehouses(productId, fromSubWarehouseId, toSubWarehouseId, quantity) {
+    if (fromSubWarehouseId === toSubWarehouseId) {
+      return { success: false, message: 'Source and destination must be different' };
+    }
+
+    const subWarehouses = getSubWarehouses();
+    const fromSW = subWarehouses.find(sw => sw.id === fromSubWarehouseId);
+    const toSW = subWarehouses.find(sw => sw.id === toSubWarehouseId);
+
+    if (!fromSW) {
+      return { success: false, message: 'Source sub-warehouse not found' };
+    }
+    if (!toSW) {
+      return { success: false, message: 'Destination sub-warehouse not found' };
+    }
+
+    // Find product in source sub-warehouse
+    const sourceProductIndex = fromSW.stock.findIndex(item => String(item.id) === String(productId) || item.name === productId);
+    if (sourceProductIndex === -1) {
+      return { success: false, message: 'Product not found in source sub-warehouse' };
+    }
+
+    const sourceProduct = fromSW.stock[sourceProductIndex];
+    if (sourceProduct.qty < quantity) {
+      return { success: false, message: `Insufficient quantity. Available: ${sourceProduct.qty}, Requested: ${quantity}` };
+    }
+
+    // Find or create product in destination sub-warehouse
+    const destProductIndex = toSW.stock.findIndex(item => String(item.id) === String(productId) || item.name === productId);
+
+    // Reduce from source
+    sourceProduct.qty -= quantity;
+    if (sourceProduct.qty <= 0) {
+      fromSW.stock.splice(sourceProductIndex, 1);
+    }
+
+    // Add to destination
+    if (destProductIndex === -1) {
+      toSW.stock.push({
+        id: sourceProduct.id,
+        name: sourceProduct.name,
+        qty: quantity,
+        price: sourceProduct.price
+      });
+    } else {
+      toSW.stock[destProductIndex].qty += quantity;
+    }
+
+    saveSubWarehouses(subWarehouses);
+    return { 
+      success: true, 
+      message: `Successfully transferred ${quantity} units of ${sourceProduct.name} from ${fromSW.name} to ${toSW.name}` 
+    };
+  }
+
+  /**
+   * Deduct quantity from main store inventory
+   * Returns remaining quantity if store doesn't have enough
+   */
+  function deductFromStore(productId, productName, quantity) {
+    let remaining = quantity;
+    const products = getAllProducts();
+    let changed = false;
+
+    for (const category in products) {
+      const product = products[category].find(p => String(p.id) === String(productId) || p.name === productName);
+      if (product && product.quantity > 0) {
+        const deduct = Math.min(product.quantity, remaining);
+        product.quantity -= deduct;
+        remaining -= deduct;
+        changed = true;
+      }
+      if (remaining <= 0) break;
+    }
+
+    if (changed) {
+      localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
+    }
+
+    return remaining;
   }
 
   /**
@@ -906,7 +1166,11 @@ const DataManager = (() => {
     const cartCounts = document.querySelectorAll('.cart-count');
     cartCounts.forEach(el => {
       el.textContent = totalItems;
-      el.style.display = totalItems > 0 ? 'inline-block' : 'none';
+      if (isAllowedBadgePage()) {
+        el.style.display = totalItems > 0 ? 'inline-block' : 'none';
+      } else {
+        el.style.display = 'none';
+      }
     });
   }
 
@@ -1033,6 +1297,12 @@ const DataManager = (() => {
     addSubWarehouse,
     updateSubWarehouse,
     deleteSubWarehouse,
+    addStoreToSubWarehouse,
+    getStoresForSubWarehouse,
+    addProductToStore,
+    deductFromStoreInventory,
+    transferProductBetweenSubWarehouses,
+    deductFromStore,
     deductFromSubWarehouses,
     updateCartUI
   };

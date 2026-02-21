@@ -93,6 +93,51 @@ body{
 .sent{background:#8ebdf7}
 .dispatched{background:#87f5ae}
 
+.blurry-text {
+  filter: blur(5px);
+  cursor: not-allowed;
+  user-select: none;
+  transition: filter 0.3s;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+  color: black;
+}
+
+.close-modal {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 30px;
+  cursor: pointer;
+  color: #777;
+}
+
+.hidden {
+  display: none !important;
+}
+
 </style>
 </head>
 <body>
@@ -105,21 +150,21 @@ body{
 
   <!-- SUMMARY -->
   <div class="grid">
-    <div class="card">
+    <div class="card" onclick="showAwaitingPackaging()" style="cursor: pointer; transition: 0.3s;">
       <h3>Orders Awaiting Packaging</h3>
-      <strong>18</strong>
+      <strong id="awaitingCount">0</strong>
     </div>
     <div class="card">
       <h3>Ready for Dispatch</h3>
-      <strong>10</strong>
+      <strong id="readyCount">0</strong>
     </div>
     <div class="card">
       <h3>Dispatched Today</h3>
-      <strong>27</strong>
+      <strong id="dispatchedCount">0</strong>
     </div>
     <div class="card">
       <h3>Urgent Deliveries</h3>
-      <strong>4</strong>
+      <strong id="urgentCount">0</strong>
     </div>
   </div>
 
@@ -137,214 +182,297 @@ body{
           <th>Action</th>
         </tr>
       </thead>
-      <tbody>
-        <tr>
-          <td>#DM2041</td>
-          <td>Mercy Wanjiku</td>
-          <td>Rice 2kg (5), Cooking Oil (2)</td>
-          <td>Westlands</td>
-          <td><span class="status pending">Awaiting Packaging</span></td>
-          <td class="action-cell">
-            <button class="action-btn send">Send for Packaging</button>
-          </td>
-
-        </tr>
-        <tr>
-          <td>#DM2042</td>
-          <td>Peter Otieno</td>
-          <td>Sugar 1kg (10)</td>
-          <td>Karen</td>
-          <td><span class="status sent">Under Packaging</span></td>
-          <td>
-            <button class="action-btn dispatch">Dispatch.......</button>
-          </td>
-        </tr>
-        <tr>
-          <td>#DM2043</td>
-          <td>Grace Njeri</td>
-          <td>Flour 2kg (8)</td>
-          <td>Kilimani</td>
-          <td><span class="status dispatched">Dispatched</span></td>
-          <td>Completed</td>
-        </tr>
+      <tbody id="packagingQueueTable">
       </tbody>
     </table>
   </div>
 
 </div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
+<!-- AWAITING PACKAGING MODAL -->
+<div id="packagingModal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal" onclick="closePackagingModal()">&times;</span>
+    <h2>Orders Awaiting Packaging</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Products</th>
+          <th>Amount</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="awaitingOrdersTable">
+      </tbody>
+    </table>
+  </div>
+</div>
 
-  const summaryCards = {
-    packaging: document.querySelectorAll(".card strong")[0],
-    ready: document.querySelectorAll(".card strong")[1],
-    dispatched: document.querySelectorAll(".card strong")[2],
-    urgent: document.querySelectorAll(".card strong")[3]
-  };
+<!-- ORDER DETAILS MODAL -->
+<div id="orderDetailsModal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal" onclick="closeOrderDetailsModal()">&times;</span>
+    <div id="orderDetailsContent"></div>
+  </div>
+</div>
 
-  function updateCounts() {
-    let awaiting = document.querySelectorAll(".pending").length;
-    let underPackaging = document.querySelectorAll(".sent").length;
-    let dispatched = document.querySelectorAll(".dispatched").length;
-
-    summaryCards.packaging.textContent = awaiting;
-    summaryCards.ready.textContent = underPackaging;
-    summaryCards.dispatched.textContent = dispatched;
-  }
-
-  document.querySelectorAll(".send").forEach(button => {
-    button.addEventListener("click", () => {
-      const row = button.closest("tr");
-      const status = row.querySelector(".status");
-
-      status.textContent = "Under Packaging";
-      status.className = "status sent";
-
-      button.textContent = "Dispatch";
-      button.classList.remove("send");
-      button.classList.add("dispatch");
-
-      attachDispatchHandler(button);
-      updateCounts();
-    });
-  });
-
-  function attachDispatchHandler(button) {
-    button.addEventListener("click", () => {
-      const row = button.closest("tr");
-      const status = row.querySelector(".status");
-
-      status.textContent = "Dispatched";
-      status.className = "status dispatched";
-
-      row.cells[5].textContent = "Completed";
-      updateCounts();
-    });
-  }
-
-  document.querySelectorAll(".dispatch").forEach(btn => {
-    attachDispatchHandler(btn);
-  });
-
-  updateCounts();
-});
-
-</script>
-
-
+<script src="data-manager.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-
-  // 👥 Packaging staff
-  const packagers = [
-    "James Mwangi",
-    "Lucy Achieng",
-    "Brian Kiptoo",
-    "Faith Wambui"
-  ];
-
-  // 📊 Update dashboard summary
-  function updateCounts() {
-    const awaiting = document.querySelectorAll(".pending").length;
-    const packaging = document.querySelectorAll(".sent").length;
-    const dispatched = document.querySelectorAll(".dispatched").length;
-
-    const cards = document.querySelectorAll(".card strong");
-    cards[0].textContent = awaiting;
-    cards[1].textContent = packaging;
-    cards[2].textContent = dispatched;
+  if (typeof DataManager === 'undefined') {
+    console.error('DataManager not loaded');
+    return;
   }
-
-  // 📦 Show packager selector
-  function showPackagerSelector(cell, row) {
-
-    const select = document.createElement("select");
-    select.style.padding = "6px";
-    select.style.borderRadius = "6px";
-
-    const defaultOption = document.createElement("option");
-    defaultOption.textContent = "Select Packager";
-    defaultOption.disabled = true;
-    defaultOption.selected = true;
-    select.appendChild(defaultOption);
-
-    packagers.forEach(name => {
-      const option = document.createElement("option");
-      option.value = name;
-      option.textContent = name;
-      select.appendChild(option);
-    });
-
-    const confirmBtn = document.createElement("button");
-    confirmBtn.textContent = "Confirm";
-    confirmBtn.className = "action-btn send";
-    confirmBtn.style.marginLeft = "8px";
-    confirmBtn.disabled = true;
-
-    // replace button
-    cell.innerHTML = "";
-    cell.appendChild(select);
-    cell.appendChild(confirmBtn);
-
-    // enable confirm when selected
-    select.addEventListener("change", () => {
-      confirmBtn.disabled = false;
-    });
-
-    confirmBtn.addEventListener("click", () => {
-      const selectedName = select.value;
-      if (!selectedName) return;
-
-      const status = row.querySelector(".status");
-
-      // ✅ status changes ONLY after confirmation
-      status.textContent = "Under Packaging";
-      status.className = "status sent";
-
-      cell.innerHTML = `
-        Assigned to <strong>${selectedName}</strong><br>
-        <button class="action-btn dispatch">Dispatch</button>
-      `;
-
-      const dispatchBtn = cell.querySelector(".dispatch");
-
-      dispatchBtn.addEventListener("click", () => {
-        status.textContent = "Dispatched";
-        status.className = "status dispatched";
-        cell.textContent = "Completed";
-        updateCounts();
-      });
-
-      updateCounts();
-    });
-  }
-
-  // attach send buttons
-  document.querySelectorAll(".send").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const row = btn.closest("tr");
-      const cell = btn.closest("td");
-      showPackagerSelector(cell, row);
-    });
+  console.log('DataManager loaded successfully');
+  console.log('Initial orders:', DataManager.getAllOrders());
+  updateOrderCounts();
+  renderPackagingQueue();
+  
+  setInterval(() => {
+    updateOrderCounts();
+    renderPackagingQueue();
+  }, 2000);
+  
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'ecommerce_orders') {
+      console.log('Orders updated from another tab/window');
+      updateOrderCounts();
+      renderPackagingQueue();
+    }
   });
-
-  // existing dispatch buttons
-  document.querySelectorAll(".dispatch").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const row = btn.closest("tr");
-      const status = row.querySelector(".status");
-
-      status.textContent = "Dispatched";
-      status.className = "status dispatched";
-      btn.parentElement.textContent = "Completed";
-      updateCounts();
-    });
-  });
-
-  updateCounts();
-
 });
+
+window.addEventListener('focus', () => {
+  updateOrderCounts();
+  renderPackagingQueue();
+});
+
+function updateOrderCounts() {
+  const orders = DataManager.getAllOrders() || [];
+  
+  const awaitingOrders = orders.filter(o => o.status === 'pending').length;
+  const packagingOrders = orders.filter(o => o.status === 'in-packaging').length;
+  const dispatchedOrders = orders.filter(o => o.status === 'in-transit').length;
+  const completedOrders = orders.filter(o => o.status === 'completed').length;
+  
+  console.log('Order counts - Awaiting:', awaitingOrders, 'Packaging:', packagingOrders, 'Dispatched:', dispatchedOrders);
+  
+  const awaitingCountElement = document.getElementById('awaitingCount');
+  const readyCountElement = document.getElementById('readyCount');
+  const dispatchedCountElement = document.getElementById('dispatchedCount');
+  
+  const previousAwaitingCount = parseInt(awaitingCountElement.textContent) || 0;
+  
+  awaitingCountElement.textContent = awaitingOrders;
+  readyCountElement.textContent = packagingOrders;
+  dispatchedCountElement.textContent = dispatchedOrders;
+  
+  if (awaitingOrders > previousAwaitingCount) {
+    console.log('New orders received!');
+    showAwaitingPackagingAuto();
+  }
+}
+
+function showAwaitingPackaging() {
+  populateAwaitingOrdersModal();
+  document.getElementById('packagingModal').style.display = 'flex';
+}
+
+function showAwaitingPackagingAuto() {
+  populateAwaitingOrdersModal();
+  const modal = document.getElementById('packagingModal');
+  modal.style.display = 'flex';
+  console.log('Auto-opened Orders Awaiting Packaging modal');
+}
+
+function populateAwaitingOrdersModal() {
+  const orders = DataManager.getAllOrders() || [];
+  const awaitingOrders = orders.filter(o => o.status === 'pending');
+  
+  const tbody = document.getElementById('awaitingOrdersTable');
+  tbody.innerHTML = '';
+  
+  console.log('All Orders:', orders);
+  console.log('Awaiting Orders:', awaitingOrders);
+  
+  if (awaitingOrders.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #666;">No orders awaiting packaging</td></tr>';
+    return;
+  }
+  
+  awaitingOrders.forEach(order => {
+    const itemsText = order.items ? order.items.map(i => `${i.name} (${i.qty || 1})`).join(', ') : 'N/A';
+    const amount = order.grandTotal || order.totalPrice || 0;
+    
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${order.id || 'N/A'}</td>
+      <td>${itemsText}</td>
+      <td>KES ${amount.toLocaleString()}</td>
+      <td><button class="action-btn send" onclick="viewOrderDetails('${order.id}')">View Details</button></td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+function closePackagingModal() {
+  document.getElementById('packagingModal').style.display = 'none';
+}
+
+function renderPackagingQueue() {
+  const orders = DataManager.getAllOrders();
+  const packagingOrders = orders.filter(o => o.status === 'in-packaging');
+  
+  const tbody = document.getElementById('packagingQueueTable');
+  tbody.innerHTML = '';
+  
+  if (packagingOrders.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #666;">No orders in packaging queue</td></tr>';
+    return;
+  }
+  
+  packagingOrders.forEach(order => {
+    const itemsText = order.items ? order.items.map(i => `${i.name} (${i.qty || 1})`).join(', ') : 'N/A';
+    const destination = order.deliveryLocation || 'Pickup';
+    
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${order.id || 'N/A'}</td>
+      <td><span class="blurry-text">${order.customerName || 'N/A'}</span></td>
+      <td>${itemsText}</td>
+      <td>${destination}</td>
+      <td><span class="status sent">Under Packaging</span></td>
+      <td>
+        <button class="action-btn dispatch" onclick="sendToFulfillment('${order.id}')">Packer(s)</button>
+      </td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+function sendToFulfillment(orderId) {
+  const orders = DataManager.getAllOrders();
+  const order = orders.find(o => o.id === orderId);
+  
+  if (!order) {
+    alert('Order not found');
+    return;
+  }
+  
+  order.status = 'awaiting-fulfillment';
+  DataManager.saveOrders(orders);
+  
+  updateOrderCounts();
+  renderPackagingQueue();
+  alert('Order sent to Order Packaging');
+}
+
+function viewOrderDetails(orderId) {
+  const orders = DataManager.getAllOrders();
+  const order = orders.find(o => o.id === orderId);
+  
+  if (!order) {
+    alert('Order not found');
+    return;
+  }
+  
+  const itemsHtml = order.items ? order.items.map(item => `
+    <tr>
+      <td>${item.name}</td>
+      <td>${item.qty || 1}</td>
+      <td>KES ${(item.price || 0).toLocaleString()}</td>
+    </tr>
+  `).join('') : '<tr><td colspan="3">No items</td></tr>';
+  
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${order.id}`;
+  
+  const html = `
+    <div style="text-align: center; margin-bottom: 20px;">
+      <h3>Order Receipt</h3>
+    </div>
+    
+    <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+      <p><strong>Customer Name:</strong> <span class="blurry-text">${order.customerName || 'N/A'}</span></p>
+      <p><strong>Order ID:</strong> <span class="blurry-text">${order.id || 'N/A'}</span></p>
+      <p><strong>Phone:</strong> <span class="blurry-text">${order.customerPhone || 'N/A'}</span></p>
+      <p><strong>Status:</strong> <span class="blurry-text">${order.status || 'N/A'}</span></p>
+      <p><strong>Delivery Location:</strong> <span class="blurry-text">${order.deliveryLocation || 'Pickup'}</span></p>
+    </div>
+    
+    <h4>Order Items</h4>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Qty</th>
+          <th>Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${itemsHtml}
+      </tbody>
+    </table>
+    
+    <div style="text-align: center; margin-top: 20px;">
+      <div class="blurry-text" style="display: inline-block;">
+        <img src="${qrUrl}" style="width: 150px; height: 150px;">
+        <div style="font-size: 14px; margin-top: 5px;">Scan to verify order details</div>
+        <div style="font-size: 14px;">${order.id || 'N/A'}</div>
+      </div>
+    </div>
+    
+    <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #ddd;">
+      <p><strong>Subtotal:</strong> KES ${(order.subtotal || 0).toLocaleString()}</p>
+      <p><strong>Delivery Fee:</strong> KES ${(order.deliveryFee || 0).toLocaleString()}</p>
+      <p><strong>Total:</strong> KES ${(order.grandTotal || order.totalPrice || 0).toLocaleString()}</p>
+    </div>
+    
+    <div style="margin-top: 20px; display: flex; gap: 10px;">
+      <button class="action-btn send" style="flex: 1; background: #16a34a;" onclick="sendToPackaging('${order.id}')"><i class="fas fa-check"></i> Send to Packaging & Dispatch</button>
+      <button class="action-btn" style="flex: 1; background: #ccc; color: #000;" onclick="closeOrderDetailsModal()">Close</button>
+    </div>
+  `;
+  
+  document.getElementById('orderDetailsContent').innerHTML = html;
+  document.getElementById('packagingModal').style.display = 'none';
+  document.getElementById('orderDetailsModal').style.display = 'flex';
+}
+
+function closeOrderDetailsModal() {
+  document.getElementById('orderDetailsModal').style.display = 'none';
+}
+
+function sendToPackaging(orderId) {
+  const orders = DataManager.getAllOrders();
+  const order = orders.find(o => o.id === orderId);
+  
+  if (!order) {
+    alert('Order not found');
+    return;
+  }
+  
+  order.status = 'in-packaging';
+  DataManager.saveOrders(orders);
+  
+  closeOrderDetailsModal();
+  updateOrderCounts();
+  renderPackagingQueue();
+  alert('Order sent to Packaging & Dispatch Queue');
+}
+
+// Close modal on background click
+window.onclick = function(event) {
+  const packagingModal = document.getElementById('packagingModal');
+  const detailsModal = document.getElementById('orderDetailsModal');
+  
+  if (event.target == packagingModal) {
+    closePackagingModal();
+  }
+  if (event.target == detailsModal) {
+    closeOrderDetailsModal();
+  }
+}
 </script>
 
 

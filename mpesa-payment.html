@@ -245,12 +245,13 @@ function payNow(){
   setTimeout(() => {
     alert("Payment successful! Thank you for shopping with Daimara Online Mart.");
     
-    // UPDATE ORDER STATUS TO COMPLETED
+    // UPDATE ORDER STATUS TO PENDING (awaiting packaging)
     const allOrders = DataManager.getAllOrders();
     const currentOrder = allOrders.find(o => o.id === orderData.orderId);
     if (currentOrder) {
-      currentOrder.status = 'completed';
+      currentOrder.status = 'pending';
       DataManager.saveOrders(allOrders);
+      console.log('Order status updated to pending after payment:', currentOrder);
     }
 
     // Clear cart AFTER payment success

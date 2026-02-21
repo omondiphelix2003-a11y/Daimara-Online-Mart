@@ -4,6 +4,7 @@
  */
 document.addEventListener("DOMContentLoaded", function() {
   const currentUser = DataManager.getCurrentUser();
+  const isHomePage = window.location.pathname.includes('index.html') || window.location.pathname.endsWith('/') || window.location.pathname.endsWith('daimara.project/');
   const navCenter = document.querySelector(".nav-center");
   const navbarLinks = document.querySelector(".navbar div:nth-child(2)"); // For Shop.html style
   const navRight = document.querySelector(".nav-right") || document.querySelector(".nav-icons");
@@ -15,20 +16,18 @@ document.addEventListener("DOMContentLoaded", function() {
     userIconLink.title = "View Profile";
   }
 
-  if (currentUser && currentUser.email === "omondiphelix2003@gmail.com") {
-    // Add Admin Manager link if it doesn't exist
+  if (currentUser && currentUser.email === "omondiphelix2003@gmail.com" && isHomePage) {
+    // Add Admin Manager icon link only on home page
     const adminLink = document.createElement("a");
     adminLink.href = "admin-manager.html";
-    adminLink.textContent = "Admin Manager";
+    adminLink.innerHTML = '<i class="fa fa-cogs"></i>';
+    adminLink.title = "Admin Manager";
+    adminLink.style.fontSize = "55px";
     adminLink.style.color = "rgb(233, 157, 17)";
-    adminLink.style.fontWeight = "bold";
     adminLink.className = "admin-nav-link";
 
     if (navCenter) {
       navCenter.appendChild(adminLink);
-    } else if (navbarLinks) {
-      // For Shop.html which has a slightly different structure
-      navbarLinks.appendChild(adminLink);
     }
   }
 });
