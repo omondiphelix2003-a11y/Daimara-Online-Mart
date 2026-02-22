@@ -17,7 +17,7 @@
 
 body {
   font-family: Arial, sans-serif;
-  background: #111827;
+  background: #1F2937;
   font-size: 16px;
   padding-bottom: 80px;
 }
@@ -117,21 +117,43 @@ body {
   color: #fff;
   font-size: 24px;
   transition: color 0.3s;
+  position: relative;
+  overflow: visible;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
 }
 
 .nav-icons a:hover {
   color: rgb(233, 157, 17);
 }
 
-.cart-count {
-  background: rgb(233, 157, 17);
-  color: #000;
-  font-size: 12px;
-  padding: 2px 6px;
-  border-radius: 50%;
+.cart-link {
   position: relative;
-  top: -10px;
-  left: -5px;
+  display: inline-block;
+}
+
+.cart-count {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  background: #000;
+  color: #fff;
+  font-size: 12px;
+  font-weight: bold;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+  margin: 0;
+  z-index: 10;
 }
 
  .search-container {
@@ -218,19 +240,29 @@ body {
   margin: 0 auto;
 }
 
+@media (max-width: 1024px) {
+  .product-container {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    padding: 140px 15px 30px;
+  }
+}
+
 .product-card {
   background: white;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+ box-shadow: 0 5px 15px rgba(0, 0, 0, 0.329);
   transition: all 0.3s ease;
   cursor: pointer;
+  border:0.5px solid rgba(168, 163, 163, 0.363);
 }
 
 .product-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-}
+ transform:translateY(-4px);
+      box-shadow:0 20px 25px -5px rgba(0,0,0,0.1);
+      border-color:#e99d11;
+    }
 
 .product-image-wrapper {
   position: relative;
@@ -1136,7 +1168,7 @@ body {
 
 </style>
 
-<base target="_blank">
+
 </head>
 
 <body>
@@ -1203,6 +1235,7 @@ body {
 
 <script src="data-manager.js"></script>
 <script src="auth-check.js"></script>
+<script src="navigation-helper.js"></script>
 <script>// Load products dynamically from DataManager
 let product = DataManager.getAllProducts();
 let cart = DataManager.getCart();

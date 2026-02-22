@@ -50,7 +50,7 @@
       align-items:center;
       justify-content:space-between;
       padding:clamp(0.75rem, 2vw, 1rem) clamp(1rem, 3vw, 1.5rem);
-      background:var(--dark);
+      background:black;
       color:#fff;
       position:sticky;
       top:0;
@@ -58,8 +58,8 @@
       box-shadow:var(--shadow);
       flex-wrap:wrap;
       gap:1rem;
-      
-      
+      border-radius:1px;
+      border:1px solid black;
     }
 
     .logo{
@@ -123,6 +123,7 @@
       justify-content:center;
       border-radius:50%;
       position:relative;
+      overflow:visible;
     }
 
     .nav-icons a:hover{
@@ -132,18 +133,22 @@
 
     .cart-count{
       position:absolute;
-      top:-2px;
-      right:-2px;
-      background:var(--primary);
-      color:var(--dark);
-      font-size:0.75rem;
+      top:-12px;
+      right:-12px;
+      background:#000;
+      color:#fff;
+      font-size:12px;
       font-weight:bold;
-      width:20px;
-      height:20px;
+      width:22px;
+      height:22px;
       border-radius:50%;
       display:flex;
       align-items:center;
       justify-content:center;
+      line-height:1;
+      padding:0;
+      margin:0;
+      z-index:10;
     }
 
     /* Shop Icon */
@@ -418,6 +423,13 @@
        /*width:280%;
       height:100px;*/
     }
+    
+    @media (max-width: 1024px) {
+      .products {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+      }
+    }
 
     .product{
       background:var(--card);
@@ -551,6 +563,8 @@
         width:100%;
         justify-content:center;
         gap:1.5rem;
+        border-top:1px solid #fff;
+        padding-top:1rem;
       }
 
       .slider{
@@ -596,8 +610,8 @@
     /* DARK MODE */
     @media (prefers-color-scheme:dark){
       :root{
-        --bg:#111827;
-        --card:#1f2937;
+        --bg:#1F2937;
+        --card:#1F2937;
         --text:#f9fafb;
         --border:#374151;
       }
@@ -616,7 +630,6 @@
       }
     }
   </style>
-<base target="_blank">
 </head>
 <body>
 
@@ -750,6 +763,7 @@
 
   <script src="data-manager.js"></script>
   <script src="auth-check.js"></script>
+  <script src="navigation-helper.js"></script>
   <script>
     // SLIDER
     let currentSlide = 0;

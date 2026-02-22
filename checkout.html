@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
     *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
-    body{background:#111827; font-size: 14px; padding-bottom: 100px; padding-top: 60px;}
+    body{background:#1F2937; font-size: 14px; padding-bottom: 100px; padding-top: 60px;}
     
     @media (min-width: 768px) {
       body{font-size: 16px; padding-top: 70px;}
@@ -59,13 +59,47 @@
   .navbar a { font-size: 18px; }
 }
 
-    .container{padding:15px;max-width:100%;margin:auto; margin-top: -5px;}
-    h2{text-align:center;font-size:18px;margin-bottom:20px;color: rgb(0, 0, 0);}
-    h3{text-align:center;font-size:16px;margin-left: 0;color: rgb(0, 0, 0);}
-    table{width:100%;border-collapse:collapse;margin-bottom:30px;color: rgb(233, 157, 17);font-size:14px;}
-    table th, table td{padding:8px;border-bottom:1px solid #ddd;text-align:left;}
+    .container{padding:15px;max-width:100%;margin:auto; margin-top: -5px;overflow: hidden;}
+    
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      overflow-y: auto;
+      max-height: 600px;
+      border: 1px solid #333;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    .table-wrapper::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    
+    .table-wrapper::-webkit-scrollbar-track {
+      background: #1F2937;
+      border-radius: 8px;
+    }
+    
+    .table-wrapper::-webkit-scrollbar-thumb {
+      background: #11111188;
+      border-radius: 8px;
+    }
+    
+    .table-wrapper::-webkit-scrollbar-thumb:hover {
+      background: #11111188;
+    }
+    
+    .table-wrapper::-webkit-scrollbar-corner {
+      background: #1F2937;
+    }
+    h2{text-align:center;font-size:28px;margin-bottom:20px;color: #000000;}
+    h3{text-align:center;font-size:26px;margin-left: 0;color: #dadada;}
+    table{min-width: 100%;border-collapse:collapse;margin-bottom:0px;color: rgb(233, 157, 17);font-size:14px;}
+    table th, table td{padding:8px;border-bottom:1px solid #333;text-align:left;color: #aaa;}
     table img{width:60px;height:50px;object-fit:cover;border-radius:5px}
-    .total{float:right;font-size:16px;margin-bottom:20px}
+    .total{float:right;font-size:16px;margin-bottom:20px;color:#000000;}
     
     @media (min-width: 768px) {
       .container{padding:30px;}
@@ -86,9 +120,21 @@
       table img{width:90px;height:70px;}
       .total{font-size:29px;}
     }
-    .checkout-form{background:#fff;margin-top: 100px;padding:20px;border-radius:10px;font-size: 16px;box-shadow:0 5px 15px rgba(0,0,0,.1)}
-    .checkout-form input, .checkout-form select{width:100%;padding:12px;font-size: 16px;margin:10px 0;border:1px solid #ccc;border-radius:6px}
+    .checkout-form{background:#1F2937;
+       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.329);
+        transition: transform 0.3s;
+       border:0.5px solid rgba(168, 163, 163, 0.363);
+      margin-top: 100px;padding:20px;border-radius:10px;font-size: 16px;box-shadow:0 5px 15px rgba(0,0,0,.1)}
+    .checkout-form input, .checkout-form select{width:100%;padding:12px;font-size: 16px;margin:10px 0;border:1px solid #333;border-radius:6px;background:#1F2937;color:#ffffff;}
     .checkout-form button{padding:12px 20px;font-size: 18px;background:#111;color:rgb(233, 157, 17);border:none;border-radius:6px;cursor:pointer;width:100%}
+
+   .checkout-form:hover {
+      transform:translateY(-4px);
+      box-shadow:0 20px 25px -5px rgba(0,0,0,0.1);
+      border-color:#e99d11;
+    }
+    
+
     
     @media (min-width: 768px) {
       .checkout-form{padding:40px 40px;}
@@ -173,7 +219,7 @@
     .slider {
       position: relative;
       width: 100%;
-      height: 400px;
+      height: 200px;
       overflow: hidden;
       margin-top: 30px;
     }
@@ -203,13 +249,31 @@
       grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
       gap: 20px;
     }
+    
+    @media (max-width: 1024px) {
+      #random-products {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        padding: 20px 15px;
+      }
+    }
     .product {
-      background: #fff;
+     background:#1F2937;
+       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.329);
+        transition: transform 0.3s;
+       border:0.5px solid rgba(168, 163, 163, 0.363);
       padding: 20px;
       border-radius: 10px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, .1);
       text-align: center;
     }
+
+ 
+    .product:hover {
+      transform:translateY(-4px);
+      box-shadow:0 20px 25px -5px rgba(0,0,0,0.1);
+      border-color:#e99d11;
+    }
+
     .product img {
       width: 100%;
       height: 160px;
@@ -260,19 +324,21 @@
 
 <div class="container">
   <h2>Your Cart</h2>
-  <table id="cartTable">
-    <thead>
-      <tr>
-        <th>Product</th>
-        <th>Details</th>
-        <th>Price</th>
-        <th>Quantity</th>
-        <th>Subtotal</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <div class="table-wrapper">
+    <table id="cartTable">
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Details</th>
+          <th>Price</th>
+          <th>Quantity</th>
+          <th>Subtotal</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
   <div class="total">
     <div id="subtotalPrice">Subtotal: KES 0</div>
     <div id="deliveryFeeDisplay" style="display: none; margin-top: 10px;">Delivery Fee: KES 70</div>
@@ -310,7 +376,7 @@
 
       <!-- Map Container -->
       <div id="map-container">
-        <a href="https://www.google.com/maps/@-0.2802098,36.0567096,15z?entry=ttu&g_ep=EgoyMDI2MDIwNC4wIKXMDSoASAFQAw%3D%3D" target="_blank">
+        <a href="https://www.google.com/maps/@-0.2802098,36.0567096,15z?entry=ttu&g_ep=EgoyMDI2MDIwNC4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer">
           <button type="button" class="map-btn"><i class="fas fa-map-marker-alt"></i> Open Google Maps to find your location</button>
         </a>
         <p style="font-size: 25px; color: #666; margin-top: 10px; margin-bottom: 5px;">Paste your location coordinates or link below:</p>
@@ -338,6 +404,7 @@
 </section>
 
 <script src="data-manager.js"></script>
+<script src="navigation-helper.js"></script>
 <script>
   // Authentication check - Inaccessible unless logged in
   (function() {
@@ -374,13 +441,24 @@
     populateWarehouses();
   });
 
+  function getWarehouseData() {
+    try {
+      const data = localStorage.getItem('daimara_warehouse_data');
+      return data ? JSON.parse(data) : { subWarehouses: [] };
+    } catch(e) {
+      return { subWarehouses: [] };
+    }
+  }
+
   function populateWarehouses() {
     const select = document.getElementById('warehouseSelect');
-    const subWarehouses = DataManager.getSubWarehouses();
+    const warehouseData = getWarehouseData();
+    const subWarehouses = warehouseData.subWarehouses || [];
+    
     subWarehouses.forEach(sw => {
       const option = document.createElement('option');
       option.value = sw.id;
-      option.textContent = sw.name;
+      option.textContent = sw.name + (sw.stores && sw.stores.length > 0 ? ` (${sw.stores.length} stores)` : '');
       select.appendChild(option);
     });
   }
@@ -395,9 +473,11 @@
       return;
     }
     
-    const stores = DataManager.getStoresForSubWarehouse(warehouseId);
+    const warehouseData = getWarehouseData();
+    const subWarehouses = warehouseData.subWarehouses || [];
+    const warehouse = subWarehouses.find(sw => sw.id == warehouseId);
     
-    if (stores.length === 0) {
+    if (!warehouse || !warehouse.stores || warehouse.stores.length === 0) {
       const option = document.createElement('option');
       option.value = '';
       option.textContent = 'No stores available';
@@ -406,10 +486,10 @@
       return;
     }
     
-    stores.forEach(store => {
+    warehouse.stores.forEach(store => {
       const option = document.createElement('option');
       option.value = store.id;
-      option.textContent = store.name;
+      option.textContent = store.name + ' (' + store.location + ')';
       storeSelect.appendChild(option);
     });
   }
@@ -587,7 +667,7 @@
     } else {
       alert('Order placed successfully! Order ID: ' + data.orderId);
       DataManager.clearCart();
-      window.location.href = "home.html";
+      window.location.href = "index.html";
     }
   }
 

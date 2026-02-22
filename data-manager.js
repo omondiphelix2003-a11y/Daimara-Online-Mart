@@ -4,6 +4,17 @@
  */
 
 const DataManager = (() => {
+  let storageAvailable = false;
+  
+  try {
+    const test = '__storage_test__';
+    localStorage.setItem(test, test);
+    localStorage.removeItem(test);
+    storageAvailable = true;
+  } catch(e) {
+    console.warn('localStorage is not available. Using in-memory fallback.');
+  }
+
   const STORAGE_KEYS = {
     PRODUCTS: 'ecommerce_products',
     CART: 'ecommerce_cart',
@@ -21,7 +32,7 @@ const DataManager = (() => {
     SUB_WAREHOUSES: 'ecommerce_sub_warehouses'
   };
 
-  const ALLOWED_BADGE_PAGES = ['index.html', 'store.html', 'supermarket.html', 'second-hand items.html'];
+  const ALLOWED_BADGE_PAGES = ['index.html', 'store.html', 'supermarket.html', 'second-hand items.html', 'about.html', 'gas-refill.html', 'grocery delivery.html', 'login.html', 'profile.html', 'water refilling.html', 'cart.html'];
 
   function isAllowedBadgePage() {
     const pathname = window.location.pathname.toLowerCase();
@@ -87,6 +98,26 @@ const DataManager = (() => {
       { id: 'g6', name: 'Pro Gas – 6 KG', price: 900, image: 'progas.jfif', subcategory: 'Gas', description: 'Standard 6kg gas refill' },
       { id: 'g13', name: 'Total Gas – 13 KG', price: 1800, image: 'total.jfif', subcategory: 'Gas', description: 'Medium 13kg gas refill' },
       { id: 'g50', name: 'Lake Gas – 50 KG', price: 6500, image: 'lake gas.jpg', subcategory: 'Gas', description: 'Large 50kg industrial gas refill' }
+    ],
+    'Fruits & Vegetables': [
+      { id: 'gd1', name: 'Fresh Tomatoes', price: 120, image: 'https://picsum.photos/300/200?tomatoes', subcategory: 'Fruits & Vegetables', description: 'Organic fresh tomatoes from local farms' },
+      { id: 'gd2', name: 'Carrots Bundle', price: 80, image: 'https://picsum.photos/300/200?carrots', subcategory: 'Fruits & Vegetables', description: 'Fresh organic carrots, 1kg bundle' }
+    ],
+    'Dairy & Eggs': [
+      { id: 'gd3', name: 'Fresh Milk 1L', price: 100, image: 'https://picsum.photos/300/200?milk', subcategory: 'Dairy & Eggs', description: 'Fresh pasteurized milk, farm-to-table' },
+      { id: 'gd4', name: 'Free-Range Eggs', price: 150, image: 'https://picsum.photos/300/200?eggs', subcategory: 'Dairy & Eggs', description: 'Dozen free-range organic eggs' }
+    ],
+    'Bakery Items': [
+      { id: 'gd5', name: 'Fresh Bread Loaf', price: 80, image: 'https://picsum.photos/300/200?bread', subcategory: 'Bakery Items', description: 'Daily-baked artisan bread loaf' },
+      { id: 'gd6', name: 'Croissants Pack', price: 200, image: 'https://picsum.photos/300/200?croissants', subcategory: 'Bakery Items', description: 'Fresh butter croissants, pack of 6' }
+    ],
+    'Organic Foods': [
+      { id: 'gd7', name: 'Organic Honey 500g', price: 350, image: 'https://picsum.photos/300/200?honey', subcategory: 'Organic Foods', description: 'Pure organic raw honey from local beekeepers' },
+      { id: 'gd8', name: 'Organic Coffee Beans', price: 500, image: 'https://picsum.photos/300/200?coffee', subcategory: 'Organic Foods', description: 'Premium organic roasted coffee beans, 500g' }
+    ],
+    'Spices & Condiments': [
+      { id: 'gd9', name: 'Mixed Spices Pack', price: 250, image: 'https://picsum.photos/300/200?spices', subcategory: 'Spices & Condiments', description: 'Variety of premium spices and seasonings' },
+      { id: 'gd10', name: 'Pure Chili Powder', price: 180, image: 'https://picsum.photos/300/200?chili', subcategory: 'Spices & Condiments', description: 'Pure ground chili powder, 200g' }
     ]
   };
 
@@ -1200,16 +1231,19 @@ const DataManager = (() => {
       position: absolute;
       top: -12px;
       right: -12px;
-      background: #e74c3c;
-      color: white;
+      background: #000;
+      color: #fff;
       border-radius: 50%;
-      padding: 4px 8px;
-      font-size: 16px;
+      font-size: 12px;
       font-weight: bold;
-      min-width: 24px;
-      text-align: center;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       line-height: 1;
-      border: 2px solid #000;
+      padding: 0;
+      margin: 0;
       z-index: 1001;
     }
   `;

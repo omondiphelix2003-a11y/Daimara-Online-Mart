@@ -19,11 +19,12 @@ html {
 }
 
 body {
-  background: #111827;
+  background: #1F2937;
   font-size: 16px;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  color: #ffffff;
 }
 
 .main-content-wrapper {
@@ -118,6 +119,13 @@ body {
   font-size: 18px;
   transition: color 0.3s ease;
   position: relative;
+  overflow: visible;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
 }
 
 .nav-center a:hover,
@@ -133,18 +141,22 @@ body {
 /* Cart count badge */
 .cart-count {
   position: absolute;
-  top: -8px;
-  right: -10px;
-  background: rgb(233, 157, 17);
-  color: #000;
-  font-size: 11px;
+  top: -12px;
+  right: -12px;
+  background: #000;
+  color: #fff;
+  font-size: 12px;
   font-weight: bold;
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  line-height: 1;
+  padding: 0;
+  margin: 0;
+  z-index: 10;
 }
 
 /* Mobile Menu Toggle */

@@ -25,7 +25,7 @@
     }
 
     body{
-      background:linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
+      background:linear-gradient(135deg, #1F2937 0%, #111827 100%);
       margin:0;
       min-height:100vh;
       display:flex;
@@ -92,6 +92,7 @@
       justify-content:center;
       border-radius:50%;
       position:relative;
+      overflow:visible;
     }
 
     .nav-icons a:hover{
@@ -101,18 +102,22 @@
 
     .cart-count{
       position:absolute;
-      top:-2px;
-      right:-2px;
-      background:var(--primary);
-      color:#000;
-      font-size:0.75rem;
+      top:-12px;
+      right:-12px;
+      background:#000;
+      color:#fff;
+      font-size:12px;
       font-weight:bold;
-      width:20px;
-      height:20px;
+      width:22px;
+      height:22px;
       border-radius:50%;
       display:flex;
       align-items:center;
       justify-content:center;
+      line-height:1;
+      padding:0;
+      margin:0;
+      z-index:10;
     }
 
     /* Shop Icon */
@@ -568,13 +573,13 @@
       border-width:0;
     }
   </style>
-<base target="_blank">
+
 </head>
 <body>
 
   <!-- NAVBAR -->
   <nav class="navbar">
-    <a href="home.html" class="logo">
+    <a href="index.html" class="logo">
       <i class="fas fa-store"></i> Daimara
     </a>
 
@@ -686,6 +691,7 @@
   </div>
 
   <script src="data-manager.js"></script>
+  <script src="navigation-helper.js"></script>
   <script src="auth-check.js"></script>
   <script>
     // Profile image preview
@@ -858,7 +864,7 @@
             if(email === "admin@gmail.com"){
               window.location.href = "admin-manager.html";
             } else {
-              window.location.href = "home.html";
+              window.location.href = "index.html";
             }
           }, 1000);
         } else {

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daimara Online Mart | Add Product - Refilling, Supermarket & Second-hand Items</title>
+    <title>Daimara Online Mart | Add Product - Refilling, Supermarket, Second-hand & Grocery Delivery</title>
     <script src="data-manager.js"></script>
     <style>
         * {
@@ -14,7 +14,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: rgb(233,157,17);
+            background: #1F2937;
             min-height: 100vh;
             padding: 15px;
         }
@@ -22,7 +22,7 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            background: white;
+            background: #1F2937;
             border-radius: 10px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
             overflow: hidden;
@@ -50,15 +50,15 @@
         }
 
         .form-section {
-            background: #f8f9fa;
+            background: #1F2937;
             padding: 20px;
             border-radius: 8px;
             margin-bottom: 25px;
-            border-left: 5px solid #667eea;
+            border-left: 5px solid #e99d11;
         }
 
         .form-section h2 {
-            color: #333;
+            color: #ffffff;
             margin-bottom: 15px;
             font-size: 1.3em;
         }
@@ -76,7 +76,7 @@
         label {
             display: block;
             margin-bottom: 6px;
-            color: #333;
+            color: #ffffff;
             font-weight: 600;
             font-size: 0.9em;
         }
@@ -88,27 +88,30 @@
         textarea {
             width: 100%;
             padding: 12px;
-            border: 2px solid #e0e0e0;
+            border: 2px solid #333;
             border-radius: 5px;
             font-size: 16px;
             transition: border-color 0.3s;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #2a3441;
+            color: #ffffff;
         }
 
         input[type="file"] {
             width: 100%;
             padding: 10px;
-            border: 2px solid #e0e0e0;
+            border: 2px solid #333;
             border-radius: 5px;
             font-size: 0.9em;
             cursor: pointer;
-            background: white;
+            background: #2a3441;
+            color: #ffffff;
         }
 
         input[type="file"]:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: #e99d11;
+            box-shadow: 0 0 0 3px rgba(233, 157, 17, 0.1);
         }
 
         input[type="text"]:focus,
@@ -117,8 +120,8 @@
         select:focus,
         textarea:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: #e99d11;
+            box-shadow: 0 0 0 3px rgba(233, 157, 17, 0.1);
         }
 
         textarea {
@@ -146,22 +149,22 @@
         }
 
         .btn-add {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: linear-gradient(135deg, #e99d11 0%, #d97706 100%);
+            color: #000;
         }
 
         .btn-add:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 5px 20px rgba(233, 157, 17, 0.4);
         }
 
         .btn-reset {
-            background: #e0e0e0;
-            color: #333;
+            background: #333;
+            color: #aaa;
         }
 
         .btn-reset:hover {
-            background: #d0d0d0;
+            background: #444;
         }
 
         .products-section {
@@ -169,7 +172,7 @@
         }
 
         .products-section h2 {
-            color: #333;
+            color: #ffffff;
             margin-bottom: 15px;
             font-size: 1.3em;
         }
@@ -183,20 +186,21 @@
 
         .category-filter button {
             padding: 8px 16px;
-            background: #f0f0f0;
-            border: 2px solid #e0e0e0;
+            background: #333;
+            border: 2px solid #555;
             border-radius: 20px;
             cursor: pointer;
             transition: all 0.3s;
             font-size: 0.85em;
             flex: 0 0 auto;
             min-width: auto;
+            color: #aaa;
         }
 
         .category-filter button.active {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
+            background: #e99d11;
+            color: #000;
+            border-color: #e99d11;
         }
 
         .products-grid {
@@ -204,18 +208,25 @@
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 15px;
         }
+        
+        @media (max-width: 1024px) {
+            .products-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 12px;
+            }
+        }
 
         .product-card {
-            background: #f8f9fa;
-            border: 2px solid #e0e0e0;
+            background: #1F2937;
+            border: 2px solid #333;
             border-radius: 8px;
             padding: 15px;
             transition: all 0.3s;
         }
 
         .product-card:hover {
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-            border-color: #667eea;
+            box-shadow: 0 5px 20px rgba(233, 157, 17, 0.3);
+            border-color: #e99d11;
         }
 
         .product-image {
@@ -224,17 +235,17 @@
             object-fit: cover;
             border-radius: 6px;
             margin-bottom: 12px;
-            background: #e0e0e0;
+            background: #1F2937;
         }
 
         .product-card h3 {
-            color: #333;
+            color: #ffffff;
             margin-bottom: 8px;
             font-size: 1.1em;
         }
 
         .product-details {
-            color: #666;
+            color: #aaa;
             font-size: 0.9em;
             margin-bottom: 12px;
         }
@@ -245,7 +256,7 @@
 
         .price {
             font-size: 1.2em;
-            color: #667eea;
+            color: #e99d11;
             font-weight: bold;
             margin: 10px 0;
         }
@@ -253,8 +264,8 @@
         .category-badge {
             display: inline-block;
             padding: 4px 10px;
-            background: #667eea;
-            color: white;
+            background: #e99d11;
+            color: #000;
             border-radius: 3px;
             font-size: 0.75em;
             margin-bottom: 8px;
@@ -563,7 +574,7 @@
     <div class="container">
         <header>
             <h1>📦 Product Management</h1>
-            <p>Manage your Refilling, Supermarket & Second-hand Items</p>
+            <p>Manage your Refilling, Supermarket, Second-hand Items & Grocery Delivery</p>
         </header>
 
         <div class="content">
@@ -583,6 +594,7 @@
                                 <option value="Supermarket">Supermarket</option>
                                 <option value="Second-hand">Second-hand Items</option>
                                 <option value="Refilling">Refilling Services</option>
+                                <option value="Grocery">Grocery Delivery</option>
                             </select>
                         </div>
                     </div>
@@ -677,7 +689,7 @@
                         <option value="Supermarket">Supermarket</option>
                         <option value="Second-hand">Second-hand Items</option>
                         <option value="Refilling">Refilling Services</option>
-                        <option value="Grocery">Grocery Pick</option>
+                        <option value="Grocery">Grocery Delivery</option>
                     </select>
                 </div>
 
@@ -743,7 +755,9 @@
                 { name: 'Liquor', link: 'supermarket.html', page: 'Supermarket' },
                 { name: 'Electronics', link: 'supermarket.html', page: 'Supermarket' },
                 { name: 'Furniture', link: 'supermarket.html', page: 'Supermarket' },
-                { name: 'Clothings', link: 'supermarket.html', page: 'Supermarket' }
+                { name: 'Clothings', link: 'supermarket.html', page: 'Supermarket' },
+                { name: 'Household items', link: 'supermarket.html', page: 'Supermarket' },
+                { name: 'Water', link: 'supermarket.html', page: 'Supermarket' }
             ],
             'Second-hand': [
                 { name: 'Household items', link: 'second-hand items.html', page: 'Second-hand' },
@@ -751,17 +765,16 @@
                 { name: 'Furniture', link: 'second-hand items.html', page: 'Second-hand' }
             ],
             'Refilling': [
-                 { name: 'Gas', link: 'gas-refill.html', page: 'Gas Refilling' },
-                { name: 'Water', link: 'water-refill.html', page: 'Water Refilling' }
-
-            ]
-
+                { name: 'Gas', link: 'gas-refill.html', page: 'Gas Refilling' },
+                { name: 'Water', link: 'water refilling.html', page: 'Water Refilling' }
+            ],
             'Grocery': [
-                { name: 'Grocery', link: 'grocery delivery.html', page: 'Grocery Pick' },
-                
-
+                { name: 'Fruits & Vegetables', link: 'grocery delivery.html', page: 'Grocery Delivery' },
+                { name: 'Dairy & Eggs', link: 'grocery delivery.html', page: 'Grocery Delivery' },
+                { name: 'Bakery Items', link: 'grocery delivery.html', page: 'Grocery Delivery' },
+                { name: 'Organic Foods', link: 'grocery delivery.html', page: 'Grocery Delivery' },
+                { name: 'Spices & Condiments', link: 'grocery delivery.html', page: 'Grocery Delivery' }
             ]
-
         };
 
         // Product Management System
@@ -836,15 +849,17 @@
             const supermarketSubs = (subcategories['Supermarket'] || []).map(s => s.name);
             const secondSubs = (subcategories['Second-hand'] || []).map(s => s.name);
             const refillSubs = (subcategories['Refilling'] || []).map(s => s.name);
+            const grocerySubs = (subcategories['Grocery'] || []).map(s => s.name);
 
             for (const cat in all) {
                 if (Array.isArray(all[cat])) {
                     all[cat].forEach(p => {
-                        // Derive main category (Supermarket / Second-hand / Refilling) from subcategory when missing
+                        // Derive main category from subcategory when missing
                         if (!p.category) {
                             if (supermarketSubs.includes(cat)) p.category = 'Supermarket';
                             else if (secondSubs.includes(cat)) p.category = 'Second-hand';
                             else if (refillSubs.includes(cat)) p.category = 'Refilling';
+                            else if (grocerySubs.includes(cat)) p.category = 'Grocery';
                             else p.category = 'Supermarket';
                         }
                         products.push(p);
