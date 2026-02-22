@@ -9,57 +9,306 @@
 :root{
   --primary:#f59e0b;
   --bg:#f4f6f9;
+  --danger:#dc2626;
+  --success:#16a34a;
+  --text:#1f2937;
+  --border:#e5e7eb;
+}
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
 }
 
 body{
   margin:0;
-  font-family:Arial, Helvetica, sans-serif;
-  background:var(--bg);
+  font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background:#111827;
+  color:var(--text);
+  line-height:1.6;
 }
 
 .topbar{
   background:var(--primary);
-  padding:16px 24px;
+  padding:1rem 1.5rem;
   font-weight:bold;
-  font-size:20px;
+  font-size:clamp(1.125rem, 2.5vw, 1.5rem);
+  color:white;
+  box-shadow:0 2px 4px rgba(0,0,0,0.1);
+  position:sticky;
+  top:0;
+  z-index:100;
 }
 
-.container{ padding:24px; }
+.container{ 
+  padding:clamp(1rem, 3vw, 2rem);
+  max-width:1400px;
+  margin:0 auto;
+}
 
 .card{
   background:white;
-  padding:20px;
+  padding:clamp(1rem, 3vw, 1.5rem);
   border-radius:12px;
-  box-shadow:0 4px 12px rgba(0,0,0,0.2);
-  margin-bottom:25px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.08);
+  margin-bottom:1.5rem;
+  border:1px solid var(--border);
+}
+
+h3{
+  font-size:clamp(1.125rem, 2.5vw, 1.25rem);
+  margin-bottom:1rem;
+  color:var(--text);
+}
+
+.form-group{
+  display:flex;
+  flex-wrap:wrap;
+  gap:0.75rem;
+  align-items:center;
 }
 
 input{
-  padding:10px;
-  margin:5px;
-  width:200px;
+  padding:0.75rem;
+  border:1px solid var(--border);
+  border-radius:8px;
+  font-size:1rem;
+  flex:1 1 200px;
+  min-width:0;
+  transition:border-color 0.2s;
+}
+
+input:focus{
+  outline:none;
+  border-color:var(--primary);
+  box-shadow:0 0 0 3px rgba(245, 158, 11, 0.1);
 }
 
 button, select{
-  padding:8px;
-  border-radius:6px;
+  padding:0.75rem 1.25rem;
+  border-radius:8px;
   border:none;
+  font-size:0.95rem;
+  font-weight:500;
+  cursor:pointer;
+  transition:all 0.2s;
+  white-space:nowrap;
 }
 
-.add{ background:#16a34a; color:white;}
-.remove{ background:#dc2626; color:white;}
+button:hover{
+  transform:translateY(-1px);
+  box-shadow:0 4px 12px rgba(0,0,0,0.15);
+}
+
+button:active{
+  transform:translateY(0);
+}
+
+.add{ 
+  background:var(--success); 
+  color:white;
+  flex:0 0 auto;
+}
+
+.add:hover{
+  background:#15803d;
+}
+
+.remove{ 
+  background:var(--danger); 
+  color:white;
+}
+
+.remove:hover{
+  background:#b91c1c;
+}
+
+.dispatch-btn{
+  background:var(--primary);
+  color:white;
+  margin-left:0.5rem;
+}
+
+.dispatch-btn:hover{
+  background:#d97706;
+}
+
+/* Table Styles - Desktop */
+.table-wrapper{
+  overflow-x:auto;
+  margin-top:1rem;
+  border-radius:8px;
+  border:1px solid var(--border);
+}
 
 table{
   width:100%;
   border-collapse:collapse;
-  margin-top:15px;
+  min-width:600px;
+  font-size:0.95rem;
 }
 
 th, td{
-  padding:12px;
-  border-bottom:1px solid #eee;
+  padding:1rem;
+  text-align:left;
+  border-bottom:1px solid var(--border);
+}
+
+th{
+  background:#f9fafb;
+  font-weight:600;
+  color:#374151;
+  font-size:0.875rem;
+  text-transform:uppercase;
+  letter-spacing:0.05em;
+}
+
+tr:hover{
+  background:#f9fafb;
+}
+
+td{
+  vertical-align:middle;
+}
+
+select{
+  background:#f3f4f6;
+  border:1px solid var(--border);
+  min-width:140px;
+}
+
+/* Mobile Card Layout */
+@media (max-width:768px){
+  .table-wrapper{
+    display:none;
+  }
+  
+  .mobile-cards{
+    display:flex;
+    flex-direction:column;
+    gap:1rem;
+    margin-top:1rem;
+  }
+  
+  .order-card{
+    background:#f9fafb;
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:1.25rem;
+    display:flex;
+    flex-direction:column;
+    gap:0.75rem;
+    animation:slideIn 0.3s ease-out;
+  }
+  
+  @keyframes slideIn{
+    from{
+      opacity:0;
+      transform:translateY(10px);
+    }
+    to{
+      opacity:1;
+      transform:translateY(0);
+    }
+  }
+  
+  .order-field{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0.5rem 0;
+    border-bottom:1px solid #e5e7eb;
+  }
+  
+  .order-field:last-of-type{
+    border-bottom:none;
+  }
+  
+  .order-field label{
+    font-weight:600;
+    color:#6b7280;
+    font-size:0.875rem;
+    text-transform:uppercase;
+    letter-spacing:0.025em;
+  }
+  
+  .order-field span{
+    font-weight:500;
+    color:var(--text);
+  }
+  
+  .order-actions{
+    display:flex;
+    flex-direction:column;
+    gap:0.75rem;
+    margin-top:0.5rem;
+  }
+  
+  .order-actions select{
+    width:100%;
+    padding:0.75rem;
+  }
+  
+  .order-actions button{
+    width:100%;
+    padding:0.875rem;
+  }
+  
+  .mobile-remove{
+    background:var(--danger);
+    color:white;
+    margin-top:0.5rem;
+  }
+}
+
+@media (min-width:769px){
+  .mobile-cards{
+    display:none;
+  }
+}
+
+/* Empty State */
+.empty-state{
+  text-align:center;
+  padding:3rem 1rem;
+  color:#6b7280;
+}
+
+.empty-state svg{
+  width:64px;
+  height:64px;
+  margin-bottom:1rem;
+  opacity:0.3;
+}
+
+/* Responsive Typography */
+.empty-state h4{
+  font-size:1.125rem;
+  margin-bottom:0.5rem;
+  color:var(--text);
+}
+
+/* Touch-friendly improvements */
+@media (hover:none) and (pointer:coarse){
+  button, select, input{
+    min-height:44px;
+  }
+}
+
+/* Print styles */
+@media print{
+  .topbar, button, .remove, .dispatch-btn{
+    display:none;
+  }
+  
+  .card{
+    box-shadow:none;
+    border:1px solid #000;
+  }
 }
 </style>
+<base target="_blank">
 </head>
 <body>
 
@@ -70,31 +319,47 @@ th, td{
   <!-- RECEIVE ORDERS -->
   <div class="card">
     <h3>Receive New Order</h3>
-
-    <input type="text" id="client" placeholder="Client Name">
-    <input type="text" id="destination" placeholder="Delivery Location">
-    <input type="text" id="phone" placeholder="Phone Number">
-
-    <button class="add" onclick="receiveOrder()">Receive Order</button>
+    
+    <div class="form-group">
+      <input type="text" id="client" placeholder="Client Name" autocomplete="name">
+      <input type="text" id="destination" placeholder="Delivery Location" autocomplete="street-address">
+      <input type="tel" id="phone" placeholder="Phone Number" autocomplete="tel">
+      <button class="add" onclick="receiveOrder()">Receive Order</button>
+    </div>
   </div>
 
   <!-- DELIVERY QUEUE -->
   <div class="card">
     <h3>Incoming Delivery Queue</h3>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Order ID</th>
-          <th>Client</th>
-          <th>Destination</th>
-          <th>Phone</th>
-          <th>Assign & Dispatch</th>
-          <th>Remove</th>
-        </tr>
-      </thead>
-      <tbody id="queueTable"></tbody>
-    </table>
+    
+    <!-- Desktop Table -->
+    <div class="table-wrapper">
+      <table id="desktopTable">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Client</th>
+            <th>Destination</th>
+            <th>Phone</th>
+            <th>Assign & Dispatch</th>
+            <th>Remove</th>
+          </tr>
+        </thead>
+        <tbody id="queueTable"></tbody>
+      </table>
+    </div>
+    
+    <!-- Mobile Cards -->
+    <div class="mobile-cards" id="mobileCards"></div>
+    
+    <!-- Empty State -->
+    <div class="empty-state" id="emptyState" style="display:none;">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+      </svg>
+      <h4>No Orders Yet</h4>
+      <p>Add a new order above to get started</p>
+    </div>
   </div>
 
 </div>
@@ -120,12 +385,12 @@ function saveQueue(){
 }
 
 function receiveOrder(){
-  const client = document.getElementById("client").value;
-  const destination = document.getElementById("destination").value;
-  const phone = document.getElementById("phone").value;
+  const client = document.getElementById("client").value.trim();
+  const destination = document.getElementById("destination").value.trim();
+  const phone = document.getElementById("phone").value.trim();
 
   if(!client || !destination || !phone){
-    alert("Fill all fields");
+    alert("Please fill all fields");
     return;
   }
 
@@ -142,12 +407,14 @@ function receiveOrder(){
   document.getElementById("client").value="";
   document.getElementById("destination").value="";
   document.getElementById("phone").value="";
+  
+  // Focus back on first input for rapid entry
+  document.getElementById("client").focus();
 }
 
 function dispatchOrder(index, rider){
-
   if(!rider){
-    alert("Select delivery employee");
+    alert("Please select a delivery employee");
     return;
   }
 
@@ -156,7 +423,8 @@ function dispatchOrder(index, rider){
   dispatchList.push({
     ...queue[index],
     rider: rider,
-    status: "Out for Delivery"
+    status: "Out for Delivery",
+    dispatchedAt: new Date().toISOString()
   });
 
   localStorage.setItem("deliveryOrders", JSON.stringify(dispatchList));
@@ -165,37 +433,54 @@ function dispatchOrder(index, rider){
   saveQueue();
   displayQueue();
 
+  // Open delivery services in new tab
   window.open("Delivery services.html","_blank");
 }
 
 function removeOrder(index){
-  queue.splice(index,1);
-  saveQueue();
-  displayQueue();
+  if(confirm("Are you sure you want to remove this order?")){
+    queue.splice(index,1);
+    saveQueue();
+    displayQueue();
+  }
+}
+
+function getEmployeeOptions(selectedValue = ""){
+  let options = `<option value="">Select Rider</option>`;
+  employees.forEach(emp=>{
+    options += `<option value="${emp}" ${emp === selectedValue ? 'selected' : ''}>${emp}</option>`;
+  });
+  return options;
 }
 
 function displayQueue(){
-  const table = document.getElementById("queueTable");
-  table.innerHTML="";
+  const tableBody = document.getElementById("queueTable");
+  const mobileContainer = document.getElementById("mobileCards");
+  const emptyState = document.getElementById("emptyState");
+  
+  tableBody.innerHTML = "";
+  mobileContainer.innerHTML = "";
+
+  if(queue.length === 0){
+    emptyState.style.display = "block";
+    return;
+  } else {
+    emptyState.style.display = "none";
+  }
 
   queue.forEach((order, index)=>{
-
-    let employeeOptions = `<option value="">Select Rider</option>`;
-    employees.forEach(emp=>{
-      employeeOptions += `<option value="${emp}">${emp}</option>`;
-    });
-
-    table.innerHTML += `
+    // Desktop Table Row
+    tableBody.innerHTML += `
       <tr>
-        <td>${order.id}</td>
+        <td><strong>${order.id}</strong></td>
         <td>${order.client}</td>
         <td>${order.destination}</td>
         <td>${order.phone}</td>
         <td>
-          <select id="emp${index}">
-            ${employeeOptions}
+          <select id="emp${index}" onchange="this.dataset.selected=this.value">
+            ${getEmployeeOptions()}
           </select>
-          <button onclick="dispatchOrder(${index}, document.getElementById('emp${index}').value)">
+          <button class="dispatch-btn" onclick="dispatchOrder(${index}, document.getElementById('emp${index}').value)">
             Dispatch
           </button>
         </td>
@@ -204,11 +489,53 @@ function displayQueue(){
         </td>
       </tr>
     `;
+    
+    // Mobile Card
+    mobileContainer.innerHTML += `
+      <div class="order-card">
+        <div class="order-field">
+          <label>Order ID</label>
+          <span>${order.id}</span>
+        </div>
+        <div class="order-field">
+          <label>Client</label>
+          <span>${order.client}</span>
+        </div>
+        <div class="order-field">
+          <label>Destination</label>
+          <span>${order.destination}</span>
+        </div>
+        <div class="order-field">
+          <label>Phone</label>
+          <span>${order.phone}</span>
+        </div>
+        <div class="order-actions">
+          <select id="mobileEmp${index}">
+            ${getEmployeeOptions()}
+          </select>
+          <button class="dispatch-btn" onclick="dispatchOrder(${index}, document.getElementById('mobileEmp${index}').value)">
+            Dispatch Order
+          </button>
+          <button class="mobile-remove" onclick="removeOrder(${index})">
+            Remove Order
+          </button>
+        </div>
+      </div>
+    `;
   });
 }
 
+// Initialize
 displayQueue();
 
+// Handle Enter key in form
+document.querySelectorAll('input').forEach(input => {
+  input.addEventListener('keypress', function(e) {
+    if(e.key === 'Enter') {
+      receiveOrder();
+    }
+  });
+});
 </script>
 </body>
 </html>

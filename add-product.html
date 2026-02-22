@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=1200">
-    <title>Daimara Online Mart | Add Product - Refilling,Supermarket & Second-hand Items</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daimara Online Mart | Add Product - Refilling, Supermarket & Second-hand Items</title>
     <script src="data-manager.js"></script>
     <style>
         * {
@@ -16,7 +16,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: rgb(233,157,17);
             min-height: 100vh;
-            padding: 20px;
+            padding: 15px;
         }
 
         .container {
@@ -31,54 +31,54 @@
         header {
             background: rgb(0, 0, 0);
             color: white;
-            padding: 30px;
+            padding: 25px 20px;
             text-align: center;
         }
 
         header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
+            font-size: 1.8em;
+            margin-bottom: 8px;
         }
 
         header p {
-            font-size: 1.1em;
+            font-size: 1em;
             opacity: 0.9;
         }
 
         .content {
-            padding: 30px;
+            padding: 20px;
         }
 
         .form-section {
             background: #f8f9fa;
-            padding: 25px;
+            padding: 20px;
             border-radius: 8px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             border-left: 5px solid #667eea;
         }
 
         .form-section h2 {
             color: #333;
-            margin-bottom: 20px;
-            font-size: 1.5em;
+            margin-bottom: 15px;
+            font-size: 1.3em;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .form-row {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+            gap: 15px;
         }
 
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             color: #333;
             font-weight: 600;
-            font-size: 0.95em;
+            font-size: 0.9em;
         }
 
         input[type="text"],
@@ -90,18 +90,19 @@
             padding: 12px;
             border: 2px solid #e0e0e0;
             border-radius: 5px;
-            font-size: 1em;
+            font-size: 16px;
             transition: border-color 0.3s;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         input[type="file"] {
             width: 100%;
-            padding: 8px;
+            padding: 10px;
             border: 2px solid #e0e0e0;
             border-radius: 5px;
-            font-size: 0.95em;
+            font-size: 0.9em;
             cursor: pointer;
+            background: white;
         }
 
         input[type="file"]:focus {
@@ -122,29 +123,31 @@
 
         textarea {
             resize: vertical;
-            min-height: 100px;
+            min-height: 80px;
         }
 
         .button-group {
             display: flex;
             gap: 10px;
             margin-top: 20px;
+            flex-wrap: wrap;
         }
 
         button {
-            padding: 12px 30px;
+            padding: 12px 25px;
             border: none;
             border-radius: 5px;
             font-size: 1em;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
+            flex: 1;
+            min-width: 120px;
         }
 
         .btn-add {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            flex: 1;
         }
 
         .btn-add:hover {
@@ -155,7 +158,6 @@
         .btn-reset {
             background: #e0e0e0;
             color: #333;
-            flex: 1;
         }
 
         .btn-reset:hover {
@@ -163,30 +165,32 @@
         }
 
         .products-section {
-            margin-top: 40px;
+            margin-top: 30px;
         }
 
         .products-section h2 {
             color: #333;
-            margin-bottom: 20px;
-            font-size: 1.5em;
+            margin-bottom: 15px;
+            font-size: 1.3em;
         }
 
         .category-filter {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 8px;
+            margin-bottom: 15px;
             flex-wrap: wrap;
         }
 
         .category-filter button {
-            padding: 10px 20px;
+            padding: 8px 16px;
             background: #f0f0f0;
             border: 2px solid #e0e0e0;
             border-radius: 20px;
             cursor: pointer;
             transition: all 0.3s;
-            font-size: 0.95em;
+            font-size: 0.85em;
+            flex: 0 0 auto;
+            min-width: auto;
         }
 
         .category-filter button.active {
@@ -198,14 +202,14 @@
         .products-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
+            gap: 15px;
         }
 
         .product-card {
             background: #f8f9fa;
             border: 2px solid #e0e0e0;
             border-radius: 8px;
-            padding: 20px;
+            padding: 15px;
             transition: all 0.3s;
         }
 
@@ -216,31 +220,31 @@
 
         .product-image {
             width: 100%;
-            height: 200px;
+            height: 180px;
             object-fit: cover;
             border-radius: 6px;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             background: #e0e0e0;
         }
 
         .product-card h3 {
             color: #333;
-            margin-bottom: 10px;
-            font-size: 1.2em;
+            margin-bottom: 8px;
+            font-size: 1.1em;
         }
 
         .product-details {
             color: #666;
-            font-size: 0.95em;
-            margin-bottom: 15px;
+            font-size: 0.9em;
+            margin-bottom: 12px;
         }
 
         .product-details p {
-            margin-bottom: 8px;
+            margin-bottom: 5px;
         }
 
         .price {
-            font-size: 1.3em;
+            font-size: 1.2em;
             color: #667eea;
             font-weight: bold;
             margin: 10px 0;
@@ -248,18 +252,18 @@
 
         .category-badge {
             display: inline-block;
-            padding: 5px 10px;
+            padding: 4px 10px;
             background: #667eea;
             color: white;
             border-radius: 3px;
-            font-size: 0.8em;
-            margin-bottom: 10px;
+            font-size: 0.75em;
+            margin-bottom: 8px;
         }
 
         .product-actions {
             display: flex;
-            gap: 10px;
-            margin-top: 15px;
+            gap: 8px;
+            margin-top: 12px;
         }
 
         .btn-edit, .btn-delete {
@@ -295,12 +299,12 @@
 
         .empty-state {
             text-align: center;
-            padding: 40px;
+            padding: 30px;
             color: #999;
         }
 
         .empty-state p {
-            font-size: 1.1em;
+            font-size: 1em;
         }
 
         .modal {
@@ -313,6 +317,7 @@
             height: 100%;
             background-color: rgba(0, 0, 0, 0.5);
             animation: fadeIn 0.3s;
+            overflow-y: auto;
         }
 
         @keyframes fadeIn {
@@ -322,10 +327,10 @@
 
         .modal-content {
             background: white;
-            margin: 10% auto;
-            padding: 30px;
+            margin: 5% auto;
+            padding: 20px;
             border-radius: 8px;
-            width: 90%;
+            width: 95%;
             max-width: 500px;
             animation: slideIn 0.3s;
         }
@@ -339,20 +344,24 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .modal-header h2 {
             color: #333;
             margin: 0;
+            font-size: 1.3em;
         }
 
         .close-btn {
             background: none;
             border: none;
-            font-size: 2em;
+            font-size: 1.8em;
             cursor: pointer;
             color: #999;
+            padding: 0;
+            min-width: auto;
+            flex: 0;
         }
 
         .close-btn:hover {
@@ -360,10 +369,11 @@
         }
 
         .alert {
-            padding: 15px;
-            margin-bottom: 20px;
+            padding: 12px 15px;
+            margin-bottom: 15px;
             border-radius: 5px;
             font-weight: 500;
+            font-size: 0.95em;
         }
 
         .alert-success {
@@ -378,16 +388,182 @@
             border: 1px solid #bee5eb;
         }
 
+        /* ==================== RESPONSIVE DESIGN ==================== */
 
+        /* Tablet (768px - 1024px) */
+        @media (max-width: 1024px) {
+            .form-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
 
+        /* Mobile (up to 768px) */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
 
+            header {
+                padding: 20px 15px;
+            }
+
+            header h1 {
+                font-size: 1.5em;
+            }
+
+            header p {
+                font-size: 0.9em;
+            }
+
+            .content {
+                padding: 15px;
+            }
+
+            .form-section {
+                padding: 15px;
+            }
+
+            .form-section h2 {
+                font-size: 1.2em;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .form-group {
+                margin-bottom: 12px;
+            }
+
+            label {
+                font-size: 0.85em;
+            }
+
+            input[type="text"],
+            input[type="number"],
+            input[type="email"],
+            select,
+            textarea {
+                padding: 10px;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+                padding: 14px;
+            }
+
+            .products-section h2 {
+                font-size: 1.2em;
+            }
+
+            .category-filter {
+                gap: 6px;
+            }
+
+            .category-filter button {
+                padding: 8px 12px;
+                font-size: 0.8em;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .product-image {
+                height: 200px;
+            }
+
+            .product-card h3 {
+                font-size: 1em;
+            }
+
+            .product-details {
+                font-size: 0.85em;
+            }
+
+            .price {
+                font-size: 1.1em;
+            }
+
+            .product-actions {
+                flex-direction: row;
+            }
+
+            .btn-edit, .btn-delete {
+                padding: 12px;
+            }
+
+            .modal-content {
+                margin: 10% auto;
+                padding: 15px;
+                width: 95%;
+            }
+
+            .modal-header h2 {
+                font-size: 1.2em;
+            }
+        }
+
+        /* Small Mobile (up to 480px) */
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 1.3em;
+            }
+
+            .form-section h2,
+            .products-section h2 {
+                font-size: 1.1em;
+            }
+
+            .product-image {
+                height: 160px;
+            }
+
+            .category-filter button {
+                padding: 6px 10px;
+                font-size: 0.75em;
+            }
+        }
+
+        /* Large Desktop (1200px+) */
+        @media (min-width: 1200px) {
+            .content {
+                padding: 30px;
+            }
+
+            .form-section {
+                padding: 25px;
+            }
+
+            header {
+                padding: 30px;
+            }
+
+            header h1 {
+                font-size: 2.2em;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>📦 Product Management</h1>
-            <p>Manage your Refilling,Supermarket & Second-hand Items</p>
+            <p>Manage your Refilling, Supermarket & Second-hand Items</p>
         </header>
 
         <div class="content">
@@ -468,6 +644,7 @@
                     <button class="category-btn" data-category="Supermarket">Supermarket</button>
                     <button class="category-btn" data-category="Second-hand">Second-hand Items</button>
                     <button class="category-btn" data-category="Refilling">Refilling</button>
+                    <button class="category-btn" data-category="grocery delivery">Grocery</button>
                 </div>
 
                 <div id="alertBox"></div>
@@ -500,6 +677,7 @@
                         <option value="Supermarket">Supermarket</option>
                         <option value="Second-hand">Second-hand Items</option>
                         <option value="Refilling">Refilling Services</option>
+                        <option value="Grocery">Grocery Pick</option>
                     </select>
                 </div>
 
@@ -573,9 +751,17 @@
                 { name: 'Furniture', link: 'second-hand items.html', page: 'Second-hand' }
             ],
             'Refilling': [
-                { name: 'Gas', link: 'gas-refill.html', page: 'Gas Refilling' },
+                 { name: 'Gas', link: 'gas-refill.html', page: 'Gas Refilling' },
                 { name: 'Water', link: 'water-refill.html', page: 'Water Refilling' }
+
             ]
+
+            'Grocery': [
+                { name: 'Grocery', link: 'grocery delivery.html', page: 'Grocery Pick' },
+                
+
+            ]
+
         };
 
         // Product Management System
@@ -785,11 +971,13 @@
             }
 
             document.getElementById('editModal').style.display = 'block';
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
         }
 
         // Close Edit Modal
         function closeEditModal() {
             document.getElementById('editModal').style.display = 'none';
+            document.body.style.overflow = 'auto'; // Restore scrolling
             editingProductId = null;
         }
 
@@ -858,14 +1046,15 @@
             }
         });
 
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeEditModal();
+            }
+        });
+
         // Initialize
         loadProducts();
-
-
-// Duplicate local submit handler removed — DataManager is used instead.
-
-
-
     </script>
 </body>
 </html>

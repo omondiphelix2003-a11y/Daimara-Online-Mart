@@ -7,120 +7,455 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 :root {
-  --primary:rgb(233, 157, 17);
-  --bg:#f4f6f9;
-  --card:#ffffff;
+  --primary: rgb(233, 157, 17);
+  --bg: #f4f6f9;
+  --card: #ffffff;
+  --text: #333333;
+  --border: #e0e0e0;
 }
-body{margin:0;font-family:Arial;background:var(--bg);} 
-.topbar{background:var(--primary);padding:16px 24px;display:flex;justify-content:space-between;align-items:center;}
-.topbar h1{margin:0;color:black;}
-.btn{background:black;color:white;border:none;padding:10px 16px;border-radius:8px;cursor:pointer;}
-.container{padding:24px;}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px;margin-bottom:25px;}
-.card{background:var(--card);border-radius:12px;padding:20px;box-shadow:0 6px 15px rgba(0, 0, 0, 0.945);} 
-.card:hover{background-color: rgb(233, 157, 17);color: aliceblue;}
-.table{width:100%;border-collapse:collapse;margin-top:10px;}
-.table th,.table td{padding:12px;border-bottom:1px solid #eee;text-align:left;font-size:16px;}
-.section{margin-top:30px;}
-.section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
-.sub-btn{padding:8px 12px;border:none;border-radius:6px;cursor:pointer;background:#111;color:var(--primary);} 
-.move-btn{background:#16a34a;color:black;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;}
-input[type='number']{width:70px;padding:5px;}
-.email-actions button{margin-right:6px;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;}
-.whatsapp{background:#25D366;color:black;}
-.gmail{background:#EA4335;color:black;}
-.hidden{display:none;}
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 2000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.5);
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #111827;
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* TOPBAR */
+.topbar {
+  background: var(--primary);
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
+  flex-wrap: wrap;
+  gap: 15px;
 }
-.modal-content {
-  background: #fff;
-  padding: 30px;
-  border-radius: 12px;
-  max-width: 600px;
-  width: 90%;
-  max-height: 80vh;
-  overflow-y: auto;
-  position: relative;
+
+.topbar h1 {
+  margin: 0;
   color: black;
+  font-size: clamp(1.2rem, 4vw, 1.8rem);
 }
-.close-modal {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  font-size: 30px;
-  cursor: pointer;
-  color: #777;
+
+.topbar-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
 }
-.delete-btn {
-  background: #ef4444;
+
+.btn {
+  background: black;
   color: white;
   border: none;
-  padding: 4px 8px;
-  border-radius: 4px;
+  padding: 12px 18px;
+  border-radius: 8px;
   cursor: pointer;
-  float: right;
-  font-size: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  white-space: nowrap;
 }
-.blurry-text {
-  filter: blur(5px);
+
+.btn:hover {
+  background: #333;
+  transform: translateY(-2px);
+}
+
+/* CONTAINER */
+.container {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* GRID & CARDS */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+.card {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.card h3 {
+  margin: 0 0 12px 0;
+  font-size: 0.95rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.card strong {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  color: var(--primary);
+}
+
+.card p {
+  margin: 8px 0 0 0;
+  font-size: 0.8rem;
+  color: #888;
+}
+
+/* SECTIONS */
+.section {
+  margin-top: 35px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.section-header h2 {
+  margin: 0;
+  font-size: clamp(1.1rem, 3vw, 1.4rem);
+  color: #222;
+}
+
+/* TABLES */
+.table-container {
+  overflow-x: auto;
+  background: var(--card);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 500px;
+}
+
+.table th,
+.table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  font-size: 0.95rem;
+}
+
+.table th {
+  background: #f8f9fa;
+  font-weight: 600;
+  color: #555;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+}
+
+.table tr:hover {
+  background: #f8f9fa;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+/* FORM ELEMENTS */
+input[type='number'] {
+  width: 80px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 1rem;
+  text-align: center;
+}
+
+input[type='number']:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+/* BUTTONS */
+.sub-btn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
   cursor: pointer;
-  transition: filter 0.3s;
-  user-select: none;
-}
-.blurry-text:hover {
-  filter: blur(2px);
-}
-.blurry-text.revealed {
-  filter: blur(0);
-  user-select: auto;
+  background: #111;
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
 }
 
-/* Store Management Styles */
-.store-card {
-  background: #f0f0f0;
-  border-left: 4px solid var(--primary);
-  padding: 12px;
-  margin: 8px 0;
-  border-radius: 4px;
-  position: relative;
+.sub-btn:hover {
+  background: #333;
 }
 
-.store-card:hover {
-  background: #e8e8e8;
-}
-
-input[type='text'] {
-  border: 1px solid #ddd;
-  padding: 10px;
-  border-radius: 6px;
-  font-size: 16px;
-}
-
-select {
-  border: 1px solid #ddd;
-  padding: 10px;
-  border-radius: 6px;
-  font-size: 16px;
-  background: white;
+.move-btn {
+  background: #16a34a;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
   cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.move-btn:hover {
+  background: #15803d;
+}
+
+/* EMAIL ACTIONS */
+.email-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.email-actions button {
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.whatsapp {
+  background: #25D366;
+  color: white;
+}
+
+.whatsapp:hover {
+  background: #128C7E;
+}
+
+.gmail {
+  background: #EA4335;
+  color: white;
+}
+
+.gmail:hover {
+  background: #C5221F;
+}
+
+/* SUB WAREHOUSE CARDS */
+#subWarehouseList .card {
+  text-align: center;
+}
+
+#subWarehouseList .card strong {
+  display: block;
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+#subWarehouseList .card br {
+  display: none;
+}
+
+/* HIDDEN */
+.hidden {
+  display: none;
+}
+
+/* ==================== */
+/* TABLET STYLES (768px+) */
+/* ==================== */
+@media (min-width: 768px) {
+  .topbar {
+    padding: 18px 30px;
+  }
+
+  .container {
+    padding: 30px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+  }
+
+  .card {
+    padding: 28px;
+  }
+
+  .section {
+    margin-top: 40px;
+  }
+
+  .table th,
+  .table td {
+    padding: 16px 20px;
+  }
+}
+
+/* ==================== */
+/* DESKTOP STYLES (1024px+) */
+/* ==================== */
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .container {
+    padding: 40px;
+  }
+}
+
+/* ==================== */
+/* MOBILE STYLES (max 767px) */
+/* ==================== */
+@media (max-width: 767px) {
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 15px;
+  }
+
+  .topbar-actions {
+    width: 100%;
+  }
+
+  .btn {
+    flex: 1;
+    padding: 12px;
+    font-size: 0.85rem;
+  }
+
+  .container {
+    padding: 15px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .card {
+    padding: 20px;
+  }
+
+  .section {
+    margin-top: 25px;
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .table th,
+  .table td {
+    padding: 12px;
+    font-size: 0.9rem;
+  }
+
+  input[type='number'] {
+    width: 60px;
+    padding: 8px;
+  }
+
+  .move-btn {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+
+  .email-actions button {
+    padding: 10px 12px;
+  }
+}
+
+/* ==================== */
+/* SMALL MOBILE (max 480px) */
+/* ==================== */
+@media (max-width: 480px) {
+  .topbar h1 {
+    font-size: 1.1rem;
+  }
+
+  .btn {
+    font-size: 0.8rem;
+    padding: 10px 12px;
+  }
+
+  .card {
+    padding: 18px;
+  }
+
+  .card strong {
+    font-size: 1.5rem;
+  }
+
+  .table {
+    min-width: 400px;
+  }
+
+  .table th,
+  .table td {
+    padding: 10px;
+    font-size: 0.85rem;
+  }
+
+  input[type='number'] {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  .email-actions {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .email-actions button {
+    width: 100%;
+    padding: 10px;
+  }
+}
+
+/* ==================== */
+/* LANDSCAPE MOBILE */
+/* ==================== */
+@media (max-height: 500px) and (orientation: landscape) {
+  .topbar {
+    padding: 12px 20px;
+  }
+
+  .container {
+    padding: 15px;
+  }
 }
 </style>
+<base target="_blank">
+</head>
+
 <body>
 
 <div class="topbar">
-  <h1>Daimara Operators Panel</h1>
-  <div>
-    <button class="btn" onclick="createSubWarehouse()">Create Sub-Warehouse</button>
+  <h1><i class="fas fa-warehouse"></i> Daimara Operators Panel</h1>
+  <div class="topbar-actions">
+    <button class="btn" onclick="createSubWarehouse()"><i class="fas fa-plus"></i> Create Sub-Warehouse</button>
+    <button class="btn" onclick="openPlatform()"><i class="fas fa-external-link-alt"></i> Open Platform</button>
   </div>
 </div>
 
@@ -131,1032 +466,189 @@ select {
     <div class="card" onclick="toggleWarehouseView()" style="cursor:pointer;">
       <h3>Main Warehouse Stock</h3>
       <strong id="totalStock">170 Units</strong>
-      <p style="font-size:12px;color:gray;">(Click to view contents only)</p>
+      <p><i class="fas fa-hand-pointer"></i> Click to view contents</p>
     </div>
-    <div class="card"><h3>Sub Warehouses</h3><strong id="subCount">0 Active</strong></div>
+    <div class="card">
+      <h3>Sub Warehouses</h3>
+      <strong id="subCount">0 Active</strong>
+      <p>Active distribution centers</p>
+    </div>
   </div>
-
-<a href="main warehouse.html" class="btn btn-success" style="color: rgb(233, 157, 17);"><i class="fas fa-plus"></i> main warehouse</a>
 
   <!-- MAIN WAREHOUSE CONTENT ONLY -->
   <div id="warehouseSection" class="section hidden">
     <div class="section-header">
-      <h2>Main Warehouse Contents</h2>
-      <button class="btn" onclick="openTransferModal()" style="background: var(--primary); color: black;"><i class="fas fa-exchange-alt"></i> Transfer Product</button>
+      <h2><i class="fas fa-boxes"></i> Main Warehouse Contents</h2>
     </div>
-    <table class="table">
-      <thead>
-        <tr><th>Product</th><th>Stock</th><th>Moved Qty</th><th>Move Qty</th><th></th></tr>
-      </thead>
-      <tbody id="warehouseTable"></tbody>
-    </table>
+    <div class="table-container">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Stock</th>
+            <th>Move Qty</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="warehouseTable"></tbody>
+      </table>
+    </div>
   </div>
 
   <!-- SUB WAREHOUSES -->
   <div class="section">
     <div class="section-header">
-      <h2>Sub Warehouses Platforms</h2>
+      <h2><i class="fas fa-store"></i> Sub Warehouses Platforms</h2>
     </div>
-    <div class="grid" id="subWarehouseList"></div>
-  </div>
-
-  <!-- ORDERS SECTION -->
-  <div class="section" style="border: 2px solid var(--primary); background: #fffbf0;">
-    <div class="section-header">
-      <h2>📦 Pending Orders for Packaging <span id="orderCount" style="background: var(--primary); color: black; padding: 2px 8px; border-radius: 50%; font-size: 14px; margin-left: 10px;">0</span></h2>
+    <div class="grid" id="subWarehouseList">
+      <!-- Sub warehouses will be rendered here -->
     </div>
-    <table class="table">
-      <thead>
-        <tr><th>Order ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Action</th></tr>
-      </thead>
-      <tbody id="ordersTable">
-        <!-- Orders will be injected here -->
-      </tbody>
-    </table>
   </div>
 
   <!-- CLIENT EMAILS -->
   <div class="section">
-    <div class="section-header"><h2>Client Emails</h2></div>
-    <table class="table">
-      <thead>
-        <tr><th>Email</th><th>Phone</th><th>Message</th><th>Reply</th><th>Delete</th></tr>
-      </thead>
-      <tbody id="clientEmailsTable">
-        <!-- Data will be injected here -->
-      </tbody>
-    </table>
-  </div>
-
-</div>
-
-<!-- SUB WAREHOUSE MODAL -->
-<div id="subWarehouseModal" class="modal">
-  <div class="modal-content">
-    <span class="close-modal" onclick="closeSubModal()">&times;</span>
-    <h2 id="modalSWName">Sub Warehouse</h2>
-    <button class="btn" style="margin-bottom: 15px;" onclick="openCreateStoreModal(getCurrentSubWarehouseId())"><i class="fas fa-plus"></i> Create Store</button>
-    <hr>
-    <h3>Stores in this Sub Warehouse:</h3>
-    <div id="storesListInModal"></div>
-    <hr>
-    <h3>Products in this Sub Warehouse:</h3>
-    <table class="table">
-      <thead>
-        <tr><th>Product</th><th>Quantity</th><th>Action</th></tr>
-      </thead>
-      <tbody id="modalSWTable"></tbody>
-    </table>
-  </div>
-</div>
-
-<!-- CREATE STORE MODAL -->
-<div id="createStoreModal" class="modal">
-  <div class="modal-content">
-    <span class="close-modal" onclick="closeCreateStoreModal()">&times;</span>
-    <h2>Create New Store</h2>
-    <hr>
-    <input type="text" id="storeName" placeholder="Store Name" style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #ddd;">
-    <button class="btn" style="width: 100%; background: #16a34a;" onclick="saveNewStore()">Create Store</button>
-  </div>
-</div>
-
-<!-- VIEW STORE MODAL -->
-<div id="viewStoreModal" class="modal">
-  <div class="modal-content">
-    <span class="close-modal" onclick="closeViewStoreModal()">&times;</span>
-    <h2 id="storeModalName">Store Contents</h2>
-    <hr>
-    <table class="table">
-      <thead>
-        <tr><th>Product</th><th>Store Qty</th><th>Sub Warehouse Qty</th><th>Action</th></tr>
-      </thead>
-      <tbody id="storeModalTable"></tbody>
-    </table>
-    <hr>
-    <h3>Add Products to Store:</h3>
-    <select id="productSelectForStore" style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #ddd;">
-      <option value="">Select Product</option>
-    </select>
-    <input type="number" id="productQtyForStore" placeholder="Quantity" min="1" style="width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #ddd;">
-    <button class="btn" style="width: 100%; background: #16a34a;" onclick="addProductToStore()">Add Product</button>
-  </div>
-</div>
-
-<!-- TRANSFER MODAL -->
-<div id="transfer-modal" class="modal" style="display: none;">
-  <div class="modal-content">
-    <span class="close-modal" onclick="closeTransferModal()">&times;</span>
-    <div class="modal-header">
-      <h2>Transfer Product Between Sub-Warehouses</h2>
+    <div class="section-header">
+      <h2><i class="fas fa-envelope"></i> Client Emails</h2>
     </div>
-    <form onsubmit="executeTransfer(event)">
-      <div style="margin-bottom: 20px;">
-        <label style="display: block; margin-bottom: 8px; font-weight: 600;">From Sub-Warehouse:</label>
-        <select id="transfer-from" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px;" onchange="updateProductsDropdown()">
-          <option value="">Select source sub-warehouse...</option>
-        </select>
-      </div>
-
-      <div style="margin-bottom: 20px;">
-        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Product:</label>
-        <select id="transfer-product" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px;" onchange="updateAvailableQuantity()">
-          <option value="">Select product...</option>
-        </select>
-        <div id="available-qty" style="margin-top: 8px; font-size: 14px; color: #666;"></div>
-      </div>
-
-      <div style="margin-bottom: 20px;">
-        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Quantity to Transfer:</label>
-        <input type="number" id="transfer-qty" required min="1" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px;" />
-      </div>
-
-      <div style="margin-bottom: 20px;">
-        <label style="display: block; margin-bottom: 8px; font-weight: 600;">To Sub-Warehouse:</label>
-        <select id="transfer-to" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px;">
-          <option value="">Select destination sub-warehouse...</option>
-        </select>
-      </div>
-
-      <div style="display: flex; gap: 10px; margin-top: 25px;">
-        <button type="submit" class="btn" style="flex: 1; background: #16a34a;"><i class="fas fa-check"></i> Transfer</button>
-        <button type="button" class="btn" style="flex: 1; background: #ccc; color: #000;" onclick="closeTransferModal()">Cancel</button>
-      </div>
-    </form>
+    <div class="table-container">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Message</th>
+            <th>Reply</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>customer@email.com</td>
+            <td>+254742120329</td>
+            <td>Where is my delivery?</td>
+            <td>
+              <div class="email-actions">
+                <button class="whatsapp" onclick="window.open('https://wa.me/254742120329', '_blank')" title="Reply via WhatsApp">
+                  <i class="fab fa-whatsapp"></i>
+                </button>
+                <button class="gmail" onclick="window.open('mailto:omondiphelix2003@gmail.com', '_blank')" title="Reply via Email">
+                  <i class="fas fa-envelope"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
+
 </div>
 
-<script src="data-manager.js"></script>
 <script>
-let warehouse = [];
+let warehouse = [
+  {id: 1, name: 'Cooking Oil 5L', stock: 120},
+  {id: 2, name: 'Rice 2kg', stock: 50}
+];
 let subWarehouses = [];
-let currentSubWarehouseId = null;
-let currentStoreId = null;
 
 function renderWarehouse() {
-  warehouse = DataManager.getWarehouse();
-  subWarehouses = DataManager.getSubWarehouses();
   const table = document.getElementById('warehouseTable');
   table.innerHTML = '';
-
   warehouse.forEach(p => {
-    // Calculate total moved quantity for this product across all sub-warehouses
-    const totalMoved = subWarehouses.reduce((sum, sw) => {
-      const item = sw.stock.find(i => String(i.id) === String(p.id) || i.name === p.name);
-      return sum + (item ? (item.qty || 0) : 0);
-    }, 0);
-
     table.innerHTML += `
-    <tr>
-      <td>${p.name}</td>
-      <td>${p.quantity || p.stock || 0}</td>
-      <td><span style="color:var(--primary); font-weight:bold;">${totalMoved}</span></td>
-      <td><input type="number" id="move-${p.id}" min="1" style="width:60px"></td>
-      <td>
-        <button class="move-btn" onclick="showWarehouseDropdown('${p.id}',this)">
-          Move
-        </button>
-      </td>
-    </tr>`;
+      <tr>
+        <td><strong>${p.name}</strong></td>
+        <td><span id="stock-${p.id}" style="color: var(--primary); font-weight: 600;">${p.stock}</span></td>
+        <td><input type="number" id="move-${p.id}" min="1" max="${p.stock}" placeholder="Qty"></td>
+        <td><button class="move-btn" onclick="moveStock(${p.id})"><i class="fas fa-arrow-right"></i> Move</button></td>
+      </tr>`;
   });
-
   updateTotalStock();
 }
 
-function showWarehouseDropdown(productId, btn) {
-  subWarehouses = DataManager.getSubWarehouses();
-  if (subWarehouses.length === 0) {
-    alert("Create a sub warehouse first");
-    return;
-  }
-
-  const old = document.querySelector('.dropdown-select');
-  if (old) old.remove();
-
-  const select = document.createElement('select');
-  select.className = 'dropdown-select';
-
-  select.innerHTML = `
-    <option value="">Select warehouse</option>
-    ${subWarehouses.map((sw) =>
-    `<option value="${sw.id}">${sw.name}</option>`
-  ).join('')}
-  `;
-
-  select.onchange = function () {
-    if (this.value !== "") {
-      moveStockToWarehouse(productId, this.value);
-      this.remove();
-    }
-  };
-
-  btn.parentElement.appendChild(select);
-}
-
-function moveStockToWarehouse(productId, swId) {
-  const product = warehouse.find(p => String(p.id) === String(productId));
-  const qtyInput = document.getElementById(`move-${productId}`);
+function moveStock(id) {
+  const product = warehouse.find(p => p.id === id);
+  const qtyInput = document.getElementById(`move-${id}`);
   const qty = parseInt(qtyInput.value);
-
-  const currentStock = product.quantity || product.stock || 0;
-
-  if (!qty || qty <= 0 || qty > currentStock) {
-    alert("Invalid quantity");
-    return;
-  }
-
-  subWarehouses = DataManager.getSubWarehouses();
-  const selectedWarehouse = subWarehouses.find(sw => sw.id === swId);
-
-  if (!selectedWarehouse) {
-    alert("Sub warehouse not found");
-    return;
-  }
-
-  // Update Main Warehouse
-  if (product.quantity !== undefined) {
-    product.quantity -= qty;
-    DataManager.updateWarehouseQuantity(productId, product.quantity);
-  } else if (product.stock !== undefined) {
-    product.stock -= qty;
-    DataManager.updateWarehouseQuantity(productId, product.stock);
-  }
-
-  // Update Sub Warehouse
-  const existingItem = selectedWarehouse.stock.find(i => String(i.id) === String(product.id) || i.name === product.name);
-  if (existingItem) {
-    existingItem.qty += qty;
-  } else {
-    selectedWarehouse.stock.push({
-      id: product.id,
-      name: product.name,
-      qty: qty
-    });
-  }
-
-  DataManager.updateSubWarehouse(swId, { stock: selectedWarehouse.stock });
-
-  qtyInput.value = "";
-  renderWarehouse();
-  renderSubWarehouses();
-
-  alert(qty + " units moved to " + selectedWarehouse.name);
-}
-
-function createSubWarehouse() {
-  const name = prompt("Enter Sub Warehouse Name:");
-  if (!name) return;
-
-  DataManager.addSubWarehouse(name);
-  renderSubWarehouses();
-}
-
-function deleteSubWarehouse(id, event) {
-  event.stopPropagation();
-  if (!confirm("Are you sure you want to delete this sub-warehouse? All stock will be returned to the main warehouse.")) return;
-  
-  const sw = subWarehouses.find(s => s.id === id);
-  if (sw && sw.stock.length > 0) {
-    const mainWarehouse = DataManager.getWarehouse();
-    sw.stock.forEach(item => {
-      const mainProduct = mainWarehouse.find(p => String(p.id) === String(item.id) || p.name === item.name);
-      if (mainProduct) {
-        const currentQty = mainProduct.quantity || 0;
-        DataManager.updateWarehouseQuantity(mainProduct.id, currentQty + (item.qty || 0));
-      }
-    });
-  }
-
-  DataManager.deleteSubWarehouse(id);
-  renderWarehouse();
-  renderSubWarehouses();
-}
-
-function viewSubWarehouse(id) {
-  // Reload sub warehouses from DataManager to get latest data
-  subWarehouses = DataManager.getSubWarehouses();
-
-  const sw = subWarehouses.find(s => s.id === id);
-  if (!sw) return;
-
-  currentSubWarehouseId = id;
-  document.getElementById('modalSWName').innerText = sw.name;
-  
-  // Display stores list
-  const storesList = document.getElementById('storesListInModal');
-  const stores = sw.stores || [];
-  storesList.innerHTML = stores.length > 0
-    ? stores.map(store => `
-      <div class="card" style="margin-bottom: 10px; cursor: pointer;" onclick="viewStoreContents('${id}', '${store.id}')">
-        <strong>${store.name}</strong><br>
-        <span style="font-size:12px; color:#555;">${store.products ? store.products.length : 0} products</span>
-        <button class="delete-btn" onclick="deleteStore('${id}', '${store.id}', event)">Delete</button>
-      </div>`).join('')
-    : '<p style="color: #999;">No stores created yet. Click "Create Store" to add one.</p>';
-
-  const tbody = document.getElementById('modalSWTable');
-  tbody.innerHTML = sw.stock && sw.stock.length > 0
-    ? sw.stock.map((item, index) => `
-      <tr>
-        <td>${item.name}</td>
-        <td style="font-weight: bold; color: ${item.qty <= 5 ? 'red' : 'green'};">
-          ${item.qty} units
-        </td>
-        <td>
-          <input type="number" id="sw-qty-${id}-${index}" value="${item.qty}" 
-                 style="width:70px; color: ${item.qty <= 5 ? 'red' : 'black'}; font-weight: ${item.qty <= 5 ? 'bold' : 'normal'};">
-          <button class="sub-btn" onclick="saveSubWarehouseQty('${id}', ${index})">Update</button>
-        </td>
-      </tr>`).join('')
-    : '<tr><td colspan="3" style="text-align:center">No products in this warehouse</td></tr>';
-
-  document.getElementById('subWarehouseModal').style.display = 'flex';
-}
-
-function saveSubWarehouseQty(swId, itemIndex) {
-  const sw = subWarehouses.find(s => s.id === swId);
-  if (!sw) return;
-
-  const item = sw.stock[itemIndex];
-  const oldQty = item.qty || 0;
-  const newQty = parseInt(document.getElementById(`sw-qty-${swId}-${itemIndex}`).value);
-  
-  if (isNaN(newQty) || newQty < 0) {
-    alert("Please enter a valid quantity");
-    return;
-  }
-
-  const diff = newQty - oldQty; // positive = more to sub, negative = return to main
-
-  if (diff !== 0) {
-    const mainWarehouse = DataManager.getWarehouse();
-    const mainProduct = mainWarehouse.find(p => String(p.id) === String(item.id) || p.name === item.name);
-    
-    if (mainProduct) {
-      const currentMainQty = mainProduct.quantity || 0;
-      if (diff > 0 && currentMainQty < diff) {
-        alert("Insufficient stock in main warehouse");
-        return;
-      }
-      DataManager.updateWarehouseQuantity(mainProduct.id, currentMainQty - diff);
-    }
-  }
-
-  // Update Sub Warehouse
-  if (newQty === 0) {
-    sw.stock.splice(itemIndex, 1);
-    alert("Product removed from sub-warehouse and stock returned to main.");
-  } else {
-    item.qty = newQty;
-  }
-  
-  DataManager.updateSubWarehouse(swId, { stock: sw.stock });
-  
-  renderWarehouse(); 
-  renderSubWarehouses();
-  
-  if (newQty === 0) {
-    closeSubModal();
-  } else {
-    viewSubWarehouse(swId); 
-  }
-}
-
-function closeSubModal() {
-  document.getElementById('subWarehouseModal').style.display = 'none';
-}
-
-function renderSubWarehouses() {
-  subWarehouses = DataManager.getSubWarehouses();
-  const list = document.getElementById('subWarehouseList');
-  const countDisplay = document.getElementById('subCount');
-  list.innerHTML = '';
-  countDisplay.innerText = subWarehouses.length + " Active";
-
-  subWarehouses.forEach(sw => {
-    const storeCount = sw.stores ? sw.stores.length : 0;
-    list.innerHTML += `
-      <div class="card" onclick="viewSubWarehouse('${sw.id}')" style="cursor:pointer; position:relative;">
-        <button class="delete-btn" onclick="deleteSubWarehouse('${sw.id}', event)">Delete</button>
-        <strong>${sw.name}</strong><br>
-        <span style="font-size:14px; color:#555;">${sw.stock.length} products | ${storeCount} store(s)</span><br>
-        <button class="sub-btn" style="margin-top: 10px; width: 100%;" onclick="openCreateStoreModal('${sw.id}'); event.stopPropagation();">
-          <i class="fas fa-plus"></i> Create Store
-        </button>
-      </div>`;
-  });
-}
-
-function renderEmails() {
-  const emails = DataManager.getClientEmails() || [];
-  const tbody = document.getElementById('clientEmailsTable');
-  if (!tbody) return;
-
-  tbody.innerHTML = emails.map(e => {
-    const isRead = e.status === 'read';
-    return `
-      <tr>
-        <td>${e.email}</td>
-        <td>${e.phone || 'N/A'}</td>
-        <td class="blurry-text ${isRead ? 'revealed' : ''}" 
-            onclick="revealMessage('${e.id}', this)" 
-            style="cursor: ${isRead ? 'default' : 'pointer'};">
-          ${e.message}
-        </td>
-        <td class="email-actions">
-          ${e.phone && e.phone !== 'N/A' ? `
-            <button class="whatsapp" onclick="window.location.href='https://wa.me/${e.phone.replace(/\+/g, '').replace(/\s/g, '')}'"><i class="fab fa-whatsapp"></i></button>
-          ` : ''}
-          <button class="gmail" onclick="window.location.href='mailto:omondiphelix2003@gmail.com'"><i class="fas fa-envelope"></i></button>
-        </td>
-        <td>
-          <button class="btn" style="background:#ef4444; padding:5px 10px;" onclick="deleteOperatorEmail('${e.id}')"><i class="fas fa-trash"></i></button>
-        </td>
-      </tr>
-    `;
-  }).join('') || '<tr><td colspan="5" style="text-align:center">No messages</td></tr>';
-}
-
-function revealMessage(id, el) {
-  el.classList.add('revealed');
-  DataManager.markMessageAsRead(id);
-  renderEmails(); // Refresh local UI
-}
-
-function deleteOperatorEmail(id) {
-  if (!confirm("Are you sure you want to delete this message?")) return;
-  DataManager.deleteMessage(id);
-  renderEmails();
-}
-
-function toggleWarehouseView() {
-  document.getElementById('warehouseSection').classList.toggle('hidden');
-}
-
-function updateTotalStock() {
-  const total = warehouse.reduce((sum, p) => sum + (p.quantity || p.stock || 0), 0);
-  document.getElementById('totalStock').innerText = total + " Units";
-}
-
-// STORE MANAGEMENT FUNCTIONS
-function getCurrentSubWarehouseId() {
-  return currentSubWarehouseId;
-}
-
-function liveUpdateSubWarehouseQty(swId, storeId, itemIndex, newValue) {
-  // Reload latest data to get current quantities
-  subWarehouses = DataManager.getSubWarehouses();
-
-  const sw = subWarehouses.find(s => s.id === swId);
-  if (!sw) return;
-
-  const store = sw.stores ? sw.stores.find(st => st.id === storeId) : null;
-  if (!store || !store.products || !store.products[itemIndex]) return;
-
-  const item = store.products[itemIndex];
-  const newQty = parseInt(newValue) || 0;
-
-  // Get the original quantity from the input's data attribute
-  const inputElement = document.getElementById(`store-qty-${storeId}-${itemIndex}`);
-  if (!inputElement) return;
-  
-  const originalQtyValue = parseInt(inputElement.getAttribute('data-original-qty'));
-
-  // Find the sub warehouse product
-  const subWarehouseProduct = sw.stock.find(p => String(p.id) === String(item.id) || p.name === item.name);
-  if (!subWarehouseProduct) return;
-
-  // Calculate total available (unallocated in SW + currently allocated to this store)
-  const totalAvailable = subWarehouseProduct.qty + originalQtyValue;
-  
-  // Calculate what the sub warehouse quantity would be after this change
-  // Formula: Total Available - New Store Allocation = Remaining Unallocated SW Qty
-  const resultingSubWarehouseQty = totalAvailable - newQty;
-
-  // Update the display in real-time
-  const swQtyDisplay = document.getElementById(`sw-qty-value-${itemIndex}`);
-  if (swQtyDisplay) {
-    if (resultingSubWarehouseQty < 0) {
-      swQtyDisplay.style.fontWeight = 'bold';
-      swQtyDisplay.style.color = 'darkred';
-      swQtyDisplay.textContent = '⚠ INSUFFICIENT STOCK';
-    } else {
-      swQtyDisplay.style.fontWeight = resultingSubWarehouseQty <= 5 ? 'bold' : 'normal';
-      swQtyDisplay.style.color = resultingSubWarehouseQty <= 5 ? 'red' : 'green';
-      swQtyDisplay.textContent = resultingSubWarehouseQty + ' units';
-    }
-  }
-}
-
-function openCreateStoreModal(swId) {
-  currentSubWarehouseId = swId;
-  document.getElementById('storeName').value = '';
-  document.getElementById('createStoreModal').style.display = 'flex';
-}
-
-function closeCreateStoreModal() {
-  document.getElementById('createStoreModal').style.display = 'none';
-}
-
-function saveNewStore() {
-  const storeName = document.getElementById('storeName').value.trim();
-  if (!storeName) {
-    alert('Please enter a store name');
-    return;
-  }
-
-  const sw = subWarehouses.find(s => s.id === currentSubWarehouseId);
-  if (!sw) {
-    alert('Sub warehouse not found');
-    return;
-  }
-
-  if (!sw.stores) {
-    sw.stores = [];
-  }
-
-  const newStore = {
-    id: 'store_' + Date.now(),
-    name: storeName,
-    products: []
-  };
-
-  sw.stores.push(newStore);
-  DataManager.updateSubWarehouse(currentSubWarehouseId, { stores: sw.stores });
-
-  alert('Store "' + storeName + '" created successfully');
-  closeCreateStoreModal();
-  viewSubWarehouse(currentSubWarehouseId);
-  renderSubWarehouses();
-}
-
-function viewStoreContents(swId, storeId) {
-  currentSubWarehouseId = swId;
-  currentStoreId = storeId;
-
-  // Reload sub warehouses from DataManager to get latest data
-  subWarehouses = DataManager.getSubWarehouses();
-
-  const sw = subWarehouses.find(s => s.id === swId);
-  if (!sw) return;
-
-  const store = sw.stores ? sw.stores.find(st => st.id === storeId) : null;
-  if (!store) return;
-
-  document.getElementById('storeModalName').innerText = store.name + ' (Contents)';
-
-  // Display store products with real-time updating
-  const tbody = document.getElementById('storeModalTable');
-  const storeProducts = store.products || [];
-  tbody.innerHTML = storeProducts.length > 0
-    ? storeProducts.map((item, index) => `
-      <tr>
-        <td>${item.name}</td>
-        <td>
-          <input type="number" id="store-qty-${storeId}-${index}" value="${item.qty}" 
-                 data-original-qty="${item.qty}"
-                 data-product-id="${item.id}"
-                 onchange="updateStoreProductQty('${swId}', '${storeId}', ${index})"
-                 oninput="liveUpdateSubWarehouseQty('${swId}', '${storeId}', ${index}, this.value)"
-                 style="width:70px; color: ${item.qty <= 2 ? 'red' : 'black'}; font-weight: ${item.qty <= 2 ? 'bold' : 'normal'};">
-        </td>
-        <td id="sw-qty-display-${index}" style="font-weight: bold;">
-          Sub WH: <span id="sw-qty-value-${index}">-</span>
-        </td>
-        <td>
-          <button class="delete-btn" style="margin-left: 5px;" onclick="removeProductFromStore('${swId}', '${storeId}', ${index})">Remove</button>
-        </td>
-      </tr>`).join('')
-    : '<tr><td colspan="4" style="text-align:center">No products in this store yet</td></tr>';
-
-  // Initialize sub warehouse quantity display
-  storeProducts.forEach((item, index) => {
-    const subWarehouseProduct = sw.stock.find(p => String(p.id) === String(item.id) || p.name === item.name);
-    const swQtyDisplay = document.getElementById(`sw-qty-value-${index}`);
-    if (swQtyDisplay && subWarehouseProduct) {
-      swQtyDisplay.textContent = subWarehouseProduct.qty + ' units';
-      swQtyDisplay.style.color = subWarehouseProduct.qty <= 5 ? 'red' : 'green';
-    }
-  });
-
-  // Populate product dropdown
-  const availableProducts = sw.stock || [];
-  const productSelect = document.getElementById('productSelectForStore');
-  productSelect.innerHTML = '<option value="">Select Product</option>' +
-    availableProducts.map(p => `<option value="${p.id}">${p.name} (Available: ${p.qty})</option>`).join('');
-
-  document.getElementById('viewStoreModal').style.display = 'flex';
-}
-
-function closeViewStoreModal() {
-  document.getElementById('viewStoreModal').style.display = 'none';
-}
-
-function addProductToStore() {
-  const productSelect = document.getElementById('productSelectForStore');
-  const productQtyInput = document.getElementById('productQtyForStore');
-
-  const selectedProductId = productSelect.value;
-  const qty = parseInt(productQtyInput.value);
-
-  if (!selectedProductId) {
-    alert('Please select a product');
-    return;
-  }
 
   if (!qty || qty <= 0) {
     alert('Please enter a valid quantity');
     return;
   }
-
-  // Reload latest data
-  subWarehouses = DataManager.getSubWarehouses();
-
-  const sw = subWarehouses.find(s => s.id === currentSubWarehouseId);
-  if (!sw) return;
-
-  if (!sw.stores) {
-    sw.stores = [];
+  if (qty > product.stock) {
+    alert(`Insufficient stock. Available: ${product.stock} units`);
+    return;
   }
-
-  const store = sw.stores.find(st => st.id === currentStoreId);
-  if (!store) return;
-
-  // Check if sub warehouse has enough stock
-  const subWarehouseProduct = sw.stock.find(p => String(p.id) === String(selectedProductId));
-  if (!subWarehouseProduct || subWarehouseProduct.qty < qty) {
-    alert('Insufficient stock in sub warehouse');
+  if (subWarehouses.length === 0) {
+    alert('Please create a sub-warehouse first');
     return;
   }
 
-  // Initialize products array if not exists
-  if (!store.products) {
-    store.products = [];
-  }
+  product.stock -= qty;
+  subWarehouses[0].stock.push({name: product.name, qty: qty});
+  qtyInput.value = '';
+  renderWarehouse();
+  renderSubWarehouses();
+  alert(`${qty} units of ${product.name} moved successfully!`);
+}
 
-  // Check if product already in store
-  const existingProduct = store.products.find(p => String(p.id) === String(selectedProductId));
-  if (existingProduct) {
-    existingProduct.qty += qty;
+function createSubWarehouse() {
+  const name = prompt('Enter Sub Warehouse Name:');
+  if (!name || name.trim() === '') return;
+
+  subWarehouses.push({
+    name: name.trim(),
+    stock: [],
+    createdAt: new Date().toISOString()
+  });
+  renderSubWarehouses();
+}
+
+function renderSubWarehouses() {
+  const list = document.getElementById('subWarehouseList');
+  list.innerHTML = '';
+
+  if (subWarehouses.length === 0) {
+    list.innerHTML = `
+      <div class="card" style="text-align: center; color: #888;">
+        <i class="fas fa-store-slash" style="font-size: 2rem; margin-bottom: 10px; color: #ccc;"></i>
+        <p>No sub-warehouses yet</p>
+        <p style="font-size: 0.8rem;">Click "Create Sub-Warehouse" to add one</p>
+      </div>`;
   } else {
-    store.products.push({
-      id: subWarehouseProduct.id,
-      name: subWarehouseProduct.name,
-      qty: qty
+    subWarehouses.forEach((sw, index) => {
+      const totalItems = sw.stock.reduce((sum, item) => sum + item.qty, 0);
+      list.innerHTML += `
+        <div class="card">
+          <strong><i class="fas fa-store"></i> ${sw.name}</strong>
+          <p style="margin-top: 10px; color: #666;">${sw.stock.length} Products | ${totalItems} Total Items</p>
+        </div>`;
     });
   }
 
-  // Deduct from sub warehouse stock
-  subWarehouseProduct.qty -= qty;
-
-  DataManager.updateSubWarehouse(currentSubWarehouseId, { 
-    stores: sw.stores,
-    stock: sw.stock 
-  });
-
-  productQtyInput.value = '';
-  productSelect.value = '';
-  alert('Product added to store');
-  
-  // Refresh both store and sub warehouse views
-  renderWarehouse();
-  renderSubWarehouses();
-  viewStoreContents(currentSubWarehouseId, currentStoreId);
+  document.getElementById('subCount').innerText = subWarehouses.length + ' Active';
 }
 
-function updateStoreProductQty(swId, storeId, itemIndex) {
-  // Reload latest data
-  subWarehouses = DataManager.getSubWarehouses();
+function toggleWarehouseView() {
+  const section = document.getElementById('warehouseSection');
+  section.classList.toggle('hidden');
+}
 
-  const sw = subWarehouses.find(s => s.id === swId);
-  if (!sw) return;
-
-  const store = sw.stores ? sw.stores.find(st => st.id === storeId) : null;
-  if (!store) return;
-
-  if (!store.products || !store.products[itemIndex]) return;
-
-  const item = store.products[itemIndex];
-  const oldQty = item.qty;
-  const newQty = parseInt(document.getElementById(`store-qty-${storeId}-${itemIndex}`).value);
-
-  if (isNaN(newQty) || newQty < 0) {
-    alert('Please enter a valid quantity');
+function openPlatform() {
+  if (subWarehouses.length === 0) {
+    alert('Please create at least one sub-warehouse first');
     return;
   }
-
-  if (newQty === 0) {
-    alert('Quantity cannot be 0. Remove the product instead.');
-    return;
-  }
-
-  const diff = newQty - oldQty;
-
-  if (diff !== 0) {
-    const subWarehouseProduct = sw.stock.find(p => String(p.id) === String(item.id) || p.name === item.name);
-    if (subWarehouseProduct) {
-      if (diff > 0 && subWarehouseProduct.qty < diff) {
-        alert('Insufficient stock in sub warehouse');
-        return;
-      }
-      subWarehouseProduct.qty -= diff;
-    }
-  }
-
-  item.qty = newQty;
-  DataManager.updateSubWarehouse(swId, { 
-    stores: sw.stores,
-    stock: sw.stock 
-  });
-
-  alert('Quantity updated');
-  
-  // Refresh both store and sub warehouse views
-  renderWarehouse();
-  renderSubWarehouses();
-  viewStoreContents(swId, storeId);
+  alert('Sub Warehouse Platforms Opened');
 }
 
-function removeProductFromStore(swId, storeId, itemIndex) {
-  if (!confirm('Remove this product from store?')) return;
-
-  // Reload latest data
-  subWarehouses = DataManager.getSubWarehouses();
-
-  const sw = subWarehouses.find(s => s.id === swId);
-  if (!sw) return;
-
-  const store = sw.stores ? sw.stores.find(st => st.id === storeId) : null;
-  if (!store) return;
-
-  if (!store.products || !store.products[itemIndex]) return;
-
-  const item = store.products[itemIndex];
-
-  // Return stock to sub warehouse
-  const subWarehouseProduct = sw.stock.find(p => String(p.id) === String(item.id) || p.name === item.name);
-  if (subWarehouseProduct) {
-    subWarehouseProduct.qty += item.qty;
-  }
-
-  store.products.splice(itemIndex, 1);
-
-  DataManager.updateSubWarehouse(swId, { 
-    stores: sw.stores,
-    stock: sw.stock 
-  });
-
-  alert('Product removed from store');
-  
-  // Refresh both store and sub warehouse views
-  renderWarehouse();
-  renderSubWarehouses();
-  viewStoreContents(swId, storeId);
+function updateTotalStock() {
+  const total = warehouse.reduce((sum, p) => sum + p.stock, 0);
+  document.getElementById('totalStock').innerText = total + ' Units';
 }
 
-function deleteStore(swId, storeId, event) {
-  event.stopPropagation();
-  if (!confirm('Delete this store? All products will be returned to sub warehouse.')) return;
-
-  // Reload latest data
-  subWarehouses = DataManager.getSubWarehouses();
-
-  const sw = subWarehouses.find(s => s.id === swId);
-  if (!sw) return;
-
-  const store = sw.stores ? sw.stores.find(st => st.id === storeId) : null;
-  if (store && store.products) {
-    // Return all products to sub warehouse
-    store.products.forEach(storeProduct => {
-      const swProduct = sw.stock.find(p => String(p.id) === String(storeProduct.id) || p.name === storeProduct.name);
-      if (swProduct) {
-        swProduct.qty += storeProduct.qty;
-      }
-    });
-  }
-
-  if (sw.stores) {
-    sw.stores = sw.stores.filter(st => st.id !== storeId);
-  }
-
-  DataManager.updateSubWarehouse(swId, { 
-    stores: sw.stores,
-    stock: sw.stock 
-  });
-
-  alert('Store deleted');
-  
-  // Refresh all views
-  renderWarehouse();
-  renderSubWarehouses();
-  viewSubWarehouse(swId);
-}
-
-function openTransferModal() {
-  const modal = document.getElementById('transfer-modal');
-  const fromSelect = document.getElementById('transfer-from');
-  const toSelect = document.getElementById('transfer-to');
-  
-  subWarehouses = DataManager.getSubWarehouses();
-  fromSelect.innerHTML = '<option value="">Select source sub-warehouse...</option>';
-  toSelect.innerHTML = '<option value="">Select destination sub-warehouse...</option>';
-  
-  subWarehouses.forEach(sw => {
-    fromSelect.innerHTML += `<option value="${sw.id}">${sw.name}</option>`;
-    toSelect.innerHTML += `<option value="${sw.id}">${sw.name}</option>`;
-  });
-  
-  document.getElementById('transfer-product').innerHTML = '<option value="">Select product...</option>';
-  document.getElementById('transfer-qty').value = '';
-  modal.style.display = 'flex';
-}
-
-function closeTransferModal() {
-  document.getElementById('transfer-modal').style.display = 'none';
-}
-
-function updateProductsDropdown() {
-  const fromId = document.getElementById('transfer-from').value;
-  const productSelect = document.getElementById('transfer-product');
-  
-  if (!fromId) {
-    productSelect.innerHTML = '<option value="">Select product...</option>';
-    document.getElementById('available-qty').textContent = '';
-    return;
-  }
-  
-  subWarehouses = DataManager.getSubWarehouses();
-  const sourceSW = subWarehouses.find(sw => sw.id === fromId);
-  
-  if (!sourceSW) return;
-  
-  productSelect.innerHTML = '<option value="">Select product...</option>';
-  sourceSW.stock.forEach(item => {
-    productSelect.innerHTML += `<option value="${item.id}">${item.name} (${item.qty} available)</option>`;
-  });
-}
-
-function updateAvailableQuantity() {
-  const fromId = document.getElementById('transfer-from').value;
-  const productId = document.getElementById('transfer-product').value;
-  
-  if (!fromId || !productId) {
-    document.getElementById('available-qty').textContent = '';
-    return;
-  }
-  
-  subWarehouses = DataManager.getSubWarehouses();
-  const sourceSW = subWarehouses.find(sw => sw.id === fromId);
-  
-  if (!sourceSW) return;
-  
-  const product = sourceSW.stock.find(item => String(item.id) === String(productId));
-  if (product) {
-    document.getElementById('available-qty').textContent = `Available: ${product.qty} units`;
-  }
-}
-
-function executeTransfer(event) {
-  event.preventDefault();
-  
-  const productId = document.getElementById('transfer-product').value;
-  const fromId = document.getElementById('transfer-from').value;
-  const toId = document.getElementById('transfer-to').value;
-  const qty = parseInt(document.getElementById('transfer-qty').value);
-  
-  if (!productId || !fromId || !toId || !qty) {
-    alert('Please fill in all fields');
-    return;
-  }
-  
-  const result = DataManager.transferProductBetweenSubWarehouses(productId, fromId, toId, qty);
-  
-  if (result.success) {
-    alert(result.message);
-    closeTransferModal();
-    renderWarehouse();
-    renderSubWarehouses();
-  } else {
-    alert('Transfer failed: ' + result.message);
-  }
-}
-
-// Close modal on background click
-window.onclick = function(event) {
-  const transferModal = document.getElementById('transfer-modal');
-  if (event.target == transferModal) {
-    closeTransferModal();
-  }
-}
-
-// RENDER ORDERS FOR PACKAGING
-let previousOrderCount = 0;
-
-function renderOrders() {
-  const orders = DataManager.getAllOrders() || [];
-  const pendingOrders = orders.filter(o => o.status === 'pending');
-  
-  const tbody = document.getElementById('ordersTable');
-  const orderCountBadge = document.getElementById('orderCount');
-  
-  // Update badge count
-  if (orderCountBadge) {
-    orderCountBadge.textContent = pendingOrders.length;
-  }
-  
-  tbody.innerHTML = '';
-  
-  // Check if new orders arrived
-  if (pendingOrders.length > previousOrderCount) {
-    console.log('New orders received! Count:', pendingOrders.length);
-    scrollToOrdersSection();
-  }
-  previousOrderCount = pendingOrders.length;
-  
-  if (pendingOrders.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #666;">No pending orders</td></tr>';
-    return;
-  }
-  
-  pendingOrders.forEach(order => {
-    const itemsText = order.items ? order.items.map(i => `${i.name} (${i.qty || 1})`).join(', ') : 'N/A';
-    const amount = order.grandTotal || order.totalPrice || 0;
-    
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td><strong>${order.id || 'N/A'}</strong></td>
-      <td><span class="blurry-text">${order.customerName || 'N/A'}</span></td>
-      <td>${itemsText}</td>
-      <td>KES ${amount.toLocaleString()}</td>
-      <td><button class="btn" style="padding: 6px 12px; background: #16a34a;" onclick="sendOrderForPackaging('${order.id}')"><i class="fas fa-send"></i> Send for Packaging</button></td>
-    `;
-    tbody.appendChild(row);
-  });
-}
-
-function scrollToOrdersSection() {
-  const ordersSection = document.querySelector('h2');
-  const allH2s = Array.from(document.querySelectorAll('h2'));
-  const ordersH2 = allH2s.find(h => h.textContent === 'Pending Orders for Packaging');
-  
-  if (ordersH2) {
-    ordersH2.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    ordersH2.parentElement.parentElement.style.backgroundColor = '#fffacd';
-    setTimeout(() => {
-      ordersH2.parentElement.parentElement.style.backgroundColor = '';
-    }, 3000);
-  }
-}
-
-// SEND ORDER FOR PACKAGING
-function sendOrderForPackaging(orderId) {
-  const orders = DataManager.getAllOrders() || [];
-  const order = orders.find(o => o.id === orderId);
-  
-  if (!order) {
-    alert('Order not found');
-    return;
-  }
-  
-  if (confirm(`Send order ${order.id} for packaging?`)) {
-    order.status = 'in-packaging';
-    DataManager.saveOrders(orders);
-    renderOrders();
-    alert('Order sent to Packaging Queue for Executive Review');
-  }
-}
-
-// Initial renders
+// Initialize
 renderWarehouse();
 renderSubWarehouses();
-renderEmails();
-renderOrders();
-
-// Real-time synchronization
-window.addEventListener('dataChanged', (e) => {
-  renderWarehouse();
-  renderSubWarehouses();
-  renderEmails();
-  renderOrders();
-});
-
-// Listen for storage changes (orders created from checkout)
-window.addEventListener('storage', (e) => {
-  if (e.key === 'ecommerce_orders') {
-    console.log('New orders detected from checkout');
-    renderOrders();
-  }
-});
-
-// Check for new orders every 2 seconds
-setInterval(() => {
-  renderOrders();
-}, 2000);
-
-// Refresh when page regains focus
-window.addEventListener('focus', () => {
-  renderOrders();
-});
 </script>
 
 </body>

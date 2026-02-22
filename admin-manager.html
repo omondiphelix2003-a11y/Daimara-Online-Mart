@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Admin Panel | Daimara Online Mart</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
     :root {
@@ -22,56 +22,64 @@
     body { background: #0f172a; display: flex; min-height: 100vh; }
 
     /* SIDEBAR */
-    .sidebar {  width: 270px; background: var(--sidebar-bg); color: rgb(255, 255, 255); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; transition: all 0.3s; overflow-y: scroll; }
+    .sidebar {  width: 270px; background: var(--sidebar-bg); color: rgb(255, 255, 255); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; transition: transform 0.3s ease; overflow-y: auto; }
     .sidebar-header { padding: 20px 15px; text-align: center; border-bottom: 1px solid #333; }
     .sidebar-header h2 { color: black; font-size: 20px; letter-spacing: 1px; }
     .nav-links { list-style: none; padding: 15px 0; flex: 1; }
     .nav-links li { padding: 5px 10px; }
     .nav-links a { color: #bdc3c7; text-decoration: none; display: flex; align-items: center; padding: 10px 12px; border-radius: 8px; transition: all 0.3s; gap: 12px; font-size: 14px; }
     .nav-links a:hover, .nav-links a.active { background: rgba(233, 157, 17, 0.15); color: black }
-    
-    @media (min-width: 768px) {
-      .sidebar-header h2 { font-size: 24px; }
-      .nav-links a { font-size: 18px; gap: 14px; }
-    }
-    
-    @media (min-width: 1200px) {
-      .sidebar-header { padding: 30px 20px; }
-      .sidebar-header h2 { font-size: 33px; }
-      .nav-links li { padding: 5px 20px; }
-      .nav-links a { font-size: 23px; gap: 16px; padding: 12px 15px; }
-    }
-    .nav-links i { width: 20px; font-size: 25px; }
+    .nav-links i { width: 20px; font-size: 18px; }
     .sidebar-footer { padding: 20px; border-top: 1px solid #333; }
-    .logout-btn { background: var(--danger); color: white; border: none;font-size: 27; width: 100%; padding: 12px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 600; }
+    .logout-btn { background: var(--danger); color: white; border: none; font-size: 14px; width: 100%; padding: 12px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 600; }
+
+    /* MOBILE MENU TOGGLE */
+    .menu-toggle {
+      display: none;
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      z-index: 101;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      width: 45px;
+      height: 45px;
+      border-radius: 8px;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 99;
+    }
+    .sidebar-overlay.active { display: block; }
 
     /* MAIN CONTENT */
-    .main-content { flex: 1; margin-left: 260px; padding: 20px; }
-    
-    @media (max-width: 768px) {
-      .main-content { margin-left: 0; padding: 15px; }
-      .sidebar { width: 100%; height: auto; position: relative; }
-      body { flex-direction: column; }
-    }
-    
-    @media (min-width: 768px) and (max-width: 1199px) {
-      .main-content { margin-left: 200px; padding: 25px; }
-      .sidebar { width: 200px; }
-    }
-    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-    .page-title h1 { font-size: 25px; color: var(--text-main); }
+    .main-content { flex: 1; margin-left: 270px; padding: 20px; transition: margin-left 0.3s; }
+
+    /* PAGE HEADER */
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 15px; }
+    .page-title h1 { font-size: 24px; color: white; }
     .admin-profile { display: flex; align-items: center; gap: 15px; }
     .admin-info { text-align: right; }
-    .admin-info p { font-weight: 700; font-size: 23px; }
-    .admin-info span { font-size: 21px; color: var(--text-muted); }
-    .admin-avatar { width: 45px; height: 45px; border-radius: 50%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+    .admin-info p { font-weight: 700; font-size: 16px; color: white; }
+    .admin-info span { font-size: 14px; color: #bdc3c7; }
+    .admin-avatar { width: 45px; height: 45px; border-radius: 50%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 16px; }
 
     /* DASHBOARD CARDS */
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 30px; }
-    .stat-card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 20px; }
-    .stat-icon { width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
-    .stat-info h3 { font-size: 25px; color: var(--text-main); margin-bottom: 5px; }
-    .stat-info p { color: var(--text-muted); font-size: 23px; font-weight: 500; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
+    .stat-card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 15px; }
+    .stat-icon { width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .stat-info h3 { font-size: 20px; color: var(--text-main); margin-bottom: 3px; }
+    .stat-info p { color: var(--text-muted); font-size: 14px; font-weight: 500; }
 
     /* TAB CONTENT */
     .tab-content { display: none; animation: fadeIn 0.3s ease; }
@@ -79,26 +87,29 @@
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
     /* DATA TABLES */
-    .data-card { background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 30px; }
-    .card-header {display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #f0f0f0; }
-    .card-title { font-size: 48px; font-weight: 700; color: var(--text-main); }
-    .btn { padding: 8px 16px; border-radius: 6px; cursor: pointer; border: none; font-weight: 600; font-size: 18px; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
+    .data-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 30px; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #f0f0f0; flex-wrap: wrap; gap: 10px; }
+    .card-title { font-size: 20px; font-weight: 700; color: var(--text-main); }
+    .btn { padding: 8px 16px; border-radius: 6px; cursor: pointer; border: none; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
     .btn-primary { background: var(--primary-color); color: white; }
     .btn-success { background: var(--success); color: white; }
     .btn-info { background: var(--info); color: white; }
+    .btn-danger { background: var(--danger); color: white; }
     .btn:hover { opacity: 0.9; transform: translateY(-1px); }
 
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th { text-align: left; padding: 15px; background: #f8f9fa; color: var(--text-muted); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
-    td { padding: 15px; border-bottom: 1px solid #f0f0f0; font-size: 20px; color: var(--text-main); }
-    .status-pill { padding: 4px 10px; border-radius: 20px; font-size: 18px; font-weight: 600; text-transform: capitalize; }
+    /* TABLE CONTAINER FOR HORIZONTAL SCROLL */
+    .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { width: 100%; border-collapse: collapse; min-width: 600px; }
+    th { text-align: left; padding: 12px; background: #f8f9fa; color: var(--text-muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+    td { padding: 12px; border-bottom: 1px solid #f0f0f0; font-size: 14px; color: var(--text-main); }
+    .status-pill { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; text-transform: capitalize; white-space: nowrap; }
     .status-in-transit { background: #fff3e0; color: #ff9800; }
     .status-completed { background: #e8f5e9; color: #4caf50; }
     .status-unread { background: #e3f2fd; color: #2196f3; }
 
     /* WAREHOUSE IMAGES */
     .product-thumb { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; }
-    .quantity-badge { padding: 2px 8px; border-radius: 4px; font-weight: bold; }
+    .quantity-badge { padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; }
     .qty-low { background: #ffebee; color: #c62828; }
     .qty-ok { background: #e8f5e9; color: #2e7d32; }
 
@@ -106,10 +117,15 @@
       filter: blur(5px);
       transition: filter 0.3s;
       user-select: none;
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .blurry-text.revealed {
       filter: blur(0);
       user-select: auto;
+      white-space: normal;
     }
 
     /* CHECKBOX STYLES */
@@ -125,10 +141,10 @@
     }
 
     /* PROFIT & LOSS */
-    .pl-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
-    .pl-item { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px dashed #eee; }
-    .pl-label { font-weight: 600; color: var(--text-muted); }
-    .pl-value { font-weight: 700; }
+    .pl-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+    .pl-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px dashed #eee; }
+    .pl-label { font-weight: 600; color: var(--text-muted); font-size: 14px; }
+    .pl-value { font-weight: 700; font-size: 16px; }
     .pl-positive { color: var(--success); }
     .pl-negative { color: var(--danger); }
 
@@ -144,29 +160,32 @@
       background: rgba(0,0,0,0.5);
       align-items: center;
       justify-content: center;
+      padding: 15px;
     }
     .modal-content {
       background: #fff;
-      padding: 30px;
+      padding: 25px;
       border-radius: 12px;
       max-width: 600px;
-      width: 90%;
-      max-height: 80vh;
+      width: 100%;
+      max-height: 85vh;
       overflow-y: auto;
       position: relative;
     }
     .close-modal {
       position: absolute;
-      top: 15px;
+      top: 10px;
       right: 15px;
-      font-size: 30px;
+      font-size: 28px;
       cursor: pointer;
       color: var(--text-muted);
+      z-index: 10;
     }
     .modal-header {
       margin-bottom: 20px;
       border-bottom: 1px solid #f0f0f0;
       padding-bottom: 10px;
+      padding-right: 30px;
     }
     .clickable-name {
       color: var(--info);
@@ -180,12 +199,12 @@
     /* RECEIPT STYLES */
     .receipt { color: #333; background: #fff; padding: 10px; }
     .receipt-header { text-align: center; margin-bottom: 20px; border-bottom: 2px dashed #ddd; padding-bottom: 15px; }
-    .receipt-header h1 { color: var(--primary-color); font-size: 24px; margin-bottom: 5px; }
-    .receipt-info { margin-bottom: 20px; line-height: 1.6; font-size: 23px; }
+    .receipt-header h1 { color: var(--primary-color); font-size: 22px; margin-bottom: 5px; }
+    .receipt-info { margin-bottom: 20px; line-height: 1.6; font-size: 14px; }
     .receipt-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px; }
     .receipt-table th { text-align: left; border-bottom: 1px solid #eee; padding: 8px 0; }
     .receipt-table td { padding: 8px 0; border-bottom: 1px solid #f9f9f9; vertical-align: middle; }
-    .receipt-total { text-align: right; font-size: 27px; font-weight: bold; border-top: 2px solid #333; padding-top: 10px; }
+    .receipt-total { text-align: right; font-size: 18px; font-weight: bold; border-top: 2px solid #333; padding-top: 10px; }
     .print-btn {
       display: block;
       width: 100%;
@@ -199,6 +218,109 @@
       font-weight: bold;
     }
 
+    /* RESPONSIVE BREAKPOINTS */
+    
+    /* Large screens (1200px+) */
+    @media (min-width: 1200px) {
+      .sidebar { width: 280px; }
+      .main-content { margin-left: 280px; padding: 30px; }
+      .sidebar-header { padding: 25px 20px; }
+      .sidebar-header h2 { font-size: 26px; }
+      .nav-links li { padding: 5px 15px; }
+      .nav-links a { font-size: 15px; gap: 14px; padding: 12px 15px; }
+      .nav-links i { font-size: 18px; }
+      .page-title h1 { font-size: 28px; }
+      .stats-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+      .card-title { font-size: 22px; }
+    }
+
+    /* Medium screens (768px - 1199px) */
+    @media (min-width: 768px) and (max-width: 1199px) {
+      .sidebar { width: 240px; }
+      .main-content { margin-left: 240px; padding: 20px; }
+      .sidebar-header h2 { font-size: 22px; }
+      .nav-links a { font-size: 14px; }
+      .stats-grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+    }
+
+    /* Small screens (below 768px) */
+    @media (max-width: 767px) {
+      body { flex-direction: column; }
+      
+      /* Mobile Menu */
+      .menu-toggle { display: flex; align-items: center; justify-content: center; }
+      .sidebar { 
+        width: 280px; 
+        transform: translateX(-100%);
+        box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+      }
+      .sidebar.active { transform: translateX(0); }
+      .main-content { margin-left: 0; padding: 70px 15px 15px; }
+      
+      /* Header */
+      .page-header { flex-direction: column; align-items: flex-start; }
+      .page-title h1 { font-size: 20px; }
+      .admin-profile { align-self: flex-end; }
+      .admin-info p { font-size: 14px; }
+      .admin-avatar { width: 40px; height: 40px; font-size: 14px; }
+      
+      /* Stats Grid */
+      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
+      .stat-card { padding: 15px; gap: 10px; }
+      .stat-icon { width: 40px; height: 40px; font-size: 16px; }
+      .stat-info h3 { font-size: 16px; }
+      .stat-info p { font-size: 12px; }
+      
+      /* Cards */
+      .data-card { padding: 15px; margin-bottom: 20px; }
+      .card-header { flex-direction: column; align-items: flex-start; }
+      .card-title { font-size: 18px; }
+      
+      /* Buttons */
+      .btn { padding: 6px 12px; font-size: 13px; }
+      
+      /* Tables */
+      table { min-width: 500px; }
+      th, td { padding: 10px 8px; font-size: 13px; }
+      .status-pill { font-size: 11px; padding: 3px 8px; }
+      
+      /* P&L */
+      .pl-summary { grid-template-columns: 1fr; }
+      .pl-item { padding: 10px 0; }
+      
+      /* Modal */
+      .modal { padding: 10px; }
+      .modal-content { padding: 20px 15px; max-height: 90vh; }
+      .close-modal { font-size: 24px; top: 8px; right: 10px; }
+      
+      /* Receipt */
+      .receipt-header h1 { font-size: 18px; }
+      .receipt-info { font-size: 13px; }
+      .receipt-total { font-size: 16px; }
+    }
+
+    /* Extra small screens (below 480px) */
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .stat-card { padding: 12px; }
+      .stat-icon { width: 35px; height: 35px; font-size: 14px; }
+      .stat-info h3 { font-size: 18px; }
+      
+      .page-title h1 { font-size: 18px; }
+      
+      table { min-width: 400px; }
+      th { font-size: 11px; padding: 8px 6px; }
+      td { font-size: 12px; padding: 8px 6px; }
+      
+      .btn { padding: 5px 10px; font-size: 12px; }
+      
+      .product-thumb { width: 30px; height: 30px; }
+      
+      /* Action buttons in tables */
+      td .btn { padding: 4px 6px; font-size: 11px; }
+      td .btn i { font-size: 10px; }
+    }
+
     @media print {
       body * { visibility: hidden; }
       #details-modal, #details-modal * { visibility: visible; }
@@ -210,8 +332,14 @@
 </head>
 <body>
 
+  <!-- MOBILE MENU TOGGLE -->
+  <button class="menu-toggle" onclick="toggleSidebar()">
+    <i class="fas fa-bars"></i>
+  </button>
+  <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
   <!-- SIDEBAR -->
-  <aside class="sidebar">
+  <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <h2>DAIMARA ADMIN</h2>
     </div>
@@ -230,7 +358,7 @@
       <li><a href="executives.html"><i class="fas fa-user-tie"></i> Executive Dept</a></li>
       <li><a href="manager.html"><i class="fas fa-users-cog"></i> Manager Dept</a></li>
       <li><a href="order fulfillment specialists.html"><i class="fas fa-box"></i> Order Packaging</a></li>
-
+    </ul>
     <div class="sidebar-footer">
       <button class="logout-btn" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
     </div>
@@ -321,12 +449,14 @@
           <h2 class="card-title">Recent Orders</h2>
           <button class="btn btn-primary" onclick="showTab('orders')">View All</button>
         </div>
-        <table id="recent-orders-table">
-          <thead>
-            <tr><th>Order ID</th><th>Customer</th><th>Amount</th><th>Status</th><th>Date</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <div class="table-container">
+          <table id="recent-orders-table">
+            <thead>
+              <tr><th>Order ID</th><th>Customer</th><th>Amount</th><th>Status</th><th>Date</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -339,12 +469,14 @@
         <div style="margin-bottom: 10px; display: none;" id="ordersSelectActions">
           <button class="btn btn-danger" onclick="bulkDeleteOrders()"><i class="fas fa-trash"></i> Delete Selected</button>
         </div>
-        <table id="all-orders-table">
-          <thead>
-            <tr><th><input type="checkbox" onclick="toggleAllOrders(this)"></th><th>Order ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th><th>Action</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <div class="table-container">
+          <table id="all-orders-table">
+            <thead>
+              <tr><th><input type="checkbox" onclick="toggleAllOrders(this)"></th><th>Order ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th><th>Action</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -353,28 +485,32 @@
       <div class="data-card">
         <div class="card-header">
           <h2 class="card-title">Inventory Management</h2>
-          <div style="display: flex; gap: 10px;">
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
             <a href="add-product.html" class="btn btn-success"><i class="fas fa-plus"></i> Add New Product</a>
           </div>
         </div>
-        <table id="warehouse-table">
-          <thead>
-            <tr><th>Image</th><th>Product Name</th><th>Sub-Category</th><th>Supplier</th><th>Price</th><th>In Stock</th><th>Added Date</th><th>Action</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <div class="table-container">
+          <table id="warehouse-table">
+            <thead>
+              <tr><th>Image</th><th>Product Name</th><th>Sub-Category</th><th>Supplier</th><th>Price</th><th>In Stock</th><th>Added Date</th><th>Action</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
 
       <div class="data-card">
         <div class="card-header">
           <h2 class="card-title">Sub-Warehouse Stock</h2>
         </div>
-        <table id="subwarehouse-table">
-          <thead>
-            <tr><th>Sub-Warehouse</th><th>Product</th><th>Quantity</th><th>Price</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <div class="table-container">
+          <table id="subwarehouse-table">
+            <thead>
+              <tr><th>Sub-Warehouse</th><th>Product</th><th>Quantity</th><th>Price</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -388,12 +524,14 @@
         <div style="margin-bottom: 10px; display: none;" id="invoicesSelectActions">
           <button class="btn btn-danger" onclick="bulkDeleteInvoices()"><i class="fas fa-trash"></i> Delete Selected</button>
         </div>
-        <table id="invoices-table">
-          <thead>
-            <tr><th><input type="checkbox" onclick="toggleAllInvoices(this)"></th><th>Invoice #</th><th>Customer</th><th>Order ID</th><th>Amount</th><th>Date</th><th>Action</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <div class="table-container">
+          <table id="invoices-table">
+            <thead>
+              <tr><th><input type="checkbox" onclick="toggleAllInvoices(this)"></th><th>Invoice #</th><th>Customer</th><th>Order ID</th><th>Amount</th><th>Date</th><th>Action</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -406,12 +544,14 @@
         <div style="margin-bottom: 10px; display: none;" id="emailsSelectActions">
           <button class="btn btn-danger" onclick="bulkDeleteEmails()"><i class="fas fa-trash"></i> Delete Selected</button>
         </div>
-        <table id="emails-table">
-          <thead>
-            <tr><th><input type="checkbox" onclick="toggleAllEmails(this)"></th><th>From</th><th>Subject</th><th>Message</th><th>Date</th><th>Status</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <div class="table-container">
+          <table id="emails-table">
+            <thead>
+              <tr><th><input type="checkbox" onclick="toggleAllEmails(this)"></th><th>From</th><th>Subject</th><th>Message</th><th>Date</th><th>Status</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -420,19 +560,19 @@
       <div class="data-card">
         <div class="card-header">
           <h2 class="card-title">Financial Analysis</h2>
-          <p style="color: #666; font-size: 80%;">Loading analysis...</p>
+          <p style="color: #666; font-size: 14px;">Loading analysis...</p>
         </div>
         <div class="pl-summary">
           <div>
             <div class="pl-item"><span class="pl-label">Gross Revenue:</span><span class="pl-value" id="pl-revenue">KSH 0</span></div>
             <div class="pl-item"><span class="pl-label">Inventory Value:</span><span class="pl-value" id="pl-warehouse">KSH 0</span></div>
             <div class="pl-item"><span class="pl-label">Estimated Operating Costs (15%):</span><span class="pl-value pl-negative" id="pl-costs">-KSH 0</span></div>
-            <div class="pl-item" style="border-top: 2px solid #333; margin-top: 10px; padding-top: 20px;"><span class="pl-label" style="font-size: 35px;">Net Profit:</span><span class="pl-value pl-positive" id="pl-profit" style="font-size: 18px;">KSH 0</span></div>
+            <div class="pl-item" style="border-top: 2px solid #333; margin-top: 10px; padding-top: 15px;"><span class="pl-label" style="font-size: 16px;">Net Profit:</span><span class="pl-value pl-positive" id="pl-profit" style="font-size: 18px;">KSH 0</span></div>
           </div>
           <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
-            <h3>Margin Analysis</h3>
-            <div style="font-size: 48px; font-weight: 800; color: var(--primary-color); margin: 20px 0;" id="pl-margin">0%</div>
-            <p>Your current profit margin based on total sales and operating costs.</p>
+            <h3 style="font-size: 16px; margin-bottom: 10px;">Margin Analysis</h3>
+            <div style="font-size: 32px; font-weight: 800; color: var(--primary-color); margin: 15px 0;" id="pl-margin">0%</div>
+            <p style="font-size: 14px;">Your current profit margin based on total sales and operating costs.</p>
           </div>
         </div>
       </div>
@@ -442,12 +582,14 @@
     <div id="users" class="tab-content">
       <div class="data-card">
         <div class="card-header"><h2 class="card-title">Registered Users</h2></div>
-        <table id="users-table">
-          <thead>
-            <tr><th>User ID</th><th>Name</th><th>Email</th><th>Signup Date</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <div class="table-container">
+          <table id="users-table">
+            <thead>
+              <tr><th>User ID</th><th>Name</th><th>Email</th><th>Signup Date</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -467,6 +609,21 @@
 
   <script src="data-manager.js"></script>
   <script>
+    // SIDEBAR TOGGLE FOR MOBILE
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.querySelector('.sidebar-overlay');
+      sidebar.classList.toggle('active');
+      overlay.classList.toggle('active');
+    }
+
+    // Close sidebar when clicking a link on mobile
+    function closeSidebarOnMobile() {
+      if (window.innerWidth <= 767) {
+        toggleSidebar();
+      }
+    }
+
     // TAB SWITCHING
     function showTab(tabId, el) {
       document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -487,6 +644,9 @@
         'users': 'User Base Growth'
       };
       document.getElementById('tab-title').innerText = titleMap[tabId];
+      
+      // Close sidebar on mobile after navigation
+      closeSidebarOnMobile();
       
       // Load specific tab data
       loadTabData(tabId);
@@ -557,9 +717,9 @@
           <td><span class="status-pill status-${o.status || 'pending'}">${o.status || 'pending'}</span></td>
           <td>${o.date ? new Date(o.date).toLocaleDateString() : 'N/A'}</td>
           <td>
-            <div style="display:flex; gap:5px;">
-              <button class="btn btn-primary" style="padding:4px 8px; font-size:25px; background:#6c5ce7;" onclick="showAdminReceipt('${o.id}')">Receipt</button>
-              <button class="btn btn-danger" style="padding:4px 8px; font-size:25px;" onclick="returnOrder('${o.id}')">Return</button>
+            <div style="display:flex; gap:5px; flex-wrap: wrap;">
+              <button class="btn btn-primary" style="padding:4px 8px; font-size:12px; background:#6c5ce7;" onclick="showAdminReceipt('${o.id}')">Receipt</button>
+              <button class="btn btn-danger" style="padding:4px 8px; font-size:12px;" onclick="returnOrder('${o.id}')">Return</button>
               <button class="btn btn-danger" style="padding:4px 8px; background:#333;" onclick="deleteOrder('${o.id}')"><i class="fas fa-trash"></i></button>
             </div>
           </td>
@@ -580,7 +740,7 @@
           <td>KSH ${(p.price || 0).toLocaleString()}</td>
           <td><span class="quantity-badge ${p.quantity < 10 ? 'qty-low' : 'qty-ok'}">${p.quantity || 0}</span></td>
           <td>${p.createdAt || p.addedDate || 'N/A'}</td>
-          <td><button class="btn btn-primary" style="padding:4px 8px" onclick="editStock('${p.id}')">Adjust</button></td>
+          <td><button class="btn btn-primary" style="padding:4px 8px; font-size:12px;" onclick="editStock('${p.id}')">Adjust</button></td>
         </tr>
       `).join('') || '<tr><td colspan="8" style="text-align:center">Warehouse is empty</td></tr>';
 
@@ -608,34 +768,36 @@
       const storesHtml = subWarehouses.map(sw => {
         const storesDetail = (sw.stores || []).map(store => {
           const stockList = (store.stock || []).map(item => 
-            `<tr style="font-size: 13px;"><td>${item.name}</td><td><span class="quantity-badge ${item.qty < 5 ? 'qty-low' : 'qty-ok'}">${item.qty}</span></td><td>KSH ${(item.price || 0).toLocaleString()}</td></tr>`
+            `<tr style="font-size: 12px;"><td>${item.name}</td><td><span class="quantity-badge ${item.qty < 5 ? 'qty-low' : 'qty-ok'}">${item.qty}</span></td><td>KSH ${(item.price || 0).toLocaleString()}</td></tr>`
           ).join('');
           
           return `
             <div style="background: #f9f9f9; padding: 12px; margin-bottom: 10px; border-radius: 6px; border-left: 3px solid var(--primary-color);">
-              <p style="margin: 0 0 8px 0; font-weight: 600; color: var(--text-main);">${store.name}</p>
-              <table style="width: 100%; font-size: 12px; margin-bottom: 8px;">
-                <thead style="background: #f0f0f0;">
-                  <tr><th style="padding: 4px; text-align: left;">Product</th><th style="padding: 4px; text-align: left;">Qty</th><th style="padding: 4px; text-align: left;">Price</th></tr>
-                </thead>
-                <tbody>
-                  ${stockList || '<tr><td colspan="3" style="padding: 4px; text-align: center; color: var(--text-muted);">No inventory</td></tr>'}
-                </tbody>
-              </table>
+              <p style="margin: 0 0 8px 0; font-weight: 600; color: var(--text-main); font-size: 14px;">${store.name}</p>
+              <div class="table-container">
+                <table style="width: 100%; font-size: 12px; margin-bottom: 8px;">
+                  <thead style="background: #f0f0f0;">
+                    <tr><th style="padding: 4px; text-align: left;">Product</th><th style="padding: 4px; text-align: left;">Qty</th><th style="padding: 4px; text-align: left;">Price</th></tr>
+                  </thead>
+                  <tbody>
+                    ${stockList || '<tr><td colspan="3" style="padding: 4px; text-align: center; color: var(--text-muted);">No inventory</td></tr>'}
+                  </tbody>
+                </table>
+              </div>
             </div>
           `;
         }).join('');
 
         return `
-          <div style="background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; border-left: 4px solid var(--primary-color); box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-              <h4 style="margin: 0; color: var(--text-main);">${sw.name}</h4>
-              <button class="btn btn-success" style="padding: 6px 12px; font-size: 14px;" onclick="addStoreToWarehouse('${sw.id}', '${sw.name}')">
+          <div style="background: white; padding: 15px; margin-bottom: 15px; border-radius: 8px; border-left: 4px solid var(--primary-color); box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;">
+              <h4 style="margin: 0; color: var(--text-main); font-size: 16px;">${sw.name}</h4>
+              <button class="btn btn-success" style="padding: 6px 12px; font-size: 13px;" onclick="addStoreToWarehouse('${sw.id}', '${sw.name}')">
                 <i class="fas fa-plus"></i> Add Store
               </button>
             </div>
             <div style="margin-top: 10px;">
-              ${storesDetail || '<p style="color: var(--text-muted); margin: 0;">No stores created yet</p>'}
+              ${storesDetail || '<p style="color: var(--text-muted); margin: 0; font-size: 14px;">No stores created yet</p>'}
             </div>
           </div>
         `;
@@ -649,7 +811,7 @@
         } else {
           const section = document.createElement('div');
           section.setAttribute('data-stores-section', 'true');
-          section.innerHTML = `<h3 style="margin-top: 30px; color: var(--text-main);">Sub-Warehouse Stores & Inventory</h3>${storesHtml}`;
+          section.innerHTML = `<h3 style="margin-top: 25px; margin-bottom: 15px; color: var(--text-main); font-size: 18px;">Sub-Warehouse Stores & Inventory</h3>${storesHtml}`;
           storesContainer.appendChild(section);
         }
       }
@@ -681,8 +843,10 @@
           <td>KSH ${(inv.total || inv.amount || 0).toLocaleString()}</td>
           <td>${inv.createdDate ? new Date(inv.createdDate).toLocaleDateString() : 'N/A'}</td>
           <td>
-            <button class="btn btn-success" style="padding:4px 8px" onclick="downloadInvoiceExcel('${inv.id}')"><i class="fas fa-download"></i> Excel</button>
-            <button class="btn btn-danger" style="padding:4px 8px; background:#333;" onclick="deleteInvoice('${inv.id}')"><i class="fas fa-trash"></i></button>
+            <div style="display:flex; gap:5px; flex-wrap: wrap;">
+              <button class="btn btn-success" style="padding:4px 8px; font-size:12px;" onclick="downloadInvoiceExcel('${inv.id}')"><i class="fas fa-download"></i> Excel</button>
+              <button class="btn btn-danger" style="padding:4px 8px; background:#333;" onclick="deleteInvoice('${inv.id}')"><i class="fas fa-trash"></i></button>
+            </div>
           </td>
         </tr>
       `).join('') || '<tr><td colspan="7" style="text-align:center">No invoices generated yet</td></tr>';
@@ -751,41 +915,41 @@
       
       body.innerHTML = `
         <div class="modal-header">
-          <h2>User Profile: ${user.name}</h2>
+          <h2 style="font-size: 20px;">User Profile: ${user.name}</h2>
         </div>
-        <div style="display:flex; gap:30px; padding:20px;">
-          <div style="flex: 0 0 150px;">
-            <img src="${user.profileImage || 'https://via.placeholder.com/150'}" style="width:150px; height:150px; border-radius:12px; object-fit:cover; border:3px solid var(--primary-color);">
-            <div style="margin-top:20px; display:flex; flex-direction:column; gap:10px;">
-              <button class="btn ${isRestricted ? 'btn-success' : 'btn-danger'}" onclick="toggleUserRestriction('${user.id}')" style="width:100%;">
+        <div style="display:flex; gap:20px; flex-wrap: wrap;">
+          <div style="flex: 0 0 150px; text-align: center;">
+            <img src="${user.profileImage || 'https://via.placeholder.com/150'}" style="width:120px; height:120px; border-radius:12px; object-fit:cover; border:3px solid var(--primary-color);">
+            <div style="margin-top:15px; display:flex; flex-direction:column; gap:10px;">
+              <button class="btn ${isRestricted ? 'btn-success' : 'btn-danger'}" onclick="toggleUserRestriction('${user.id}')" style="width:100%; font-size: 13px;">
                 <i class="fas ${isRestricted ? 'fa-unlock' : 'fa-ban'}"></i> ${isRestricted ? 'Unrestrict' : 'Restrict'}
               </button>
-              <button class="btn btn-danger" onclick="deleteUserAccount('${user.id}')" style="width:100%; background:#333;">
+              <button class="btn btn-danger" onclick="deleteUserAccount('${user.id}')" style="width:100%; background:#333; font-size: 13px;">
                 <i class="fas fa-trash"></i> Delete Account
               </button>
             </div>
           </div>
-          <div style="flex:1;">
-            <h3 style="margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">Account Information</h3>
-            <div style="display:grid; grid-template-columns: 150px 1fr; gap:10px; font-size:20px;">
+          <div style="flex:1; min-width: 200px;">
+            <h3 style="margin-bottom:12px; border-bottom:1px solid #eee; padding-bottom:8px; font-size: 16px;">Account Information</h3>
+            <div style="display:grid; grid-template-columns: 120px 1fr; gap:8px; font-size:14px;">
               <strong>Full Name:</strong> <span>${user.name}</span>
               <strong>Email:</strong> <span>${user.email}</span>
-              <strong>Account ID:</strong> <span>${user.id}</span>
+              <strong>Account ID:</strong> <span style="font-size: 12px;">${user.id}</span>
               <strong>Status:</strong> <span class="status-pill ${isRestricted ? 'status-unread' : 'status-completed'}" style="display:inline-block;">${user.status || 'Active'}</span>
               <strong>Registered:</strong> <span>${new Date(user.registeredDate || user.createdAt).toLocaleString()}</span>
             </div>
             
-            <h3 style="margin-top:25px; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">User Activity</h3>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
-              <div style="background:#f8f9fa; padding:15px; border-radius:8px; text-align:center;">
-                <h4 style="margin-bottom:5px;">Orders</h4>
-                <div style="font-size:32px; font-weight:bold; color:var(--primary-color);">
+            <h3 style="margin-top:20px; margin-bottom:12px; border-bottom:1px solid #eee; padding-bottom:8px; font-size: 16px;">User Activity</h3>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+              <div style="background:#f8f9fa; padding:12px; border-radius:8px; text-align:center;">
+                <h4 style="margin-bottom:5px; font-size: 14px;">Orders</h4>
+                <div style="font-size:24px; font-weight:bold; color:var(--primary-color);">
                   ${(DataManager.getAllOrders() || []).filter(o => (o.customerEmail || o.customer?.email) === user.email).length}
                 </div>
               </div>
-              <div style="background:#f8f9fa; padding:15px; border-radius:8px; text-align:center;">
-                <h4 style="margin-bottom:5px;">Messages</h4>
-                <div style="font-size:32px; font-weight:bold; color:var(--info);">
+              <div style="background:#f8f9fa; padding:12px; border-radius:8px; text-align:center;">
+                <h4 style="margin-bottom:5px; font-size: 14px;">Messages</h4>
+                <div style="font-size:24px; font-weight:bold; color:var(--info);">
                   ${(DataManager.getClientEmails() || []).filter(e => e.email === user.email).length}
                 </div>
               </div>
@@ -835,9 +999,9 @@
       
       body.innerHTML = `
         <div class="modal-header">
-          <h2>Order Details: ${order.id}</h2>
+          <h2 style="font-size: 18px;">Order Details: ${order.id}</h2>
         </div>
-        <div style="margin-bottom:20px;">
+        <div style="margin-bottom:15px; font-size: 14px;">
           <p><strong>Customer:</strong> ${order.customerName || order.customer?.name}</p>
           <p><strong>Email:</strong> ${order.customerEmail || order.customer?.email || 'N/A'}</p>
           <p><strong>Phone:</strong> ${order.customerPhone || order.customer?.phone || 'Not provided'}</p>
@@ -846,29 +1010,33 @@
           <p><strong>Status:</strong> ${order.status}</p>
           ${order.deliveryLocation ? `<p style="margin-top:10px; color:#e67e22;"><strong>📍 Delivery Location:</strong><br>${order.deliveryLocation}</p>` : ''}
         </div>
-        <h3>Items:</h3>
-        <table style="width:100%; border-collapse: collapse; margin-top:10px;">
-          <thead style="background:#f8f9fa;">
-            <tr>
-              <th style="padding:10px; border:1px solid #ddd; text-align:left;">Product</th>
-              <th style="padding:10px; border:1px solid #ddd; text-align:center;">Qty</th>
-              <th style="padding:10px; border:1px solid #ddd; text-align:right;">Price</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${items.map(i => `
+        <h3 style="font-size: 16px; margin-bottom: 10px;">Items:</h3>
+        <div class="table-container">
+          <table style="width:100%; border-collapse: collapse; margin-top:10px; min-width: 300px;">
+            <thead style="background:#f8f9fa;">
               <tr>
-                <td style="padding:10px; border:1px solid #ddd; display:flex; align-items:center; gap:10px;">
-                  <img src="${i.image || 'image-placeholder.jpg'}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;">
-                  <span>${i.name}</span>
-                </td>
-                <td style="padding:10px; border:1px solid #ddd; text-align:center;">${i.qty || i.quantity || 1}</td>
-                <td style="padding:10px; border:1px solid #ddd; text-align:right;">KES ${i.price.toLocaleString()}</td>
+                <th style="padding:8px; border:1px solid #ddd; text-align:left; font-size: 12px;">Product</th>
+                <th style="padding:8px; border:1px solid #ddd; text-align:center; font-size: 12px;">Qty</th>
+                <th style="padding:8px; border:1px solid #ddd; text-align:right; font-size: 12px;">Price</th>
               </tr>
-            `).join('')}
-          </tbody>
-        </table>
-        <div style="margin-top:20px; text-align:right; font-weight:bold; font-size:1.2em;">
+            </thead>
+            <tbody>
+              ${items.map(i => `
+                <tr>
+                  <td style="padding:8px; border:1px solid #ddd;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                      <img src="${i.image || 'image-placeholder.jpg'}" style="width:35px; height:35px; object-fit:cover; border-radius:4px;">
+                      <span style="font-size: 13px;">${i.name}</span>
+                    </div>
+                  </td>
+                  <td style="padding:8px; border:1px solid #ddd; text-align:center; font-size: 13px;">${i.qty || i.quantity || 1}</td>
+                  <td style="padding:8px; border:1px solid #ddd; text-align:right; font-size: 13px;">KES ${i.price.toLocaleString()}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+        <div style="margin-top:15px; text-align:right; font-weight:bold; font-size:16px;">
           Total: KES ${(order.grandTotal || order.totalPrice || 0).toLocaleString()}
         </div>
       `;
@@ -899,7 +1067,7 @@
 
       body.innerHTML = `
         <div class="receipt">
-          <div class="receipt-header"style="font-size:27px">
+          <div class="receipt-header">
             <h1>Daimara Online Mart</h1>
             <p>Official Order Receipt</p>
           </div>
@@ -911,36 +1079,40 @@
             <p><strong>Status:</strong> ${order.status.toUpperCase()}</p>
             ${order.deliveryLocation ? `<p style="margin-top:5px; color:#e67e22;"><strong>📍 Delivery Location:</strong><br>${locationLink}</p>` : ''}
           </div>
-          <table class="receipt-table">
-            <thead>
-              <tr>
-                <th>Item</th>
-                <th style="text-align:center;">Qty</th>
-                <th style="text-align:right;">Price</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${items.map(item => `
+          <div class="table-container">
+            <table class="receipt-table">
+              <thead>
                 <tr>
-                  <td style="display:flex; align-items:center; gap:10px;">
-                    <img src="${item.image || 'image-placeholder.jpg'}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;">
-                    <span>${item.name}</span>
-                  </td>
-                  <td style="text-align:center;">${item.qty || item.quantity || 1}</td>
-                  <td style="text-align:right;">KSH ${item.price.toLocaleString()}</td>
+                  <th>Item</th>
+                  <th style="text-align:center;">Qty</th>
+                  <th style="text-align:right;">Price</th>
                 </tr>
-              `).join('')}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                ${items.map(item => `
+                  <tr>
+                    <td>
+                      <div style="display:flex; align-items:center; gap:8px;">
+                        <img src="${item.image || 'image-placeholder.jpg'}" style="width:35px; height:35px; object-fit:cover; border-radius:4px;">
+                        <span style="font-size: 13px;">${item.name}</span>
+                      </div>
+                    </td>
+                    <td style="text-align:center;">${item.qty || item.quantity || 1}</td>
+                    <td style="text-align:right;">KSH ${item.price.toLocaleString()}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
           <div class="receipt-total">
             TOTAL: KSH ${(order.grandTotal || order.totalPrice || 0).toLocaleString()}
           </div>
           <div style="text-align:center; margin-top:20px;">
-            <img src="${qrUrl}" style="width:120px; height:120px;" alt="Order QR Code">
-            <div style="font-size:25px; color:#666; margin-top:5px;">Scan to verify order details</div>
-            <div style="font-size:18px; color:#999; margin-top:5px;">${order.id}</div>
+            <img src="${qrUrl}" style="width:100px; height:100px;" alt="Order QR Code">
+            <div style="font-size:12px; color:#666; margin-top:5px;">Scan to verify order details</div>
+            <div style="font-size:11px; color:#999; margin-top:5px;">${order.id}</div>
           </div>
-          <div style="margin-top:30px; text-align:center;">
+          <div style="margin-top:20px; text-align:center;">
              <button class="print-btn" onclick="window.print()"><i class="fas fa-print"></i> Print Receipt</button>
           </div>
         </div>
@@ -956,14 +1128,14 @@
       const body = document.getElementById('modal-body');
       body.innerHTML = `
         <div class="modal-header">
-          <h2>Client Message</h2>
+          <h2 style="font-size: 18px;">Client Message</h2>
         </div>
-        <div style="margin-bottom:15px;">
+        <div style="margin-bottom:12px; font-size: 14px;">
           <p><strong>From:</strong> ${email.email}</p>
           <p><strong>Subject:</strong> ${email.subject || 'No Subject'}</p>
           <p><strong>Date:</strong> ${new Date(email.receivedDate).toLocaleString()}</p>
         </div>
-        <div style="background:#f8f9fa; padding:15px; border-radius:8px; line-height:1.6; white-space:pre-wrap;">
+        <div style="background:#f8f9fa; padding:15px; border-radius:8px; line-height:1.6; white-space:pre-wrap; font-size: 14px; max-height: 300px; overflow-y: auto;">
           ${email.message}
         </div>
       `;
@@ -1227,6 +1399,14 @@
         if (activeTab) {
           const tabId = activeTab.getAttribute('onclick').match(/'([^']+)'/)[1];
           loadTabData(tabId);
+        }
+      });
+
+      // Handle window resize
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 767) {
+          document.getElementById('sidebar').classList.remove('active');
+          document.querySelector('.sidebar-overlay').classList.remove('active');
         }
       });
     };

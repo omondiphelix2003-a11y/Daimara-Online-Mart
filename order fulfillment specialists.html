@@ -7,138 +7,244 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
     :root {
-      --primary-color: rgb(233, 157, 17);
+      --primary: rgb(233, 157, 17);
+      --primary-dark: #d97706;
       --dark-bg: #0a0a0a;
       --sidebar-bg: rgb(233, 157, 17);
       --card-bg: #ffffff;
-      --text-main: #2c3e50;
-      --text-muted: #7f8c8d;
-      --success: #27ae60;
-      --danger: #e74c3c;
-      --info: #3498db;
+      --text-main: #1f2937;
+      --text-muted: #6b7280;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --info: #2563eb;
+      --warning: #f59e0b;
+      --border: #e5e7eb;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body { background: #0f172a; display: flex; min-height: 100vh; color: var(--text-main); }
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    body { 
+      background: #111827; 
+      min-height: 100vh; 
+      color: var(--text-main);
+      line-height: 1.6;
+    }
 
     /* TOPBAR */
     .topbar {
       background: white;
-      padding: 20px 30px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      padding: clamp(0.75rem, 2vw, 1rem) clamp(1rem, 3vw, 1.5rem);
+      box-shadow: var(--shadow);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      position: fixed;
+      position: sticky;
       top: 0;
       left: 0;
       right: 0;
       z-index: 50;
+      flex-wrap: wrap;
+      gap: 1rem;
     }
 
     .topbar h1 {
-      font-size: 28px;
-      color: var(--primary-color);
+      font-size: clamp(1.25rem, 3vw, 1.75rem);
+      color: var(--primary);
       font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
     }
 
     .topbar-actions {
       display: flex;
-      gap: 15px;
+      gap: 0.75rem;
     }
 
     .back-btn {
-      background: var(--primary-color);
-      color: white;
+      background: var(--primary);
+      color: #000;
       border: none;
-      padding: 10px 20px;
-      border-radius: 6px;
+      padding: 0.625rem 1.25rem;
+      border-radius: 10px;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 0.9375rem;
+      font-weight: 600;
       display: flex;
       align-items: center;
-      gap: 8px;
-      transition: 0.3s;
+      gap: 0.5rem;
+      transition: all 0.3s;
     }
 
     .back-btn:hover {
-      background: #d4941a;
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(233, 157, 17, 0.3);
     }
 
     /* CONTAINER */
     .container {
-      flex: 1;
-      margin-top: 80px;
-      padding: 30px;
+      padding: clamp(1rem, 3vw, 2rem);
       max-width: 1400px;
-      margin-left: auto;
-      margin-right: auto;
+      margin: 0 auto;
     }
 
-    /* SECTION STYLES */
+    /* STATS GRID */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+      gap: clamp(1rem, 2vw, 1.5rem);
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: white;
+      padding: clamp(1.25rem, 3vw, 1.5rem);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      text-align: center;
+      transition: all 0.3s;
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--primary);
+    }
+
+    .stat-card:nth-child(2)::before { background: var(--success); }
+    .stat-card:nth-child(3)::before { background: var(--info); }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+    }
+
+    .stat-card h3 {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+
+    .stat-card strong {
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      color: var(--text-main);
+      display: block;
+      line-height: 1.2;
+    }
+
+    /* SECTION */
     .section {
       background: white;
-      padding: 25px;
-      border-radius: 12px;
-      margin-bottom: 25px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+      padding: clamp(1.25rem, 3vw, 1.5rem);
+      border-radius: 16px;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
     }
 
     .section-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
-      padding-bottom: 15px;
-      border-bottom: 2px solid #f0f0f0;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 1rem;
     }
 
     .section-header h2 {
-      font-size: 24px;
+      font-size: clamp(1.125rem, 2.5vw, 1.375rem);
       color: var(--text-main);
-      margin: 0;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
     }
 
     /* TABLE STYLES */
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
     .table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 15px;
+      min-width: 700px;
+      font-size: 0.9375rem;
     }
 
     .table thead {
-      background: #f8f9fa;
+      background: #f9fafb;
     }
 
     .table th {
-      padding: 15px;
+      padding: 1rem;
       text-align: left;
       font-weight: 600;
-      color: var(--text-main);
-      border-bottom: 2px solid #e0e0e0;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
     }
 
     .table td {
-      padding: 12px 15px;
-      border-bottom: 1px solid #f0f0f0;
+      padding: 1rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-main);
+      vertical-align: middle;
+    }
+
+    .table tbody tr {
+      transition: background 0.2s;
     }
 
     .table tbody tr:hover {
-      background: #f8f9fa;
+      background: #f9fafb;
+    }
+
+    .table tbody tr:last-child td {
+      border-bottom: none;
     }
 
     /* BUTTONS */
     .btn {
-      padding: 10px 20px;
+      padding: 0.625rem 1.25rem;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
-      font-size: 14px;
+      font-size: 0.875rem;
       font-weight: 600;
-      transition: 0.3s;
+      transition: all 0.2s;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 0.5rem;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
 
     .btn-success {
@@ -147,16 +253,16 @@
     }
 
     .btn-success:hover {
-      background: #229954;
+      background: #15803d;
     }
 
     .btn-primary {
-      background: var(--primary-color);
-      color: white;
+      background: var(--primary);
+      color: #000;
     }
 
     .btn-primary:hover {
-      background: #d4941a;
+      background: var(--primary-dark);
     }
 
     .btn-info {
@@ -165,7 +271,7 @@
     }
 
     .btn-info:hover {
-      background: #2980b9;
+      background: #1d4ed8;
     }
 
     .btn-danger {
@@ -174,63 +280,108 @@
     }
 
     .btn-danger:hover {
-      background: #c0392b;
+      background: #b91c1c;
+    }
+
+    .btn-sm {
+      padding: 0.5rem 1rem;
+      font-size: 0.8125rem;
     }
 
     /* STATUS PILLS */
     .status-pill {
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 13px;
+      padding: 0.375rem 0.875rem;
+      border-radius: 9999px;
+      font-size: 0.8125rem;
       font-weight: 600;
       text-transform: capitalize;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      white-space: nowrap;
+    }
+
+    .status-pill::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
     }
 
     .status-pending {
-      background: #fff3e0;
-      color: #ff9800;
+      background: #fef3c7;
+      color: #92400e;
     }
 
     .status-in-packaging {
-      background: #e3f2fd;
-      color: #1976d2;
+      background: #dbeafe;
+      color: #1e40af;
     }
 
     .status-in-transit {
-      background: #f3e5f5;
-      color: #7b1fa2;
+      background: #fce7f3;
+      color: #9d174d;
     }
 
     .status-completed {
-      background: #e8f5e9;
-      color: #388e3c;
+      background: #d1fae5;
+      color: #065f46;
     }
 
-    /* GRID */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-      margin-bottom: 25px;
+    /* BLURRY TEXT */
+    .blurry-text {
+      filter: blur(5px);
+      transition: filter 0.3s;
+      user-select: none;
+      cursor: pointer;
     }
 
-    .card {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    .blurry-text:hover {
+      filter: blur(3px);
+    }
+
+    .blurry-text.revealed {
+      filter: blur(0);
+      user-select: auto;
+    }
+
+    /* ACTION BUTTON */
+    .action-btn {
+      padding: 0.5rem 1rem;
+      background: var(--primary);
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.875rem;
+      transition: all 0.2s;
+    }
+
+    .action-btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    /* EMPTY STATE */
+    .empty-state {
       text-align: center;
-    }
-
-    .card h3 {
-      font-size: 16px;
+      padding: 3rem 1rem;
       color: var(--text-muted);
-      margin-bottom: 10px;
     }
 
-    .card strong {
-      font-size: 32px;
-      color: var(--primary-color);
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.3;
+      color: var(--primary);
+    }
+
+    .empty-state h4 {
+      font-size: 1.125rem;
+      margin-bottom: 0.5rem;
+      color: var(--text-main);
     }
 
     /* MODAL */
@@ -245,82 +396,280 @@
       background: rgba(0,0,0,0.5);
       align-items: center;
       justify-content: center;
+      padding: 1rem;
+      backdrop-filter: blur(4px);
     }
 
     .modal-content {
       background: white;
-      padding: 30px;
-      border-radius: 12px;
+      padding: clamp(1.5rem, 4vw, 2rem);
+      border-radius: 20px;
+      width: 100%;
       max-width: 600px;
-      width: 90%;
-      max-height: 80vh;
+      max-height: 90vh;
       overflow-y: auto;
       position: relative;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+      animation: modalSlide 0.3s ease;
+    }
+
+    @keyframes modalSlide {
+      from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
     }
 
     .close-modal {
       position: absolute;
-      top: 15px;
-      right: 15px;
-      font-size: 30px;
+      top: 1rem;
+      right: 1rem;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
       cursor: pointer;
       color: var(--text-muted);
+      transition: all 0.2s;
+      background: #f3f4f6;
+      border: none;
     }
 
     .close-modal:hover {
+      background: var(--border);
+      color: var(--text-main);
+      transform: rotate(90deg);
+    }
+
+    /* MOBILE CARDS (Alternative to table) */
+    .mobile-cards {
+      display: none;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .order-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.25rem;
+      box-shadow: var(--shadow);
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .order-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .order-card h3 {
+      font-size: 1.125rem;
+      font-weight: 700;
       color: var(--text-main);
     }
 
-    /* BLURRY TEXT */
-    .blurry-text {
-      filter: blur(5px);
-      cursor: not-allowed;
-      user-select: none;
-      transition: filter 0.3s;
+    .order-details {
+      display: grid;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
     }
 
-    .blurry-text.revealed {
-      filter: blur(0);
-      user-select: auto;
-      cursor: auto;
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
-    .empty-state {
-      text-align: center;
-      padding: 40px 20px;
+    .detail-label {
+      font-size: 0.875rem;
       color: var(--text-muted);
+      font-weight: 500;
     }
 
-    .empty-state i {
-      font-size: 48px;
-      margin-bottom: 15px;
-      color: #ccc;
-    }
-
-    .action-btn {
-      padding: 6px 12px;
-      background: var(--primary-color);
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
+    .detail-value {
       font-weight: 600;
-      transition: 0.3s;
+      color: var(--text-main);
+      text-align: right;
     }
 
-    .action-btn:hover {
-      background: #d4941a;
+    .order-actions {
+      display: flex;
+      gap: 0.75rem;
     }
 
+    .order-actions .btn {
+      flex: 1;
+      justify-content: center;
+    }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--text-main);
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      opacity: 0;
+      transform: translateY(100px);
+      transition: all 0.3s;
+      z-index: 3000;
+      max-width: 90vw;
+      font-weight: 500;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .toast.success {
+      background: var(--success);
+    }
+
+    /* RESPONSIVE BREAKPOINTS */
+    @media (max-width: 768px) {
+      .table-wrapper {
+        display: none;
+      }
+
+      .mobile-cards {
+        display: flex;
+      }
+
+      .section-header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .stat-card {
+        padding: 1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .modal-content {
+        padding: 1.25rem;
+        border-radius: 16px;
+      }
+    }
+
+    @media (min-width: 769px) {
+      .mobile-cards {
+        display: none !important;
+      }
+    }
+
+    /* TOUCH OPTIMIZATIONS */
+    @media (hover: none) and (pointer: coarse) {
+      .stat-card,
+      .order-card {
+        transform: none !important;
+      }
+
+      .btn,
+      .action-btn,
+      .back-btn {
+        min-height: 44px;
+      }
+    }
+
+    /* DARK MODE */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --card-bg: #1f2937;
+        --text-main: #f9fafb;
+        --text-muted: #9ca3af;
+        --border: #374151;
+      }
+
+      body {
+        background: #111827;
+      }
+
+      .topbar,
+      .section,
+      .stat-card,
+      .order-card {
+        background: #1f2937;
+        border-color: #374151;
+      }
+
+      .table th {
+        background: #374151;
+        color: #e5e7eb;
+      }
+
+      .table tbody tr:hover {
+        background: #374151;
+      }
+
+      .modal-content {
+        background: #1f2937;
+        color: #f9fafb;
+      }
+    }
+
+    /* REDUCED MOTION */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
   </style>
+<base target="_blank">
 </head>
 <body>
 
 <!-- TOPBAR -->
 <div class="topbar">
-  <h1><i class="fas fa-box"></i> Order Packaging</h1>
+  <h1><i class="fas fa-box-open"></i> Order Packaging</h1>
   <div class="topbar-actions">
-    <button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i> Back</button>
+    <button class="back-btn" onclick="goBack()">
+      <i class="fas fa-arrow-left"></i> Back
+    </button>
   </div>
 </div>
 
@@ -328,17 +677,17 @@
 <div class="container">
 
   <!-- SUMMARY CARDS -->
-  <div class="grid">
-    <div class="card">
-      <h3>Total Orders to Package</h3>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <h3>Orders to Package</h3>
       <strong id="totalOrdersCount">0</strong>
     </div>
-    <div class="card">
+    <div class="stat-card">
       <h3>Packaged Today</h3>
       <strong id="completedTodayCount">0</strong>
     </div>
-    <div class="card">
-      <h3>Pending Packaging</h3>
+    <div class="stat-card">
+      <h3>Pending</h3>
       <strong id="pendingFulfillmentCount">0</strong>
     </div>
   </div>
@@ -346,29 +695,36 @@
   <!-- ORDERS FOR PACKAGING -->
   <div class="section">
     <div class="section-header">
-      <h2>Orders Awaiting Packaging</h2>
+      <h2><i class="fas fa-list"></i> Orders Awaiting Packaging</h2>
     </div>
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Order ID</th>
-          <th>Customer</th>
-          <th>Products</th>
-          <th>Store</th>
-          <th>Quantity</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="fulfillmentTable">
-        <tr>
-          <td colspan="7" style="text-align: center; padding: 30px; color: var(--text-muted);">
-            <i class="fas fa-box" style="font-size: 32px; margin-bottom: 10px; display: block;"></i>
-            Loading orders...
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    
+    <!-- Desktop Table -->
+    <div class="table-wrapper">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Products</th>
+            <th>Store</th>
+            <th>Qty</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="fulfillmentTable">
+          <tr>
+            <td colspan="7" class="empty-state">
+              <i class="fas fa-spinner fa-spin"></i>
+              <h4>Loading orders...</h4>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Mobile Cards -->
+    <div class="mobile-cards" id="fulfillmentMobile"></div>
   </div>
 
 </div>
@@ -376,8 +732,17 @@
 <!-- ORDER DETAILS MODAL -->
 <div id="orderDetailsModal" class="modal">
   <div class="modal-content">
+    <button class="close-modal" onclick="closeModal()" aria-label="Close modal">
+      <i class="fas fa-times"></i>
+    </button>
     <div id="orderDetailsContent"></div>
   </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <i class="fas fa-check-circle"></i>
+  <span id="toastMessage">Operation successful</span>
 </div>
 
 <script src="data-manager.js"></script>
@@ -385,6 +750,10 @@
 let allOrders = [];
 
 document.addEventListener("DOMContentLoaded", () => {
+  if (typeof DataManager === 'undefined') {
+    showToast('Error: DataManager not loaded', 'error');
+    return;
+  }
   loadOrdersForFulfillment();
   updateStats();
 });
@@ -393,22 +762,51 @@ function goBack() {
   window.history.back();
 }
 
+function showToast(message, type = 'success') {
+  const toast = document.getElementById('toast');
+  const toastMessage = document.getElementById('toastMessage');
+  
+  toast.className = 'toast ' + type;
+  toastMessage.textContent = message;
+  
+  const icon = toast.querySelector('i');
+  icon.className = type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+  
+  toast.classList.add('show');
+  
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3000);
+}
+
 function loadOrdersForFulfillment() {
   allOrders = DataManager.getAllOrders();
   
   const fulfillmentOrders = allOrders.filter(o => o.status === 'awaiting-fulfillment');
   
+  // Desktop Table
   const tbody = document.getElementById('fulfillmentTable');
   tbody.innerHTML = '';
   
+  // Mobile Cards
+  const mobileContainer = document.getElementById('fulfillmentMobile');
+  mobileContainer.innerHTML = '';
+  
   if (fulfillmentOrders.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="7" style="text-align: center; padding: 30px; color: var(--text-muted);">
-          <i class="fas fa-check-circle" style="font-size: 32px; margin-bottom: 10px; display: block;"></i>
-          No orders awaiting fulfillment
-        </td>
-      </tr>
+    const emptyHtml = `
+      <td colspan="7" class="empty-state">
+        <i class="fas fa-check-circle"></i>
+        <h4>No orders awaiting fulfillment</h4>
+        <p>All orders have been packaged</p>
+      </td>
+    `;
+    tbody.innerHTML = `<tr>${emptyHtml}</tr>`;
+    mobileContainer.innerHTML = `
+      <div class="empty-state">
+        <i class="fas fa-check-circle"></i>
+        <h4>No orders awaiting fulfillment</h4>
+        <p>All orders have been packaged</p>
+      </div>
     `;
     return;
   }
@@ -418,39 +816,76 @@ function loadOrdersForFulfillment() {
     const itemsCount = order.items ? order.items.length : 0;
     const storeLocation = order.storeId || 'N/A';
     
+    // Desktop Row
     const row = document.createElement('tr');
     row.innerHTML = `
-      <td><strong>${order.id || 'N/A'}</strong></td>
+      <td><strong>#${(order.id || '').slice(-6)}</strong></td>
       <td><span class="blurry-text">${order.customerName || 'N/A'}</span></td>
       <td>${itemsText}</td>
       <td>${storeLocation}</td>
       <td><strong>${itemsCount}</strong></td>
       <td><span class="status-pill status-in-packaging">Awaiting Packaging</span></td>
       <td>
-        <button class="action-btn" onclick="viewOrderDetails('${order.id}')">View</button>
+        <button class="action-btn" onclick="viewOrderDetails('${order.id}')">
+          <i class="fas fa-eye"></i> View
+        </button>
       </td>
     `;
     tbody.appendChild(row);
+    
+    // Mobile Card
+    const card = document.createElement('div');
+    card.className = 'order-card';
+    card.innerHTML = `
+      <div class="order-card-header">
+        <h3>#${(order.id || '').slice(-6)}</h3>
+        <span class="status-pill status-in-packaging">Awaiting</span>
+      </div>
+      <div class="order-details">
+        <div class="detail-row">
+          <span class="detail-label">Customer</span>
+          <span class="detail-value blurry-text">${order.customerName || 'N/A'}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Products</span>
+          <span class="detail-value" style="font-size:0.875rem;">${itemsText}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Store</span>
+          <span class="detail-value">${storeLocation}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Quantity</span>
+          <span class="detail-value">${itemsCount} items</span>
+        </div>
+      </div>
+      <div class="order-actions">
+        <button class="btn btn-primary" onclick="viewOrderDetails('${order.id}')" style="width:100%;">
+          <i class="fas fa-eye"></i> View Details
+        </button>
+      </div>
+    `;
+    mobileContainer.appendChild(card);
   });
 }
 
 function updateStats() {
   const orders = DataManager.getAllOrders();
   
-  const awaitingPackagingOrders = orders.filter(o => o.status === 'awaiting-fulfillment').length;
-  const packagedOrders = orders.filter(o => o.status === 'in-delivery').length;
-  const pendingOrders = orders.filter(o => o.status === 'pending').length;
+  const awaitingPackaging = orders.filter(o => o.status === 'awaiting-fulfillment').length;
+  const packagedToday = orders.filter(o => o.status === 'in-delivery').length;
+  const pending = orders.filter(o => o.status === 'pending').length;
   
-  document.getElementById('totalOrdersCount').textContent = awaitingPackagingOrders;
-  document.getElementById('completedTodayCount').textContent = packagedOrders;
-  document.getElementById('pendingFulfillmentCount').textContent = pendingOrders;
+  document.getElementById('totalOrdersCount').textContent = awaitingPackaging;
+  document.getElementById('completedTodayCount').textContent = packagedToday;
+  document.getElementById('pendingFulfillmentCount').textContent = pending;
 }
 
 function viewOrderDetails(orderId) {
   const order = allOrders.find(o => o.id === orderId);
   
   if (!order) {
-    alert('Order not found');
+    showToast('Order not found', 'error');
     return;
   }
   
@@ -459,88 +894,136 @@ function viewOrderDetails(orderId) {
   
   const itemsHtml = order.items ? order.items.map(item => `
     <tr>
-      <td>${item.name}</td>
-      <td>${item.qty || 1}</td>
-      <td>KES ${(item.price || 0).toLocaleString()}</td>
+      <td style="display:flex; align-items:center; gap:0.75rem;">
+        <img src="${item.image || ''}" style="width:40px; height:40px; object-fit:cover; border-radius:6px;">
+        <span>${item.name}</span>
+      </td>
+      <td style="text-align:center;">${item.qty || 1}</td>
+      <td style="text-align:right;">KES ${(item.price || 0).toLocaleString()}</td>
     </tr>
   `).join('') : '<tr><td colspan="3">No items</td></tr>';
   
   const html = `
-    <div style="text-align: center; margin-bottom: 20px;">
-      <h2>Order Details</h2>
+    <div style="text-align: center; margin-bottom: 1.5rem;">
+      <h2 style="color: var(--primary);"><i class="fas fa-box-open"></i> Order Details</h2>
     </div>
     
-    <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-      <p><strong>Order ID:</strong> ${order.id || 'N/A'}</p>
-      <p><strong>Customer:</strong> <span class="blurry-text">${order.customerName || 'N/A'}</span></p>
-      <p><strong>Phone:</strong> <span class="blurry-text">${order.customerPhone || 'N/A'}</span></p>
-      <p><strong>Store:</strong> ${order.storeId || 'N/A'}</p>
+    <div style="background: #f9fafb; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid var(--border);">
+      <p style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+        <strong style="color:var(--text-muted);">Order ID:</strong>
+        <span>${order.id || 'N/A'}</span>
+      </p>
+      <p style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+        <strong style="color:var(--text-muted);">Customer:</strong>
+        <span class="blurry-text">${order.customerName || 'N/A'}</span>
+      </p>
+      <p style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+        <strong style="color:var(--text-muted);">Phone:</strong>
+        <span class="blurry-text">${order.customerPhone || 'N/A'}</span>
+      </p>
+      <p style="display:flex; justify-content:space-between;">
+        <strong style="color:var(--text-muted);">Store:</strong>
+        <span>${order.storeId || 'N/A'}</span>
+      </p>
     </div>
     
-    <h4>Items to Package</h4>
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Product</th>
-          <th>Qty</th>
-          <th>Price</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${itemsHtml}
-      </tbody>
-    </table>
-    
-    <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #ddd;">
-      <p><strong>Subtotal:</strong> KES ${(order.subtotal || 0).toLocaleString()}</p>
-      <p><strong>Delivery Fee:</strong> KES ${(order.deliveryFee || 0).toLocaleString()}</p>
-      <p><strong>Total:</strong> KES ${(order.grandTotal || order.totalPrice || 0).toLocaleString()}</p>
+    <h3 style="margin-bottom: 1rem;"><i class="fas fa-list"></i> Items to Package</h3>
+    <div style="overflow-x:auto;">
+      <table style="width:100%; min-width:300px;">
+        <thead>
+          <tr style="background:#f9fafb;">
+            <th style="text-align:left; padding:0.75rem;">Product</th>
+            <th style="text-align:center; padding:0.75rem;">Qty</th>
+            <th style="text-align:right; padding:0.75rem;">Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${itemsHtml}
+        </tbody>
+      </table>
     </div>
     
-    <div style="margin-top: 20px; display: flex; gap: 10px;">
-      <button class="btn btn-success" style="flex: 1;" onclick="markAsFulfilled('${order.id}')"><i class="fas fa-check"></i> Mark as Packaged</button>
+    <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 2px solid var(--border);">
+      <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+        <span style="color:var(--text-muted);">Subtotal</span>
+        <strong>KES ${(order.subtotal || 0).toLocaleString()}</strong>
+      </div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+        <span style="color:var(--text-muted);">Delivery Fee</span>
+        <strong>KES ${(order.deliveryFee || 0).toLocaleString()}</strong>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:1.125rem; font-weight:700; margin-top:0.75rem; padding-top:0.75rem; border-top:1px solid var(--border);">
+        <span>Total</span>
+        <span style="color:var(--primary);">KES ${(order.grandTotal || order.totalPrice || 0).toLocaleString()}</span>
+      </div>
+    </div>
+    
+    <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem;">
+      <button class="btn btn-success" style="flex: 1;" onclick="markAsFulfilled('${order.id}')">
+        <i class="fas fa-check"></i> Mark Packaged
+      </button>
+      <button class="btn btn-danger" style="flex: 1;" onclick="closeModal()">
+        <i class="fas fa-times"></i> Cancel
+      </button>
     </div>
   `;
   
   document.getElementById('orderDetailsContent').innerHTML = html;
   document.getElementById('orderDetailsModal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
 }
 
-
+function closeModal() {
+  document.getElementById('orderDetailsModal').style.display = 'none';
+  document.body.style.overflow = '';
+}
 
 function markAsFulfilled(orderId) {
   const order = allOrders.find(o => o.id === orderId);
   
   if (!order) {
-    alert('Order not found');
+    showToast('Order not found', 'error');
     return;
   }
   
-  if (confirm('Mark this order as packaged and send to delivery?')) {
-    const deliveryQueue = JSON.parse(localStorage.getItem("deliveryQueue")) || [];
-    
-    deliveryQueue.push({
-      id: order.id,
-      client: order.customerName || 'Guest',
-      destination: order.deliveryLocation || 'Pickup',
-      phone: order.customerPhone || 'N/A',
-      items: order.items,
-      amount: order.grandTotal || order.totalPrice || 0
-    });
-    
-    localStorage.setItem("deliveryQueue", JSON.stringify(deliveryQueue));
-    
-    order.status = 'in-delivery';
-    DataManager.saveOrders(allOrders);
-    
-    document.getElementById('orderDetailsModal').style.display = 'none';
-    loadOrdersForFulfillment();
-    updateStats();
-    alert('Order marked as packaged and sent to Delivery Management System');
+  if (!confirm('Mark this order as packaged and send to delivery?')) return;
+  
+  const deliveryQueue = JSON.parse(localStorage.getItem("deliveryQueue")) || [];
+  
+  deliveryQueue.push({
+    id: order.id,
+    client: order.customerName || 'Guest',
+    destination: order.deliveryLocation || 'Pickup',
+    phone: order.customerPhone || 'N/A',
+    items: order.items,
+    amount: order.grandTotal || order.totalPrice || 0
+  });
+  
+  localStorage.setItem("deliveryQueue", JSON.stringify(deliveryQueue));
+  
+  order.status = 'in-delivery';
+  DataManager.saveOrders(allOrders);
+  
+  closeModal();
+  loadOrdersForFulfillment();
+  updateStats();
+  showToast('Order packaged and sent to Delivery Management');
+}
+
+// Close modal on background click
+window.onclick = function(event) {
+  const modal = document.getElementById('orderDetailsModal');
+  if (event.target === modal) {
+    closeModal();
   }
 }
 
-
+// Escape key to close modal
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeModal();
+  }
+});
 </script>
 
 </body>

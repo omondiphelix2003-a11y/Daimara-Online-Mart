@@ -2,266 +2,718 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=1200">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Daimara Online Mart | M-Pesa Payment</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
-body{background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%); font-size: 22px; padding-bottom: 100px;}
-
-/* FOOTER */
-.footer {
-  background: #0a0a0a;
-  color: white;
-  padding: 30px 20px;
-  text-align: center;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  z-index: 1000;
+:root{
+  --primary:#e99d11;
+  --primary-dark:#d97706;
+  --dark:#0a0a0a;
+  --darker:#1a1a1a;
+  --card:#ffffff;
+  --text:#1f2937;
+  --success:#16a34a;
+  --border:#e5e7eb;
+  --shadow:0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
-.footer p {
-  color: rgb(233, 157, 17);
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  background:#111827;
+  min-height:100vh;
+  font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  color:var(--text);
+  line-height:1.6;
+  display:flex;
+  flex-direction:column;
+  padding-bottom:80px;
 }
 
 /* NAVBAR */
-/*.navbar{
+.navbar{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  padding:5px 5px 5px 10px;
-  margin: 5px 0px 10px 0px;
-  background:#000000;
+  padding:clamp(0.75rem, 2vw, 1rem) clamp(1rem, 3vw, 1.5rem);
+  background:#000;
   color:#fff;
   position:fixed;
-  bottom:1945px;
+  top:0;
+  left:0;
   width:100%;
   z-index:1000;
+  box-shadow:var(--shadow);
 }
-.logo{color:rgb(233,157,17);font-size:25px;font-weight:bold}
-.navbar a{color:#f5f5f5;text-decoration:none;margin-left:15px;font-size: 25px;}
-.navbar a:hover{color:rgb(233,157,17)}*/
 
+.logo{
+  color:var(--primary);
+  font-size:clamp(1.25rem, 3vw, 1.5rem);
+  font-weight:bold;
+  text-decoration:none;
+  display:flex;
+  align-items:center;
+  gap:0.5rem;
+}
+
+.nav-icons{
+  display:flex;
+  align-items:center;
+  gap:1rem;
+}
+
+.nav-icons a{
+  color:#fff;
+  font-size:1.25rem;
+  text-decoration:none;
+  transition:color 0.2s;
+  width:40px;
+  height:40px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:50%;
+}
+
+.nav-icons a:hover{
+  color:var(--primary);
+  background:rgba(255,255,255,0.1);
+}
+
+/* Shop Icon */
+.shop-icon{
+  position:relative;
+  width:32px;
+  height:28px;
+  background:transparent;
+  border:2px solid var(--primary);
+  border-radius:3px;
+}
+
+.shop-icon::before{
+  content:'';
+  position:absolute;
+  top:-10px;
+  left:50%;
+  transform:translateX(-50%);
+  width:14px;
+  height:10px;
+  border:2px solid var(--primary);
+  border-bottom:none;
+  border-radius:8px 8px 0 0;
+}
+
+.shop-icon::after{
+  content:'';
+  position:absolute;
+  top:8px;
+  left:6px;
+  width:18px;
+  height:2px;
+  background:var(--primary);
+  box-shadow:0 4px 0 var(--primary);
+}
+
+/* MAIN CONTAINER */
 .container{
- max-width:1000px;
-  height: 1000px;
-  margin:120px auto 40px;
-  padding:30px;
-  background:#000000;
-  border-radius:10px;
-  box-shadow:0 10px 15px rgba(0, 0, 0, 0);
-  top: 150%;
-  margin-top: 250px;
-}
-
-h2{text-align:center;margin-bottom:20px;color: rgb(233,157,17);margin-bottom:80px;margin-top: 40px;}
-
-.m-pesa {
-   width:-250px;
-  height: -250px;
-  padding-bottom: 50px;
-  border-radius:50px;
-   box-shadow:0 10px 15px rgba(116, 115, 115, 0);
-}
-
-.mpesa-box{
-  background:#dfdddd;
-  padding:20px;
-  border-radius:8px;
-  margin-bottom:120px;
-}
-
-.mpesa-box p{
-  margin-bottom:20px;
-  margin-top: 20px;
-  font-size:20px;
-  color: #000000;
-}
-
-.phone {
-  color: rgb(233,157,17);margin-bottom: 50px;margin-top: 80px;font-size: 25px;
-}
-
-input{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:clamp(1rem, 3vw, 2rem);
+  margin-top:80px;
   width:100%;
-  padding:12px;
-  margin:10px 0;
-  border:1px solid #000000cc;
-  border-radius:6px;
-  box-shadow: #000000;
-  background:#ffffff;
-  cursor: pointer;
-  font-size: 20px;
+  max-width:600px;
+  margin-left:auto;
+  margin-right:auto;
 }
 
-button{
-  width:50%;
-  padding:14px;
-  background:#111;
-  color:rgb(233,157,17);
+/* M-PESA LOGO */
+.m-pesa{
+  width:100%;
+  max-width:280px;
+  margin-bottom:2rem;
+  animation:fadeIn 0.5s ease;
+}
+
+.m-pesa img{
+  width:100%;
+  height:auto;
+  border-radius:16px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.3);
+}
+
+@keyframes fadeIn{
+  from{
+    opacity:0;
+    transform:translateY(-20px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+/* PAYMENT CARD */
+.payment-card{
+  background:var(--card);
+  width:100%;
+  border-radius:20px;
+  padding:clamp(1.5rem, 4vw, 2.5rem);
+  box-shadow:0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+  animation:slideUp 0.5s ease 0.1s both;
+}
+
+@keyframes slideUp{
+  from{
+    opacity:0;
+    transform:translateY(20px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+/* ORDER SUMMARY */
+.order-summary{
+  background:#f9fafb;
+  padding:1.25rem;
+  border-radius:12px;
+  margin-bottom:1.5rem;
+  border:1px solid var(--border);
+}
+
+.order-summary h3{
+  font-size:0.875rem;
+  text-transform:uppercase;
+  letter-spacing:0.05em;
+  color:#6b7280;
+  margin-bottom:1rem;
+  display:flex;
+  align-items:center;
+  gap:0.5rem;
+}
+
+.summary-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:0.75rem 0;
+  border-bottom:1px solid var(--border);
+  font-size:0.9375rem;
+}
+
+.summary-row:last-child{
+  border-bottom:none;
+  padding-bottom:0;
+}
+
+.summary-row:first-child{
+  padding-top:0;
+}
+
+.summary-label{
+  color:#6b7280;
+  font-weight:500;
+}
+
+.summary-value{
+  font-weight:700;
+  color:var(--text);
+}
+
+.summary-value.amount{
+  color:var(--primary);
+  font-size:1.25rem;
+}
+
+/* PHONE INPUT */
+.input-group{
+  margin-bottom:1.5rem;
+}
+
+.input-group label{
+  display:block;
+  margin-bottom:0.5rem;
+  font-weight:600;
+  color:var(--text);
+  font-size:0.9375rem;
+}
+
+.input-wrapper{
+  position:relative;
+  display:flex;
+  align-items:center;
+}
+
+.input-wrapper i{
+  position:absolute;
+  left:1rem;
+  color:#6b7280;
+  font-size:1.125rem;
+}
+
+input[type="tel"]{
+  width:100%;
+  padding:1rem 1rem 1rem 3rem;
+  border:2px solid var(--border);
+  border-radius:12px;
+  font-size:1rem;
+  font-family:inherit;
+  transition:all 0.3s;
+  background:white;
+}
+
+input[type="tel"]:focus{
+  outline:none;
+  border-color:var(--primary);
+  box-shadow:0 0 0 4px rgba(233,157,17,0.1);
+}
+
+input[type="tel"]::placeholder{
+  color:#9ca3af;
+}
+
+/* PAY BUTTON */
+.pay-btn{
+  width:100%;
+  padding:1rem 1.5rem;
+  background:linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color:#000;
   border:none;
-  border-radius:6px;
-  font-size:21px;
+  border-radius:12px;
+  font-size:1.125rem;
+  font-weight:700;
   cursor:pointer;
-  margin-left: 25%;
+  transition:all 0.3s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:0.75rem;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  margin-bottom:1.5rem;
 }
 
-button:hover{
-  background:#0b7021;
-  color: #000000;
-  font-weight: bold;
+.pay-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 20px rgba(233,157,17,0.3);
 }
 
+.pay-btn:active{
+  transform:translateY(0);
+}
+
+.pay-btn:disabled{
+  background:#d1d5db;
+  color:#9ca3af;
+  cursor:not-allowed;
+  transform:none;
+  box-shadow:none;
+}
+
+/* LOADING SPINNER */
+.spinner{
+  display:inline-block;
+  width:20px;
+  height:20px;
+  border:3px solid rgba(0,0,0,0.3);
+  border-radius:50%;
+  border-top-color:transparent;
+  animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+  to{transform:rotate(360deg);}
+}
+
+/* NOTE */
 .note{
-  font-size:20px;
-  color:#ffffffbb;
   text-align:center;
-  margin-top:45px;
+  font-size:0.875rem;
+  color:#6b7280;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0.5rem;
 }
 
-.shop-icon {
-            position: relative;
-            width: 40px;
-            height: 35px;
-            background-color: transparent;
-            border: 3px solid rgb(233, 157, 17);
-            border-radius: 4px;
-            margin: 20px;
-             top: 5px;
-            left: -15%;
-        }
+.note i{
+  font-size:1.5rem;
+  color:var(--success);
+}
 
-        .shop-icon::before {
-            content: '';
-            position: absolute;
-            top: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 18px;
-            height: 12px;
-            border: 3px solid rgb(233, 157, 17);
-            border-bottom: none;
-            border-radius: 10px 10px 0 0;
-        }
+/* SECURITY BADGES */
+.security-badges{
+  display:flex;
+  justify-content:center;
+  gap:1.5rem;
+  margin-top:1.5rem;
+  flex-wrap:wrap;
+}
 
-        .shop-icon::after {
-            content: '';
-            position: absolute;
-            top: 10px;
-            left: 8px;
-            width: 24px;
-            height: 2px;
-            background-color: #ffffff;
-            box-shadow: 0 6px 0 #a7884f;
-        }
+.badge{
+  display:flex;
+  align-items:center;
+  gap:0.5rem;
+  font-size:0.75rem;
+  color:#6b7280;
+  text-transform:uppercase;
+  letter-spacing:0.05em;
+}
 
+.badge i{
+  color:var(--success);
+  font-size:1rem;
+}
 
+/* FOOTER */
+.footer{
+  background:var(--dark);
+  color:#fff;
+  padding:1rem;
+  text-align:center;
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  z-index:100;
+  font-size:0.875rem;
+}
+
+.footer p{
+  color:var(--primary);
+  margin:0;
+}
+
+/* TOAST NOTIFICATION */
+.toast{
+  position:fixed;
+  top:100px;
+  left:50%;
+  transform:translateX(-50%) translateY(-100px);
+  background:var(--dark);
+  color:white;
+  padding:1rem 1.5rem;
+  border-radius:12px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.2);
+  display:flex;
+  align-items:center;
+  gap:0.75rem;
+  opacity:0;
+  transition:all 0.3s;
+  z-index:2000;
+  max-width:90vw;
+  font-weight:500;
+  border-left:4px solid var(--primary);
+}
+
+.toast.show{
+  transform:translateX(-50%) translateY(0);
+  opacity:1;
+}
+
+.toast.success{
+  border-left-color:var(--success);
+}
+
+.toast.error{
+  border-left-color:var(--danger);
+}
+
+/* RESPONSIVE BREAKPOINTS */
+@media (max-width:640px){
+  .container{
+    margin-top:70px;
+    padding:1rem;
+  }
+  
+  .m-pesa{
+    max-width:200px;
+  }
+  
+  .payment-card{
+    border-radius:16px;
+    padding:1.25rem;
+  }
+  
+  .pay-btn{
+    font-size:1rem;
+    padding:0.875rem 1.25rem;
+  }
+}
+
+/* TOUCH OPTIMIZATIONS */
+@media (hover:none) and (pointer:coarse){
+  .pay-btn{
+    min-height:56px;
+  }
+  
+  input[type="tel"]{
+    font-size:16px; /* Prevents zoom on iOS */
+  }
+}
+
+/* REDUCED MOTION */
+@media (prefers-reduced-motion:reduce){
+  *{
+    animation-duration:0.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:0.01ms !important;
+  }
+}
+
+/* ACCESSIBILITY */
+.sr-only{
+  position:absolute;
+  width:1px;
+  height:1px;
+  padding:0;
+  margin:-1px;
+  overflow:hidden;
+  clip:rect(0,0,0,0);
+  white-space:nowrap;
+  border-width:0;
+}
 </style>
+<base target="_blank">
 </head>
 
 <body>
 
 <!-- NAVBAR -->
-<!--<nav class="navbar">
-  <div class="logo">
-    <a href="home.html" style="color:inherit;text-decoration:none;"><!--Pay with-->
-
-    <!--</a>-->
- <!-- </div>
-  <div>
-    <a href="shop.html"><div class="shop-icon"></div></a>
-    <a href="cart.html" ><i class="fa fa-shopping-cart" ></i></a>
+<nav class="navbar">
+  <!--<a href="home.html" class="logo">
+    <i class="fas fa-store"></i> Daimara
+  </a>-->
+  <div class="nav-icons">
+    <a href="store.html" title="Shop">
+      <div class="shop-icon"></div>
+    </a>
+    <a href="cart.html" title="Cart"style="font-size:28px;color:rgb(233, 157, 17);">
+      <i class="fas fa-shopping-cart"></i>
+    </a>
   </div>
-</nav>-->
+</nav>
 
+<!-- MAIN CONTENT -->
+<main class="container">
+  <!-- M-PESA LOGO -->
+  <div class="m-pesa">
+    <img src="mpesa.png" alt="M-Pesa Logo">
+  </div>
+
+  <!-- PAYMENT CARD -->
+  <div class="payment-card">
+    <!-- ORDER SUMMARY -->
+    <div class="order-summary">
+      <h3><i class="fas fa-receipt"></i> Order Summary</h3>
+      <div class="summary-row">
+        <span class="summary-label">Order ID</span>
+        <span class="summary-value" id="orderId">—</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-label">Amount to Pay</span>
+        <span class="summary-value amount">KES <span id="amount">0</span></span>
+      </div>
+    </div>
+
+    <!-- PHONE INPUT -->
+    <div class="input-group">
+      <label for="phone">
+        <i class="fas fa-mobile-alt"></i> M-Pesa Phone Number
+      </label>
+      <div class="input-wrapper">
+        <i class="fas fa-phone"></i>
+        <input 
+          type="tel" 
+          id="phone" 
+          placeholder="2547XXXXXXXX" 
+          required
+          inputmode="tel"
+          autocomplete="tel"
+        >
+      </div>
+    </div>
+
+    <!-- PAY BUTTON -->
+    <button class="pay-btn" id="payBtn" onclick="payNow()">
+      <i class="fas fa-mobile-alt"></i> Pay with M-Pesa
+    </button>
+
+    <!-- NOTE -->
+    <div class="note">
+      <i class="fas fa-info-circle"></i>
+      <span>You will receive an M-Pesa STK prompt on your phone. Enter your PIN to complete payment.</span>
+    </div>
+
+    <!-- SECURITY BADGES -->
+    <div class="security-badges">
+      <div class="badge">
+        <i class="fas fa-shield-alt"></i>
+        <span>Secure Payment</span>
+      </div>
+      <div class="badge">
+        <i class="fas fa-lock"></i>
+        <span>256-bit SSL</span>
+      </div>
+      <div class="badge">
+        <i class="fas fa-check-circle"></i>
+        <span>Instant Confirmation</span>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- FOOTER -->
 <footer class="footer">
-  <p>Copyright © 2026 Daimara Online Mart.All rights reserved.</p>
+  <p>© 2026 Daimara Online Mart. All rights reserved.</p>
 </footer>
 
-<div class="container">
-  <div class="m-pesa"><img src="mpesa.png"></div>
-  <!--<h2>M-Pesa Payment</h2>-->
-
-  <div class="mpesa-box">
-    <p><strong>Order ID:</strong> <span id="orderId">—</span></p>
-    <p><strong>Amount:</strong> KES <span id="amount">0</span></p>
-  </div>
-
-  <div class="phone">
-    <label for="phone">M-Pesa Phone Number</label>
-  <input type="tel" id="phone" placeholder="2547XXXXXXXX" required>
-  </div>
-  
-
-  <button onclick="payNow()">
-    <i class="fa fa-mobile-alt"></i> Pay with M-Pesa
-  </button>
-
-  <p class="note">
-    You will receive an M-Pesa STK prompt on your phone.
-  </p>
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <i class="fas fa-info-circle"></i>
+  <span id="toastMessage">Message</span>
 </div>
 
 <script src="data-manager.js"></script>
 <script>
+// Get order data
 const orderData = JSON.parse(localStorage.getItem('mpesaOrder'));
 
 if(!orderData){
-  alert("No order found");
-  window.location.href = "checkout.html";
-}
-
-document.getElementById('orderId').innerText = orderData.orderId;
-document.getElementById('amount').innerText = orderData.total;
-
-// AUTO-FILL PHONE: First from logged-in user profile, then from localStorage
-const loggedInUser = DataManager.getCurrentUser();
-const savedPhone = localStorage.getItem('customerPhone');
-
-if (loggedInUser && loggedInUser.phone) {
-  document.getElementById('phone').value = loggedInUser.phone;
-} else if (savedPhone) {
-  document.getElementById('phone').value = savedPhone;
-}
-
-function payNow(){
-  const phone = document.getElementById('phone').value.trim();
-
-  if(!phone){
-    alert("Please enter phone number");
-    return;
-  }
-
-  localStorage.setItem('customerPhone', phone);
-
-  console.log('Initiating M-Pesa payment for', phone, 'Amount:', orderData.total);
-  
-  // Simulate STK push
-  alert("STK Push sent to " + phone + ". Please enter your PIN on your phone.");
-
+  showToast('No order found. Redirecting...', 'error');
   setTimeout(() => {
-    alert("Payment successful! Thank you for shopping with Daimara Online Mart.");
-    
-    // UPDATE ORDER STATUS TO PENDING (awaiting packaging)
-    const allOrders = DataManager.getAllOrders();
-    const currentOrder = allOrders.find(o => o.id === orderData.orderId);
-    if (currentOrder) {
-      currentOrder.status = 'pending';
-      DataManager.saveOrders(allOrders);
-      console.log('Order status updated to pending after payment:', currentOrder);
-    }
+    window.location.href = "checkout.html";
+  }, 2000);
+}
 
-    // Clear cart AFTER payment success
-    if (typeof DataManager !== 'undefined') {
-      DataManager.clearCart();
-    }
-    localStorage.removeItem('mpesaOrder');
-    window.location.href = "index.html";
+// Populate order details
+document.getElementById('orderId').textContent = orderData.orderId;
+document.getElementById('amount').textContent = parseInt(orderData.total).toLocaleString();
+
+// Auto-fill phone number
+if(typeof DataManager !== 'undefined'){
+  const loggedInUser = DataManager.getCurrentUser();
+  const savedPhone = localStorage.getItem('customerPhone');
+  
+  if(loggedInUser && loggedInUser.phone){
+    document.getElementById('phone').value = loggedInUser.phone;
+  } else if(savedPhone){
+    document.getElementById('phone').value = savedPhone;
+  }
+}
+
+// Toast notification
+function showToast(message, type = 'info'){
+  const toast = document.getElementById('toast');
+  const toastMessage = document.getElementById('toastMessage');
+  const icon = toast.querySelector('i');
+  
+  toast.className = 'toast ' + type;
+  toastMessage.textContent = message;
+  
+  // Set appropriate icon
+  if(type === 'error'){
+    icon.className = 'fas fa-exclamation-circle';
+  } else if(type === 'success'){
+    icon.className = 'fas fa-check-circle';
+  } else {
+    icon.className = 'fas fa-info-circle';
+  }
+  
+  toast.classList.add('show');
+  
+  setTimeout(() => {
+    toast.classList.remove('show');
   }, 3000);
 }
+
+// Payment function
+function payNow(){
+  const phone = document.getElementById('phone').value.trim();
+  const payBtn = document.getElementById('payBtn');
+  
+  // Validation
+  if(!phone){
+    showToast('Please enter your M-Pesa phone number', 'error');
+    document.getElementById('phone').focus();
+    return;
+  }
+  
+  // Basic phone validation
+  const phoneRegex = /^254[0-9]{9}$/;
+  if(!phoneRegex.test(phone)){
+    showToast('Please enter a valid phone number (2547XXXXXXXX)', 'error');
+    document.getElementById('phone').focus();
+    return;
+  }
+  
+  // Save phone for future
+  localStorage.setItem('customerPhone', phone);
+  
+  // Show loading state
+  payBtn.disabled = true;
+  payBtn.innerHTML = '<span class="spinner"></span> Sending STK Push...';
+  
+  showToast('STK Push sent to ' + phone + '. Check your phone...');
+  
+  // Simulate payment process
+  setTimeout(() => {
+    // Show success
+    payBtn.innerHTML = '<i class="fas fa-check"></i> Payment Successful!';
+    payBtn.style.background = 'var(--success)';
+    payBtn.style.color = 'white';
+    
+    showToast('Payment successful! Thank you for shopping with us.', 'success');
+    
+    // Update order status
+    if(typeof DataManager !== 'undefined'){
+      const allOrders = DataManager.getAllOrders();
+      const currentOrder = allOrders.find(o => o.id === orderData.orderId);
+      
+      if(currentOrder){
+        currentOrder.status = 'pending';
+        currentOrder.paymentMethod = 'mpesa';
+        currentOrder.paymentPhone = phone;
+        currentOrder.paidAt = new Date().toISOString();
+        DataManager.saveOrders(allOrders);
+      }
+      
+      // Clear cart
+      DataManager.clearCart();
+    }
+    
+    // Cleanup and redirect
+    localStorage.removeItem('mpesaOrder');
+    
+    setTimeout(() => {
+      window.location.href = "order-confirmation.html?orderId=" + orderData.orderId;
+    }, 1500);
+    
+  }, 3000);
+}
+
+// Handle Enter key
+document.getElementById('phone').addEventListener('keypress', function(e){
+  if(e.key === 'Enter'){
+    payNow();
+  }
+});
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+  showToast('Ready for payment. Please confirm your phone number.');
+});
 </script>
 
 </body>
