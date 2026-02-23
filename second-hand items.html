@@ -77,24 +77,70 @@ body {
   font-weight: bold;
 }
 
-.nav-links {
+.menu-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
   display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 0 15px;
+}
+
+.menu-toggle span {
+  width: 25px;
+  height: 3px;
+  background-color: rgb(233, 157, 17);
+  transition: all 0.3s ease;
+  border-radius: 2px;
+}
+
+.menu-toggle.active span:nth-child(1) {
+  transform: rotate(45deg) translate(8px, 8px);
+}
+
+.menu-toggle.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.menu-toggle.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -7px);
+}
+
+.nav-links {
+  display: none;
   list-style: none;
-  gap: 30px;
+  position: absolute;
+  top: 60px;
+  left: 0;
+  right: 0;
+  background: #111;
+  flex-direction: column;
+  gap: 0;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  z-index: 999;
+  border-bottom: 2px solid rgb(233, 157, 17);
+}
+
+.nav-links.active {
+  display: flex;
 }
 
 .nav-links li{
-  display: inline-block;
+  display: block;
   font-size: 16px;
   transition: color 0.3s;
+  border-bottom: 1px solid #333;
 }
 
 .nav-links a{
   color: #fff;
   text-decoration: none;
-  padding: 8px 12px;
-  border-radius: 4px;
+  padding: 15px 20px;
+  border-radius: 0;
   transition: all 0.3s;
+  display: block;
 }
 
 .nav-links li:hover,
@@ -102,8 +148,9 @@ body {
   color: rgb(233, 157, 17);
 }
 
-.nav-links a:hover,
+.nav-links li:hover a,
 .nav-links a.active {
+  background: #222;
   color: rgb(233, 157, 17);
 }
 
@@ -158,12 +205,13 @@ body {
 
  .search-container {
   position: fixed;
-  top: 86px;
+  top: 70px;
   left: 50%;
   transform: translateX(-50%);
   width: 90%;
   max-width: 600px;
   z-index: 999;
+  margin-top: 12px;
 }
 
 #search-input {
@@ -230,26 +278,128 @@ body {
   100% { transform: scale(1); }
 } 
 
+/* CONTENT WRAPPER WITH SIDEBAR */
+.content-wrapper {
+  display: flex;
+  gap: 20px;
+  padding: 20px 30px 30px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding-top: 170px;
+}
+
+.type-sidebar {
+  width: 200px;
+  background: #a3a4a79c;
+  border-radius: 12px;
+  border: 0.5px solid rgba(168, 163, 163, 0.363);
+  padding: 15px;
+  height: fit-content;
+  position: sticky;
+  top: 100px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.329);
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  border-bottom: 2px solid rgb(233, 157, 17);
+  padding-bottom: 10px;
+}
+
+.sidebar-header h3 {
+  margin: 0;
+  color: #1d2715;
+  font-size: 16px;
+}
+
+.sidebar-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: rgb(233, 157, 17);
+  font-size: 18px;
+  transition: transform 0.3s;
+}
+
+.sidebar-toggle.collapsed {
+  transform: rotate(-90deg);
+}
+
+.type-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.type-list button {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 10px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+  font-size: 14px;
+  color: #1d2715;
+  transition: all 0.3s;
+}
+
+.type-list button:hover {
+  background: rgb(233, 157, 17);
+  color: #fff;
+  border-color: rgb(233, 157, 17);
+}
+
+.type-list button.active {
+  background: rgb(233, 157, 17);
+  color: #fff;
+  border-color: rgb(233, 157, 17);
+  font-weight: 600;
+}
+
 /* PRODUCT */
 .product-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 20px;
-  padding: 140px 30px 30px;
-  max-width: 1400px;
-  margin: 0 auto;
+  flex: 1;
 }
 
 @media (max-width: 1024px) {
+  .content-wrapper {
+    flex-direction: column;
+  }
+  
+  .type-sidebar {
+    width: 100%;
+    position: static;
+  }
+  
   .product-container {
     grid-template-columns: repeat(3, 1fr);
     gap: 15px;
-    padding: 140px 15px 30px;
+  }
+}
+
+@media (max-width: 768px) {
+  .content-wrapper {
+    padding: 20px 15px 30px;
+    padding-top: 170px;
+  }
+  
+  .type-sidebar {
+    width: 100%;
+  }
+  
+  .product-container {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 .product-card {
-  background: white;
+  background: #a3a4a79c;
   border-radius: 12px;
   overflow: hidden;
  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.329);
@@ -1178,11 +1328,14 @@ body {
 <nav class="navbar">
    <div class="nav-left">
       <a href="store.html" class="home-link"><span><div class="logo"><div class="shop-icon"></div></div></span></a>
-    </div>
-  <ul class="nav-links">
-    <li><a href="#" data-category="Household items">Household items</a></li>
-    <li><a href="#" data-category="Electronics">Electronics</a></li>
-    <li><a href="#" data-category="Furniture">Furniture</a></li>
+     </div>
+  
+     <button class="menu-toggle" id="menu-toggle">
+       <span></span>
+       <span></span>
+       <span></span>
+       </button>
+  <ul class="nav-links" id="nav-dropdown">
   </ul>
 
      <div class="nav-icons">
@@ -1203,14 +1356,23 @@ body {
   <div id="search-results"></div>
 </div>
 
-
-<div class="product-container">
- <div class="product-card">
-    <img src="image-placeholder.jpg" alt="Product" class="product-image">
-    <h3>Product Name</h3>
-    <p class="price">Ksh 500</p>
-    <button class="add-to-cart">Add to Cart</button>
-  </div> 
+<div class="content-wrapper">
+  <aside class="type-sidebar" id="type-sidebar">
+    <div class="sidebar-header">
+      <h3>Types</h3>
+      <button class="sidebar-toggle" id="sidebar-toggle">▼</button>
+    </div>
+    <div class="type-list" id="type-list"></div>
+  </aside>
+  
+  <div class="product-container" id="product-container">
+    <div class="product-card">
+      <img src="image-placeholder.jpg" alt="Product" class="product-image">
+      <h3>Product Name</h3>
+      <p class="price">Ksh 500</p>
+      <button class="add-to-cart">Add to Cart</button>
+    </div> 
+  </div>
 </div>
 
 
@@ -1240,21 +1402,123 @@ body {
 let product = DataManager.getAllProducts();
 let cart = DataManager.getCart();
 let currentCategory = "Household items";
+let currentType = "All";
 
 const productContainer = document.querySelector(".product-container");
+const typeList = document.getElementById("type-list");
+const typeListToggle = document.getElementById("sidebar-toggle");
+const typeSidebar = document.getElementById("type-sidebar");
 const cartModal = document.getElementById("cart-modal");
 const cartItems = document.getElementById("cart-items");
 const cartTotal = document.getElementById("cart-total");
 const cartCount = document.querySelector(".cart-count");
+const navDropdown = document.getElementById("nav-dropdown");
+
+function loadSubcategoriesFromStorage(pageCategory) {
+  const stored = localStorage.getItem('ecommerce_subcategories');
+  let subcategories = {};
+  
+  if (stored) {
+    try {
+      subcategories = JSON.parse(stored);
+    } catch (e) {
+      console.error('Failed to parse stored subcategories');
+      return [];
+    }
+  }
+  
+  return (subcategories[pageCategory] || []).map(s => s.name);
+}
+
+function populateNavDropdown() {
+  const categories = loadSubcategoriesFromStorage('Second-hand');
+  navDropdown.innerHTML = '';
+  
+  if (categories.length === 0) {
+    navDropdown.innerHTML = '<li><a href="#">No categories</a></li>';
+    return;
+  }
+  
+  categories.forEach((category, index) => {
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.href = '#';
+    a.textContent = category;
+    a.setAttribute('data-category', category);
+    li.appendChild(a);
+    navDropdown.appendChild(li);
+  });
+  
+  currentCategory = categories[0] || 'Household items';
+}
+
+populateNavDropdown();
+
+// Extract unique types from category products
+function getProductTypes(category) {
+  const categoryProducts = product[category] || [];
+  const types = new Set();
+  
+  categoryProducts.forEach(item => {
+    const name = item.name || '';
+    const words = name.split(' ');
+    if (words.length > 0) {
+      types.add(words[0]);
+    }
+  });
+  
+  return Array.from(types).sort();
+}
+
+// Populate type list
+function populateTypeList(category) {
+  typeList.innerHTML = '';
+  currentType = 'All';
+  
+  const types = getProductTypes(category);
+  
+  const allButton = document.createElement('button');
+  allButton.textContent = 'All';
+  allButton.classList.add('active');
+  allButton.onclick = () => {
+    document.querySelectorAll('.type-list button').forEach(btn => btn.classList.remove('active'));
+    allButton.classList.add('active');
+    currentType = 'All';
+    renderProducts(category, 'All');
+  };
+  typeList.appendChild(allButton);
+  
+  types.forEach(type => {
+    const button = document.createElement('button');
+    button.textContent = type;
+    button.onclick = () => {
+      document.querySelectorAll('.type-list button').forEach(btn => btn.classList.remove('active'));
+      button.classList.add('active');
+      currentType = type;
+      renderProducts(category, type);
+    };
+    typeList.appendChild(button);
+  });
+}
 
 // Render product by category
-function renderProducts(category) {
+function renderProducts(category, type = 'All') {
   // Reload product from DataManager to get latest
   product = DataManager.getAllProducts();
   cart = DataManager.getCart();
   
+  populateTypeList(category);
+  
   productContainer.innerHTML = "";
-  const categoryProducts = product[category] || [];
+  let categoryProducts = product[category] || [];
+  
+  if (type !== 'All') {
+    categoryProducts = categoryProducts.filter(item => {
+      const name = item.name || '';
+      return name.startsWith(type);
+    });
+  }
+  
   if (categoryProducts.length === 0) {
     productContainer.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #666; padding: 40px; font-size: 18px;">No products available in this category.</p>';
     return;
@@ -1432,6 +1696,22 @@ document.addEventListener('click', (e) => {
   }
 });
 
+const menuToggle = document.getElementById('menu-toggle');
+const navDropdown = document.getElementById('nav-dropdown');
+
+// Sidebar toggle functionality
+if (typeListToggle) {
+  typeListToggle.addEventListener('click', () => {
+    typeListToggle.classList.toggle('collapsed');
+    typeList.style.display = typeList.style.display === 'none' ? 'flex' : 'none';
+  });
+}
+
+menuToggle.addEventListener('click', () => {
+  menuToggle.classList.toggle('active');
+  navDropdown.classList.toggle('active');
+});
+
 document.querySelectorAll(".nav-links a").forEach(link => {
   link.onclick = e => {
     // Only prevent default and render if it has a data-category attribute
@@ -1443,6 +1723,9 @@ document.querySelectorAll(".nav-links a").forEach(link => {
       // Add active state
       document.querySelectorAll(".nav-links a").forEach(l => l.classList.remove('active'));
       link.classList.add('active');
+      
+      menuToggle.classList.remove('active');
+      navDropdown.classList.remove('active');
     }
   };
 });

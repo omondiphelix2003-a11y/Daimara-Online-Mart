@@ -502,48 +502,80 @@
       gap: 15px;
     }
     .product {
-      background: #1F2937;
-      padding: 15px;
-      border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.329);
-      text-align: center;
-      transition: transform 0.3s;
-       border:0.5px solid rgba(168, 163, 163, 0.363);
+      background: #a3a4a79c;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.329);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: 0.5px solid rgba(168, 163, 163, 0.363);
+      display: flex;
+      flex-direction: column;
     }
 
- .product:hover {
-      transform:translateY(-4px);
-      box-shadow:0 20px 25px -5px rgba(0,0,0,0.1);
-      border-color:#e99d11;
+    .product:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+      border-color: #e99d11;
     }
 
     .product img {
       width: 100%;
-      height: 120px;
+      height: 220px;
       object-fit: cover;
-      border-radius: 8px;
+      border-radius: 12px 12px 0 0;
+      display: block;
+      margin: 0;
+      padding: 0;
+      transition: transform 0.4s ease;
     }
+
+    .product:hover img {
+      transform: scale(1.08);
+    }
+
+    .product-details {
+      padding: 18px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
     .product h4 {
-      font-size: 14px;
-      margin: 10px 0;
-      text-align: center;
-      color: #000;
+      font-size: 18px;
+      margin: 0 0 8px 0;
+      color: #1d2715;
+      font-weight: 600;
+      flex-grow: 1;
     }
+
     .product p {
-      font-size: 16px;
-      color: #e74c3c;
+      font-size: 20px;
+      color: #000000;
       font-weight: bold;
+      margin: 10px 0;
     }
+
     .product button {
-      margin-top: 10px;
-      padding: 10px 15px;
+      width: 100%;
+      margin-top: 12px;
+      padding: 12px;
       border: none;
-      border-radius: 5px;
-      background: #111;
+      border-radius: 6px;
+      background: #000000;
       color: rgb(233, 157, 17);
       cursor: pointer;
-      font-size: 14px;
-      width: 100%;
+      font-size: 15px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .product button:hover {
+      background-color: #ffffff;
+      color: #000;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
     }
 
     /* RESPONSIVE BREAKPOINTS */
@@ -981,9 +1013,11 @@
           rndContainer.innerHTML += `
             <div class="product">
               <img src="${img}">
-              <h4>${p.name}</h4>
-              <p>Ksh ${p.price}</p>
-              <button onclick="addToCartById('${p.id}')">Add to Cart</button>
+              <div class="product-details">
+                <h4>${p.name}</h4>
+                <p>Ksh ${p.price}</p>
+                <button onclick="addToCartById('${p.id}')">Add to Cart</button>
+              </div>
             </div>`;
         });
       }

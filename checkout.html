@@ -235,7 +235,7 @@
     /* RANDOM PRODUCTS */
     .products-preview {
       padding: 40px 30px;
-      max-width: 1200px;
+      max-width: 1400px;
       margin: 0 auto;
     }
     .products-preview h2 {
@@ -246,7 +246,7 @@
     }
     #random-products {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
       gap: 20px;
     }
     
@@ -254,52 +254,91 @@
       #random-products {
         grid-template-columns: repeat(3, 1fr);
         gap: 15px;
-        padding: 20px 15px;
       }
     }
+    
+    @media (max-width: 768px) {
+      #random-products {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+      }
+    }
+    
     .product {
-     background:#1F2937;
-       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.329);
-        transition: transform 0.3s;
-       border:0.5px solid rgba(168, 163, 163, 0.363);
-      padding: 20px;
-      border-radius: 10px;
-      text-align: center;
+      background: #a3a4a79c;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.329);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: 0.5px solid rgba(168, 163, 163, 0.363);
+      display: flex;
+      flex-direction: column;
     }
 
- 
     .product:hover {
-      transform:translateY(-4px);
-      box-shadow:0 20px 25px -5px rgba(0,0,0,0.1);
-      border-color:#e99d11;
+      transform: translateY(-4px);
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+      border-color: #e99d11;
     }
 
     .product img {
       width: 100%;
-      height: 160px;
+      height: 220px;
       object-fit: cover;
-      border-radius: 8px;
+      border-radius: 12px 12px 0 0;
+      display: block;
+      margin: 0;
+      padding: 0;
+      transition: transform 0.4s ease;
     }
+    
+    .product:hover img {
+      transform: scale(1.08);
+    }
+    
+    .product-details {
+      padding: 18px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    
     .product h4 {
-      font-size: 24px;
-      margin: 10px 0;
-      text-align: center;
-      color: #000;
+      font-size: 18px;
+      margin: 0 0 8px 0;
+      color: #1d2715;
+      font-weight: 600;
+      flex-grow: 1;
     }
+    
     .product p {
-      font-size: 22px;
+      font-size: 20px;
       color: #000000;
       font-weight: bold;
+      margin: 10px 0;
     }
+    
     .product button {
-      margin-top: 10px;
-      padding: 8px 15px;
+      width: 100%;
+      margin-top: 12px;
+      padding: 12px;
       border: none;
-      border-radius: 5px;
-      background: #111;
+      border-radius: 6px;
+      background: #000000;
       color: rgb(233, 157, 17);
       cursor: pointer;
-      font-size: 20px;
+      font-size: 15px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    .product button:hover {
+      background-color: #ffffff;
+      color: #000;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
     }
   </style>
 </head>
@@ -384,7 +423,7 @@
       </div>
     </div>
 
-   <button onclick="checkout()">Place Order</button>
+   <button type="button" onclick="checkout()">Place Order</button>
     
     
   </div>
@@ -551,123 +590,133 @@
   }
 
   function checkout(){
-    const currentUser = DataManager.getCurrentUser();
-    const name=document.getElementById('name').value;
-    const email=document.getElementById('email').value;
-    const paymentMethod=document.getElementById('paymentMethod').value;
-    const warehouseId = document.getElementById('warehouseSelect').value;
-    const storeId = document.getElementById('storeSelect').value;
-    
-    if(!name||!email){alert('Please fill all fields'); return;}
-    if(!warehouseId){alert('Please select a branch for fulfillment'); return;}
-    if(!storeId){alert('Please select a store for fulfillment'); return;}
-
-    const subtotal = cart.reduce((a,b)=>a+b.price*(b.qty||1),0);
-    const deliveryCheckbox = document.getElementById('delivery-option');
-    const deliveryFee = deliveryCheckbox.checked ? 70 : 0;
-    const totalPrice = subtotal + deliveryFee;
-
-    const locationInput = document.getElementById('location-coords').value.trim();
-    if (deliveryCheckbox.checked && !locationInput) {
-      alert('Please paste your delivery location or link.');
-      return;
-    }
-
-    const orderData = {
-      items: cart,
-      subtotal: subtotal,
-      deliveryFee: deliveryFee,
-      totalPrice: totalPrice,
-      paymentMethod,
-      warehouseId: warehouseId,
-      storeId: storeId,
-      customer: { 
-        name, 
-        email, 
-        phone: currentUser ? currentUser.phone : '' 
-      },
-      customerName: name,
-      customerPhone: currentUser ? currentUser.phone : '',
-      deliveryLocation: deliveryCheckbox.checked ? locationInput : null
-    };
-
-    // Simulate backend call
-    console.log('Placing order...', orderData);
-    
-    // In a real app, you'd fetch here
-    /*
-    fetch('http://localhost:5000/api/orders',{ 
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'Authorization':'Bearer '+localStorage.getItem('token')
-      },
-      body:JSON.stringify(orderData)
-    })
-    */
-
-    // Simulate successful response
-    const data = {
-      success: true,
-      orderId: 'ORD-' + Date.now(),
-      totalPrice: totalPrice
-    };
-
-    // Save to DataManager orders
-    const newOrder = {
-      ...orderData,
-      id: data.orderId,
-      date: new Date().toISOString(),
-      status: 'pending',
-      userId: currentUser ? currentUser.id : 'guest',
-      grandTotal: totalPrice // Align with admin-manager.html expectation
-    };
-    
-    const allOrders = DataManager.getAllOrders() || [];
-    allOrders.push(newOrder);
-    DataManager.saveOrders(allOrders);
-    
-    console.log('Order saved successfully:', newOrder);
-    console.log('All orders after save:', DataManager.getAllOrders());
-
-    // REDUCE STOCK FROM SELECTED STORE
-    cart.forEach(item => {
-      const qty = item.qty || 1;
-      // Deduct from the specific store's inventory
-      const result = DataManager.deductFromStoreInventory(warehouseId, storeId, item.id, item.name, qty);
-      if (!result.success) {
-        console.warn(`Failed to deduct ${item.name} from store: ${result.message}`);
+    try {
+      const currentUser = DataManager.getCurrentUser();
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const paymentMethod = document.getElementById('paymentMethod').value;
+      const warehouseId = document.getElementById('warehouseSelect').value;
+      const storeId = document.getElementById('storeSelect').value;
+      const deliveryCheckbox = document.getElementById('delivery-option');
+      
+      if(!name || !email){
+        alert('Please fill all required fields (Name and Email)');
+        return;
       }
-    });
+      if(!warehouseId){
+        alert('Please select a branch for fulfillment');
+        return;
+      }
+      if(!storeId){
+        alert('Please select a store for fulfillment');
+        return;
+      }
+      
+      cart = DataManager.getCart();
+      if(!cart || cart.length === 0){
+        alert('Your cart is empty. Please add items before checkout.');
+        return;
+      }
 
-    // Generate Invoice
-    const invoiceData = {
-      orderId: data.orderId,
-      customerInfo: {
-        name: name,
-        email: email,
-        phone: currentUser ? currentUser.phone : ''
-      },
-      items: cart,
-      subtotal: subtotal,
-      tax: subtotal * 0.16, // 16% VAT
-      shipping: deliveryFee,
-      total: totalPrice
-    };
-    DataManager.addInvoice(invoiceData);
+      const locationInput = document.getElementById('location-coords').value.trim();
+      if (deliveryCheckbox && deliveryCheckbox.checked && !locationInput) {
+        alert('Please paste your delivery location or link.');
+        return;
+      }
 
-    localStorage.setItem('mpesaOrder', JSON.stringify({
-      orderId: data.orderId,
-      total: totalPrice,
-      items: cart
-    }));
+      const subtotal = cart.reduce((a,b) => a + (b.price * (b.qty || 1)), 0);
+      const deliveryFee = (deliveryCheckbox && deliveryCheckbox.checked) ? 70 : 0;
+      const totalPrice = subtotal + deliveryFee;
 
-    if (paymentMethod === 'mpesa') {
-      window.location.href = "mpesa-payment.html";
-    } else {
-      alert('Order placed successfully! Order ID: ' + data.orderId);
-      DataManager.clearCart();
-      window.location.href = "index.html";
+      const orderId = 'ORD-' + Date.now();
+      
+      const orderData = {
+        id: orderId,
+        items: cart,
+        subtotal: subtotal,
+        deliveryFee: deliveryFee,
+        totalPrice: totalPrice,
+        grandTotal: totalPrice,
+        paymentMethod: paymentMethod,
+        warehouseId: warehouseId,
+        storeId: storeId,
+        customer: { 
+          name: name, 
+          email: email, 
+          phone: currentUser ? currentUser.phone : '' 
+        },
+        customerName: name,
+        customerPhone: currentUser ? currentUser.phone : '',
+        deliveryLocation: (deliveryCheckbox && deliveryCheckbox.checked) ? locationInput : null,
+        date: new Date().toISOString(),
+        status: 'pending',
+        userId: currentUser ? currentUser.id : 'guest'
+      };
+
+      console.log('Order Data:', orderData);
+
+      try {
+        const allOrders = DataManager.getAllOrders() || [];
+        allOrders.push(orderData);
+        DataManager.saveOrders(allOrders);
+        console.log('Order saved successfully');
+      } catch(saveError) {
+        console.warn('Failed to save order to DataManager:', saveError);
+      }
+
+      try {
+        const invoiceData = {
+          orderId: orderId,
+          customerInfo: {
+            name: name,
+            email: email,
+            phone: currentUser ? currentUser.phone : ''
+          },
+          items: cart,
+          subtotal: subtotal,
+          tax: subtotal * 0.16,
+          shipping: deliveryFee,
+          total: totalPrice
+        };
+        if(typeof DataManager.addInvoice === 'function') {
+          DataManager.addInvoice(invoiceData);
+        }
+      } catch(invoiceError) {
+        console.warn('Failed to add invoice:', invoiceError);
+      }
+
+      try {
+        cart.forEach(item => {
+          const qty = item.qty || 1;
+          if(typeof DataManager.deductFromStoreInventory === 'function') {
+            DataManager.deductFromStoreInventory(warehouseId, storeId, item.id, item.name, qty);
+          }
+        });
+      } catch(stockError) {
+        console.warn('Failed to deduct stock:', stockError);
+      }
+
+      localStorage.setItem('mpesaOrder', JSON.stringify({
+        orderId: orderId,
+        total: totalPrice,
+        customerName: name,
+        customerEmail: email,
+        customerPhone: currentUser ? currentUser.phone : '',
+        warehouseId: warehouseId,
+        storeId: storeId
+      }));
+
+      if (paymentMethod === 'mpesa') {
+        window.location.href = 'mpesa-payment.html';
+      } else {
+        alert('Order placed successfully! Order ID: ' + orderId);
+        DataManager.clearCart();
+        window.location.href = 'index.html';
+      }
+      
+    } catch(error) {
+      console.error('Checkout error:', error);
+      alert('Error during checkout: ' + error.message + '\n\nPlease check the browser console for details.');
     }
   }
 
@@ -720,9 +769,11 @@
         rndContainer.innerHTML += `
           <div class="product">
             <img src="${img}">
-            <h4>${p.name}</h4>
-            <p>Ksh ${p.price}</p>
-            <button onclick="addToCartById('${p.id}')">Add to Cart</button>
+            <div class="product-details">
+              <h4>${p.name}</h4>
+              <p>Ksh ${p.price}</p>
+              <button onclick="addToCartById('${p.id}')">Add to Cart</button>
+            </div>
           </div>`;
       });
     }

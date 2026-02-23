@@ -100,12 +100,13 @@ body {
 
 .search-container {
   position: fixed;
-  top: 86px;
+  top: 70px;
   left: 50%;
   transform: translateX(-50%);
   width: 90%;
   max-width: 600px;
   z-index: 999;
+  margin-top: 12px;
 }
 
 #search-input {
@@ -149,7 +150,7 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 20px;
-  padding: 140px 30px 30px;
+  padding: 170px 30px 30px;
   max-width: 1400px;
   margin: 0 auto;
 }

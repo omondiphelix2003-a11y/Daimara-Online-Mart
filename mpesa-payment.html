@@ -306,21 +306,24 @@ input[type="tel"]::placeholder{
   margin-bottom:1.5rem;
 }
 
-.pay-btn:hover{
+.pay-btn:hover:not(:disabled):not(.disabled){
   transform:translateY(-2px);
   box-shadow:0 10px 20px rgba(233,157,17,0.3);
 }
 
-.pay-btn:active{
+.pay-btn:active:not(:disabled):not(.disabled){
   transform:translateY(0);
 }
 
-.pay-btn:disabled{
-  background:#d1d5db;
-  color:#9ca3af;
-  cursor:not-allowed;
-  transform:none;
-  box-shadow:none;
+.pay-btn:disabled,
+.pay-btn.disabled{
+  background:#d1d5db !important;
+  color:#9ca3af !important;
+  cursor:not-allowed !important;
+  transform:none !important;
+  box-shadow:none !important;
+  opacity:0.6 !important;
+  pointer-events:none !important;
 }
 
 /* LOADING SPINNER */
@@ -548,7 +551,7 @@ input[type="tel"]::placeholder{
     </div>
 
     <!-- PAY BUTTON -->
-    <button class="pay-btn" id="payBtn" onclick="payNow()">
+    <button onclick="payNow()" id="payButton" class="pay-btn-new" style="width: 100%; padding: 1rem 1.5rem; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: #000; border: none; border-radius: 12px; font-size: 1.125rem; font-weight: 700; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 1.5rem;">
       <i class="fas fa-mobile-alt"></i> Pay with M-Pesa
     </button>
 
@@ -589,133 +592,60 @@ input[type="tel"]::placeholder{
 
 <script src="data-manager.js"></script>
 <script>
-// Get order data
 const orderData = JSON.parse(localStorage.getItem('mpesaOrder'));
 
 if(!orderData){
-  showToast('No order found. Redirecting...', 'error');
-  setTimeout(() => {
-    window.location.href = "checkout.html";
-  }, 2000);
+  alert("No order found");
+  window.location.href = "checkout.html";
 }
 
-// Populate order details
-document.getElementById('orderId').textContent = orderData.orderId;
-document.getElementById('amount').textContent = parseInt(orderData.total).toLocaleString();
+document.getElementById('orderId').innerText = orderData.orderId;
+document.getElementById('amount').innerText = orderData.total;
 
-// Auto-fill phone number
-if(typeof DataManager !== 'undefined'){
-  const loggedInUser = DataManager.getCurrentUser();
-  const savedPhone = localStorage.getItem('customerPhone');
-  
-  if(loggedInUser && loggedInUser.phone){
-    document.getElementById('phone').value = loggedInUser.phone;
-  } else if(savedPhone){
-    document.getElementById('phone').value = savedPhone;
-  }
+// AUTO-FILL PHONE: First from logged-in user profile, then from localStorage
+const loggedInUser = DataManager.getCurrentUser();
+const savedPhone = localStorage.getItem('customerPhone');
+
+if (loggedInUser && loggedInUser.phone) {
+  document.getElementById('phone').value = loggedInUser.phone;
+} else if (savedPhone) {
+  document.getElementById('phone').value = savedPhone;
 }
 
-// Toast notification
-function showToast(message, type = 'info'){
-  const toast = document.getElementById('toast');
-  const toastMessage = document.getElementById('toastMessage');
-  const icon = toast.querySelector('i');
-  
-  toast.className = 'toast ' + type;
-  toastMessage.textContent = message;
-  
-  // Set appropriate icon
-  if(type === 'error'){
-    icon.className = 'fas fa-exclamation-circle';
-  } else if(type === 'success'){
-    icon.className = 'fas fa-check-circle';
-  } else {
-    icon.className = 'fas fa-info-circle';
-  }
-  
-  toast.classList.add('show');
-  
-  setTimeout(() => {
-    toast.classList.remove('show');
-  }, 3000);
-}
-
-// Payment function
 function payNow(){
   const phone = document.getElementById('phone').value.trim();
-  const payBtn = document.getElementById('payBtn');
-  
-  // Validation
+
   if(!phone){
-    showToast('Please enter your M-Pesa phone number', 'error');
-    document.getElementById('phone').focus();
+    alert("Please enter phone number");
     return;
   }
-  
-  // Basic phone validation
-  const phoneRegex = /^254[0-9]{9}$/;
-  if(!phoneRegex.test(phone)){
-    showToast('Please enter a valid phone number (2547XXXXXXXX)', 'error');
-    document.getElementById('phone').focus();
-    return;
-  }
-  
-  // Save phone for future
+
   localStorage.setItem('customerPhone', phone);
+
+  console.log('Initiating M-Pesa payment for', phone, 'Amount:', orderData.total);
   
-  // Show loading state
-  payBtn.disabled = true;
-  payBtn.innerHTML = '<span class="spinner"></span> Sending STK Push...';
-  
-  showToast('STK Push sent to ' + phone + '. Check your phone...');
-  
-  // Simulate payment process
+  // Simulate STK push
+  alert("STK Push sent to " + phone + ". Please enter your PIN on your phone.");
+
   setTimeout(() => {
-    // Show success
-    payBtn.innerHTML = '<i class="fas fa-check"></i> Payment Successful!';
-    payBtn.style.background = 'var(--success)';
-    payBtn.style.color = 'white';
+    alert("Payment successful! Thank you for shopping with Daimara Online Mart.");
     
-    showToast('Payment successful! Thank you for shopping with us.', 'success');
-    
-    // Update order status
-    if(typeof DataManager !== 'undefined'){
-      const allOrders = DataManager.getAllOrders();
-      const currentOrder = allOrders.find(o => o.id === orderData.orderId);
-      
-      if(currentOrder){
-        currentOrder.status = 'pending';
-        currentOrder.paymentMethod = 'mpesa';
-        currentOrder.paymentPhone = phone;
-        currentOrder.paidAt = new Date().toISOString();
-        DataManager.saveOrders(allOrders);
-      }
-      
-      // Clear cart
+    // UPDATE ORDER STATUS TO COMPLETED
+    const allOrders = DataManager.getAllOrders();
+    const currentOrder = allOrders.find(o => o.id === orderData.orderId);
+    if (currentOrder) {
+      currentOrder.status = 'completed';
+      DataManager.saveOrders(allOrders);
+    }
+
+    // Clear cart AFTER payment success
+    if (typeof DataManager !== 'undefined') {
       DataManager.clearCart();
     }
-    
-    // Cleanup and redirect
     localStorage.removeItem('mpesaOrder');
-    
-    setTimeout(() => {
-      window.location.href = "order-confirmation.html?orderId=" + orderData.orderId;
-    }, 1500);
-    
+    window.location.href = "index.html";
   }, 3000);
 }
-
-// Handle Enter key
-document.getElementById('phone').addEventListener('keypress', function(e){
-  if(e.key === 'Enter'){
-    payNow();
-  }
-});
-
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-  showToast('Ready for payment. Please confirm your phone number.');
-});
 </script>
 
 </body>

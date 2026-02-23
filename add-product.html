@@ -49,6 +49,70 @@
             padding: 20px;
         }
 
+        .form-container {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+            align-items: flex-start;
+        }
+
+        .form-wrapper {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .preview-sidebar {
+            width: 280px;
+            background: #2a3441;
+            border-radius: 8px;
+            padding: 20px;
+            border: 2px solid #e99d11;
+            box-shadow: 0 5px 15px rgba(233, 157, 17, 0.2);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .preview-sidebar h3 {
+            color: #e99d11;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            border-bottom: 2px solid #e99d11;
+            padding-bottom: 10px;
+        }
+
+        .preview-item {
+            background: #1F2937;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            border-left: 4px solid #e99d11;
+        }
+
+        .preview-label {
+            color: #aaa;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .preview-value {
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 1em;
+        }
+
+        .preview-value.empty {
+            color: #666;
+            font-style: italic;
+        }
+
+        .preview-icon {
+            display: inline-block;
+            margin-right: 6px;
+            font-size: 1.1em;
+        }
+
         .form-section {
             background: #1F2937;
             padding: 20px;
@@ -414,6 +478,16 @@
 
         /* Mobile (up to 768px) */
         @media (max-width: 768px) {
+            .form-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .preview-sidebar {
+                width: 100%;
+                position: static;
+            }
+
             body {
                 padding: 10px;
             }
@@ -578,10 +652,12 @@
         </header>
 
         <div class="content">
-            <!-- Add Product Form -->
-            <div class="form-section">
-                <h2>➕ Add New Product</h2>
-                <form id="productForm">
+            <!-- Add Product Form Container -->
+            <div class="form-container">
+                <div class="form-wrapper">
+                    <div class="form-section">
+                        <h2>➕ Add New Product</h2>
+                        <form id="productForm">
                     <div class="form-row">
                         <div class="form-group">
                             <label for="productName">Product Name *</label>
@@ -602,11 +678,21 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="productSubcategory">Sub-Category *</label>
-                            <select id="productSubcategory" required>
+                            <select id="productSubcategory" required onchange="updateProductTypes()">
                                 <option value="">Select Sub-Category</option>
                             </select>
                             <small id="subcategoryInfo" style="color: #667eea; display: block; margin-top: 5px; font-weight: 500;"></small>
                         </div>
+                        <div class="form-group">
+                            <label for="productType">Product Type *</label>
+                            <select id="productType" required disabled style="opacity: 0.6;">
+                                <option value="">Select Type (Choose Sub-Category first)</option>
+                            </select>
+                            <small id="productTypeInfo" style="color: #888; display: block; margin-top: 5px; font-size: 0.85em;"></small>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
                         <div class="form-group">
                             <label for="productImage">Product Image *</label>
                             <input type="file" id="productImage" accept="image/*" required>
@@ -645,6 +731,64 @@
                         <button type="reset" class="btn-reset">Clear Form</button>
                     </div>
                 </form>
+                    </div>
+                </div>
+
+                <!-- Product Location Preview Sidebar -->
+                <div class="preview-sidebar" id="previewSidebar">
+                    <h3><span class="preview-icon">📍</span>Product Location</h3>
+                    
+                    <div class="preview-item">
+                        <div class="preview-label">📂 Category</div>
+                        <div class="preview-value empty" id="previewCategory">Not selected</div>
+                    </div>
+
+                    <div class="preview-item">
+                        <div class="preview-label">🏷️ Sub-Category</div>
+                        <div class="preview-value empty" id="previewSubcategory">Not selected</div>
+                    </div>
+
+                    <div class="preview-item">
+                        <div class="preview-label">📄 Product Type</div>
+                        <div class="preview-value empty" id="previewType">Based on product name</div>
+                    </div>
+
+                    <div class="preview-item">
+                        <div class="preview-label">✓ Status</div>
+                        <div class="preview-value empty" id="previewStatus">Not ready to add</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category, Sub-Category & Type Management Section -->
+            <div class="form-section" style="background: #0f1419; border-left-color: #667eea;">
+                <h2>⚙️ Manage Categories & Types</h2>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>📂 Categories</label>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button type="button" class="btn-add" onclick="openCategoryModal()" style="flex: 1; min-width: 120px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">+ New Category</button>
+                            <button type="button" class="btn-reset" onclick="openEditCategoryModal()" style="flex: 1; min-width: 120px;">✎ Manage</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>🏷️ Sub-Categories</label>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button type="button" class="btn-add" onclick="openSubcategoryModal()" style="flex: 1; min-width: 120px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">+ New Sub-Category</button>
+                            <button type="button" class="btn-reset" onclick="openEditSubcategoryModal()" style="flex: 1; min-width: 120px;">✎ Manage</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>📄 Product Types</label>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button type="button" class="btn-add" onclick="openProductTypeModal()" style="flex: 1; min-width: 120px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">+ New Type</button>
+                            <button type="button" class="btn-reset" onclick="openEditProductTypeModal()" style="flex: 1; min-width: 120px;">✎ Manage</button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Products Display Section -->
@@ -695,9 +839,17 @@
 
                 <div class="form-group">
                     <label for="editProductSubcategory">Sub-Category *</label>
-                    <select id="editProductSubcategory" required>
+                    <select id="editProductSubcategory" required onchange="updateEditProductTypes()">
                         <option value="">Select Sub-Category</option>
                     </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="editProductType">Product Type *</label>
+                    <select id="editProductType" required disabled>
+                        <option value="">Select Type (Choose Sub-Category first)</option>
+                    </select>
+                    <small id="editProductTypeInfo" style="color: #888; display: block; margin-top: 5px; font-size: 0.85em;"></small>
                 </div>
 
                 <div class="form-group">
@@ -744,9 +896,111 @@
         </div>
     </div>
 
+    <!-- Category Management Modal -->
+    <div id="categoryManagementModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2 id="categoryModalTitle">Add Category</h2>
+                <button class="close-btn" onclick="closeCategoryModal()">&times;</button>
+            </div>
+            <form id="categoryForm">
+                <div class="form-group">
+                    <label for="categoryName">Category Name *</label>
+                    <input type="text" id="categoryName" required placeholder="Enter category name">
+                </div>
+
+                <div class="form-group">
+                    <label>📄 Display on Pages *</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: #1F2937; padding: 15px; border-radius: 6px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" id="page_supermarket" value="Supermarket">
+                            <label for="page_supermarket" style="margin: 0; cursor: pointer;">🛒 Supermarket</label>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" id="page_secondhand" value="Second-hand">
+                            <label for="page_secondhand" style="margin: 0; cursor: pointer;">♻️ Second-hand</label>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" id="page_gas" value="Gas">
+                            <label for="page_gas" style="margin: 0; cursor: pointer;">⛽ Gas Refill</label>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" id="page_water" value="Water">
+                            <label for="page_water" style="margin: 0; cursor: pointer;">💧 Water Refill</label>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" id="page_grocery" value="Grocery">
+                            <label for="page_grocery" style="margin: 0; cursor: pointer;">🥕 Grocery Delivery</label>
+                        </div>
+                    </div>
+                    <small style="color: #888; display: block; margin-top: 8px;">Select which pages this category should appear on</small>
+                </div>
+
+                <div id="categoryList" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #333;"></div>
+                <div class="button-group">
+                    <button type="submit" class="btn-add" id="categorySubmitBtn">Add Category</button>
+                    <button type="button" class="btn-reset" onclick="closeCategoryModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Sub-Category Management Modal -->
+    <div id="subcategoryManagementModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2 id="subcategoryModalTitle">Add Sub-Category</h2>
+                <button class="close-btn" onclick="closeSubcategoryModal()">&times;</button>
+            </div>
+            <form id="subcategoryForm">
+                <div class="form-group">
+                    <label for="subcategoryParent">Select Category *</label>
+                    <select id="subcategoryParent" required onchange="loadSubcategoriesForParent()">
+                        <option value="">Select Category</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="subcategoryName">Sub-Category Name *</label>
+                    <input type="text" id="subcategoryName" required placeholder="Enter sub-category name">
+                </div>
+                <div id="subcategoryList" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #333;"></div>
+                <div class="button-group">
+                    <button type="submit" class="btn-add" id="subcategorySubmitBtn">Add Sub-Category</button>
+                    <button type="button" class="btn-reset" onclick="closeSubcategoryModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Product Type Management Modal -->
+    <div id="productTypeManagementModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2 id="productTypeModalTitle">Add Product Type</h2>
+                <button class="close-btn" onclick="closeProductTypeModal()">&times;</button>
+            </div>
+            <form id="productTypeForm">
+                <div class="form-group">
+                    <label for="productTypeSubcategory">Select Sub-Category *</label>
+                    <select id="productTypeSubcategory" required onchange="loadProductTypesForSubcategory()">
+                        <option value="">Select Sub-Category</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="productTypeName">Product Type Name *</label>
+                    <input type="text" id="productTypeName" required placeholder="Enter product type name">
+                </div>
+                <div id="productTypeList" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #333;"></div>
+                <div class="button-group">
+                    <button type="submit" class="btn-add" id="productTypeSubmitBtn">Add Type</button>
+                    <button type="button" class="btn-reset" onclick="closeProductTypeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
-        // Subcategories mapping with links to actual page categories
-        const subcategories = {
+        const defaultSubcategories = {
             'Supermarket': [
                 { name: 'Fresh food', link: 'supermarket.html', page: 'Supermarket' },
                 { name: 'Grocery', link: 'supermarket.html', page: 'Supermarket' },
@@ -777,10 +1031,155 @@
             ]
         };
 
+        function loadSubcategories() {
+            const stored = localStorage.getItem('ecommerce_subcategories');
+            if (stored) {
+                try {
+                    return JSON.parse(stored);
+                } catch (e) {
+                    console.error('Failed to parse stored subcategories, using defaults');
+                    return defaultSubcategories;
+                }
+            }
+            return defaultSubcategories;
+        }
+
+        function saveSubcategories(subcats) {
+            try {
+                localStorage.setItem('ecommerce_subcategories', JSON.stringify(subcats));
+            } catch (e) {
+                console.error('Failed to save subcategories to localStorage', e);
+                alert('Warning: Could not save changes to storage');
+            }
+        }
+
+        let subcategories = loadSubcategories();
+
         // Product Management System
         let products = [];
         let currentFilter = 'all';
         let editingProductId = null;
+
+        // Extract product types from existing products in a subcategory
+        function getProductTypesForSubcategory(subcategory) {
+            const allProducts = DataManager.getAllProducts();
+            const categoryProducts = allProducts[subcategory] || [];
+            const types = new Set();
+
+            categoryProducts.forEach(product => {
+                const productType = document.getElementById('productType').selectedOptions[0];
+                if (productType && productType.value) {
+                    types.add(productType.value);
+                }
+            });
+
+            return Array.from(types).sort();
+        }
+
+        // Update product types based on selected subcategory
+        function updateProductTypes() {
+            const subcategory = document.getElementById('productSubcategory').value;
+            const productTypeSelect = document.getElementById('productType');
+            const productTypeInfo = document.getElementById('productTypeInfo');
+
+            productTypeSelect.innerHTML = '<option value="">Select Type</option>';
+            productTypeInfo.textContent = '';
+
+            if (!subcategory) {
+                productTypeSelect.disabled = true;
+                productTypeSelect.style.opacity = '0.6';
+                productTypeSelect.innerHTML = '<option value="">Select Type (Choose Sub-Category first)</option>';
+                return;
+            }
+
+            // Get existing types from products in this subcategory
+            const allProducts = DataManager.getAllProducts();
+            const categoryProducts = allProducts[subcategory] || [];
+            const types = new Set();
+
+            categoryProducts.forEach(product => {
+                const name = product.name || '';
+                const words = name.split(' ');
+                if (words.length > 0) {
+                    types.add(words[0]);
+                }
+            });
+
+            const typeArray = Array.from(types).sort();
+
+            if (typeArray.length === 0) {
+                productTypeSelect.innerHTML = '<option value="">Create new type (no existing types)</option>';
+                productTypeInfo.textContent = '💡 No products exist yet. You can create a new product type.';
+            } else {
+                typeArray.forEach(type => {
+                    const option = document.createElement('option');
+                    option.value = type;
+                    option.textContent = type;
+                    productTypeSelect.appendChild(option);
+                });
+                productTypeInfo.textContent = `✓ ${typeArray.length} product type(s) available for this sub-category`;
+            }
+
+            productTypeSelect.disabled = false;
+            productTypeSelect.style.opacity = '1';
+            updatePreview();
+        }
+
+        // Update preview sidebar
+        function updatePreview() {
+            const category = document.getElementById('productCategory').value;
+            const subcategory = document.getElementById('productSubcategory').value;
+            const productType = document.getElementById('productType').value;
+            const productName = document.getElementById('productName').value;
+            
+            const previewCategory = document.getElementById('previewCategory');
+            const previewSubcategory = document.getElementById('previewSubcategory');
+            const previewType = document.getElementById('previewType');
+            const previewStatus = document.getElementById('previewStatus');
+
+            // Update category preview
+            if (category) {
+                previewCategory.textContent = category;
+                previewCategory.classList.remove('empty');
+            } else {
+                previewCategory.textContent = 'Not selected';
+                previewCategory.classList.add('empty');
+            }
+
+            // Update subcategory preview
+            if (subcategory) {
+                previewSubcategory.textContent = subcategory;
+                previewSubcategory.classList.remove('empty');
+            } else {
+                previewSubcategory.textContent = 'Not selected';
+                previewSubcategory.classList.add('empty');
+            }
+
+            // Update type preview based on selected type
+            if (productType) {
+                previewType.textContent = productType;
+                previewType.classList.remove('empty');
+            } else if (productName) {
+                const words = productName.split(' ');
+                const autoType = words[0];
+                previewType.textContent = `${autoType} (auto-detected)`;
+                previewType.classList.remove('empty');
+            } else {
+                previewType.textContent = 'Based on product name';
+                previewType.classList.add('empty');
+            }
+
+            // Update status
+            if (category && subcategory) {
+                previewStatus.textContent = '✓ Ready to add';
+                previewStatus.style.color = '#4CAF50';
+                previewStatus.classList.remove('empty');
+            } else {
+                previewStatus.textContent = 'Not ready to add';
+                previewStatus.style.color = '#666';
+                previewStatus.classList.add('empty');
+            }
+        }
 
         // Update subcategories based on category selection
         function updateSubcategories() {
@@ -800,6 +1199,8 @@
                 });
             }
 
+            updatePreview();
+
             // Listen for subcategory change
             subcategorySelect.addEventListener('change', function() {
                 const selectedOption = this.options[this.selectedIndex];
@@ -810,6 +1211,7 @@
                 } else {
                     infoElement.textContent = '';
                 }
+                updatePreview();
             });
         }
 
@@ -829,6 +1231,52 @@
                     subcategorySelect.appendChild(option);
                 });
             }
+        }
+
+        // Update product types in edit modal
+        function updateEditProductTypes() {
+            const subcategory = document.getElementById('editProductSubcategory').value;
+            const productTypeSelect = document.getElementById('editProductType');
+            const productTypeInfo = document.getElementById('editProductTypeInfo');
+
+            productTypeSelect.innerHTML = '<option value="">Select Type</option>';
+            productTypeInfo.textContent = '';
+
+            if (!subcategory) {
+                productTypeSelect.disabled = true;
+                productTypeSelect.innerHTML = '<option value="">Select Type (Choose Sub-Category first)</option>';
+                return;
+            }
+
+            // Get existing types from products in this subcategory
+            const allProducts = DataManager.getAllProducts();
+            const categoryProducts = allProducts[subcategory] || [];
+            const types = new Set();
+
+            categoryProducts.forEach(product => {
+                const name = product.name || '';
+                const words = name.split(' ');
+                if (words.length > 0) {
+                    types.add(words[0]);
+                }
+            });
+
+            const typeArray = Array.from(types).sort();
+
+            if (typeArray.length === 0) {
+                productTypeSelect.innerHTML = '<option value="">Create new type (no existing types)</option>';
+                productTypeInfo.textContent = '💡 No products exist yet. You can create a new product type.';
+            } else {
+                typeArray.forEach(type => {
+                    const option = document.createElement('option');
+                    option.value = type;
+                    option.textContent = type;
+                    productTypeSelect.appendChild(option);
+                });
+                productTypeInfo.textContent = `✓ ${typeArray.length} product type(s) available for this sub-category`;
+            }
+
+            productTypeSelect.disabled = false;
         }
 
         // Convert image to base64
@@ -886,11 +1334,17 @@
 
             const imageData = await convertImageToBase64(imageFile);
 
+            const selectedType = document.getElementById('productType').value;
+            const productName = document.getElementById('productName').value;
+            const autoType = productName ? productName.split(' ')[0] : 'Uncategorized';
+            const productType = selectedType || autoType;
+
             const product = {
                 id: generateId(),
-                name: document.getElementById('productName').value,
+                name: productName,
                 category: document.getElementById('productCategory').value,
                 subcategory: document.getElementById('productSubcategory').value,
+                productType: productType,
                 price: parseFloat(document.getElementById('productPrice').value),
                 quantity: parseInt(document.getElementById('productQuantity').value),
                 description: document.getElementById('productDescription').value,
@@ -910,6 +1364,10 @@
                 this.reset();
                 document.getElementById('productSubcategory').innerHTML = '<option value="">Select Sub-Category</option>';
                 document.getElementById('subcategoryInfo').textContent = '';
+                document.getElementById('productType').disabled = true;
+                document.getElementById('productType').style.opacity = '0.6';
+                document.getElementById('productType').innerHTML = '<option value="">Select Type (Choose Sub-Category first)</option>';
+                document.getElementById('productTypeInfo').textContent = '';
             } else {
                 showAlert('Error adding product: ' + result.message, 'info');
             }
@@ -933,7 +1391,7 @@
                 <div class="product-card">
                     ${product.image ? `<img src="${product.image}" alt="${product.name}" class="product-image">` : '<div class="product-image" style="display: flex; align-items: center; justify-content: center; color: #999;">No Image</div>'}
                     <span class="category-badge">${product.category}</span>
-                    <div style="font-size: 0.85em; color: #888; margin-top: 5px; margin-bottom: 10px;"><strong>Sub:</strong> ${product.subcategory}</div>
+                    <div style="font-size: 0.85em; color: #888; margin-top: 5px; margin-bottom: 10px;"><strong>Sub:</strong> ${product.subcategory} ${product.productType ? `<span style="color: #e99d11; margin-left: 10px;">🏷️ ${product.productType}</span>` : ''}</div>
                     <h3>${product.name}</h3>
                     <div class="product-details">
                         <p><strong>SKU:</strong> ${product.sku || 'N/A'}</p>
@@ -975,6 +1433,8 @@
             document.getElementById('editProductCategory').value = product.category;
             updateEditSubcategories();
             document.getElementById('editProductSubcategory').value = product.subcategory;
+            updateEditProductTypes();
+            document.getElementById('editProductType').value = product.productType || '';
             document.getElementById('editProductPrice').value = product.price;
             document.getElementById('editProductQuantity').value = product.quantity;
             document.getElementById('editProductDescription').value = product.description;
@@ -1006,6 +1466,7 @@
             product.name = document.getElementById('editProductName').value;
             product.category = document.getElementById('editProductCategory').value;
             product.subcategory = document.getElementById('editProductSubcategory').value;
+            product.productType = document.getElementById('editProductType').value;
             product.price = parseFloat(document.getElementById('editProductPrice').value);
             product.quantity = parseInt(document.getElementById('editProductQuantity').value);
             product.description = document.getElementById('editProductDescription').value;
@@ -1067,6 +1528,439 @@
                 closeEditModal();
             }
         });
+
+        // Add event listeners for preview update
+        document.getElementById('productName').addEventListener('input', updatePreview);
+        document.getElementById('productCategory').addEventListener('change', updatePreview);
+        document.getElementById('productType').addEventListener('change', updatePreview);
+        
+        // Reset preview on form reset
+        document.getElementById('productForm').addEventListener('reset', function() {
+            document.getElementById('productType').disabled = true;
+            document.getElementById('productType').style.opacity = '0.6';
+            document.getElementById('productType').innerHTML = '<option value="">Select Type (Choose Sub-Category first)</option>';
+            setTimeout(updatePreview, 0);
+        });
+
+        // ==================== CATEGORY MANAGEMENT ====================
+        let categoryPageMap = JSON.parse(localStorage.getItem('categoryPageMap')) || {
+            'Supermarket': ['Supermarket'],
+            'Second-hand': ['Second-hand'],
+            'Refilling': ['Gas', 'Water'],
+            'Grocery': ['Grocery']
+        };
+
+        function saveCategoryPageMap() {
+            localStorage.setItem('categoryPageMap', JSON.stringify(categoryPageMap));
+        }
+
+        function openCategoryModal() {
+            document.getElementById('categoryModalTitle').textContent = 'Add Category';
+            document.getElementById('categoryForm').reset();
+            document.getElementById('categoryName').focus();
+            document.getElementById('categorySubmitBtn').textContent = 'Add Category';
+            
+            // Clear all checkboxes
+            document.getElementById('page_supermarket').checked = false;
+            document.getElementById('page_secondhand').checked = false;
+            document.getElementById('page_gas').checked = false;
+            document.getElementById('page_water').checked = false;
+            document.getElementById('page_grocery').checked = false;
+            
+            document.getElementById('categoryList').innerHTML = '<h3>Current Categories:</h3>' + getCategories().map((cat, idx) => {
+                const pages = categoryPageMap[cat] || [];
+                return `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #1F2937; margin: 8px 0; border-radius: 5px;">
+                    <div style="flex: 1;">
+                        <div style="color: #fff; font-weight: 600;">${cat}</div>
+                        <div style="color: #888; font-size: 0.85em;">📄 Pages: ${pages.length > 0 ? pages.join(', ') : 'None'}</div>
+                    </div>
+                    <button type="button" class="btn-delete" onclick="deleteCategory('${cat}')" style="padding: 5px 10px; font-size: 0.85em;">Delete</button>
+                </div>
+            `}).join('');
+            document.getElementById('categoryManagementModal').style.display = 'block';
+        }
+
+        function getCategories() {
+            return ['Supermarket', 'Second-hand', 'Refilling', 'Grocery'];
+        }
+
+        function deleteCategory(categoryName) {
+            if (confirm(`Delete category "${categoryName}"? All sub-categories will be removed.`)) {
+                delete subcategories[categoryName];
+                delete categoryPageMap[categoryName];
+                saveCategoryPageMap();
+                saveSubcategories(subcategories);
+                showAlert(`✓ Category "${categoryName}" deleted`, 'success');
+                openCategoryModal();
+            }
+        }
+
+        function closeCategoryModal() {
+            document.getElementById('categoryManagementModal').style.display = 'none';
+        }
+
+        // ==================== SUBCATEGORY MANAGEMENT ====================
+        function openSubcategoryModal() {
+            document.getElementById('subcategoryModalTitle').textContent = 'Add Sub-Category';
+            document.getElementById('subcategoryForm').reset();
+            document.getElementById('subcategoryName').focus();
+            document.getElementById('subcategorySubmitBtn').textContent = 'Add Sub-Category';
+            
+            const parentSelect = document.getElementById('subcategoryParent');
+            parentSelect.innerHTML = '<option value="">Select Category</option>';
+            getCategories().forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat;
+                option.textContent = cat;
+                parentSelect.appendChild(option);
+            });
+            
+            document.getElementById('subcategoryList').innerHTML = '';
+            document.getElementById('subcategoryManagementModal').style.display = 'block';
+        }
+
+        function loadSubcategoriesForParent() {
+            const parent = document.getElementById('subcategoryParent').value;
+            if (!parent) {
+                document.getElementById('subcategoryList').innerHTML = '';
+                return;
+            }
+            
+            const subs = (subcategories[parent] || []).map(s => s.name);
+            document.getElementById('subcategoryList').innerHTML = '<h3>Sub-Categories in ' + parent + ':</h3>' + 
+            subs.map(sub => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: #1F2937; margin: 5px 0; border-radius: 5px;">
+                    <span>${sub}</span>
+                    <button type="button" class="btn-delete" onclick="deleteSubcategory('${parent}', '${sub}')" style="padding: 5px 10px; font-size: 0.85em;">Delete</button>
+                </div>
+            `).join('');
+        }
+
+        function deleteSubcategory(categoryName, subcategoryName) {
+            if (confirm(`Delete sub-category "${subcategoryName}" from "${categoryName}"?`)) {
+                if (subcategories[categoryName]) {
+                    subcategories[categoryName] = subcategories[categoryName].filter(s => s.name !== subcategoryName);
+                    saveSubcategories(subcategories);
+                }
+                showAlert(`✓ Sub-category "${subcategoryName}" deleted`, 'success');
+                loadSubcategoriesForParent();
+            }
+        }
+
+        function closeSubcategoryModal() {
+            document.getElementById('subcategoryManagementModal').style.display = 'none';
+        }
+
+        // ==================== PRODUCT TYPE MANAGEMENT ====================
+        function openProductTypeModal() {
+            document.getElementById('productTypeModalTitle').textContent = 'Add Product Type';
+            document.getElementById('productTypeForm').reset();
+            document.getElementById('productTypeName').focus();
+            document.getElementById('productTypeSubmitBtn').textContent = 'Add Type';
+            
+            const subSelect = document.getElementById('productTypeSubcategory');
+            subSelect.innerHTML = '<option value="">Select Sub-Category</option>';
+            
+            for (const cat in subcategories) {
+                (subcategories[cat] || []).forEach(sub => {
+                    const option = document.createElement('option');
+                    option.value = sub.name;
+                    option.textContent = `${sub.name} (${cat})`;
+                    subSelect.appendChild(option);
+                });
+            }
+            
+            document.getElementById('productTypeList').innerHTML = '';
+            document.getElementById('productTypeManagementModal').style.display = 'block';
+        }
+
+        function loadProductTypesForSubcategory() {
+            const subcat = document.getElementById('productTypeSubcategory').value;
+            if (!subcat) {
+                document.getElementById('productTypeList').innerHTML = '';
+                return;
+            }
+            
+            const allProducts = DataManager.getAllProducts();
+            const products = allProducts[subcat] || [];
+            const types = new Set();
+            
+            products.forEach(p => {
+                const name = p.name || '';
+                const words = name.split(' ');
+                if (words.length > 0) {
+                    types.add(words[0]);
+                }
+            });
+            
+            const typeArray = Array.from(types).sort();
+            document.getElementById('productTypeList').innerHTML = '<h3>Types in ' + subcat + ':</h3>' + 
+            (typeArray.length === 0 ? '<p style="color: #888;">No types exist yet</p>' : typeArray.map(type => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: #1F2937; margin: 5px 0; border-radius: 5px;">
+                    <span>${type}</span>
+                    <button type="button" class="btn-delete" onclick="deleteProductType('${subcat}', '${type}')" style="padding: 5px 10px; font-size: 0.85em;">Delete</button>
+                </div>
+            `).join(''));
+        }
+
+        function deleteProductType(subcategoryName, typeName) {
+            if (confirm(`Delete product type "${typeName}" from "${subcategoryName}"?`)) {
+                const allProducts = DataManager.getAllProducts();
+                if (allProducts[subcategoryName]) {
+                    allProducts[subcategoryName] = allProducts[subcategoryName].filter(p => {
+                        const name = p.name || '';
+                        const words = name.split(' ');
+                        return words.length === 0 || words[0] !== typeName;
+                    });
+                    localStorage.setItem('ecommerce_products', JSON.stringify(allProducts));
+                }
+                showAlert(`✓ Product type "${typeName}" deleted`, 'success');
+                loadProductTypesForSubcategory();
+            }
+        }
+
+        function closeProductTypeModal() {
+            document.getElementById('productTypeManagementModal').style.display = 'none';
+        }
+
+        // ==================== MANAGEMENT FORM SUBMISSION ====================
+        document.getElementById('categoryForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const catName = document.getElementById('categoryName').value.trim();
+            
+            if (!catName) {
+                showAlert('Please enter a category name', 'info');
+                return;
+            }
+            if (subcategories[catName]) {
+                showAlert('Category already exists', 'info');
+                return;
+            }
+
+            // Get selected pages
+            const selectedPages = [];
+            if (document.getElementById('page_supermarket').checked) selectedPages.push('Supermarket');
+            if (document.getElementById('page_secondhand').checked) selectedPages.push('Second-hand');
+            if (document.getElementById('page_gas').checked) selectedPages.push('Gas');
+            if (document.getElementById('page_water').checked) selectedPages.push('Water');
+            if (document.getElementById('page_grocery').checked) selectedPages.push('Grocery');
+
+            if (selectedPages.length === 0) {
+                showAlert('Please select at least one page for this category', 'info');
+                return;
+            }
+
+            subcategories[catName] = [];
+            categoryPageMap[catName] = selectedPages;
+            saveCategoryPageMap();
+            saveSubcategories(subcategories);
+            showAlert(`✓ Category "${catName}" created on ${selectedPages.join(', ')}`, 'success');
+            openCategoryModal();
+        });
+
+        document.getElementById('subcategoryForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const parent = document.getElementById('subcategoryParent').value;
+            const subName = document.getElementById('subcategoryName').value.trim();
+            
+            if (!parent || !subName) {
+                showAlert('Please select a category and enter a sub-category name', 'info');
+                return;
+            }
+            
+            if (!subcategories[parent]) {
+                subcategories[parent] = [];
+            }
+            
+            if (subcategories[parent].some(s => s.name === subName)) {
+                showAlert('Sub-category already exists', 'info');
+                return;
+            }
+            
+            subcategories[parent].push({ name: subName, link: 'index.html', page: parent });
+            saveSubcategories(subcategories);
+            showAlert(`✓ Sub-category "${subName}" created`, 'success');
+            openSubcategoryModal();
+        });
+
+        document.getElementById('productTypeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const subcat = document.getElementById('productTypeSubcategory').value;
+            const typeName = document.getElementById('productTypeName').value.trim();
+            
+            if (!subcat || !typeName) {
+                showAlert('Please select a sub-category and enter a type name', 'info');
+                return;
+            }
+            
+            const allProducts = DataManager.getAllProducts();
+            if (!allProducts[subcat]) {
+                allProducts[subcat] = [];
+            }
+            
+            const newProduct = {
+                id: 'temp_' + Date.now(),
+                name: typeName + ' (Template)',
+                category: '',
+                subcategory: subcat,
+                productType: typeName,
+                price: 0,
+                quantity: 0,
+                description: '',
+                sku: '',
+                supplier: '',
+                image: '',
+                createdAt: new Date().toLocaleDateString()
+            };
+            
+            allProducts[subcat].push(newProduct);
+            localStorage.setItem('ecommerce_products', JSON.stringify(allProducts));
+            
+            showAlert(`✓ Product type "${typeName}" created`, 'success');
+            openProductTypeModal();
+        });
+
+        // ==================== EDIT MANAGEMENT FUNCTIONS ====================
+        function openEditCategoryModal() {
+            const modal = document.getElementById('categoryManagementModal');
+            document.getElementById('categoryModalTitle').textContent = 'Manage Categories & Page Placement';
+            document.getElementById('categoryForm').style.display = 'none';
+            
+            let html = '<h3>Categories & Page Placement:</h3>';
+            html += getCategories().map((cat, idx) => {
+                const pages = categoryPageMap[cat] || [];
+                return `
+                <div style="padding: 12px; background: #1F2937; margin: 10px 0; border-radius: 5px; border-left: 3px solid #e99d11;">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                        <div>
+                            <div style="color: #fff; font-weight: 600; margin-bottom: 5px;">${cat}</div>
+                            <div style="color: #888; font-size: 0.85em;">📄 Appears on: ${pages.length > 0 ? pages.join(', ') : 'No pages'}</div>
+                        </div>
+                        <button type="button" class="btn-delete" onclick="deleteCategory('${cat}')" style="padding: 5px 10px; font-size: 0.85em;">Delete</button>
+                    </div>
+                    <button type="button" onclick="editCategoryPages('${cat}')" style="width: 100%; padding: 6px; background: #667eea; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9em; margin-top: 8px;">✎ Edit Pages</button>
+                </div>
+            `}).join('');
+            html += '<p style="color: #888; margin-top: 15px; font-size: 0.9em;">💡 Use "Add Category" button above to create new categories</p>';
+            document.getElementById('categoryList').innerHTML = html;
+            modal.style.display = 'block';
+        }
+
+        function editCategoryPages(categoryName) {
+            const newPages = [];
+            const pages = ['Supermarket', 'Second-hand', 'Gas', 'Water', 'Grocery'];
+            const currentPages = categoryPageMap[categoryName] || [];
+            
+            let pageList = pages.map(page => {
+                const isSelected = currentPages.includes(page);
+                return `<div style="display: flex; align-items: center; gap: 8px; padding: 8px; background: #0f1419; margin: 5px 0; border-radius: 4px;">
+                    <input type="checkbox" id="edit_${page}" ${isSelected ? 'checked' : ''} onchange="updatePageSelection('${categoryName}', '${page}')" style="cursor: pointer;">
+                    <label for="edit_${page}" style="margin: 0; cursor: pointer; flex: 1;">${page}</label>
+                </div>`;
+            }).join('');
+            
+            const saveBtn = confirm(`Edit pages for "${categoryName}"?\n\nCurrent pages: ${currentPages.join(', ') || 'None'}\n\nClick OK to edit, or Cancel to close.`);
+            if (saveBtn) {
+                // Show inline edit interface
+                const modal = document.getElementById('categoryManagementModal');
+                const originalList = document.getElementById('categoryList').innerHTML;
+                document.getElementById('categoryList').innerHTML = `
+                    <h3>Edit Pages for "${categoryName}":</h3>
+                    <div style="background: #0f1419; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                        ${pageList}
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button type="button" onclick="savePageSelection('${categoryName}'); openEditCategoryModal();" style="flex: 1; padding: 10px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 600;">Save Changes</button>
+                        <button type="button" onclick="openEditCategoryModal();" style="flex: 1; padding: 10px; background: #333; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 600;">Cancel</button>
+                    </div>
+                `;
+                
+                // Store original list for cancel
+                window.originalCategoryList = originalList;
+            }
+        }
+
+        function updatePageSelection(categoryName, page) {
+            const checkbox = document.getElementById(`edit_${page}`);
+            let pages = categoryPageMap[categoryName] || [];
+            
+            if (checkbox.checked && !pages.includes(page)) {
+                pages.push(page);
+            } else if (!checkbox.checked && pages.includes(page)) {
+                pages = pages.filter(p => p !== page);
+            }
+            
+            categoryPageMap[categoryName] = pages;
+        }
+
+        function savePageSelection(categoryName) {
+            const pages = categoryPageMap[categoryName] || [];
+            if (pages.length === 0) {
+                showAlert('Please select at least one page', 'info');
+                return;
+            }
+            saveCategoryPageMap();
+            showAlert(`✓ "${categoryName}" now appears on: ${pages.join(', ')}`, 'success');
+        }
+
+        function openEditSubcategoryModal() {
+            const modal = document.getElementById('subcategoryManagementModal');
+            document.getElementById('subcategoryModalTitle').textContent = 'Manage Sub-Categories';
+            document.getElementById('subcategoryForm').style.display = 'none';
+            
+            let html = '<h3>Sub-Categories by Category:</h3>';
+            getCategories().forEach(cat => {
+                const subs = (subcategories[cat] || []).map(s => s.name);
+                if (subs.length > 0) {
+                    html += `<h4 style="color: #e99d11; margin-top: 15px;">${cat}</h4>`;
+                    html += subs.map(sub => `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: #1F2937; margin: 5px 0; border-radius: 5px;">
+                            <span>${sub}</span>
+                            <button type="button" class="btn-delete" onclick="deleteSubcategory('${cat}', '${sub}')" style="padding: 5px 10px; font-size: 0.85em;">Delete</button>
+                        </div>
+                    `).join('');
+                }
+            });
+            html += '<p style="color: #888; margin-top: 15px; font-size: 0.9em;">💡 Use "Add Sub-Category" button above to create new sub-categories</p>';
+            document.getElementById('subcategoryList').innerHTML = html;
+            modal.style.display = 'block';
+        }
+
+        function openEditProductTypeModal() {
+            const modal = document.getElementById('productTypeManagementModal');
+            document.getElementById('productTypeModalTitle').textContent = 'Manage Product Types';
+            document.getElementById('productTypeForm').style.display = 'none';
+            
+            let html = '<h3>Product Types by Sub-Category:</h3>';
+            const allProducts = DataManager.getAllProducts();
+            
+            for (const subcat in allProducts) {
+                const products = allProducts[subcat] || [];
+                const types = new Set();
+                products.forEach(p => {
+                    const name = p.name || '';
+                    const words = name.split(' ');
+                    if (words.length > 0 && !words[0].includes('Template')) {
+                        types.add(words[0]);
+                    }
+                });
+                
+                const typeArray = Array.from(types).sort();
+                if (typeArray.length > 0) {
+                    html += `<h4 style="color: #e99d11; margin-top: 15px;">${subcat}</h4>`;
+                    html += typeArray.map(type => `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: #1F2937; margin: 5px 0; border-radius: 5px;">
+                            <span>${type}</span>
+                            <button type="button" class="btn-delete" onclick="deleteProductType('${subcat}', '${type}')" style="padding: 5px 10px; font-size: 0.85em;">Delete</button>
+                        </div>
+                    `).join('');
+                }
+            }
+            
+            document.getElementById('productTypeList').innerHTML = html + '<p style="color: #888; margin-top: 15px; font-size: 0.9em;">💡 Use "Add Type" button above to create new product types</p>';
+            modal.style.display = 'block';
+        }
 
         // Initialize
         loadProducts();
