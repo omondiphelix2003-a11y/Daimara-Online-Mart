@@ -3,82 +3,61 @@
 <head>
   <meta charset="UTF-8">
   <title>Daimara Online Mart | Contact Us</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta name="viewport" content="width=1200">
+  <link rel="stylesheet" href="contact.css">
 
-<style>
-* {
+<style>* {
   box-sizing: border-box;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin: 0;
-  padding: 0;
-}
-
-html {
-  font-size: 16px;
 }
 
 body {
-  background: #1F2937;
-  font-size: 1rem;
-  min-height: 100vh;
-  padding-bottom: 80px;
+  background: #f5f5f5;
+  font-size: 25px;
+  padding-bottom: 100px;
 }
 
-/* NAVBAR */
-.navbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 15px 20px;
-  background: #111;
-  color: #fff;
+/* FOOTER */
+.footer {
+  background: #0a0a0a;
+  color: white;
+  padding: 30px 20px;
+  text-align: center;
   position: fixed;
-  top: 0;
+  bottom: 0;
   left: 0;
   width: 100%;
   z-index: 1000;
 }
-
-.logo {
+.footer p {
   color: rgb(233, 157, 17);
-  font-size: 1.2rem;
-  font-weight: bold;
 }
 
-.logo a {
-  text-decoration: none;
-  color: inherit;
+/* PARA */
+.para{
+ color: #f5f5f5;
 }
 
-.nav-center {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.nav-center a {
-  color: #fff;
-  text-decoration: none;
-  font-size: 0.9rem;
-  transition: color 0.3s ease;
-}
+/* NAVBAR */
+    .navbar{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:15px 30px;background:#111;color:#fff; position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #000000; /* Add your desired background color */
+    z-index: 1000; /* Ensure it's on top of other elements */ 
+    }
+    .logo{color:rgb(233, 157, 17);font-size:25px;font-weight:bold}
+    .nav-center{display:flex;align-items:center;gap:20px}
+    .nav-center a{color:#fff;text-decoration:none;padding-left: 20px;margin-right: 40px;}
+    .nav-center input{padding:7px 10px;border-radius:5px;border:none}
+    .nav-icons a{color:#fff;margin-left:15px;font-size:14px}
 
 .nav-center a:hover,
 .nav-center a.active {
   color: rgb(233, 157, 17);
-}
-
-.nav-icons {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.nav-icons a {
-  color: #fff;
-  font-size: 1.1rem;
-  transition: color 0.3s ease;
 }
 
 .nav-icons a:hover,
@@ -86,80 +65,44 @@ body {
   color: rgb(233, 157, 17);
 }
 
-/* Mobile Menu Toggle */
-.menu-toggle {
-  display: none;
-  background: none;
-  border: none;
-  color: #fff;
-  font-size: 1.5rem;
-  cursor: pointer;
+@media (max-width: 768px) {
+  .logo {font-size: 25px;}
+  .nav-center a { font-size: 18px; }
+  .nav-icons a { font-size: 18px; }
 }
 
-/* Shop Icon */
-.shop-icon {
-  position: relative;
-  width: 28px;
-  height: 24px;
-  background-color: transparent;
-  border: 2px solid rgb(233, 157, 17);
-  border-radius: 3px;
-}
 
-.shop-icon::before {
-  content: '';
-  position: absolute;
-  top: -10px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 12px;
-  height: 8px;
-  border: 2px solid rgb(233, 157, 17);
-  border-bottom: none;
-  border-radius: 6px 6px 0 0;
-}
-
-.shop-icon::after {
-  content: '';
-  position: absolute;
-  top: 7px;
-  left: 5px;
-  width: 16px;
-  height: 2px;
-  background-color: #fff;
-  box-shadow: 0 4px 0 rgb(233, 157, 17);
-}
 
 /* CONTACT SECTION */
 .contact-container {
   max-width: 1000px;
-  margin: 80px auto 40px auto;
-  padding: 20px;
+  margin: 100px auto 40px auto;
+  padding: 40px 20px;
 }
 
 .contact-container h1 {
-  font-size: clamp(1.8rem, 5vw, 2.5rem);
+  font-size: 39px;
   color: #2c3e50;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
   font-weight: 700;
 }
 
 .contact-container > p {
-  font-size: clamp(1rem, 3vw, 1.2rem);
+  font-size: 30px;
   color: #7f8c8d;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
 }
 
 .contact-grid {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 25px;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
 }
 
 /* FORM */
 #contact-form {
   background: white;
-  padding: 25px;
+  padding: 30px;
   border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
@@ -167,12 +110,12 @@ body {
 #contact-form input,
 #contact-form textarea {
   width: 100%;
-  padding: 14px;
+  padding: 12px;
   margin-bottom: 15px;
-  border-radius: 8px;
+  border-radius: 6px;
   border: 1px solid #bdc3c7;
   font-family: inherit;
-  font-size: 1rem;
+  font-size: 25px;
   transition: all 0.3s ease;
 }
 
@@ -180,43 +123,36 @@ body {
 #contact-form textarea:focus {
   outline: none;
   border-color: rgb(233, 157, 17);
-  box-shadow: 0 0 8px rgba(233, 157, 17, 0.3);
+  box-shadow: 0 0 5px rgba(233, 157, 17, 0.3);
 }
 
 #contact-form textarea {
-  height: 120px;
+  height: 140px;
   resize: vertical;
-  min-height: 100px;
 }
 
 #contact-form button {
   width: 100%;
-  padding: 16px;
+  padding: 14px;
   background: linear-gradient(135deg, rgb(233, 157, 17) 0%, #e67e22 100%);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 23px;
   transition: all 0.3s ease;
 }
 
 #contact-form button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(233, 157, 17, 0.4);
-}
-
-#contact-form button:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-  transform: none;
+  box-shadow: 0 4px 12px rgba(233, 157, 17, 0.3);
 }
 
 /* CONTACT INFO */
 .contact-info {
   background: white;
-  padding: 25px;
+  padding: 30px;
   border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
@@ -224,14 +160,14 @@ body {
 .contact-info h3 {
   color: #2c3e50;
   margin-bottom: 20px;
-  font-size: 1.3rem;
+  font-size: 27px;
 }
 
 .contact-info p {
   color: #555;
   margin-bottom: 12px;
-  font-size: 1rem;
-  line-height: 1.6;
+  font-size: 25px;
+  line-height: 1.8;
 }
 
 .contact-info strong {
@@ -241,49 +177,60 @@ body {
 .social-links {
   margin-top: 25px;
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  gap: 12px;
 }
+
+
 
 .social-links a {
   display: inline-block;
-  padding: 10px 18px;
-  background: rgb(233, 157, 17);
-  color: #fff;
+  padding: 10px 15px;
+  background: rgb(233, 157, 17);;
+  color: rgb(255, 255, 255);
   text-decoration: none;
   border-radius: 6px;
   transition: all 0.3s ease;
   font-weight: 600;
-  font-size: 0.9rem;
 }
 
 .social-links a:hover {
-  background: #e67e22;
+
+  color: #000000;
   transform: translateY(-2px);
 }
 
 /* FOOTER */
-.footer {
+.footer-old {
   background: #0a0a0a;
   color: white;
-  padding: 20px;
+  padding: 30px 20px;
   text-align: center;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  z-index: 1000;
 }
 
 .footer p {
   color: rgb(233, 157, 17);
-  font-size: 0.85rem;
+}
+
+
+/* Login Button */
+#login-btn {
+  color: white;
+  text-decoration: none;
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  display: none;
+}
+
+#login-btn:hover {
+  color: rgb(233, 157, 17);
 }
 
 /* Profile Dropdown */
 #profile-icon {
-  width: 35px;
-  height: 35px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: rgba(233, 157, 17, 0.2);
   display: flex;
@@ -291,6 +238,7 @@ body {
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease;
+  position: relative;
   overflow: hidden;
 }
 
@@ -304,13 +252,13 @@ body {
 #dropdown-menu {
   display: none;
   position: absolute;
-  top: 60px;
-  right: 15px;
+  top: 70px;
+  right: 20px;
   background: #1a1a1a;
   border: 2px solid rgb(233, 157, 17);
   border-radius: 10px;
   padding: 10px 0;
-  min-width: 160px;
+  min-width: 180px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
   z-index: 2000;
 }
@@ -323,14 +271,14 @@ body {
 #dropdown-menu button {
   display: block;
   width: 100%;
-  padding: 12px 18px;
+  padding: 12px 20px;
   color: #ecf0f1;
   text-decoration: none;
   border: none;
   background: transparent;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-size: 0.9rem;
+  font-size: 14px;
   text-align: left;
 }
 
@@ -338,7 +286,7 @@ body {
 #dropdown-menu button:hover {
   background: rgba(233, 157, 17, 0.2);
   color: rgb(233, 157, 17);
-  padding-left: 22px;
+  padding-left: 25px;
 }
 
 #dropdown-menu button {
@@ -351,249 +299,68 @@ body {
   color: #ff6b6b;
 }
 
-/* Login Button */
-#login-btn {
-  color: white;
-  text-decoration: none;
-  font-size: 0.85rem;
-  padding: 8px 12px;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  display: none;
-}
+.shop-icon {
+            position: relative;
+            width: 40px;
+            height: 35px;
+            background-color: transparent;
+            border: 3px solid rgb(233, 157, 17);
+            border-radius: 4px;
+            margin: 20px;
+        }
 
-#login-btn:hover {
-  color: rgb(233, 157, 17);
-}
+        .shop-icon::before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 18px;
+            height: 12px;
+            border: 3px solid rgb(233, 157, 17);
+            border-bottom: none;
+            border-radius: 10px 10px 0 0;
+        }
 
-/* ==================== */
-/* TABLET STYLES (768px+) */
-/* ==================== */
-@media (min-width: 768px) {
-  .navbar {
-    padding: 15px 30px;
-  }
+        .shop-icon::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 8px;
+            width: 24px;
+            height: 2px;
+            background-color: #ffffff;
+            box-shadow: 0 6px 0 #a7884f;
+        }
 
-  .logo {
-    font-size: 1.5rem;
-  }
-
-  .nav-center {
-    gap: 25px;
-  }
-
-  .nav-center a {
-    font-size: 1rem;
-  }
-
-  .nav-icons a {
-    font-size: 1.2rem;
-  }
-
-  .shop-icon {
-    width: 32px;
-    height: 28px;
-  }
-
-  .shop-icon::before {
-    width: 14px;
-    height: 10px;
-    top: -12px;
-  }
-
-  .shop-icon::after {
-    width: 20px;
-    top: 8px;
-    left: 6px;
-  }
-
-  .contact-container {
-    margin-top: 90px;
-    padding: 30px;
-  }
-
-  .contact-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-  }
-
-  #contact-form,
-  .contact-info {
-    padding: 30px;
-  }
-
-  .footer p {
-    font-size: 0.9rem;
-  }
-}
-
-/* ==================== */
-/* DESKTOP STYLES (1024px+) */
-/* ==================== */
-@media (min-width: 1024px) {
-  .navbar {
-    padding: 18px 50px;
-  }
-
-  .logo {
-    font-size: 1.8rem;
-  }
-
-  .nav-center {
-    gap: 35px;
-  }
-
-  .contact-container {
-    margin-top: 100px;
-    padding: 40px;
-  }
-
-  #contact-form button {
-    font-size: 1.1rem;
-  }
-}
-
-/* ==================== */
-/* MOBILE MENU (max 767px) */
-/* ==================== */
-@media (max-width: 767px) {
-  .menu-toggle {
-    display: block;
-    order: 3;
-  }
-
-  .nav-center {
-    position: fixed;
-    top: 60px;
-    left: 0;
-    width: 100%;
-    background: #111;
-    flex-direction: column;
-    padding: 20px;
-    gap: 15px;
-    transform: translateY(-150%);
-    transition: transform 0.3s ease;
-    z-index: 999;
-  }
-
-  .nav-center.active {
-    transform: translateY(0);
-  }
-
-  .nav-center a {
-    font-size: 1.1rem;
-    padding: 10px 0;
-  }
-
-  .shop-icon {
-    margin: 0 auto;
-  }
-
-  .contact-container {
-    margin-top: 70px;
-  }
-
-  .social-links {
-    justify-content: center;
-  }
-
-  .social-links a {
-    flex: 1;
-    min-width: 100px;
-    text-align: center;
-  }
-}
-
-/* ==================== */
-/* SMALL MOBILE (max 480px) */
-/* ==================== */
-@media (max-width: 480px) {
-  .logo {
-    font-size: 1rem;
-  }
-
-  .nav-icons {
-    gap: 12px;
-  }
-
-  .nav-icons a {
-    font-size: 1rem;
-  }
-
-  .contact-container {
-    padding: 15px;
-    margin-top: 65px;
-  }
-
-  #contact-form,
-  .contact-info {
-    padding: 20px;
-  }
-
-  #contact-form input,
-  #contact-form textarea {
-    padding: 12px;
-    font-size: 16px; /* Prevents zoom on iOS */
-  }
-
-  .social-links a {
-    padding: 8px 14px;
-    font-size: 0.85rem;
-  }
-
-  .footer {
-    padding: 15px;
-  }
-
-  .footer p {
-    font-size: 0.75rem;
-  }
-}
-
-/* ==================== */
-/* LANDSCAPE MOBILE */
-/* ==================== */
-@media (max-height: 500px) and (orientation: landscape) {
-  .footer {
-    position: relative;
-  }
-
-  body {
-    padding-bottom: 20px;
-  }
-}
 </style>
-
 
 </head>
 <body>
 
+
 <!-- NAVBAR -->
 <nav class="navbar">
-  <div class="logo">
-    <a href="index.html"><span>Daimara Online Mart</span></a>
-  </div>
-
-  <button class="menu-toggle" onclick="toggleMenu()">
-    <i class="fas fa-bars"></i>
-  </button>
-
-  <div class="nav-center" id="navCenter">
-    <a href="index.html"><i class="fa fa-home"></i></a>
-    <a href="store.html"><div class="shop-icon"></div></a>
-    <a href="about.html"><i class="fas fa-info-circle"></i></a>
+  
+   <div class="logo">
+            <a href="home.html" style="text-decoration: none; color: inherit;"><span>Daimara Online Mart</span></a>
+   </div>
+  <div class="nav-center">
+    <a href="home.html">Home</a>
+    <a href="shop.html"><div class="shop-icon"></div></a>
+    <a href="about.html">About</a>
   </div>
 
   <div class="nav-icons">
-    <a href="login.html"><i class="fas fa-user"></i></a>
-    <a href="cart.html"><i class="fas fa-shopping-cart"></i></a>
+    <a href="login.html"><i class="fa fa-user"></i></a>
+    <a href="cart.html"><i class="fa fa-shopping-cart"></i></a>
   </div>
 </nav>
 
 <!-- CONTACT SECTION -->
 <section class="contact-container">
   <h1>Contact Us</h1>
-  <p>We'd love to hear from you. Send us a message below.</p>
+  <p>We’d love to hear from you. Send us a message below.</p>
 
   <div class="contact-grid">
 
@@ -614,9 +381,9 @@ body {
       <p><strong>Location:</strong> Nakuru, Kenya</p>
 
       <div class="social-links">
-        <a href="#"style="background-color:blue;"><i class="fab fa-facebook-f"></i> Facebook</a>
-        <a href="#"style="background-color:#E4405F;"><i class="fab fa-instagram"></i> Instagram</a>
-        <a href="#"style="background-color:#000000;"><i class="fab fa-twitter"></i> Twitter</a>
+        <a href="#">Facebook</a>
+        <a href="#">Instagram</a>
+        <a href="#">Twitter</a>
       </div>
     </div>
 
@@ -624,34 +391,24 @@ body {
 </section>
 
 <footer class="footer">
-  <p>Copyright © 2026 Daimara Online Mart. All rights reserved.</p>
+  <p>Copyright © 2026 Daimara Online Mart.All rights reserved.</p>
 </footer>
 
+<script src="data-manager.js"></script>
+<script src="auth-check.js"></script>
 <script>
-// Mobile Menu Toggle
-function toggleMenu() {
-  const navCenter = document.getElementById('navCenter');
-  navCenter.classList.toggle('active');
-}
-
-// Close menu when clicking on a link
-document.querySelectorAll('.nav-center a').forEach(link => {
-  link.addEventListener('click', () => {
-    document.getElementById('navCenter').classList.remove('active');
-  });
-});
-
-// OAuth 2.0 credentials
+// OAuth 2.0 credentials provided by user
 const CLIENT_ID = 'Client';
 const CLIENT_SECRET = 'secret';
 const REDIRECT_URI = 'https://www.daimaraonlinemart.co.ke';
-const REFRESH_TOKEN = '45344556';
+const REFRESH_TOKEN = '45344556'; // Updated with project ID/token provided by user
 
 /**
  * Sends an email using the Gmail API
  */
 async function sendEmailViaGmail(name, email, subject, message) {
   try {
+    // 1. Get Access Token using Refresh Token
     const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -665,11 +422,12 @@ async function sendEmailViaGmail(name, email, subject, message) {
 
     const tokenData = await tokenResponse.json();
     if (!tokenData.access_token) {
-      console.error('Failed to get access token.', tokenData);
+      console.error('Failed to get access token. Check if REFRESH_TOKEN is valid.', tokenData);
       return false;
     }
     const accessToken = tokenData.access_token;
 
+    // 2. Construct the email
     const ownerEmail = 'omondiphelix2003@gmail.com';
     const emailContent = [
       `From: "Daimara Contact Form" <${ownerEmail}>`,
@@ -688,11 +446,13 @@ async function sendEmailViaGmail(name, email, subject, message) {
       message
     ].join('\n');
 
+    // Base64url encode the email for Gmail API
     const encodedEmail = btoa(unescape(encodeURIComponent(emailContent)))
       .replace(/\+/g, '-')
       .replace(/\//g, '_')
       .replace(/=+$/, '');
 
+    // 3. Send via Gmail API
     const sendResponse = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
       method: 'POST',
       headers: {
@@ -709,7 +469,6 @@ async function sendEmailViaGmail(name, email, subject, message) {
   }
 }
 
-// Form Submission
 document.getElementById("contact-form").addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -728,20 +487,18 @@ document.getElementById("contact-form").addEventListener("submit", async (e) => 
   submitBtn.disabled = true;
   submitBtn.textContent = 'Sending...';
 
-  // Save message locally if DataManager exists
-  if (typeof DataManager !== 'undefined') {
-    const currentUser = DataManager.getCurrentUser();
-    const userId = currentUser ? currentUser.id : 'guest';
-    DataManager.saveMessage({
-      userId,
-      name,
-      email,
-      subject,
-      message
-    });
-  }
+  // 1. Save message locally via DataManager (as backup/record)
+  const currentUser = DataManager.getCurrentUser();
+  const userId = currentUser ? currentUser.id : 'guest';
+  DataManager.saveMessage({
+    userId,
+    name,
+    email,
+    subject,
+    message
+  });
 
-  // Attempt to send via Gmail API
+  // 2. Attempt to send via Gmail API
   const success = await sendEmailViaGmail(name, email, subject, message);
 
   submitBtn.disabled = false;
@@ -751,11 +508,13 @@ document.getElementById("contact-form").addEventListener("submit", async (e) => 
     alert("Thank you for contacting us! Your message has been sent successfully.");
     e.target.reset();
   } else {
-    alert("Dear customer, we've received your message and we are working on it. We'll give you our feedback as soon as possible. Thank you!");
+    // If Gmail fails, we let them know but it was still saved locally for the admin
+    alert("Dear customer,we've received your message and we are working on it.we'll give you our feedback as soon as possible.Thank you!.");
     e.target.reset();
   }
 });
 </script>
+  
 
 </body>
 </html>

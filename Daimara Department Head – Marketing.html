@@ -16,414 +16,230 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-* {
-  box-sizing: border-box;
+body{
+margin:0;
+font-family:Segoe UI;
+background:#0f172a;
+color:white;
+display: flex;
 }
 
-html {
-  font-size: 16px;
+.sidebar{
+width:160px;
+height:100vh;
+background:#e99d11;
+position:fixed;
+padding:20px;
+color:white;
+box-sizing: border-box;
+z-index: 1000;
+overflow-y: auto;
 }
 
-body {
-  margin: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #1F2937;
-  color: white;
-  display: flex;
-  min-height: 100vh;
+.sidebar h2{
+color:black;
+margin-bottom: 30px;
+font-size: 16px;
+
 }
 
-/* SIDEBAR */
-.sidebar {
-  width: 220px;
-  height: 100vh;
-  background: #e99d11;
-  position: fixed;
-  padding: 20px;
-  color: white;
-  box-sizing: border-box;
-  z-index: 1000;
-  overflow-y: auto;
-  transition: transform 0.3s ease;
+.sidebar a{
+display:flex;
+align-items: center;
+gap: 10px;
+color: white;
+text-decoration:none;
+margin:15px 0;
+padding: 3px;
+padding-left: -64%;
+
+border-radius: 5px;
+transition: 0.3s;
+font-weight: 600;
+font-size: 18px;
 }
 
-.sidebar h2 {
-  color: black;
-  margin-bottom: 30px;
-  font-size: 1rem;
-  line-height: 1.4;
+.sidebar a:hover, .sidebar a.active{
+color: black;
 }
 
-.sidebar a {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: white;
-  text-decoration: none;
-  margin: 12px 0;
-  padding: 10px;
-  border-radius: 8px;
-  transition: 0.3s;
-  font-weight: 600;
-  font-size: 0.95rem;
-}
-
-.sidebar a:hover, .sidebar a.active {
-  color: black;
-  background: rgba(0, 0, 0, 0.1);
-}
-
-.sidebar a i {
-  width: 20px;
-  text-align: center;
-}
-
-/* Mobile Menu Toggle */
-.menu-toggle {
-  display: none;
-  position: fixed;
-  top: 15px;
-  left: 15px;
-  z-index: 1001;
-  background: #e99d11;
-  color: black;
-  border: none;
-  padding: 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 1.2rem;
-}
-
-/* Overlay for mobile sidebar */
-.sidebar-overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 999;
-}
-
-.sidebar-overlay.active {
-  display: block;
-}
-
-/* MAIN CONTENT */
-.main {
-  margin-left: 220px;
-  padding: 20px;
-  width: calc(100% - 220px);
-  box-sizing: border-box;
-  min-height: 100vh;
+.main{
+margin-left:220px;
+padding:20px;
+width: calc(100% - 250px);
+box-sizing: border-box;
 }
 
 .tab-content {
-  display: none;
+display: none;
 }
 
 .tab-content.active {
-  display: block;
+display: block;
 }
 
-/* HEADINGS */
-.main h1 {
-  font-size: clamp(1.5rem, 4vw, 2rem);
-  margin-bottom: 20px;
+.cards{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:20px;
+margin-bottom:20px;
 }
 
-/* CARDS */
-.cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 15px;
-  margin-bottom: 25px;
-}
-
-.card {
-  background: #1e293b;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-  cursor: pointer;
-  transition: 0.3s;
+.card{
+background:#1e293b;
+padding:20px;
+border-radius:10px;
+box-shadow:0 4px 8px rgba(0,0,0,0.4);
+cursor: pointer;
+transition:  0.2s;
 }
 
 .card:hover {
-  transform: translateY(-5px);
-  background: #2d3748;
+transform: translateY(-5px);
+background: #2d3748;
 }
 
-.card h3 {
-  font-size: clamp(1.8rem, 5vw, 2.5rem);
-  margin: 0 0 8px 0;
-  color: #e99d11;
+.card h3{
+font-size:40px;
+margin:0;
+color: #e99d11;
 }
 
-.card p {
-  font-size: 0.9rem;
-  color: #cbd5e1;
-  margin: 0;
-}
-
-/* MAP CONTAINER */
 .map-container {
-  position: relative;
-  width: 100%;
-  height: 500px;
-  background: #0f172a;
-  border-radius: 12px;
-  margin-bottom: 30px;
-  overflow: hidden;
+position: relative;
+width:130%;
+height:700px;
+background: #0f172a;
+border-radius: 12px;
+margin-bottom:30px;
+overflow: hidden;
 }
 
 #chartdiv {
-  width: 100%;
-  height: 100%;
+width:100%;
+height:100%;
 }
 
 .back-btn {
-  position: absolute;
-  top: 15px;
-  left: 15px;
-  z-index: 10;
-  display: none;
-  background: #e99d11;
-  color: black;
-  padding: 10px 18px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-  border: none;
-  font-size: 0.9rem;
-  transition: 0.3s;
+position: absolute;
+top: 20px;
+left: 20px;
+z-index: 10;
+display: none;
+background: #e99d11;
+color: black;
+padding: 8px 15px;
+border-radius: 5px;
+cursor: pointer;
+font-weight: bold;
+border: none;
+
 }
 
-.back-btn:hover {
-  background: #d48a0a;
-}
-
-/* CHART BOX */
-.chart-box {
-  background: #1e293b;
-  padding: 20px;
-  border-radius: 12px;
-  margin-bottom: 20px;
-}
-
-.chart-box h3 {
-  font-size: 1.1rem;
-  margin-bottom: 15px;
-  color: #e99d11;
+.chart-box{
+background:#1e293b;
+padding:20px;
+border-radius:12px;
+margin-bottom:20px;
 }
 
 /* AD CREATOR STYLES */
 .ad-form {
-  background-color: transparent;
+  background-color: #0a66c200;
 }
 
 .ad-form label {
-  display: block;
-  margin-bottom: 6px;
-  font-weight: 600;
-  color: #e99d11;
-  font-size: 0.9rem;
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #000000;
+    font-size: 16px;
 }
-
-.ad-form input,
-.ad-form textarea {
-  width: 100%;
-  padding: 12px;
-  margin-bottom: 15px;
-  border-radius: 8px;
-  border: 1px solid #2d3748;
-  background: #0f172a;
-  color: white;
-  font-size: 1rem;
-  font-family: inherit;
+.ad-form input, .ad-form textarea {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    border: 1px solid #2d3748;
+    background: #0f172a;
+    color: white;
+    font-size: 14px;
 }
-
-.ad-form input:focus,
-.ad-form textarea:focus {
-  outline: none;
-  border-color: #e99d11;
-}
-
 .ad-form input[type="file"] {
-  padding: 10px;
-  cursor: pointer;
+    padding: 8px;
+    cursor: pointer;
+    font-size: 14px;
 }
-
-.ad-form-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 25px;
-}
-
-/* PLATFORM BUTTONS */
-.platform-selector {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  margin: 15px 0;
-}
-
 .platform-btn {
-  font-size: 1.8rem;
-  cursor: pointer;
-  transition: 0.3s;
-  opacity: 0.5;
-  padding: 8px;
+    font-size: 28px;
+    cursor: pointer;
+    transition: 0.3s;
+    opacity: 0.5;
+    
 }
-
 .platform-btn.selected {
-  opacity: 1;
-  transform: scale(1.15);
+    opacity: 1;
+    transform: scale(1.2);
 }
 
-/* PREVIEW BOX */
-.preview-container {
-  background: #0f172a;
-  padding: 20px;
-  border-radius: 10px;
-  border: 1px dashed #e99d11;
-}
-
-.preview-container h3 {
-  color: #e99d11;
-  margin-bottom: 15px;
-  font-size: 1rem;
-}
-
-#preview-box img,
-#preview-box video {
-  width: 100%;
-  border-radius: 8px;
-  margin-bottom: 15px;
-}
-
-#preview-title {
-  color: #e99d11;
-  margin: 0 0 10px 0;
-  font-size: 1.2rem;
-}
-
-#preview-text {
-  line-height: 1.6;
-  color: #cbd5e1;
-  font-size: 0.95rem;
-}
-
-/* BUTTON */
-.btn {
-  padding: 14px 24px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 1rem;
-  transition: 0.3s;
-}
-
-.btn-primary {
-  background: #e99d11;
-  color: black;
-  width: 100%;
-}
-
-.btn-primary:hover {
-  background: #d48a0a;
-}
-
-/* CAMPAIGN LIST */
+/* CAMPAIGN LIST STYLES */
 .campaign-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
 }
-
 .campaign-card {
-  background: #1e293b;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  position: relative;
+    background: #1e293b;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    position: relative;
 }
-
 .campaign-media {
-  width: 100%;
-  height: 160px;
-  object-fit: cover;
-  background: #0f172a;
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    background: #0f172a;
 }
-
 .campaign-info {
-  padding: 15px;
+    padding: 15px;
 }
-
 .campaign-title {
-  color: #e99d11;
-  font-size: 1.1rem;
-  margin: 0 0 10px 0;
+    color: #e99d11;
+    font-size: 17px;
+    margin: 0 0 10px 0;
 }
-
 .campaign-msg {
-  color: #cbd5e1;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  max-height: 70px;
-  overflow: hidden;
+    color: #cbd5e1;
+    font-size: 12px;
+    line-height: 1.4;
+    height: 60px;
+    overflow: hidden;
 }
-
-.campaign-platforms {
-  margin-top: 12px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.platform-tag {
-  font-size: 0.75rem;
-  background: rgba(233, 157, 17, 0.2);
-  color: #e99d11;
-  padding: 4px 10px;
-  border-radius: 12px;
-}
-
 .campaign-footer {
-  padding: 12px 15px;
-  border-top: 1px solid #2d3748;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
+    padding: 10px 15px;
+    border-top: 1px solid #2d3748;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
-
-.campaign-date {
-  font-size: 0.8rem;
-  color: #64748b;
-}
-
 .delete-ad-btn {
-  background: #e74c3c;
-  color: white;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 0.85rem;
-  transition: 0.2s;
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.2s;
 }
-
 .delete-ad-btn:hover {
-  background: #c0392b;
+    background: #000000;
+    color: #EA4335;
 }
 
-/* MODAL */
+/* MODAL STYLES */
 .modal {
   display: none;
   position: fixed;
@@ -432,383 +248,137 @@ body {
   top: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0,0,0,0.7);
   align-items: center;
   justify-content: center;
-  padding: 20px;
 }
-
 .modal-content {
   background: #1e293b;
   color: white;
-  padding: 25px;
+  padding: 30px;
   border-radius: 12px;
-  max-width: 900px;
-  width: 100%;
-  max-height: 85vh;
+  max-width: 800px;
+  width: 90%;
+  max-height: 80vh;
   overflow-y: auto;
   position: relative;
 }
-
 .close-modal {
   position: absolute;
   top: 15px;
-  right: 20px;
-  font-size: 28px;
+  right: 15px;
+  font-size: 25px;
   cursor: pointer;
   color: #7f8c8d;
-  transition: 0.3s;
 }
+table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+th { text-align: left; padding: 12px; background: #0f172a; color: #e99d11; }
+td { padding: 12px; border-bottom: 1px solid #2d3748; }
+.user-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+.btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
 
-.close-modal:hover {
-  color: #e99d11;
-}
 
-/* TABLE */
-.table-container {
-  overflow-x: auto;
-  margin-top: 20px;
-}
+   
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 500px;
-}
-
-th {
-  text-align: left;
-  padding: 14px 12px;
-  background: #0f172a;
-  color: #e99d11;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-td {
-  padding: 12px;
-  border-bottom: 1px solid #2d3748;
-}
-
-tr:hover {
-  background: rgba(233, 157, 17, 0.05);
-}
-
-.user-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-/* EMPTY STATE */
-.empty-state {
-  grid-column: 1/-1;
-  text-align: center;
-  padding: 50px 20px;
-  background: #1e293b;
-  border-radius: 12px;
-  color: #64748b;
-}
-
-/* ==================== */
-/* TABLET STYLES (768px+) */
-/* ==================== */
-@media (min-width: 768px) {
-  .sidebar {
-    width: 240px;
-  }
-
-  .main {
-    margin-left: 240px;
-    width: calc(100% - 240px);
-    padding: 30px;
-  }
-
-  .cards {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-  }
-
-  .ad-form-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-  }
-
-  .map-container {
-    height: 600px;
-  }
-
-  .campaign-list {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-/* ==================== */
-/* DESKTOP STYLES (1024px+) */
-/* ==================== */
-@media (min-width: 1024px) {
-  .cards {
-    grid-template-columns: repeat(4, 1fr);
-  }
-
-  .campaign-list {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .map-container {
-    height: 700px;
-  }
-}
-
-/* ==================== */
-/* MOBILE STYLES (max 767px) */
-/* ==================== */
-@media (max-width: 767px) {
-  .menu-toggle {
-    display: block;
-  }
-
-  .sidebar {
-    transform: translateX(-100%);
-    width: 260px;
-  }
-
-  .sidebar.active {
-    transform: translateX(0);
-  }
-
-  .main {
-    margin-left: 0;
-    width: 100%;
-    padding: 70px 15px 20px 15px;
-  }
-
-  .cards {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-  }
-
-  .card {
-    padding: 15px;
-  }
-
-  .card h3 {
-    font-size: 1.5rem;
-  }
-
-  .card p {
-    font-size: 0.8rem;
-  }
-
-  .map-container {
-    height: 350px;
-  }
-
-  .platform-btn {
-    font-size: 1.5rem;
-  }
-
-  .campaign-list {
-    grid-template-columns: 1fr;
-  }
-
-  .modal-content {
-    padding: 20px;
-    max-height: 90vh;
-  }
-
-  .campaign-footer {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
-
-/* ==================== */
-/* SMALL MOBILE (max 480px) */
-/* ==================== */
-@media (max-width: 480px) {
-  .cards {
-    grid-template-columns: 1fr;
-  }
-
-  .map-container {
-    height: 300px;
-  }
-
-  .ad-form input,
-  .ad-form textarea {
-    font-size: 16px; /* Prevents zoom on iOS */
-  }
-
-  .platform-selector {
-    gap: 12px;
-  }
-
-  .platform-btn {
-    font-size: 1.3rem;
-  }
-
-  .btn {
-    padding: 14px;
-  }
-
-  .chart-box {
-    padding: 15px;
-  }
-
-  th, td {
-    padding: 10px 8px;
-    font-size: 0.9rem;
-  }
-
-  .user-avatar {
-    width: 32px;
-    height: 32px;
-  }
-}
-
-/* ==================== */
-/* LANDSCAPE MOBILE */
-/* ==================== */
-@media (max-height: 500px) and (orientation: landscape) {
-  .sidebar {
-    padding-top: 10px;
-  }
-
-  .sidebar a {
-    margin: 6px 0;
-    padding: 8px;
-  }
-}
 </style>
-
 </head>
 
 <body>
 
-<!-- Mobile Menu Toggle -->
-<button class="menu-toggle" onclick="toggleSidebar()">
-  <i class="fas fa-bars"></i>
-</button>
-
-<!-- Sidebar Overlay -->
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-
-<!-- SIDEBAR -->
-<div class="sidebar" id="sidebar">
-  <h2>DAIMARA MARKETING</h2>
-  <a href="#" class="active" onclick="showTab('dashboard', this)"><i class="fas fa-chart-line"></i> Dashboard</a>
-  <a href="#" onclick="showTab('map', this)"><i class="fas fa-globe"></i> Global Intelligence</a>
-  <a href="#" onclick="showTab('ads', this)"><i class="fas fa-bullhorn"></i> Ad Creator</a>
-  <a href="#" onclick="showTab('campaigns', this)"><i class="fas fa-list"></i> Active Campaigns</a>
-  <a href="#" onclick="showTab('analytics', this)"><i class="fas fa-microchip"></i> Analytics</a>
+<div class="sidebar">
+<h2>DAIMARA MARKETING</h2>
+<a href="#" class="active" onclick="showTab('dashboard', this)"><i class="fas fa-chart-line"></i> Dashboard</a>
+<a href="#" onclick="showTab('map', this)"><i class="fas fa-globe"></i> Global Intelligence</a>
+<a href="#" onclick="showTab('ads', this)"><i class="fas fa-bullhorn"></i> Ad Creator</a>
+<a href="#" onclick="showTab('campaigns', this)"><i class="fas fa-list"></i> Active Campaigns</a>
+<a href="#" onclick="showTab('analytics', this)"><i class="fas fa-microchip"></i> Analytics</a>
+<a href="admin-manager.html" style="margin-top: 50px; background: rgba(0,0,0,0.2)"><i class="fas fa-arrow-left"></i> Back to Admin</a>
 </div>
 
-<!-- MAIN CONTENT -->
 <div class="main">
 
-  <!-- DASHBOARD TAB -->
-  <div id="dashboard" class="tab-content active">
+<div id="dashboard" class="tab-content active">
     <h1>Intelligence Overview</h1>
     <div class="cards">
-      <div class="card" onclick="viewClients('all')">
-        <h3 id="signups">0</h3>
-        <p>Registered Users</p>
-      </div>
-      <div class="card" onclick="viewClients('online')">
-        <h3 id="online">0</h3>
-        <p>Online Now</p>
-      </div>
-      <div class="card" onclick="viewClients('purchasers')">
-        <h3 id="purchasers">0</h3>
-        <p>Total Purchasers</p>
-      </div>
-      <div class="card" onclick="viewClients('potential')">
-        <h3 id="potential">0</h3>
-        <p>Potential Targets</p>
-      </div>
+        <div class="card" onclick="viewClients('all')"><h3 id="signups">0</h3><p>Registered Users</p></div>
+        <div class="card" onclick="viewClients('online')"><h3 id="online">0</h3><p>Online Now</p></div>
+        <div class="card" onclick="viewClients('purchasers')"><h3 id="purchasers">0</h3><p>Total Purchasers</p></div>
+        <div class="card" onclick="viewClients('potential')"><h3 id="potential">0</h3><p>Potential Targets</p></div>
     </div>
 
     <div class="chart-box">
-      <h3>Live Sales Performance</h3>
-      <canvas id="salesChart"></canvas>
+        <h3>Live Sales Performance</h3>
+        <canvas id="salesChart"></canvas>
     </div>
-  </div>
+</div>
 
-  <!-- MAP TAB -->
-  <div id="map" class="tab-content">
+<div id="map" class="tab-content">
     <h1>Regional Deep-Dive</h1>
     <p>Click on any country on the globe to view its specific counties and local data.</p>
     <div class="map-container">
-      <button id="back-to-globe" class="back-btn" onclick="backToGlobe()">
-        <i class="fas fa-arrow-left"></i> Back to Globe
-      </button>
-      <div id="chartdiv"></div>
+        <button id="back-to-globe" class="back-btn" onclick="backToGlobe()"><i class="fas fa-arrow-left"></i> Back to Globe</button>
+        <div id="chartdiv"></div>
     </div>
-  </div>
+</div>
 
-  <!-- AD CREATOR TAB -->
-  <div id="ads" class="tab-content">
+<div id="ads" class="tab-content">
     <h1>Advertisement Creator</h1>
     <div class="chart-box ad-form">
-      <div class="ad-form-grid">
-        <div>
-          <label>Campaign Title</label>
-          <input type="text" id="ad-title" placeholder="e.g., 50% Off Everything!" oninput="updatePreview()">
-
-          <label>Ad Message</label>
-          <textarea id="ad-message" rows="4" placeholder="Write your compelling copy here..." oninput="updatePreview()"></textarea>
-
-          <label>Upload Media (Image or Video)</label>
-          <input type="file" id="ad-media-file" accept="image/*,video/*" onchange="handleMediaUpload(this)">
-
-          <label>Or Paste URL</label>
-          <input type="text" id="ad-media-url" placeholder="https://image-or-video-url.com" oninput="updatePreview()">
-
-          <label>Select Platforms</label>
-          <div class="platform-selector">
-            <i class="fab fa-facebook platform-btn" style="color:#1877F2" onclick="togglePlatform(this, 'Facebook')" title="Facebook"></i>
-            <i class="fab fa-x-twitter platform-btn" style="color:white" onclick="togglePlatform(this, 'X')" title="X (Twitter)"></i>
-            <i class="fab fa-instagram platform-btn" style="color:#E4405F" onclick="togglePlatform(this, 'Instagram')" title="Instagram"></i>
-            <i class="fab fa-linkedin platform-btn" style="color:#0A66C2" onclick="togglePlatform(this, 'LinkedIn')" title="LinkedIn"></i>
-            <i class="fas fa-envelope platform-btn" style="color:#EA4335" onclick="togglePlatform(this, 'Gmail')" title="Gmail"></i>
-          </div>
-
-          <button class="btn btn-primary" onclick="postAdvert()">Post Campaign</button>
-        </div>
-
-        <div class="preview-container">
-          <h3>Live Preview</h3>
-          <div id="preview-box">
-            <div id="preview-media-container">
-              <img id="preview-img" src="https://via.placeholder.com/400x200?text=Your+Ad+Image" alt="Preview">
-              <video id="preview-video" controls style="display:none;"></video>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+            <div>
+                <label>Campaign Title</label>
+                <input type="text" id="ad-title" placeholder="e.g., 50% Off Everything!" oninput="updatePreview()">
+                
+                <label>Ad Message</label>
+                <textarea id="ad-message" rows="4" placeholder="Write your compelling copy here..." oninput="updatePreview()"></textarea>
+                
+                <label>Upload Media (Image or Video)</label>
+                <input type="file" id="ad-media-file" accept="image/*,video/*" onchange="handleMediaUpload(this)">
+                
+                <label>Or Paste URL</label>
+                <input type="text" id="ad-media-url" placeholder="https://image-or-video-url.com" oninput="updatePreview()">
+                
+                <label>Select Platforms</label>
+                <div style="display: flex; gap: 20px; margin: 15px 0;">
+                    <i class="fab fa-facebook platform-btn" style="color:#1877F2" onclick="togglePlatform(this, 'Facebook')"></i>
+                    <i class="fab fa-x-twitter platform-btn" style="color:white" onclick="togglePlatform(this, 'X')"></i>
+                    <i class="fab fa-instagram platform-btn" style="color:#E4405F" onclick="togglePlatform(this, 'Instagram')"></i>
+                    <i class="fab fa-linkedin platform-btn" style="color:#0A66C2" onclick="togglePlatform(this, 'LinkedIn')"></i>
+                    <i class="fas fa-envelope platform-btn" style="color:#EA4335" onclick="togglePlatform(this, 'Gmail')"></i>
+                </div>
+                
+                <button class="btn" style="background:#e99d11; color:black; width:100%; font-size:18px;" onclick="postAdvert()">Post Campaign</button>
             </div>
-            <h2 id="preview-title">Special Offer</h2>
-            <p id="preview-text">Your advertisement message will appear here. Capture your audience's attention!</p>
-          </div>
+            
+            <div style="background:#0f172a; padding:20px; border-radius:10px; border: 1px dashed #e99d11;">
+                <h3>Live Preview</h3>
+                <div id="preview-box">
+                    <div id="preview-media-container">
+                        <img id="preview-img" src="https://via.placeholder.com/400x200?text=Your+Ad+Image" style="width:100%; border-radius:8px; margin-bottom:15px;">
+                        <video id="preview-video" controls style="width:100%; border-radius:8px; margin-bottom:15px; display:none;"></video>
+                    </div>
+                    <h2 id="preview-title" style="color:#e99d11; margin:0 0 10px 0;">Special Offer</h2>
+                    <p id="preview-text" style="line-height:1.6; color:#cbd5e1;">Your advertisement message will appear here. Capture your audience's attention!</p>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
+</div>
 
-  <!-- CAMPAIGNS TAB -->
-  <div id="campaigns" class="tab-content">
+<div id="campaigns" class="tab-content">
     <h1>Active Marketing Campaigns</h1>
     <p>Manage your live advertisements across all platforms.</p>
     <div id="active-campaigns-list" class="campaign-list">
-      <!-- Campaigns will be loaded here -->
+        <!-- Campaigns will be loaded here -->
     </div>
-  </div>
+</div>
 
-  <!-- ANALYTICS TAB -->
-  <div id="analytics" class="tab-content">
+<div id="analytics" class="tab-content">
     <h1>Marketing ROI Analytics</h1>
     <div class="chart-box">
-      <p>Coming Soon: Deep integration with Google Ads and Facebook Pixel.</p>
+        <p>Coming Soon: Deep integration with Google Ads and Facebook Pixel.</p>
     </div>
-  </div>
+</div>
 
 </div>
 
@@ -825,55 +395,39 @@ tr:hover {
 <script>
 
 /* ===========================
-   SIDEBAR TOGGLE (MOBILE)
-=========================== */
-function toggleSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  const overlay = document.getElementById('sidebarOverlay');
-  sidebar.classList.toggle('active');
-  overlay.classList.toggle('active');
-}
-
-/* ===========================
    TAB SWITCHING
 =========================== */
 function showTab(tabId, el) {
-  document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-  document.getElementById(tabId).classList.add('active');
-
-  if (el) {
-    document.querySelectorAll('.sidebar a').forEach(link => link.classList.remove('active'));
-    el.classList.add('active');
-  }
-
-  // Close sidebar on mobile after selection
-  if (window.innerWidth <= 767) {
-    toggleSidebar();
-  }
-
-  if (tabId === 'map') {
-    initMap();
-  }
-  if (tabId === 'campaigns') {
-    renderCampaigns();
-  }
+    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    
+    if (el) {
+        document.querySelectorAll('.sidebar a').forEach(link => link.classList.remove('active'));
+        el.classList.add('active');
+    }
+    if(tabId === 'map') {
+        initMap();
+    }
+    if(tabId === 'campaigns') {
+        renderCampaigns();
+    }
 }
 
 /* ===========================
    DATA SYNC
 =========================== */
 function updateMarketingStats() {
-  const allUsers = (typeof DataManager !== 'undefined' && DataManager.getAllUsers) ? DataManager.getAllUsers() || [] : [];
-  const onlineCount = (typeof DataManager !== 'undefined' && DataManager.getOnlineUserCount) ? DataManager.getOnlineUserCount() || 0 : 0;
-  const orders = (typeof DataManager !== 'undefined' && DataManager.getAllOrders) ? DataManager.getAllOrders() || [] : [];
+    const allUsers = DataManager.getAllUsers() || [];
+    const onlineCount = DataManager.getOnlineUserCount() || 0;
+    const orders = DataManager.getAllOrders() || [];
+    
+    const userEmailsWithOrders = new Set(orders.map(o => o.customerEmail || (o.customer && o.customer.email)));
+    const potentialClients = allUsers.filter(u => !userEmailsWithOrders.has(u.email));
 
-  const userEmailsWithOrders = new Set(orders.map(o => o.customerEmail || (o.customer && o.customer.email)));
-  const potentialClients = allUsers.filter(u => !userEmailsWithOrders.has(u.email));
-
-  document.getElementById('signups').innerText = allUsers.length;
-  document.getElementById('online').innerText = onlineCount;
-  document.getElementById('purchasers').innerText = userEmailsWithOrders.size;
-  document.getElementById('potential').innerText = potentialClients.length;
+    document.getElementById('signups').innerText = allUsers.length;
+    document.getElementById('online').innerText = onlineCount;
+    document.getElementById('purchasers').innerText = userEmailsWithOrders.size;
+    document.getElementById('potential').innerText = potentialClients.length;
 }
 
 /* ===========================
@@ -884,137 +438,111 @@ let uploadedMediaUrl = "";
 let isVideo = false;
 
 function handleMediaUpload(input) {
-  const file = input.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      uploadedMediaUrl = e.target.result;
-      isVideo = file.type.startsWith('video/');
-      updatePreview();
-    };
-    reader.readAsDataURL(file);
-  }
+    const file = input.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            uploadedMediaUrl = e.target.result;
+            isVideo = file.type.startsWith('video/');
+            updatePreview();
+        };
+        reader.readAsDataURL(file);
+    }
 }
 
 function togglePlatform(el, platform) {
-  el.classList.toggle('selected');
-  if (selectedPlatforms.has(platform)) selectedPlatforms.delete(platform);
-  else selectedPlatforms.add(platform);
+    el.classList.toggle('selected');
+    if (selectedPlatforms.has(platform)) selectedPlatforms.delete(platform);
+    else selectedPlatforms.add(platform);
 }
 
 function updatePreview() {
-  const title = document.getElementById('ad-title').value || "Special Offer";
-  const msg = document.getElementById('ad-message').value || "Your advertisement message will appear here.";
-  let mediaUrl = uploadedMediaUrl || document.getElementById('ad-media-url').value || "https://via.placeholder.com/400x200?text=Your+Ad+Image";
+    const title = document.getElementById('ad-title').value || "Special Offer";
+    const msg = document.getElementById('ad-message').value || "Your advertisement message will appear here.";
+    let mediaUrl = uploadedMediaUrl || document.getElementById('ad-media-url').value || "https://via.placeholder.com/400x200?text=Your+Ad+Image";
+    
+    document.getElementById('preview-title').innerText = title;
+    document.getElementById('preview-text').innerText = msg;
 
-  document.getElementById('preview-title').innerText = title;
-  document.getElementById('preview-text').innerText = msg;
+    const imgEl = document.getElementById('preview-img');
+    const videoEl = document.getElementById('preview-video');
+    const isVideoUrl = mediaUrl.match(/\.(mp4|webm|ogg)$/i) || mediaUrl.includes('video');
 
-  const imgEl = document.getElementById('preview-img');
-  const videoEl = document.getElementById('preview-video');
-  const isVideoUrl = mediaUrl.match(/\.(mp4|webm|ogg)$/i) || mediaUrl.includes('video');
-
-  if (isVideo || isVideoUrl) {
-    imgEl.style.display = 'none';
-    videoEl.style.display = 'block';
-    videoEl.src = mediaUrl;
-  } else {
-    imgEl.style.display = 'block';
-    videoEl.style.display = 'none';
-    imgEl.src = mediaUrl;
-  }
+    if (isVideo || isVideoUrl) {
+        imgEl.style.display = 'none';
+        videoEl.style.display = 'block';
+        videoEl.src = mediaUrl;
+    } else {
+        imgEl.style.display = 'block';
+        videoEl.style.display = 'none';
+        imgEl.src = mediaUrl;
+    }
 }
 
 function postAdvert() {
-  if (selectedPlatforms.size === 0) return alert("Please select at least one platform.");
-  const title = document.getElementById('ad-title').value;
-  const msg = document.getElementById('ad-message').value;
-  if (!title || !msg) return alert("Title and Message are required.");
+    if (selectedPlatforms.size === 0) return alert("Please select at least one platform.");
+    const title = document.getElementById('ad-title').value;
+    const msg = document.getElementById('ad-message').value;
+    if (!title || !msg) return alert("Title and Message are required.");
 
-  const mediaUrl = uploadedMediaUrl || document.getElementById('ad-media-url').value;
+    const mediaUrl = uploadedMediaUrl || document.getElementById('ad-media-url').value;
 
-  const campaign = {
-    id: Date.now().toString(),
-    title: title,
-    message: msg,
-    media: mediaUrl,
-    isVideo: isVideo || (mediaUrl && (mediaUrl.match(/\.(mp4|webm|ogg)$/i) || mediaUrl.includes('video'))),
-    platforms: Array.from(selectedPlatforms),
-    createdAt: new Date().toISOString()
-  };
+    const campaign = {
+        title: title,
+        message: msg,
+        media: mediaUrl,
+        isVideo: isVideo || (mediaUrl && (mediaUrl.match(/\.(mp4|webm|ogg)$/i) || mediaUrl.includes('video'))),
+        platforms: Array.from(selectedPlatforms)
+    };
 
-  if (typeof DataManager !== 'undefined' && DataManager.saveCampaign) {
     DataManager.saveCampaign(campaign);
-  } else {
-    // Fallback: save to localStorage directly
-    const campaigns = JSON.parse(localStorage.getItem('daimara_campaigns') || '[]');
-    campaigns.push(campaign);
-    localStorage.setItem('daimara_campaigns', JSON.stringify(campaigns));
-  }
-
-  alert(`Successfully posted campaign to ${campaign.platforms.join(", ")}! It is now live on the platform.`);
-
-  // Clear form
-  document.getElementById('ad-title').value = "";
-  document.getElementById('ad-message').value = "";
-  document.getElementById('ad-media-url').value = "";
-  document.getElementById('ad-media-file').value = "";
-  uploadedMediaUrl = "";
-  isVideo = false;
-  selectedPlatforms.clear();
-  document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('selected'));
-  updatePreview();
+    alert(`Successfully posted campaign to ${campaign.platforms.join(", ")}! It is now live on the platform.`);
+    
+    // Clear form
+    document.getElementById('ad-title').value = "";
+    document.getElementById('ad-message').value = "";
+    document.getElementById('ad-media-url').value = "";
+    uploadedMediaUrl = "";
+    isVideo = false;
+    selectedPlatforms.clear();
+    document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('selected'));
+    updatePreview();
 }
 
 function renderCampaigns() {
-  let campaigns = [];
-  if (typeof DataManager !== 'undefined' && DataManager.getAllCampaigns) {
-    campaigns = DataManager.getAllCampaigns();
-  } else {
-    campaigns = JSON.parse(localStorage.getItem('daimara_campaigns') || '[]');
-  }
+    const campaigns = DataManager.getAllCampaigns();
+    const list = document.getElementById('active-campaigns-list');
+    
+    if (campaigns.length === 0) {
+        list.innerHTML = `<p style="grid-column: 1/-1; text-align: center; padding: 50px; background: #1e293b; border-radius: 10px;">No active campaigns. Create one in the Ad Creator tab!</p>`;
+        return;
+    }
 
-  const list = document.getElementById('active-campaigns-list');
-
-  if (campaigns.length === 0) {
-    list.innerHTML = `<div class="empty-state">No active campaigns. Create one in the Ad Creator tab!</div>`;
-    return;
-  }
-
-  list.innerHTML = campaigns.map(c => `
-    <div class="campaign-card">
-      ${c.isVideo ?
-        `<video src="${c.media}" class="campaign-media" muted loop onmouseover="this.play()" onmouseout="this.pause()"></video>` :
-        `<img src="${c.media || 'https://via.placeholder.com/400x200?text=Ad+Image'}" class="campaign-media" alt="${c.title}">`
-      }
-      <div class="campaign-info">
-        <h3 class="campaign-title">${c.title}</h3>
-        <p class="campaign-msg">${c.message}</p>
-        <div class="campaign-platforms">
-          ${c.platforms.map(p => `<span class="platform-tag">${p}</span>`).join('')}
+    list.innerHTML = campaigns.map(c => `
+        <div class="campaign-card">
+            ${c.isVideo ? 
+                `<video src="${c.media}" class="campaign-media" muted loop onmouseover="this.play()" onmouseout="this.pause()"></video>` : 
+                `<img src="${c.media || 'https://via.placeholder.com/400x200?text=Ad+Image'}" class="campaign-media">`
+            }
+            <div class="campaign-info">
+                <h3 class="campaign-title">${c.title}</h3>
+                <p class="campaign-msg">${c.message}</p>
+                <div style="margin-top: 10px;">
+                    ${c.platforms.map(p => `<span style="font-size: 12px; background: rgba(233, 157, 17, 0.2); color: #e99d11; padding: 2px 8px; border-radius: 10px; margin-right: 5px;">${p}</span>`).join('')}
+                </div>
+            </div>
+            <div class="campaign-footer">
+                <span style="font-size: 12px; color: #64748b;">Posted: ${new Date(c.createdAt).toLocaleDateString()}</span>
+                <button class="delete-ad-btn" onclick="removeCampaign('${c.id}')"><i class="fas fa-trash"></i> Delete</button>
+            </div>
         </div>
-      </div>
-      <div class="campaign-footer">
-        <span class="campaign-date">Posted: ${new Date(c.createdAt).toLocaleDateString()}</span>
-        <button class="delete-ad-btn" onclick="removeCampaign('${c.id}')">
-          <i class="fas fa-trash"></i> Delete
-        </button>
-      </div>
-    </div>
-  `).join('');
+    `).join('');
 }
 
 function removeCampaign(id) {
-  if (!confirm("Are you sure you want to delete this campaign? It will be removed from the online platform immediately.")) return;
-
-  if (typeof DataManager !== 'undefined' && DataManager.deleteCampaign) {
+    if (!confirm("Are you sure you want to delete this campaign? It will be removed from the online platform immediately.")) return;
     DataManager.deleteCampaign(id);
-  } else {
-    let campaigns = JSON.parse(localStorage.getItem('daimara_campaigns') || '[]');
-    campaigns = campaigns.filter(c => c.id !== id);
-    localStorage.setItem('daimara_campaigns', JSON.stringify(campaigns));
-  }
-  renderCampaigns();
+    renderCampaigns();
 }
 
 /* ===========================
@@ -1024,245 +552,180 @@ let mapRoot, chart, polygonSeries, backgroundSeries, graticuleSeries;
 let currentMapType = "globe";
 
 function initMap() {
-  if (mapRoot) return;
-  mapRoot = am5.Root.new("chartdiv");
-  mapRoot.setThemes([am5themes_Animated.new(mapRoot)]);
-  createGlobe();
+    if (mapRoot) return;
+    mapRoot = am5.Root.new("chartdiv");
+    mapRoot.setThemes([am5themes_Animated.new(mapRoot)]);
+    createGlobe();
 }
 
 function createGlobe() {
-  if (chart) chart.dispose();
-  currentMapType = "globe";
-  document.getElementById('back-to-globe').style.display = "none";
+    if (chart) chart.dispose();
+    currentMapType = "globe";
+    document.getElementById('back-to-globe').style.display = "none";
 
-  chart = mapRoot.container.children.push(am5map.MapChart.new(mapRoot, {
-    panX: "rotateX",
-    panY: "rotateY",
-    projection: am5map.geoOrthographic(),
-    paddingBottom: 20,
-    paddingTop: 20,
-    paddingLeft: 20,
-    paddingRight: 20
-  }));
+    chart = mapRoot.container.children.push(am5map.MapChart.new(mapRoot, {
+        panX: "rotateX",
+        panY: "rotateY",
+        projection: am5map.geoOrthographic(),
+        paddingBottom: 20, paddingTop: 20, paddingLeft: 20, paddingRight: 20
+    }));
 
-  backgroundSeries = chart.series.push(am5map.MapPolygonSeries.new(mapRoot, {}));
-  backgroundSeries.mapPolygons.template.setAll({
-    fill: am5.color(0x1e293b),
-    fillOpacity: 0.1,
-    strokeOpacity: 0
-  });
-  backgroundSeries.data.push({
-    geometry: am5map.getGeoCircle({ latitude: 0, longitude: 0 }, 89.99)
-  });
+    backgroundSeries = chart.series.push(am5map.MapPolygonSeries.new(mapRoot, {}));
+    backgroundSeries.mapPolygons.template.setAll({ fill: am5.color(0x1e293b), fillOpacity: 0.1, strokeOpacity: 0 });
+    backgroundSeries.data.push({ geometry: am5map.getGeoCircle({ latitude: 0, longitude: 0 }, 89.99) });
 
-  polygonSeries = chart.series.push(am5map.MapPolygonSeries.new(mapRoot, {
-    geoJSON: am5geodata_worldLow,
-    valueField: "value",
-    calculateAggregates: true
-  }));
+    polygonSeries = chart.series.push(am5map.MapPolygonSeries.new(mapRoot, {
+        geoJSON: am5geodata_worldLow,
+        valueField: "value",
+        calculateAggregates: true
+    }));
 
-  polygonSeries.mapPolygons.template.setAll({
-    tooltipText: "{name}: \nLogins: {logins}\nOnline: {online}\nPurchasers: {purchasers}",
-    interactive: true,
-    fill: am5.color(0x1e293b),
-    stroke: am5.color(0xe99d11),
-    strokeWidth: 0.5
-  });
+    polygonSeries.mapPolygons.template.setAll({
+        tooltipText: "{name}: \nLogins: {logins}\nOnline: {online}\nPurchasers: {purchasers}",
+        interactive: true,
+        fill: am5.color(0x1e293b),
+        stroke: am5.color(0xe99d11),
+        strokeWidth: 0.5
+    });
 
-  polygonSeries.mapPolygons.template.events.on("click", function(ev) {
-    const dataItem = ev.target.dataItem;
-    const countryId = dataItem.get("id");
-    const countryName = dataItem.dataContext.name;
-    drillDown(countryId, countryName);
-  });
+    polygonSeries.mapPolygons.template.events.on("click", function(ev) {
+        const dataItem = ev.target.dataItem;
+        const countryId = dataItem.get("id");
+        const countryName = dataItem.dataContext.name;
+        drillDown(countryId, countryName);
+    });
 
-  const countryData = [
-    { id: "KE", name: "Kenya", logins: 1200, online: 450, purchasers: 300, value: 100 },
-    { id: "US", name: "USA", logins: 800, online: 120, purchasers: 80, value: 50 },
-    { id: "GB", name: "UK", logins: 400, online: 60, purchasers: 40, value: 30 }
-  ];
-  polygonSeries.data.setAll(countryData);
+    const countryData = [
+        { id: "KE", name: "Kenya", logins: 1200, online: 450, purchasers: 300, value: 100 },
+        { id: "US", name: "USA", logins: 800, online: 120, purchasers: 80, value: 50 },
+        { id: "GB", name: "UK", logins: 400, online: 60, purchasers: 40, value: 30 }
+    ];
+    polygonSeries.data.setAll(countryData);
 
-  graticuleSeries = chart.series.push(am5map.GraticuleSeries.new(mapRoot, {}));
-  graticuleSeries.mapLines.template.setAll({
-    strokeOpacity: 0.1,
-    stroke: am5.color(0xffffff)
-  });
+    graticuleSeries = chart.series.push(am5map.GraticuleSeries.new(mapRoot, {}));
+    graticuleSeries.mapLines.template.setAll({ strokeOpacity: 0.1, stroke: am5.color(0xffffff) });
 
-  chart.animate({
-    key: "rotationX",
-    from: 0,
-    to: 360,
-    duration: 30000,
-    loops: Infinity
-  });
+    chart.animate({ key: "rotationX", from: 0, to: 360, duration: 30000, loops: Infinity });
 }
 
 function drillDown(countryId, countryName) {
-  if (chart) chart.dispose();
-  currentMapType = "country";
-  document.getElementById('back-to-globe').style.display = "block";
+    if (chart) chart.dispose();
+    currentMapType = "country";
+    document.getElementById('back-to-globe').style.display = "block";
 
-  chart = mapRoot.container.children.push(am5map.MapChart.new(mapRoot, {
-    panX: "none",
-    panY: "none",
-    projection: am5map.geoMercator()
-  }));
-
-  const script = document.createElement('script');
-  const mapFile = countryId === "KE" ? "kenyaLow" :
-                  countryId === "US" ? "usaLow" :
-                  countryId === "GB" ? "unitedKingdomLow" : "";
-
-  if (!mapFile) {
-    alert("Detailed data for " + countryName + " is coming soon! Try Kenya (KE).");
-    createGlobe();
-    return;
-  }
-
-  script.src = `https://cdn.amcharts.com/lib/5/geodata/${mapFile}.js`;
-  script.onload = function() {
-    const geoData = window["am5geodata_" + mapFile];
-
-    const countrySeries = chart.series.push(am5map.MapPolygonSeries.new(mapRoot, {
-      geoJSON: geoData,
-      valueField: "value",
-      calculateAggregates: true
+    chart = mapRoot.container.children.push(am5map.MapChart.new(mapRoot, {
+        panX: "none",
+        panY: "none",
+        projection: am5map.geoMercator()
     }));
 
-    countrySeries.mapPolygons.template.setAll({
-      tooltipText: "{name}: \nLogins: {logins}\nOnline: {online}\nPurchasers: {purchasers}",
-      interactive: true,
-      fill: am5.color(0x1e293b),
-      stroke: am5.color(0xe99d11)
-    });
+    // Load country geodata dynamically from CDN
+    const script = document.createElement('script');
+    const mapFile = countryId === "KE" ? "kenyaLow" : 
+                    countryId === "US" ? "usaLow" : 
+                    countryId === "GB" ? "unitedKingdomLow" : "";
+    
+    if (!mapFile) {
+        alert("Detailed data for " + countryName + " is coming soon! Try Kenya (KE).");
+        createGlobe();
+        return;
+    }
 
-    const counties = geoData.features.map(f => ({
-      id: f.id,
-      name: f.properties.name,
-      logins: Math.floor(Math.random() * 50) + 10,
-      online: Math.floor(Math.random() * 15) + 2,
-      purchasers: Math.floor(Math.random() * 10) + 1,
-      value: Math.random() * 100
-    }));
+    script.src = `https://cdn.amcharts.com/lib/5/geodata/${mapFile}.js`;
+    script.onload = function() {
+        const geoData = window["am5geodata_" + mapFile];
+        
+        const countrySeries = chart.series.push(am5map.MapPolygonSeries.new(mapRoot, {
+            geoJSON: geoData,
+            valueField: "value",
+            calculateAggregates: true
+        }));
 
-    countrySeries.data.setAll(counties);
+        countrySeries.mapPolygons.template.setAll({
+            tooltipText: "{name}: \nLogins: {logins}\nOnline: {online}\nPurchasers: {purchasers}",
+            interactive: true,
+            fill: am5.color(0x1e293b),
+            stroke: am5.color(0xe99d11)
+        });
 
-    countrySeries.bullets.push(function(root, series, dataItem) {
-      return am5.Bullet.new(root, {
-        sprite: am5.Label.new(root, {
-          text: "{name}",
-          fill: am5.color(0xffffff),
-          fontSize: 10,
-          centerY: am5.p50,
-          centerX: am5.p50,
-          populateText: true,
-          oversizedBehavior: "hide"
-        })
-      });
-    });
+        const counties = geoData.features.map(f => ({
+            id: f.id,
+            name: f.properties.name,
+            logins: Math.floor(Math.random() * 50) + 10,
+            online: Math.floor(Math.random() * 15) + 2,
+            purchasers: Math.floor(Math.random() * 10) + 1,
+            value: Math.random() * 100
+        }));
 
-    chart.set("zoomControl", am5map.ZoomControl.new(mapRoot, {}));
-  };
-  document.head.appendChild(script);
+        countrySeries.data.setAll(counties);
+
+        countrySeries.bullets.push(function(root, series, dataItem) {
+          return am5.Bullet.new(root, {
+            sprite: am5.Label.new(root, {
+              text: "{name}",
+              fill: am5.color(0xffffff),
+              fontSize: 10,
+              centerY: am5.p50,
+              centerX: am5.p50,
+              populateText: true,
+              oversizedBehavior: "hide"
+            })
+          });
+        });
+
+        chart.set("zoomControl", am5map.ZoomControl.new(mapRoot, {}));
+    };
+    document.head.appendChild(script);
 }
 
 function backToGlobe() {
-  createGlobe();
+    createGlobe();
 }
 
 /* ===========================
    CLIENT MODAL & SALES CHART
 =========================== */
 function viewClients(type) {
-  let allUsers = [];
-  if (typeof DataManager !== 'undefined' && DataManager.getAllUsers) {
-    allUsers = DataManager.getAllUsers() || [];
-  }
-
-  const onlineUsers = JSON.parse(localStorage.getItem('ecommerce_online_users')) || {};
-  const body = document.getElementById('modal-body');
-
-  if (allUsers.length === 0) {
-    body.innerHTML = "<p>No clients found.</p>";
-  } else {
-    body.innerHTML = `
-      <div class="table-container">
+    const allUsers = DataManager.getAllUsers() || [];
+    const onlineUsers = JSON.parse(localStorage.getItem('ecommerce_online_users')) || {};
+    const body = document.getElementById('modal-body');
+    body.innerHTML = allUsers.length === 0 ? "<p>No clients found.</p>" : `
         <table>
-          <thead>
-            <tr>
-              <th>Avatar</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${allUsers.map(u => `
-              <tr>
-                <td><img src="${u.profileImage || 'https://via.placeholder.com/40'}" class="user-avatar" alt="Avatar"></td>
-                <td>${u.name}</td>
-                <td>${u.email}</td>
-                <td>${onlineUsers[u.email] ? '<span style="color:#22c55e">● Online</span>' : '<span style="color:#64748b">Offline</span>'}</td>
-              </tr>
-            `).join('')}
-          </tbody>
+            <thead><tr><th>Avatar</th><th>Name</th><th>Email</th><th>Status</th></tr></thead>
+            <tbody>
+                ${allUsers.map(u => `
+                    <tr>
+                        <td><img src="${u.profileImage || 'https://via.placeholder.com/40'}" class="user-avatar"></td>
+                        <td>${u.name}</td>
+                        <td>${u.email}</td>
+                        <td>${onlineUsers[u.email] ? '<span style="color:#22c55e">● Online</span>' : '<span style="color:#64748b">Offline</span>'}</td>
+                    </tr>
+                `).join('')}
+            </tbody>
         </table>
-      </div>
     `;
-  }
-  document.getElementById('details-modal').style.display = 'flex';
+    document.getElementById('details-modal').style.display = 'flex';
 }
 
-function closeModal() {
-  document.getElementById('details-modal').style.display = 'none';
-}
+function closeModal() { document.getElementById('details-modal').style.display = 'none'; }
 
-// Close modal on outside click
-window.onclick = function(event) {
-  const modal = document.getElementById('details-modal');
-  if (event.target === modal) {
-    closeModal();
-  }
-}
-
-// Initialize Sales Chart
 const ctx = document.getElementById("salesChart").getContext('2d');
-new Chart(ctx, {
-  type: "line",
-  data: {
-    labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-    datasets: [{
-      label: "Weekly Conversion (KSH)",
-      data: [20000, 35000, 25000, 45000, 50000, 60000, 55000],
-      borderColor: "#e99d11",
-      backgroundColor: "rgba(233, 157, 17, 0.1)",
-      fill: true,
-      tension: 0.4
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: true,
-    plugins: {
-      legend: {
-        labels: { color: 'white' }
-      }
+new Chart(ctx,{
+    type:"line",
+    data:{
+        labels:["Mon","Tue","Wed","Thu","Fri", "Sat", "Sun"],
+        datasets:[{
+            label:"Weekly Conversion (KSH)",
+            data:[20000, 35000, 25000, 45000, 50000, 60000, 55000],
+            borderColor:"#e99d11",
+            backgroundColor: "rgba(233, 157, 17, 0.1)",
+            fill: true,
+            tension:0.4
+        }]
     },
-    scales: {
-      y: {
-        grid: { color: '#2d3748' },
-        ticks: { color: 'white' }
-      },
-      x: {
-        grid: { color: '#2d3748' },
-        ticks: { color: 'white' }
-      }
-    }
-  }
+    options: { responsive: true, plugins: { legend: { labels: { color: 'white' } } }, scales: { y: { grid: { color: '#2d3748' }, ticks: { color: 'white' } }, x: { grid: { color: '#2d3748' }, ticks: { color: 'white' } } } }
 });
 
-// Initialize
 updateMarketingStats();
 setInterval(updateMarketingStats, 5000);
 

@@ -4,17 +4,6 @@
  */
 
 const DataManager = (() => {
-  let storageAvailable = false;
-  
-  try {
-    const test = '__storage_test__';
-    localStorage.setItem(test, test);
-    localStorage.removeItem(test);
-    storageAvailable = true;
-  } catch(e) {
-    console.warn('localStorage is not available. Using in-memory fallback.');
-  }
-
   const STORAGE_KEYS = {
     PRODUCTS: 'ecommerce_products',
     CART: 'ecommerce_cart',
@@ -28,26 +17,8 @@ const DataManager = (() => {
     WAREHOUSE: 'ecommerce_warehouse',
     INVOICES: 'ecommerce_invoices',
     ONLINE_USERS: 'ecommerce_online_users',
-    CAMPAIGNS: 'ecommerce_campaigns',
-    SUB_WAREHOUSES: 'ecommerce_sub_warehouses'
+    CAMPAIGNS: 'ecommerce_campaigns'
   };
-
-  const ALLOWED_BADGE_PAGES = ['index.html', 'store.html', 'supermarket.html', 'second-hand items.html', 'about.html', 'gas-refill.html', 'grocery delivery.html', 'login.html', 'profile.html', 'water refilling.html', 'cart.html'];
-
-  function isAllowedBadgePage() {
-    const pathname = window.location.pathname.toLowerCase();
-    const pageName = pathname.split('/').pop() || 'index.html';
-    return ALLOWED_BADGE_PAGES.includes(pageName) || pathname.endsWith('/');
-  }
-
-  if (!isAllowedBadgePage()) {
-    document.addEventListener('DOMContentLoaded', function() {
-      const cartCounts = document.querySelectorAll('.cart-count');
-      cartCounts.forEach(el => {
-        el.style.display = 'none';
-      });
-    });
-  }
 
   // Initialize default products from both supermarket and second-hand categories
   const DEFAULT_PRODUCTS = {
@@ -98,26 +69,6 @@ const DataManager = (() => {
       { id: 'g6', name: 'Pro Gas – 6 KG', price: 900, image: 'progas.jfif', subcategory: 'Gas', description: 'Standard 6kg gas refill' },
       { id: 'g13', name: 'Total Gas – 13 KG', price: 1800, image: 'total.jfif', subcategory: 'Gas', description: 'Medium 13kg gas refill' },
       { id: 'g50', name: 'Lake Gas – 50 KG', price: 6500, image: 'lake gas.jpg', subcategory: 'Gas', description: 'Large 50kg industrial gas refill' }
-    ],
-    'Fruits & Vegetables': [
-      { id: 'gd1', name: 'Fresh Tomatoes', price: 120, image: 'https://picsum.photos/300/200?tomatoes', subcategory: 'Fruits & Vegetables', description: 'Organic fresh tomatoes from local farms' },
-      { id: 'gd2', name: 'Carrots Bundle', price: 80, image: 'https://picsum.photos/300/200?carrots', subcategory: 'Fruits & Vegetables', description: 'Fresh organic carrots, 1kg bundle' }
-    ],
-    'Dairy & Eggs': [
-      { id: 'gd3', name: 'Fresh Milk 1L', price: 100, image: 'https://picsum.photos/300/200?milk', subcategory: 'Dairy & Eggs', description: 'Fresh pasteurized milk, farm-to-table' },
-      { id: 'gd4', name: 'Free-Range Eggs', price: 150, image: 'https://picsum.photos/300/200?eggs', subcategory: 'Dairy & Eggs', description: 'Dozen free-range organic eggs' }
-    ],
-    'Bakery Items': [
-      { id: 'gd5', name: 'Fresh Bread Loaf', price: 80, image: 'https://picsum.photos/300/200?bread', subcategory: 'Bakery Items', description: 'Daily-baked artisan bread loaf' },
-      { id: 'gd6', name: 'Croissants Pack', price: 200, image: 'https://picsum.photos/300/200?croissants', subcategory: 'Bakery Items', description: 'Fresh butter croissants, pack of 6' }
-    ],
-    'Organic Foods': [
-      { id: 'gd7', name: 'Organic Honey 500g', price: 350, image: 'https://picsum.photos/300/200?honey', subcategory: 'Organic Foods', description: 'Pure organic raw honey from local beekeepers' },
-      { id: 'gd8', name: 'Organic Coffee Beans', price: 500, image: 'https://picsum.photos/300/200?coffee', subcategory: 'Organic Foods', description: 'Premium organic roasted coffee beans, 500g' }
-    ],
-    'Spices & Condiments': [
-      { id: 'gd9', name: 'Mixed Spices Pack', price: 250, image: 'https://picsum.photos/300/200?spices', subcategory: 'Spices & Condiments', description: 'Variety of premium spices and seasonings' },
-      { id: 'gd10', name: 'Pure Chili Powder', price: 180, image: 'https://picsum.photos/300/200?chili', subcategory: 'Spices & Condiments', description: 'Pure ground chili powder, 200g' }
     ]
   };
 
@@ -133,9 +84,6 @@ const DataManager = (() => {
     }
     if (!localStorage.getItem(STORAGE_KEYS.ADDED_PRODUCTS)) {
       localStorage.setItem(STORAGE_KEYS.ADDED_PRODUCTS, JSON.stringify([]));
-    }
-    if (!localStorage.getItem(STORAGE_KEYS.ORDERS)) {
-      localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify([]));
     }
   }
 
@@ -738,32 +686,16 @@ const DataManager = (() => {
   }
 
   function getClientEmails() {
-    const messages = getAllMessages();
-    const users = getAllUsers();
-    
-    return messages.map(m => {
-      let phone = m.phone || m.phoneNumber || '';
-      
-      // If no phone in message, try to find in user profile
-      if (!phone && m.userId && m.userId !== 'Guest') {
-        const user = users.find(u => u.id === m.userId || u.email === m.email);
-        if (user) {
-          phone = user.phone || user.phoneNumber || '';
-        }
-      }
-      
-      return {
-        id: m.id,
-        subject: m.subject || 'Customer Message',
-        userId: m.userId || 'Guest',
-        email: m.email || '',
-        phone: phone,
-        message: m.message,
-        status: m.status,
-        receivedDate: m.timestamp,
-        adminNotes: m.adminNotes
-      };
-    });
+    return getAllMessages().map(m => ({
+      id: m.id,
+      subject: m.subject || 'Customer Message',
+      userId: m.userId || 'Guest',
+      email: m.email || '',
+      message: m.message,
+      status: m.status,
+      receivedDate: m.timestamp,
+      adminNotes: m.adminNotes
+    }));
   }
 
   function markEmailAsRead(emailId) {
@@ -875,384 +807,9 @@ const DataManager = (() => {
     return { success: true };
   }
 
-  /**
-   * Sub Warehouse Management
-   */
-  function getSubWarehouses() {
-    return JSON.parse(localStorage.getItem(STORAGE_KEYS.SUB_WAREHOUSES)) || [];
-  }
-
-  function saveSubWarehouses(subWarehouses) {
-    localStorage.setItem(STORAGE_KEYS.SUB_WAREHOUSES, JSON.stringify(subWarehouses));
-    return { success: true };
-  }
-
-  function addSubWarehouse(name) {
-    const subWarehouses = getSubWarehouses();
-    const newSW = {
-      id: 'SW' + Date.now(),
-      name: name,
-      stock: [],
-      stores: [],
-      createdAt: new Date().toISOString()
-    };
-    subWarehouses.push(newSW);
-    saveSubWarehouses(subWarehouses);
-    return { success: true, subWarehouse: newSW };
-  }
-
-  /**
-   * Add a store to a sub-warehouse
-   * @param {string} swId - Sub-warehouse ID
-   * @param {string} storeName - Store name
-   * @returns {object} Result with success status
-   */
-  function addStoreToSubWarehouse(swId, storeName) {
-    const subWarehouses = getSubWarehouses();
-    const sw = subWarehouses.find(s => s.id === swId);
-    
-    if (!sw) {
-      return { success: false, message: 'Sub-warehouse not found' };
-    }
-    
-    if (!sw.stores) {
-      sw.stores = [];
-    }
-    
-    const newStore = {
-      id: 'ST' + Date.now(),
-      name: storeName,
-      stock: [],
-      createdAt: new Date().toISOString()
-    };
-    
-    sw.stores.push(newStore);
-    saveSubWarehouses(subWarehouses);
-    return { success: true, store: newStore };
-  }
-
-  /**
-   * Get stores for a specific sub-warehouse
-   * @param {string} swId - Sub-warehouse ID
-   * @returns {array} Array of stores
-   */
-  function getStoresForSubWarehouse(swId) {
-    const subWarehouses = getSubWarehouses();
-    const sw = subWarehouses.find(s => s.id === swId);
-    return sw && sw.stores ? sw.stores : [];
-  }
-
-  /**
-   * Add product to a specific store's inventory
-   * @param {string} swId - Sub-warehouse ID
-   * @param {string} storeId - Store ID
-   * @param {object} product - Product object with id, name, price, qty
-   * @returns {object} Result with success status
-   */
-  function addProductToStore(swId, storeId, product) {
-    const subWarehouses = getSubWarehouses();
-    const sw = subWarehouses.find(s => s.id === swId);
-    
-    if (!sw) {
-      return { success: false, message: 'Sub-warehouse not found' };
-    }
-    
-    const store = sw.stores.find(s => s.id === storeId);
-    if (!store) {
-      return { success: false, message: 'Store not found' };
-    }
-    
-    if (!store.stock) {
-      store.stock = [];
-    }
-    
-    const existingProduct = store.stock.find(p => String(p.id) === String(product.id));
-    if (existingProduct) {
-      existingProduct.qty += product.qty || 1;
-    } else {
-      store.stock.push({
-        id: product.id,
-        name: product.name,
-        qty: product.qty || 1,
-        price: product.price || 0
-      });
-    }
-    
-    saveSubWarehouses(subWarehouses);
-    return { success: true };
-  }
-
-  /**
-   * Deduct quantity from a specific store's inventory
-   * @param {string} swId - Sub-warehouse ID
-   * @param {string} storeId - Store ID
-   * @param {string} productId - Product ID
-   * @param {string} productName - Product name
-   * @param {number} quantity - Quantity to deduct
-   * @returns {object} Result with success status and remaining qty
-   */
-  function deductFromStoreInventory(swId, storeId, productId, productName, quantity) {
-    const subWarehouses = getSubWarehouses();
-    const sw = subWarehouses.find(s => s.id === swId);
-    
-    if (!sw) {
-      return { success: false, message: 'Sub-warehouse not found', remaining: quantity };
-    }
-    
-    const store = sw.stores.find(s => s.id === storeId);
-    if (!store) {
-      return { success: false, message: 'Store not found', remaining: quantity };
-    }
-    
-    if (!store.stock) {
-      store.stock = [];
-    }
-    
-    let product = store.stock.find(p => String(p.id) === String(productId));
-    
-    // If product doesn't exist in store, get it from main warehouse first
-    if (!product) {
-      const products = getAllProducts();
-      let mainProduct = null;
-      
-      for (const category in products) {
-        mainProduct = products[category].find(p => String(p.id) === String(productId));
-        if (mainProduct) break;
-      }
-      
-      if (!mainProduct) {
-        return { success: false, message: 'Product not found in system', remaining: quantity };
-      }
-      
-      // Add product to store from main warehouse
-      product = {
-        id: mainProduct.id,
-        name: mainProduct.name,
-        qty: mainProduct.quantity || 0,
-        price: mainProduct.price || 0
-      };
-      store.stock.push(product);
-    }
-    
-    // Check if store has enough quantity
-    if (product.qty < quantity) {
-      return { success: false, message: `Insufficient stock. Available: ${product.qty}, Requested: ${quantity}`, remaining: quantity };
-    }
-    
-    // Deduct the quantity
-    product.qty -= quantity;
-    if (product.qty <= 0) {
-      const idx = store.stock.indexOf(product);
-      store.stock.splice(idx, 1);
-    }
-    
-    saveSubWarehouses(subWarehouses);
-    return { success: true, remaining: 0 };
-  }
-
-  function updateSubWarehouse(swId, updatedData) {
-    const subWarehouses = getSubWarehouses();
-    const index = subWarehouses.findIndex(sw => sw.id === swId);
-    if (index !== -1) {
-      subWarehouses[index] = { ...subWarehouses[index], ...updatedData };
-      saveSubWarehouses(subWarehouses);
-      return { success: true };
-    }
-    return { success: false };
-  }
-
-  function deleteSubWarehouse(id) {
-    let subWarehouses = getSubWarehouses();
-    subWarehouses = subWarehouses.filter(sw => sw.id !== id);
-    saveSubWarehouses(subWarehouses);
-    return { success: true };
-  }
-
-  /**
-   * Transfer product between sub-warehouses
-   * @param {string} productId - Product ID or name
-   * @param {string} fromSubWarehouseId - Source sub-warehouse ID
-   * @param {string} toSubWarehouseId - Destination sub-warehouse ID
-   * @param {number} quantity - Quantity to transfer
-   * @returns {object} Result with success status and message
-   */
-  function transferProductBetweenSubWarehouses(productId, fromSubWarehouseId, toSubWarehouseId, quantity) {
-    if (fromSubWarehouseId === toSubWarehouseId) {
-      return { success: false, message: 'Source and destination must be different' };
-    }
-
-    const subWarehouses = getSubWarehouses();
-    const fromSW = subWarehouses.find(sw => sw.id === fromSubWarehouseId);
-    const toSW = subWarehouses.find(sw => sw.id === toSubWarehouseId);
-
-    if (!fromSW) {
-      return { success: false, message: 'Source sub-warehouse not found' };
-    }
-    if (!toSW) {
-      return { success: false, message: 'Destination sub-warehouse not found' };
-    }
-
-    // Find product in source sub-warehouse
-    const sourceProductIndex = fromSW.stock.findIndex(item => String(item.id) === String(productId) || item.name === productId);
-    if (sourceProductIndex === -1) {
-      return { success: false, message: 'Product not found in source sub-warehouse' };
-    }
-
-    const sourceProduct = fromSW.stock[sourceProductIndex];
-    if (sourceProduct.qty < quantity) {
-      return { success: false, message: `Insufficient quantity. Available: ${sourceProduct.qty}, Requested: ${quantity}` };
-    }
-
-    // Find or create product in destination sub-warehouse
-    const destProductIndex = toSW.stock.findIndex(item => String(item.id) === String(productId) || item.name === productId);
-
-    // Reduce from source
-    sourceProduct.qty -= quantity;
-    if (sourceProduct.qty <= 0) {
-      fromSW.stock.splice(sourceProductIndex, 1);
-    }
-
-    // Add to destination
-    if (destProductIndex === -1) {
-      toSW.stock.push({
-        id: sourceProduct.id,
-        name: sourceProduct.name,
-        qty: quantity,
-        price: sourceProduct.price
-      });
-    } else {
-      toSW.stock[destProductIndex].qty += quantity;
-    }
-
-    saveSubWarehouses(subWarehouses);
-    return { 
-      success: true, 
-      message: `Successfully transferred ${quantity} units of ${sourceProduct.name} from ${fromSW.name} to ${toSW.name}` 
-    };
-  }
-
-  /**
-   * Deduct quantity from main store inventory
-   * Returns remaining quantity if store doesn't have enough
-   */
-  function deductFromStore(productId, productName, quantity) {
-    let remaining = quantity;
-    const products = getAllProducts();
-    let changed = false;
-
-    for (const category in products) {
-      const product = products[category].find(p => String(p.id) === String(productId) || p.name === productName);
-      if (product && product.quantity > 0) {
-        const deduct = Math.min(product.quantity, remaining);
-        product.quantity -= deduct;
-        remaining -= deduct;
-        changed = true;
-      }
-      if (remaining <= 0) break;
-    }
-
-    if (changed) {
-      localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
-    }
-
-    return remaining;
-  }
-
-  /**
-   * Deduct quantity from sub-warehouses
-   * Returns remaining quantity if sub-warehouses don't have enough
-   */
-  function deductFromSubWarehouses(productId, productName, quantity, specificSwId = null) {
-    let remaining = quantity;
-    const subWarehouses = getSubWarehouses();
-    let changed = false;
-
-    for (const sw of subWarehouses) {
-      if (specificSwId && sw.id !== specificSwId) continue;
-
-      const item = sw.stock.find(i => String(i.id) === String(productId) || i.name === productName);
-      if (item && item.qty > 0) {
-        const deduct = Math.min(item.qty, remaining);
-        item.qty -= deduct;
-        remaining -= deduct;
-        changed = true;
-      }
-      if (remaining <= 0) break;
-    }
-
-    if (changed) {
-      saveSubWarehouses(subWarehouses);
-    }
-
-    return remaining;
-  }
-
-  /**
-   * Update Cart UI across all pages
-   */
-  function updateCartUI() {
-    const cart = JSON.parse(localStorage.getItem(STORAGE_KEYS.CART)) || [];
-    const totalItems = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
-    
-    const cartCounts = document.querySelectorAll('.cart-count');
-    cartCounts.forEach(el => {
-      el.textContent = totalItems;
-      if (isAllowedBadgePage()) {
-        el.style.display = totalItems > 0 ? 'inline-block' : 'none';
-      } else {
-        el.style.display = 'none';
-      }
-    });
-  }
-
-  // Real-time synchronization across tabs
-  window.addEventListener('storage', (event) => {
-    if (Object.values(STORAGE_KEYS).includes(event.key)) {
-      try {
-        console.log(`Data changed in another tab: ${event.key}`);
-        
-        if (event.key === STORAGE_KEYS.CART) {
-          updateCartUI();
-        }
-
-        // Dispatch a custom event for the UI to respond
-        window.dispatchEvent(new CustomEvent('dataChanged', { 
-          detail: { key: event.key, newValue: event.newValue } 
-        }));
-      } catch (e) {}
-    }
-  });
-
-  // Inject CSS for cart count
-  const style = document.createElement('style');
-  style.textContent = `
-    .cart-link { position: relative; display: inline-block; }
-    .cart-count {
-      position: absolute;
-      top: -12px;
-      right: -12px;
-      background: #000;
-      color: #fff;
-      border-radius: 50%;
-      font-size: 12px;
-      font-weight: bold;
-      width: 22px;
-      height: 22px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      line-height: 1;
-      padding: 0;
-      margin: 0;
-      z-index: 1001;
-    }
-  `;
-  document.head.appendChild(style);
-
   // Initialize on load
   initializeStorage();
   updateOnlineStatus();
-  updateCartUI();
   // Update status every 2 minutes while page is open
   setInterval(updateOnlineStatus, 2 * 60 * 1000);
 
@@ -1264,26 +821,10 @@ const DataManager = (() => {
     updateProduct,
     deleteProduct,
     getCart,
-    addToCart: function(p) {
-      const res = addToCart(p);
-      updateCartUI();
-      return res;
-    },
-    removeFromCart: function(id) {
-      const res = removeFromCart(id);
-      updateCartUI();
-      return res;
-    },
-    updateCartQuantity: function(id, q) {
-      const res = updateCartQuantity(id, q);
-      updateCartUI();
-      return res;
-    },
-    clearCart: function() {
-      const res = clearCart();
-      updateCartUI();
-      return res;
-    },
+    addToCart,
+    removeFromCart,
+    updateCartQuantity,
+    clearCart,
     getCurrentUser,
     setCurrentUser,
     registerUser,
@@ -1325,19 +866,6 @@ const DataManager = (() => {
     clearAllData,
     getAllCampaigns,
     saveCampaign,
-    deleteCampaign,
-    getSubWarehouses,
-    saveSubWarehouses,
-    addSubWarehouse,
-    updateSubWarehouse,
-    deleteSubWarehouse,
-    addStoreToSubWarehouse,
-    getStoresForSubWarehouse,
-    addProductToStore,
-    deductFromStoreInventory,
-    transferProductBetweenSubWarehouses,
-    deductFromStore,
-    deductFromSubWarehouses,
-    updateCartUI
+    deleteCampaign
   };
 })();

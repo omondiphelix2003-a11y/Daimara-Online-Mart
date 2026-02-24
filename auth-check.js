@@ -3,31 +3,32 @@
  * Handles conditional UI elements based on user authentication status
  */
 document.addEventListener("DOMContentLoaded", function() {
-  try {
-    const currentUser = DataManager && typeof DataManager.getCurrentUser === 'function' ? DataManager.getCurrentUser() : null;
-    const isHomePage = window.location.pathname.includes('index.html') || window.location.pathname.endsWith('/') || window.location.pathname.endsWith('daimara.project/');
-    const navCenter = document.querySelector(".nav-center");
-    const navRight = document.querySelector(".nav-right") || document.querySelector(".nav-icons");
+  const currentUser = DataManager.getCurrentUser();
+  const navCenter = document.querySelector(".nav-center");
+  const navbarLinks = document.querySelector(".navbar div:nth-child(2)"); // For Shop.html style
+  const navRight = document.querySelector(".nav-right") || document.querySelector(".nav-icons");
 
-    if (currentUser && navRight) {
-      const userIconLink = navRight.querySelector("a .fa-user")?.parentElement || navRight.querySelector("a[href*='profile']") || navRight.querySelector("a[href*='login']");
-      if (userIconLink) {
-        userIconLink.href = "profile.html";
-        userIconLink.title = "View Profile";
-      }
-    }
+  // Handle User Icon redirection to Profile
+  const userIconLink = document.querySelector(".fa-user")?.parentElement;
+  if (currentUser && userIconLink) {
+    userIconLink.href = "profile.html";
+    userIconLink.title = "View Profile";
+  }
 
-    if (currentUser && currentUser.email === "omondiphelix2003@gmail.com" && isHomePage && navCenter) {
-      const adminLink = document.createElement("a");
-      adminLink.href = "admin-manager.html";
-      adminLink.innerHTML = '<i class="fa fa-cogs"></i>';
-      adminLink.title = "Admin Manager";
-      adminLink.style.fontSize = "55px";
-      adminLink.style.color = "rgb(233, 157, 17)";
-      adminLink.className = "admin-nav-link";
+  if (currentUser && currentUser.email === "omondiphelix2003@gmail.com") {
+    // Add Admin Manager link if it doesn't exist
+    const adminLink = document.createElement("a");
+    adminLink.href = "admin-manager.html";
+    adminLink.textContent = "Admin Manager";
+    adminLink.style.color = "rgb(233, 157, 17)";
+    adminLink.style.fontWeight = "bold";
+    adminLink.className = "admin-nav-link";
+
+    if (navCenter) {
       navCenter.appendChild(adminLink);
+    } else if (navbarLinks) {
+      // For Shop.html which has a slightly different structure
+      navbarLinks.appendChild(adminLink);
     }
-  } catch (error) {
-    console.warn('Auth check initialization error:', error);
   }
 });

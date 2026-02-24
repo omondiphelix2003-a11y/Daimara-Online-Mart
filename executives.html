@@ -9,1271 +9,168 @@
 :root{
   --primary:rgb(233, 157, 17);
   --accent:#2563eb;
-  --success:#16a34a;
-  --warning:#f59e0b;
-  --danger:#dc2626;
-  --info:#3b82f6;
   --bg:#f4f6f9;
   --card:#ffffff;
-  --text:#1f2937;
-  --border:#e5e7eb;
-  --shadow:0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
 }
 
 body{
   margin:0;
-  font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  background:#1F2937;
-  color:var(--text);
-  line-height:1.6;
-  -webkit-font-smoothing:antialiased;
+  font-family:Arial, Helvetica, sans-serif;
+  background:var(--bg);
 }
 
 .topbar{
   background:var(--primary);
-  color:#000;
-  padding:clamp(0.75rem, 2vw, 1rem) clamp(1rem, 3vw, 1.5rem);
+  color:rgb(0, 0, 0);
+  padding:16px 24px;
   display:flex;
   justify-content:space-between;
   align-items:center;
-  position:sticky;
-  top:0;
-  z-index:100;
-  box-shadow:var(--shadow);
-  flex-wrap:wrap;
-  gap:0.75rem;
 }
 
 .topbar h1{
   margin:0;
-  font-size:clamp(1.125rem, 3vw, 1.5rem);
-  font-weight:700;
-  display:flex;
-  align-items:center;
-  gap:0.5rem;
-}
-
-.topbar-actions{
-  display:flex;
-  gap:0.75rem;
-}
-
-.icon-btn{
-  background:rgba(0,0,0,0.1);
-  border:none;
-  width:40px;
-  height:40px;
-  border-radius:50%;
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  transition:all 0.2s;
-  color:#000;
-}
-
-.icon-btn:hover{
-  background:rgba(0,0,0,0.2);
-  transform:scale(1.05);
+  font-size:20px;
 }
 
 .container{
-  padding:clamp(1rem, 3vw, 2rem);
-  max-width:1400px;
-  margin:0 auto;
+  padding:24px;
 }
 
-/* Summary Cards Grid */
 .grid{
   display:grid;
-  grid-template-columns:repeat(auto-fit, minmax(min(100%, 240px), 1fr));
-  gap:clamp(1rem, 2vw, 1.5rem);
-  margin-bottom:2rem;
+  grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+  gap:20px;
+  margin-bottom:25px;
 }
 
 .card{
   background:var(--card);
-  border-radius:16px;
-  padding:clamp(1.25rem, 3vw, 1.5rem);
-  box-shadow:var(--shadow);
-  border:1px solid var(--border);
-  transition:all 0.3s;
-  position:relative;
-  overflow:hidden;
-  cursor:pointer;
+  border-radius:12px;
+  padding:20px;
+  box-shadow:0 6px 15px rgba(0, 0, 0, 0.911);
 }
 
-.card::before{
-  content:'';
-  position:absolute;
-  top:0;
-  left:0;
-  right:0;
-  height:4px;
-  background:var(--warning);
-}
-
-.card:nth-child(2)::before{background:var(--success);}
-.card:nth-child(3)::before{background:var(--info);}
-.card:nth-child(4)::before{background:var(--danger);}
-
-.card:hover{
-  transform:translateY(-4px);
-  box-shadow:0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
-}
-
-.card h3{
-  font-size:0.875rem;
-  text-transform:uppercase;
-  letter-spacing:0.05em;
-  color:#6b7280;
-  margin-bottom:0.5rem;
-  font-weight:600;
-}
-
-.card strong{
-  font-size:clamp(2rem, 5vw, 2.5rem);
-  color:var(--text);
-  display:block;
-  line-height:1.2;
-}
-
-.card .trend{
-  font-size:0.875rem;
-  color:#6b7280;
-  margin-top:0.5rem;
-  display:flex;
-  align-items:center;
-  gap:0.25rem;
-}
-
-/* Section Styling */
 .section{
-  margin-top:clamp(2rem, 5vw, 3rem);
-}
-
-.section-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:1.5rem;
-  flex-wrap:wrap;
-  gap:1rem;
-}
-
-.section h2{
-  font-size:clamp(1.25rem, 3vw, 1.5rem);
-  font-weight:700;
-  color:var(--text);
-  display:flex;
-  align-items:center;
-  gap:0.5rem;
-}
-
-.refresh-btn{
-  background:white;
-  border:1px solid var(--border);
-  padding:0.625rem 1.25rem;
-  border-radius:10px;
-  cursor:pointer;
-  font-size:0.875rem;
-  display:flex;
-  align-items:center;
-  gap:0.5rem;
-  transition:all 0.2s;
-  font-weight:500;
-}
-
-.refresh-btn:hover{
-  background:var(--bg);
-  border-color:var(--primary);
-  color:var(--primary);
-}
-
-/* Table Styles */
-.table-wrapper{
-  overflow-x:auto;
-  border-radius:16px;
-  border:1px solid var(--border);
-  background:white;
-  box-shadow:var(--shadow);
+  margin-top:30px;
+  color:#064e1f ;
 }
 
 .table{
   width:100%;
   border-collapse:collapse;
-  min-width:700px;
-  font-size:0.95rem;
+  background:white;
+  border-radius:12px;
+  overflow:hidden;
 }
 
 .table th, .table td{
-  padding:1rem;
-  border-bottom:1px solid var(--border);
+  padding:12px;
+  border-bottom:1px solid #eee;
   text-align:left;
-  color:var(--text);
+  color: black;
 }
 
-.table th{
-  background:#f9fafb;
-  font-weight:600;
-  font-size:0.875rem;
-  text-transform:uppercase;
-  letter-spacing:0.025em;
-  color:#374151;
-  white-space:nowrap;
-}
-
-.table tbody tr{
-  transition:background 0.2s;
-}
-
-.table tbody tr:hover{
-  background:#f9fafb;
-}
-
-.table tbody tr:last-child td{
-  border-bottom:none;
-}
-
-/* Status Badges */
-.status{
-  display:inline-flex;
-  align-items:center;
-  padding:0.375rem 0.875rem;
-  border-radius:9999px;
-  font-size:0.875rem;
-  font-weight:600;
-  gap:0.375rem;
-  white-space:nowrap;
-}
-
-.status::before{
-  content:'';
-  width:6px;
-  height:6px;
-  border-radius:50%;
-  background:currentColor;
-}
-
-.pending{background:#fef3c7; color:#92400e;}
-.sent{background:#dbeafe; color:#1e40af;}
-.dispatched{background:#d1fae5; color:#065f46;}
-.under-packaging{background:#fce7f3; color:#9d174d;}
-
-/* Action Buttons */
 .action-btn{
   border:none;
-  padding:0.625rem 1.25rem;
-  border-radius:8px;
+  padding:8px 12px;
+  border-radius:6px;
   cursor:pointer;
-  color:white;
-  font-weight:500;
-  font-size:0.875rem;
-  transition:all 0.2s;
-  display:inline-flex;
-  align-items:center;
-  gap:0.5rem;
-  white-space:nowrap;
+  color:rgb(0, 0, 0);
 }
 
-.action-btn:hover{
-  transform:translateY(-1px);
-  box-shadow:0 4px 12px rgba(0,0,0,0.15);
+.send{background:#13b34d}
+.dispatch{background:#0a3ca8e7}
+
+.status{
+  padding:5px 10px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:bold;
 }
 
-.action-btn:active{
-  transform:translateY(0);
-}
+.pending{background:#fde68a}
+.sent{background:#8ebdf7}
+.dispatched{background:#87f5ae}
 
-.send{background:var(--success);}
-.send:hover{background:#15803d;}
-
-.dispatch{background:var(--accent);}
-.dispatch:hover{background:#1d4ed8;}
-
-.view{background:#6b7280;}
-.view:hover{background:#4b5563;}
-
-/* Blurry text for sensitive info */
-.blurry-text {
-  filter: blur(5px);
-  cursor: not-allowed;
-  user-select: none;
-  transition: filter 0.3s;
-}
-
-.blurry-text:hover {
-  filter: blur(3px);
-}
-
-/* Mobile Cards Layout */
-.mobile-queue{
-  display:none;
-  flex-direction:column;
-  gap:1rem;
-}
-
-.queue-card{
-  background:white;
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding:1.25rem;
-  box-shadow:var(--shadow);
-  animation:slideIn 0.3s ease-out;
-}
-
-@keyframes slideIn{
-  from{
-    opacity:0;
-    transform:translateY(10px);
-  }
-  to{
-    opacity:1;
-    transform:translateY(0);
-  }
-}
-
-.queue-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:start;
-  margin-bottom:1rem;
-  padding-bottom:1rem;
-  border-bottom:1px solid var(--border);
-}
-
-.queue-id{
-  font-weight:700;
-  font-size:1.125rem;
-  color:var(--text);
-}
-
-.queue-details{
-  display:grid;
-  gap:0.75rem;
-  margin-bottom:1rem;
-}
-
-.detail-row{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.detail-label{
-  font-size:0.875rem;
-  color:#6b7280;
-  font-weight:500;
-}
-
-.detail-value{
-  font-weight:600;
-  color:var(--text);
-  text-align:right;
-  max-width:60%;
-}
-
-.queue-actions{
-  display:flex;
-  gap:0.75rem;
-}
-
-.queue-actions .action-btn{
-  flex:1;
-  justify-content:center;
-  padding:0.875rem;
-}
-
-/* Modal Styles */
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 2000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.5);
-  align-items: center;
-  justify-content: center;
-  padding:1rem;
-  backdrop-filter:blur(4px);
-}
-
-.modal-content {
-  background: white;
-  padding: clamp(1.5rem, 4vw, 2rem);
-  border-radius: 16px;
-  width: 100%;
-  max-width: 800px;
-  max-height: 90vh;
-  overflow-y: auto;
-  position: relative;
-  color: var(--text);
-  box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);
-  animation:modalSlide 0.3s ease-out;
-}
-
-@keyframes modalSlide{
-  from{
-    opacity:0;
-    transform:translateY(-20px) scale(0.95);
-  }
-  to{
-    opacity:1;
-    transform:translateY(0) scale(1);
-  }
-}
-
-.close-modal {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  width:36px;
-  height:36px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: #6b7280;
-  transition:all 0.2s;
-  background:#f3f4f6;
-  border:none;
-}
-
-.close-modal:hover {
-  background:#e5e7eb;
-  color:var(--text);
-  transform:rotate(90deg);
-}
-
-.modal h2{
-  font-size:clamp(1.25rem, 3vw, 1.5rem);
-  margin-bottom:1.5rem;
-  padding-right:2rem;
-}
-
-/* Order Details Specific */
-.order-info-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit, minmax(min(100%, 200px), 1fr));
-  gap:1rem;
-  margin-bottom:1.5rem;
-}
-
-.info-box{
-  background:#f9fafb;
-  padding:1rem;
-  border-radius:12px;
-  border:1px solid var(--border);
-}
-
-.info-label{
-  font-size:0.75rem;
-  text-transform:uppercase;
-  letter-spacing:0.05em;
-  color:#6b7280;
-  margin-bottom:0.25rem;
-  font-weight:600;
-}
-
-.info-value{
-  font-weight:600;
-  color:var(--text);
-  font-size:1rem;
-}
-
-.qr-section{
-  text-align:center;
-  margin:1.5rem 0;
-  padding:1.5rem;
-  background:#f9fafb;
-  border-radius:12px;
-  border:2px dashed var(--border);
-}
-
-.qr-section img{
-  width:150px;
-  height:150px;
-  border-radius:8px;
-  margin-bottom:0.5rem;
-}
-
-.totals-section{
-  margin-top:1.5rem;
-  padding-top:1.5rem;
-  border-top:2px solid var(--border);
-}
-
-.total-row{
-  display:flex;
-  justify-content:space-between;
-  margin-bottom:0.5rem;
-  font-size:1rem;
-}
-
-.total-row.final{
-  font-size:1.25rem;
-  font-weight:700;
-  color:var(--text);
-  margin-top:0.75rem;
-  padding-top:0.75rem;
-  border-top:1px solid var(--border);
-}
-
-.modal-actions{
-  margin-top:1.5rem;
-  display:flex;
-  gap:1rem;
-  flex-wrap:wrap;
-}
-
-.modal-actions .action-btn{
-  flex:1;
-  min-width:140px;
-  justify-content:center;
-  padding:0.875rem 1.5rem;
-}
-
-/* Empty State */
-.empty-state{
-  text-align:center;
-  padding:3rem 1rem;
-  color:#6b7280;
-}
-
-.empty-state i{
-  font-size:3rem;
-  margin-bottom:1rem;
-  opacity:0.3;
-  color:var(--primary);
-}
-
-.empty-state h4{
-  font-size:1.125rem;
-  margin-bottom:0.5rem;
-  color:var(--text);
-}
-
-/* Toast Notification */
-.toast{
-  position:fixed;
-  bottom:2rem;
-  right:2rem;
-  background:var(--text);
-  color:white;
-  padding:1rem 1.5rem;
-  border-radius:12px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.2);
-  display:flex;
-  align-items:center;
-  gap:0.75rem;
-  transform:translateY(100px);
-  opacity:0;
-  transition:all 0.3s;
-  z-index:3000;
-  max-width:90vw;
-}
-
-.toast.show{
-  transform:translateY(0);
-  opacity:1;
-}
-
-/* Responsive Breakpoints */
-@media (max-width:768px){
-  .table-wrapper{
-    display:none;
-  }
-  
-  .mobile-queue{
-    display:flex;
-  }
-  
-  .section-header{
-    flex-direction:column;
-    align-items:stretch;
-  }
-  
-  .refresh-btn{
-    justify-content:center;
-  }
-  
-  .modal-content{
-    max-height:95vh;
-    border-radius:12px;
-  }
-  
-  .order-info-grid{
-    grid-template-columns:1fr;
-  }
-  
-  .queue-actions{
-    flex-direction:column;
-  }
-  
-  .modal-actions{
-    flex-direction:column;
-  }
-  
-  .modal-actions .action-btn{
-    width:100%;
-  }
-  
-  .detail-row{
-    flex-direction:column;
-    align-items:flex-start;
-    gap:0.25rem;
-  }
-  
-  .detail-value{
-    text-align:left;
-    max-width:100%;
-  }
-}
-
-@media (min-width:769px){
-  .mobile-queue{
-    display:none !important;
-  }
-}
-
-/* Touch optimizations */
-@media (hover:none) and (pointer:coarse){
-  .card{
-    transform:none !important;
-  }
-  
-  .action-btn,
-  .refresh-btn,
-  .icon-btn,
-  .close-modal{
-    min-height:44px;
-  }
-  
-  .blurry-text{
-    filter:blur(3px);
-  }
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme:dark){
-  :root{
-    --bg:#1F2937;
-    --card:#1F2937;
-    --text:#f9fafb;
-    --border:#374151;
-  }
-  
-  .table th{
-    background:#374151;
-    color:#e5e7eb;
-  }
-  
-  .table tbody tr:hover{
-    background:#374151;
-  }
-  
-  .status.pending{
-    background:#451a03;
-    color:#fcd34d;
-  }
-  
-  .status.sent{
-    background:#1e3a8a;
-    color:#93c5fd;
-  }
-  
-  .info-box,
-  .qr-section{
-    background:#374151;
-    border-color:#4b5563;
-  }
-}
-
-/* Print styles */
-@media print{
-  .topbar,
-  .action-btn,
-  .refresh-btn,
-  .icon-btn,
-  .modal{
-    display:none !important;
-  }
-  
-  .card{
-    break-inside:avoid;
-    box-shadow:none;
-    border:1px solid #000;
-  }
-  
-  .table-wrapper{
-    overflow:visible;
-  }
-  
-  .blurry-text{
-    filter:none !important;
-  }
-}
-
-/* Accessibility */
-@media (prefers-reduced-motion:reduce){
-  *{
-    animation-duration:0.01ms !important;
-    animation-iteration-count:1 !important;
-    transition-duration:0.01ms !important;
-  }
-}
-
-.sr-only{
-  position:absolute;
-  width:1px;
-  height:1px;
-  padding:0;
-  margin:-1px;
-  overflow:hidden;
-  clip:rect(0,0,0,0);
-  white-space:nowrap;
-  border-width:0;
-}
-
-.hidden{
-  display:none !important;
-}
 </style>
-
 </head>
 <body>
 
 <div class="topbar">
-  <h1><i class="fas fa-crown"></i> Daimara Executive Dispatch</h1>
-  <div class="topbar-actions">
-    <button class="icon-btn" onclick="refreshData()" aria-label="Refresh data">
-      <i class="fas fa-sync-alt"></i>
-    </button>
-    <button class="icon-btn" aria-label="Notifications">
-      <i class="fas fa-bell"></i>
-    </button>
-  </div>
+  <h1>Daimara Executive Dispatch Panel</h1>
 </div>
 
 <div class="container">
 
-  <!-- SUMMARY CARDS -->
+  <!-- SUMMARY -->
   <div class="grid">
-    <div class="card" onclick="showAwaitingPackaging()">
-      <h3><i class="fas fa-clock"></i> Awaiting Packaging</h3>
-      <strong id="awaitingCount">0</strong>
-      <div class="trend">
-        <i class="fas fa-arrow-up" style="color:var(--success)"></i>
-        <span>Click to view</span>
-      </div>
+    <div class="card">
+      <h3>Orders Awaiting Packaging</h3>
+      <strong>18</strong>
     </div>
     <div class="card">
-      <h3><i class="fas fa-box"></i> Ready for Dispatch</h3>
-      <strong id="readyCount">0</strong>
-      <div class="trend">
-        <i class="fas fa-minus" style="color:var(--accent)"></i>
-        <span>In queue</span>
-      </div>
+      <h3>Ready for Dispatch</h3>
+      <strong>10</strong>
     </div>
     <div class="card">
-      <h3><i class="fas fa-shipping-fast"></i> Dispatched Today</h3>
-      <strong id="dispatchedCount">0</strong>
-      <div class="trend">
-        <i class="fas fa-check" style="color:var(--success)"></i>
-        <span>Completed</span>
-      </div>
+      <h3>Dispatched Today</h3>
+      <strong>27</strong>
     </div>
     <div class="card">
-      <h3><i class="fas fa-exclamation-triangle"></i> Urgent Deliveries</h3>
-      <strong id="urgentCount">0</strong>
-      <div class="trend">
-        <i class="fas fa-fire" style="color:var(--danger)"></i>
-        <span>Priority</span>
-      </div>
+      <h3>Urgent Deliveries</h3>
+      <strong>4</strong>
     </div>
   </div>
 
   <!-- PACKAGING & DISPATCH QUEUE -->
   <div class="section">
-    <div class="section-header">
-      <h2><i class="fas fa-tasks"></i> Packaging & Dispatch Queue</h2>
-      <button class="refresh-btn" onclick="refreshData()">
-        <i class="fas fa-sync-alt"></i> Refresh
-      </button>
-    </div>
-    
-    <!-- Desktop Table -->
-    <div class="table-wrapper">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Order ID</th>
-            <th>Client</th>
-            <th>Products</th>
-            <th>Destination</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody id="packagingQueueTable">
-        </tbody>
-      </table>
-    </div>
-    
-    <!-- Mobile Cards -->
-    <div class="mobile-queue" id="mobileQueue"></div>
-    
-    <!-- Empty State -->
-    <div class="empty-state" id="emptyState" style="display:none;">
-      <i class="fas fa-clipboard-check"></i>
-      <h4>Queue is Empty</h4>
-      <p>No orders currently in packaging or dispatch</p>
-    </div>
+    <h2>Packaging & Dispatch Queue</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Client</th>
+          <th>Products</th>
+          <th>Destination</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>#DM2041</td>
+          <td>Mercy Wanjiku</td>
+          <td>Rice 2kg (5), Cooking Oil (2)</td>
+          <td>Westlands</td>
+          <td><span class="status pending">Awaiting Packaging</span></td>
+          <td>
+            <button class="action-btn send">Send for Packaging</button>
+          </td>
+        </tr>
+        <tr>
+          <td>#DM2042</td>
+          <td>Peter Otieno</td>
+          <td>Sugar 1kg (10)</td>
+          <td>Karen</td>
+          <td><span class="status sent">Packaged</span></td>
+          <td>
+            <button class="action-btn dispatch">Dispatch</button>
+          </td>
+        </tr>
+        <tr>
+          <td>#DM2043</td>
+          <td>Grace Njeri</td>
+          <td>Flour 2kg (8)</td>
+          <td>Kilimani</td>
+          <td><span class="status dispatched">Dispatched</span></td>
+          <td>Completed</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
 </div>
-
-<!-- AWAITING PACKAGING MODAL -->
-<div id="packagingModal" class="modal">
-  <div class="modal-content">
-    <button class="close-modal" onclick="closePackagingModal()" aria-label="Close modal">
-      <i class="fas fa-times"></i>
-    </button>
-    <h2><i class="fas fa-clock"></i> Orders Awaiting Packaging</h2>
-    <div class="table-wrapper" style="margin-top:1rem;">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Order ID</th>
-            <th>Products</th>
-            <th>Amount</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody id="awaitingOrdersTable">
-        </tbody>
-      </table>
-    </div>
-    <div id="awaitingEmptyState" class="empty-state" style="display:none; padding:2rem 1rem;">
-      <i class="fas fa-inbox"></i>
-      <h4>No Pending Orders</h4>
-      <p>All orders have been processed</p>
-    </div>
-  </div>
-</div>
-
-<!-- ORDER DETAILS MODAL -->
-<div id="orderDetailsModal" class="modal">
-  <div class="modal-content">
-    <button class="close-modal" onclick="closeOrderDetailsModal()" aria-label="Close modal">
-      <i class="fas fa-times"></i>
-    </button>
-    <div id="orderDetailsContent"></div>
-  </div>
-</div>
-
-<!-- TOAST NOTIFICATION -->
-<div class="toast" id="toast">
-  <i class="fas fa-check-circle"></i>
-  <span id="toastMessage">Operation successful</span>
-</div>
-
-<script>
-// Mock DataManager for demonstration
-const DataManager = {
-  getAllOrders: function() {
-    return JSON.parse(localStorage.getItem('ecommerce_orders')) || [];
-  },
-  saveOrders: function(orders) {
-    localStorage.setItem('ecommerce_orders', JSON.stringify(orders));
-    window.dispatchEvent(new Event('storage'));
-  }
-};
-
-document.addEventListener("DOMContentLoaded", () => {
-  if (typeof DataManager === 'undefined') {
-    console.error('DataManager not loaded');
-    showToast('Error: DataManager not loaded', 'error');
-    return;
-  }
-  
-  updateOrderCounts();
-  renderPackagingQueue();
-  
-  // Auto refresh every 5 seconds
-  setInterval(() => {
-    updateOrderCounts();
-    renderPackagingQueue();
-  }, 5000);
-  
-  window.addEventListener('storage', (e) => {
-    if (e.key === 'ecommerce_orders') {
-      updateOrderCounts();
-      renderPackagingQueue();
-      showToast('Data updated from another window');
-    }
-  });
-});
-
-window.addEventListener('focus', () => {
-  updateOrderCounts();
-  renderPackagingQueue();
-});
-
-function refreshData() {
-  const btn = document.querySelector('.refresh-btn i');
-  btn.classList.add('fa-spin');
-  setTimeout(() => btn.classList.remove('fa-spin'), 1000);
-  
-  updateOrderCounts();
-  renderPackagingQueue();
-  showToast('Data refreshed');
-}
-
-function updateOrderCounts() {
-  const orders = DataManager.getAllOrders() || [];
-  
-  const awaitingOrders = orders.filter(o => o.status === 'pending').length;
-  const packagingOrders = orders.filter(o => o.status === 'in-packaging').length;
-  const dispatchedOrders = orders.filter(o => o.status === 'in-transit').length;
-  const urgentOrders = orders.filter(o => o.urgent || o.priority).length;
-  
-  const awaitingCountElement = document.getElementById('awaitingCount');
-  const previousAwaitingCount = parseInt(awaitingCountElement.textContent) || 0;
-  
-  animateValue(awaitingCountElement, previousAwaitingCount, awaitingOrders, 500);
-  animateValue(document.getElementById('readyCount'), parseInt(document.getElementById('readyCount').textContent) || 0, packagingOrders, 500);
-  animateValue(document.getElementById('dispatchedCount'), parseInt(document.getElementById('dispatchedCount').textContent) || 0, dispatchedOrders, 500);
-  document.getElementById('urgentCount').textContent = urgentOrders;
-  
-  if (awaitingOrders > previousAwaitingCount && previousAwaitingCount > 0) {
-    showToast(`${awaitingOrders - previousAwaitingCount} new order(s) received!`);
-    showAwaitingPackagingAuto();
-  }
-}
-
-function animateValue(element, start, end, duration) {
-  if (start === end) return;
-  const range = end - start;
-  const increment = end > start ? 1 : -1;
-  const stepTime = Math.abs(Math.floor(duration / range));
-  let current = start;
-  
-  const timer = setInterval(() => {
-    current += increment;
-    element.textContent = current;
-    if (current === end) clearInterval(timer);
-  }, Math.max(stepTime, 50));
-}
-
-function showAwaitingPackaging() {
-  populateAwaitingOrdersModal();
-  document.getElementById('packagingModal').style.display = 'flex';
-  document.body.style.overflow = 'hidden';
-}
-
-function showAwaitingPackagingAuto() {
-  populateAwaitingOrdersModal();
-  const modal = document.getElementById('packagingModal');
-  modal.style.display = 'flex';
-  document.body.style.overflow = 'hidden';
-}
-
-function populateAwaitingOrdersModal() {
-  const orders = DataManager.getAllOrders() || [];
-  const awaitingOrders = orders.filter(o => o.status === 'pending');
-  
-  const tbody = document.getElementById('awaitingOrdersTable');
-  const emptyState = document.getElementById('awaitingEmptyState');
-  
-  tbody.innerHTML = '';
-  
-  if (awaitingOrders.length === 0) {
-    emptyState.style.display = 'block';
-    return;
-  } else {
-    emptyState.style.display = 'none';
-  }
-  
-  awaitingOrders.forEach(order => {
-    const itemsText = order.items ? order.items.map(i => `${i.name} (${i.qty || 1})`).join(', ') : 'N/A';
-    const amount = order.grandTotal || order.totalPrice || 0;
-    
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td><strong>${order.id || 'N/A'}</strong></td>
-      <td>${itemsText}</td>
-      <td>KES ${amount.toLocaleString()}</td>
-      <td><button class="action-btn send" onclick="viewOrderDetails('${order.id}')"><i class="fas fa-eye"></i> View</button></td>
-    `;
-    tbody.appendChild(row);
-  });
-}
-
-function closePackagingModal() {
-  document.getElementById('packagingModal').style.display = 'none';
-  document.body.style.overflow = '';
-}
-
-function renderPackagingQueue() {
-  const orders = DataManager.getAllOrders();
-  const packagingOrders = orders.filter(o => o.status === 'in-packaging');
-  
-  const tbody = document.getElementById('packagingQueueTable');
-  const mobileQueue = document.getElementById('mobileQueue');
-  const emptyState = document.getElementById('emptyState');
-  
-  tbody.innerHTML = '';
-  mobileQueue.innerHTML = '';
-  
-  if (packagingOrders.length === 0) {
-    emptyState.style.display = 'block';
-    return;
-  } else {
-    emptyState.style.display = 'none';
-  }
-  
-  packagingOrders.forEach(order => {
-    const itemsText = order.items ? order.items.map(i => `${i.name} (${i.qty || 1})`).join(', ') : 'N/A';
-    const destination = order.deliveryLocation || 'Pickup';
-    
-    // Desktop Row
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td><strong>${order.id || 'N/A'}</strong></td>
-      <td><span class="blurry-text">${order.customerName || 'N/A'}</span></td>
-      <td>${itemsText}</td>
-      <td>${destination}</td>
-      <td><span class="status under-packaging"><i class="fas fa-box"></i> Under Packaging</span></td>
-      <td>
-        <button class="action-btn dispatch" onclick="sendToFulfillment('${order.id}')">
-          <i class="fas fa-user-check"></i> Assign Packer
-        </button>
-      </td>
-    `;
-    tbody.appendChild(row);
-    
-    // Mobile Card
-    const card = document.createElement('div');
-    card.className = 'queue-card';
-    card.innerHTML = `
-      <div class="queue-header">
-        <span class="queue-id">${order.id || 'N/A'}</span>
-        <span class="status under-packaging">Under Packaging</span>
-      </div>
-      <div class="queue-details">
-        <div class="detail-row">
-          <span class="detail-label">Client</span>
-          <span class="detail-value blurry-text">${order.customerName || 'N/A'}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Products</span>
-          <span class="detail-value" style="font-size:0.875rem;">${itemsText}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Destination</span>
-          <span class="detail-value">${destination}</span>
-        </div>
-      </div>
-      <div class="queue-actions">
-        <button class="action-btn dispatch" onclick="sendToFulfillment('${order.id}')">
-          <i class="fas fa-user-check"></i> Assign Packer
-        </button>
-      </div>
-    `;
-    mobileQueue.appendChild(card);
-  });
-}
-
-function sendToFulfillment(orderId) {
-  const orders = DataManager.getAllOrders();
-  const order = orders.find(o => o.id === orderId);
-  
-  if (!order) {
-    showToast('Order not found', 'error');
-    return;
-  }
-  
-  order.status = 'awaiting-fulfillment';
-  DataManager.saveOrders(orders);
-  
-  updateOrderCounts();
-  renderPackagingQueue();
-  showToast('Order sent to fulfillment team');
-}
-
-function viewOrderDetails(orderId) {
-  const orders = DataManager.getAllOrders();
-  const order = orders.find(o => o.id === orderId);
-  
-  if (!order) {
-    showToast('Order not found', 'error');
-    return;
-  }
-  
-  const itemsHtml = order.items ? order.items.map(item => `
-    <tr>
-      <td>${item.name}</td>
-      <td>${item.qty || 1}</td>
-      <td>KES ${(item.price || 0).toLocaleString()}</td>
-    </tr>
-  `).join('') : '<tr><td colspan="3">No items</td></tr>';
-  
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${order.id}`;
-  
-  const html = `
-    <div style="text-align: center; margin-bottom: 1.5rem;">
-      <h2 style="color: var(--primary);"><i class="fas fa-receipt"></i> Order Receipt</h2>
-    </div>
-    
-    <div class="order-info-grid">
-      <div class="info-box">
-        <div class="info-label">Customer</div>
-        <div class="info-value blurry-text">${order.customerName || 'N/A'}</div>
-      </div>
-      <div class="info-box">
-        <div class="info-label">Order ID</div>
-        <div class="info-value">${order.id || 'N/A'}</div>
-      </div>
-      <div class="info-box">
-        <div class="info-label">Phone</div>
-        <div class="info-value blurry-text">${order.customerPhone || 'N/A'}</div>
-      </div>
-      <div class="info-box">
-        <div class="info-label">Status</div>
-        <div class="info-value" style="text-transform:capitalize;">${order.status || 'N/A'}</div>
-      </div>
-      <div class="info-box" style="grid-column: 1 / -1;">
-        <div class="info-label">Delivery Location</div>
-        <div class="info-value">${order.deliveryLocation || 'Pickup'}</div>
-      </div>
-    </div>
-    
-    <h3 style="margin-bottom: 1rem;"><i class="fas fa-shopping-cart"></i> Order Items</h3>
-    <div class="table-wrapper">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Product</th>
-            <th>Qty</th>
-            <th>Price</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${itemsHtml}
-        </tbody>
-      </table>
-    </div>
-    
-    <div class="qr-section blurry-text">
-      <img src="${qrUrl}" alt="Order QR Code">
-      <div style="font-size: 0.875rem; color: #6b7280; margin-top: 0.5rem;">
-        <i class="fas fa-qrcode"></i> Scan to verify order details
-      </div>
-      <div style="font-size: 0.875rem; font-weight: 600; margin-top: 0.25rem;">${order.id || 'N/A'}</div>
-    </div>
-    
-    <div class="totals-section">
-      <div class="total-row">
-        <span>Subtotal</span>
-        <span>KES ${(order.subtotal || 0).toLocaleString()}</span>
-      </div>
-      <div class="total-row">
-        <span>Delivery Fee</span>
-        <span>KES ${(order.deliveryFee || 0).toLocaleString()}</span>
-      </div>
-      <div class="total-row final">
-        <span>Total Amount</span>
-        <span>KES ${(order.grandTotal || order.totalPrice || 0).toLocaleString()}</span>
-      </div>
-    </div>
-    
-    <div class="modal-actions">
-      <button class="action-btn send" onclick="sendToPackaging('${order.id}')">
-        <i class="fas fa-check-circle"></i> Send to Packaging
-      </button>
-      <button class="action-btn view" onclick="closeOrderDetailsModal()">
-        <i class="fas fa-times"></i> Close
-      </button>
-    </div>
-  `;
-  
-  document.getElementById('orderDetailsContent').innerHTML = html;
-  document.getElementById('packagingModal').style.display = 'none';
-  document.getElementById('orderDetailsModal').style.display = 'flex';
-}
-
-function closeOrderDetailsModal() {
-  document.getElementById('orderDetailsModal').style.display = 'none';
-  document.body.style.overflow = '';
-}
-
-function sendToPackaging(orderId) {
-  const orders = DataManager.getAllOrders();
-  const order = orders.find(o => o.id === orderId);
-  
-  if (!order) {
-    showToast('Order not found', 'error');
-    return;
-  }
-  
-  order.status = 'in-packaging';
-  DataManager.saveOrders(orders);
-  
-  closeOrderDetailsModal();
-  updateOrderCounts();
-  renderPackagingQueue();
-  showToast('Order sent to Packaging & Dispatch Queue');
-}
-
-function showToast(message, type = 'success') {
-  const toast = document.getElementById('toast');
-  const toastMessage = document.getElementById('toastMessage');
-  
-  toast.className = 'toast ' + (type === 'error' ? 'error' : 'success');
-  toastMessage.textContent = message;
-  
-  const icon = toast.querySelector('i');
-  icon.className = type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
-  
-  toast.classList.add('show');
-  
-  setTimeout(() => {
-    toast.classList.remove('show');
-  }, 3000);
-}
-
-// Close modal on background click
-window.onclick = function(event) {
-  const packagingModal = document.getElementById('packagingModal');
-  const detailsModal = document.getElementById('orderDetailsModal');
-  
-  if (event.target === packagingModal) {
-    closePackagingModal();
-  }
-  if (event.target === detailsModal) {
-    closeOrderDetailsModal();
-  }
-}
-
-// Escape key to close modals
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    closePackagingModal();
-    closeOrderDetailsModal();
-  }
-});
-</script>
 
 </body>
 </html>

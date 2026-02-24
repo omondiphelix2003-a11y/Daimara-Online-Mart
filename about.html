@@ -3,130 +3,99 @@
 <head>
   <meta charset="UTF-8">
   <title>Daimara Online Mart | About Us</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta name="viewport" content="width=1200">
+  <link rel="stylesheet" href="about.css">
 
-<style>
-* {
+<style>* {
   box-sizing: border-box;
   margin: 0;
-  padding: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-html {
-  scroll-behavior: smooth;
-}
+ .shop-icon {
+            position: relative;
+            width: 40px;
+            height: 35px;
+            background-color: transparent;
+            border: 3px solid rgb(233, 157, 17);
+            border-radius: 4px;
+            margin: 20px;
+        }
+
+        .shop-icon::before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 18px;
+            height: 12px;
+            border: 3px solid rgb(233, 157, 17);
+            border-bottom: none;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .shop-icon::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 8px;
+            width: 24px;
+            height: 2px;
+            background-color: #ffffff;
+            box-shadow: 0 6px 0 #a7884f;
+        }
+
 
 body {
-  background: #1F2937;
-  font-size: 16px;
+  background: #f5f5f5;
+  font-size: 25px;
+  padding-bottom: 100px;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  color: #ffffff;
 }
 
 .main-content-wrapper {
   flex: 1;
 }
 
-/* Shop Icon */
-.shop-icon {
+/* FOOTER */
+.footer {
+  background: #0a0a0a;
+  color: white;
+  padding: 30px 20px;
+  text-align: center;
   position: relative;
-  width: 32px;
-  height: 28px;
-  background-color: transparent;
-  border: 2px solid rgb(233, 157, 17);
-  border-radius: 4px;
+  width: 100%;
+  z-index: 1000;
+  margin-top: 50px;
+}
+.footer p {
+  color: rgb(233, 157, 17);
 }
 
-.shop-icon::before {
-  content: '';
-  position: absolute;
-  top: -12px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 14px;
-  height: 10px;
-  border: 2px solid rgb(233, 157, 17);
-  border-bottom: none;
-  border-radius: 10px 10px 0 0;
-}
-
-.shop-icon::after {
-  content: '';
-  position: absolute;
-  top: 8px;
-  left: 6px;
-  width: 18px;
-  height: 2px;
-  background-color: #ffffff;
-  box-shadow: 0 5px 0 #a7884f;
+/* PARA */
+.para{
+ color: #f5f5f5;
 }
 
 /* NAVBAR */
-.navbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 15px 30px;
-  background: #000000;
-  color: #fff;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 1000;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-}
-
-.logo {
-  color: rgb(233, 157, 17);
-  font-size: 22px;
-  font-weight: bold;
-}
-
-.logo a {
-  text-decoration: none;
-  color: inherit;
-}
-
-.nav-center {
-  display: flex;
-  align-items: center;
-  gap: 25px;
-}
-
-.nav-center a {
-  color: #fff;
-  text-decoration: none;
-  font-size: 16px;
-  transition: color 0.3s ease;
-  display: flex;
-  align-items: center;
-}
-
-.nav-icons {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.nav-icons a {
-  color: #fff;
-  text-decoration: none;
-  font-size: 18px;
-  transition: color 0.3s ease;
-  position: relative;
-  overflow: visible;
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-}
+    .navbar{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:15px 30px;background:#000000;color:#fff;
+       position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #000000; /* Add your desired background color */
+    z-index: 1000; /* Ensure it's on top of other elements */ 
+    }
+    .logo{color:rgb(233, 157, 17);font-size:25px;font-weight:bold}
+    .nav-center{display:flex;align-items:center;gap:10px}
+    .nav-center a{color:#fff;text-decoration:none;padding-left: 20px;margin-right: 40px;}
+    .nav-center input{padding:7px 10px;border-radius:5px;border:none}
+    .nav-icons a{color:#fff;margin-left:15px;font-size:14px}
 
 .nav-center a:hover,
 .nav-center a.active {
@@ -138,101 +107,96 @@ body {
   color: rgb(233, 157, 17);
 }
 
-/* Cart count badge */
-.cart-count {
-  position: absolute;
-  top: -12px;
-  right: -12px;
-  background: #000;
-  color: #fff;
-  font-size: 12px;
-  font-weight: bold;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
+@media (max-width: 768px) {
+  .logo {font-size: 25px;}
+  .nav-center a { font-size: 18px; }
+  .nav-icons a { font-size: 18px; }
+}
+
+/* NAVBAR */
+/*.navbar {
+  background: #0a0a0a;
+  padding: 15px 30px;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  line-height: 1;
-  padding: 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.shop-name {
+  color: rgb(233, 157, 17);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/*.nav-center {
+  list-style: none;
+  display: flex;
+  gap: 35px;
   margin: 0;
-  z-index: 10;
 }
 
-/* Mobile Menu Toggle */
-.mobile-menu-toggle {
-  display: none;
-  flex-direction: column;
-  gap: 5px;
-  cursor: pointer;
-  padding: 5px;
-}
-
-.mobile-menu-toggle span {
-  width: 25px;
-  height: 3px;
-  background: rgb(233, 157, 17);
-  transition: all 0.3s ease;
-  border-radius: 2px;
-}
-
-.mobile-menu-toggle.active span:nth-child(1) {
-  transform: rotate(45deg) translate(5px, 5px);
-}
-
-.mobile-menu-toggle.active span:nth-child(2) {
-  opacity: 0;
-}
-
-.mobile-menu-toggle.active span:nth-child(3) {
-  transform: rotate(-45deg) translate(7px, -6px);
-}
-
-/* Mobile Navigation */
-.mobile-nav {
-  display: none;
-  position: fixed;
-  top: 60px;
-  left: 0;
-  width: 100%;
-  background: #000000;
-  z-index: 999;
-  flex-direction: column;
-  padding: 20px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
-}
-
-.mobile-nav.active {
-  display: flex;
-}
-
-.mobile-nav a {
-  color: #fff;
+.nav-center a {
+  color: #ecf0f1;
   text-decoration: none;
-  padding: 15px 0;
-  font-size: 16px;
-  border-bottom: 1px solid #333;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  transition: color 0.3s ease;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  position: relative;
+  padding-bottom: 5px;
 }
 
-.mobile-nav a:hover {
+.nav-center a:hover,
+.nav-center a.active {
   color: rgb(233, 157, 17);
 }
 
-.mobile-nav a:last-child {
-  border-bottom: none;
+.nav-right {
+  display: flex;
+  gap: 20px;
 }
+
+.nav-right a {
+  color: rgb(233, 157, 17);
+  text-decoration: none;
+  font-size: 20px;
+  transition: all 0.3s ease;
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+/* Nav Profile Icon Container */
+/*.nav-profile-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}*/
+
+/* Nav Login Container */
+/*.nav-login {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}*/
+
+/* Nav Cart Container */
+/*.nav-cart {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+*/
 
 /* HERO */
 .about-hero {
   background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
   color: rgb(233, 157, 17);
   text-align: center;
-  padding: 120px 20px 80px;
-  margin-top: 60px;
+  padding: 100px 20px;
+  margin-top: 160px;
 }
 
 .about-hero h1 {
@@ -242,7 +206,7 @@ body {
 }
 
 .about-hero p {
-  font-size: 18px;
+  font-size: 20px;
   opacity: 0.9;
   color: rgb(255, 255, 255);
 }
@@ -251,10 +215,14 @@ body {
 .about-container {
   max-width: 1000px;
   margin: 50px auto;
-  padding: 40px 30px;
+  padding: 40px 20px;
   background: white;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+     margin-top: 15%;
+
+  
 }
 
 .about-text {
@@ -264,38 +232,42 @@ body {
 .about-text h2 {
   margin-bottom: 15px;
   color: #2c3e50;
-  font-size: 28px;
+  font-size: 25px;
   font-weight: 700;
 }
 
 .about-text p {
-  margin-bottom: 25px;
+  margin-bottom: 20px;
   color: #555;
   line-height: 1.8;
-  font-size: 16px;
+  font-size: 19px;
 }
 
 /* STATS */
 .about-stats {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 25px;
   margin-top: 40px;
+  color: black;
+  
 }
 
 .stat {
   background: linear-gradient(135deg, rgb(233, 157, 17) 0%, #e67e22 100%);
-  padding: 30px 20px;
+  padding: 30px;
   border-radius: 10px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.938);
   text-align: center;
-  transition: all 0.3s ease;
-  color: rgb(0, 0, 0);
+  transition: all 0.6s ease;
+  color: rgb(0, 0, 0); 
+  
 }
 
 .stat:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  transform: translateY(5px);
+  border-top: 6px solid rgb(233, 157, 17);
+  background-color: #f9f9f9;
 }
 
 .stat h3 {
@@ -306,8 +278,7 @@ body {
 
 .stat p {
   color: white;
-  font-size: 16px;
-  font-weight: 500;
+  font-size: 20px;
 }
 
 /* WHY US */
@@ -318,7 +289,7 @@ body {
 }
 
 .why-us h2 {
-  font-size: 32px;
+  font-size: 33px;
   color: #2c3e50;
   margin-bottom: 40px;
   position: relative;
@@ -330,7 +301,7 @@ body {
   position: absolute;
   bottom: -10px;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateY(-50%);
   width: 80px;
   height: 4px;
   background: rgb(233, 157, 17);
@@ -339,16 +310,16 @@ body {
 
 .why-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 25px;
   max-width: 1000px;
   margin: 40px auto 0;
-  padding: 0 20px;
+  padding: 20px;
 }
 
 .why-card {
   background: #f9f9f9;
-  padding: 30px 25px;
+  padding: 30px;
   border-radius: 10px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
@@ -363,12 +334,12 @@ body {
 .why-card h3 {
   color: rgb(233, 157, 17);
   margin-bottom: 15px;
-  font-size: 22px;
+  font-size: 25px;
 }
 
 .why-card p {
   color: #666;
-  font-size: 16px;
+  font-size: 21px;
   line-height: 1.6;
 }
 
@@ -377,37 +348,30 @@ footer {
   background: #0a0a0a;
   color: white;
   padding: 50px 20px 20px;
+  margin-top: 15%;
+  margin-bottom: -12%;
 }
 
 .footer-content {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 30px;
   max-width: 1200px;
   margin: 0 auto 30px;
+  color: rgb(233, 157, 17);
 }
 
 .footer-content h3 {
   color: rgb(233, 157, 17);
   margin-bottom: 15px;
-  font-size: 20px;
+  font-size: 24px;
 }
 
 .footer-content p {
   color: #bdc3c7;
   line-height: 1.8;
   margin-bottom: 10px;
-  font-size: 15px;
-}
-
-.footer-content a {
-  color: #bdc3c7;
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-.footer-content a:hover {
-  color: rgb(233, 157, 17);
+  font-size: 21px;
 }
 
 .copyright {
@@ -416,223 +380,123 @@ footer {
   padding-top: 20px;
   border-top: 1px solid #333;
   color: rgb(233, 157, 17);
-  font-size: 14px;
 }
 
-/* ==================== RESPONSIVE DESIGN ==================== */
 
-/* Tablet (768px - 1024px) */
-@media (max-width: 1024px) {
-  .about-hero h1 {
-    font-size: 36px;
-  }
-  
-  .about-hero p {
-    font-size: 16px;
-  }
-  
-  .why-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .why-card:last-child {
-    grid-column: span 2;
-    max-width: 50%;
-    margin: 0 auto;
-  }
+/* Login Button */
+#login-btn {
+  color: white;
+  text-decoration: none;
+  font-size: 16px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  display: none;
 }
 
-/* Mobile (up to 768px) */
-@media (max-width: 768px) {
-  .navbar {
-    padding: 12px 20px;
-  }
-  
-  .logo {
-    font-size: 18px;
-  }
-  
-  .nav-center,
-  .nav-icons {
-    display: none;
-  }
-  
-  .mobile-menu-toggle {
-    display: flex;
-  }
-  
-  .about-hero {
-    padding: 100px 20px 60px;
-    margin-top: 50px;
-  }
-  
-  .about-hero h1 {
-    font-size: 28px;
-  }
-  
-  .about-hero p {
-    font-size: 15px;
-  }
-  
-  .about-container {
-    margin: 30px 15px;
-    padding: 30px 20px;
-  }
-  
-  .about-text h2 {
-    font-size: 22px;
-  }
-  
-  .about-text p {
-    font-size: 15px;
-  }
-  
-  .about-stats {
-    grid-template-columns: 1fr;
-    gap: 15px;
-  }
-  
-  .stat {
-    padding: 25px 20px;
-  }
-  
-  .stat h3 {
-    font-size: 28px;
-  }
-  
-  .why-us {
-    padding: 40px 15px;
-  }
-  
-  .why-us h2 {
-    font-size: 24px;
-  }
-  
-  .why-grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
-    padding: 0;
-  }
-  
-  .why-card:last-child {
-    grid-column: span 1;
-    max-width: 100%;
-  }
-  
-  .why-card {
-    padding: 25px 20px;
-  }
-  
-  .why-card h3 {
-    font-size: 20px;
-  }
-  
-  .why-card p {
-    font-size: 15px;
-  }
-  
-  .footer-content {
-    grid-template-columns: 1fr;
-    text-align: center;
-    gap: 25px;
-  }
-  
-  .footer-content h3 {
-    font-size: 18px;
-  }
-  
-  .footer-content p {
-    font-size: 14px;
-  }
-  
-  .copyright {
-    font-size: 13px;
-  }
+#login-btn:hover {
+  color: rgb(233, 157, 17);
 }
 
-/* Small Mobile (up to 480px) */
-@media (max-width: 480px) {
-  .about-hero h1 {
-    font-size: 24px;
-  }
-  
-  .about-hero p {
-    font-size: 14px;
-  }
-  
-  .about-text h2 {
-    font-size: 20px;
-  }
-  
-  .stat h3 {
-    font-size: 24px;
-  }
-  
-  .stat p {
-    font-size: 14px;
-  }
-  
-  .why-us h2 {
-    font-size: 22px;
-  }
-  
-  .why-card h3 {
-    font-size: 18px;
-  }
+/* Profile Dropdown */
+#profile-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(233, 157, 17, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
-/* Large Desktop (1200px+) */
-@media (min-width: 1200px) {
-  .about-container {
-    padding: 50px 40px;
-  }
-  
-  .about-hero {
-    padding: 140px 20px 100px;
-  }
-  
-  .about-hero h1 {
-    font-size: 48px;
-  }
-  
-  .about-hero p {
-    font-size: 20px;
-  }
+#profile-icon img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+#dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 70px;
+  right: 20px;
+  background: #1a1a1a;
+  border: 2px solid rgb(233, 157, 17);
+  border-radius: 10px;
+  padding: 10px 0;
+  min-width: 180px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+  z-index: 2000;
+}
+
+#dropdown-menu.show {
+  display: block;
+}
+
+#dropdown-menu a,
+#dropdown-menu button {
+  display: block;
+  width: 100%;
+  padding: 12px 20px;
+  color: #ecf0f1;
+  text-decoration: none;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 18px;
+  text-align: left;
+}
+
+#dropdown-menu a:hover,
+#dropdown-menu button:hover {
+  background: rgba(233, 157, 17, 0.2);
+  color: rgb(233, 157, 17);
+  padding-left: 25px;
+}
+
+#dropdown-menu button {
+  color: #e74c3c;
+  font-weight: 600;
+}
+
+#dropdown-menu button:hover {
+  background: rgba(231, 76, 60, 0.2);
+  color: #ff6b6b;
 }
 </style>
+  
+
 </head>
 <body>
 
+
+
 <!-- NAVBAR -->
 <nav class="navbar">
-  <div class="logo">
-    <a href="index.html"><span>Daimara Online Mart</span></a>
-  </div>
+  
+
+ <div class="logo">
+            <a href="home.html" style="text-decoration: none; color: inherit;"><span>Daimara Online Mart</span></a>
+ </div>
 
   <div class="nav-center">
-    <a href="index.html" title="Home"><i class="fas fa-home"></i></a>
-    <a href="store.html"><div class="shop-icon"></div></a>
+    <a href="home.html">Home</a>
+    <a href="shop.html"><div class="shop-icon"></div></a>
+    <a href="contact.html">Contact</a>
+    
   </div>
 
   <div class="nav-icons">
-    <a href="login.html"><i class="fas fa-user"></i></a>
-    <a href="cart.html" class="cart-link"><i class="fas fa-shopping-cart"></i><span class="cart-count">0</span></a>
-  </div>
-  
-  <!-- Mobile Menu Toggle -->
-  <div class="mobile-menu-toggle" onclick="toggleMobileMenu()">
-    <span></span>
-    <span></span>
-    <span></span>
+    <a href="login.html"><i class="fa fa-user"></i></a>
+    <a href="cart.html"><i class="fa fa-shopping-cart"></i></a>
   </div>
 </nav>
-
-<!-- Mobile Navigation -->
-<div class="mobile-nav" id="mobileNav">
-  <a href="index.html"><i class="fas fa-home"></i> Home</a>
-  <a href="store.html"><i class="fas fa-store"></i> Store</a>
-  <a href="cart.html"><i class="fas fa-shopping-cart"></i> Cart <span class="cart-count">0</span></a>
-</div>
 
 <div class="main-content-wrapper">
 
@@ -647,12 +511,14 @@ footer {
   <div class="about-text">
     <h2>Who We Are</h2>
     <p>
-     Daimara Online Mart is an online grocery and food store dedicated to delivering high-quality food, fresh produce, and beverages directly to your doorstep. We focus on convenience, affordability, and reliability, positioning ourselves as your trusted online grocery partner that sources the best products to meet everyday needs.
+     Daimara Online Mart is an online grocery and food store dedicated to delivering high‑quality food, fresh produce, and beverages directly to your doorstep. We focus on convenience, affordability, and reliability, positioning ourselves as your trusted online grocery partner that sources the best products to meet everyday needs.
+
     </p>
 
     <h2>Our Mission</h2>
     <p>
       To simplify shopping by offering fresh products, fast delivery, and secure payments through modern technology. We strive to make grocery shopping effortless and dependable, ensuring customers enjoy quick, reliable service and safe transaction methods that enhance their overall experience.
+
     </p>
   </div>
 
@@ -678,18 +544,18 @@ footer {
 
   <div class="why-grid">
     <div class="why-card">
-      <h3><i class="fas fa-leaf" style="margin-right: 8px;"></i>Fresh Products</h3>
-      <p>We source the best quality products every day to ensure you get only the freshest items delivered to your doorstep.</p>
+      <h3>Fresh Products</h3>
+      <p>We source the best quality products every day.</p>
     </div>
 
     <div class="why-card">
-      <h3><i class="fas fa-shipping-fast" style="margin-right: 8px;"></i>Fast Delivery</h3>
-      <p>Quick and reliable delivery right to your door. We value your time and ensure timely deliveries every time.</p>
+      <h3>Fast Delivery</h3>
+      <p>Quick and reliable delivery right to your door.</p>
     </div>
 
     <div class="why-card">
-      <h3><i class="fas fa-shield-alt" style="margin-right: 8px;"></i>Secure Payments</h3>
-      <p>Pay safely using M-Pesa and other secure methods. Your financial security is our top priority.</p>
+      <h3>Secure Payments</h3>
+      <p>Pay safely using M-Pesa and other secure methods.</p>
     </div>
   </div>
 </section>
@@ -700,56 +566,32 @@ footer {
 <footer id="Contact">
   <div class="footer-content">
     <div>
-      <h3>Contact Us</h3>
+      <h3>contacts</h3>
       <p>Email: omondiphelix2003@gmail.com</p>
       <p>Phone: +254 745431472</p>
     </div>
 
     <div id="about">
-      <h3>About Us</h3>
-      <p>Daimara Online Mart delivers quality groceries and food at your convenience.</p>
+      <h3>About us</h3>
+      <p>Daimara Online Mart delivers
+         quality groceries and 
+        food at your convenience.</p>
     </div>
 
     <div>
-      <h3>Social Platforms</h3>
-      <p>
-        <a href="#"><i class="fab fa-facebook"></i> Facebook</a> | 
-        <a href="#"><i class="fab fa-instagram"></i> Instagram</a> | 
-        <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
-      </p>
+      <h3>Social platforms</h3>
+      <p>Facebook | Instagram | Twitter</p>
     </div>
   </div>
-  <p class="copyright">Copyright &copy; 2026 Daimara Online Mart. All rights reserved.</p>
+  <p class="copyright">Copyright © 2026 Daimara Online Mart.All rights reserved.</p>
 </footer>
 
-<script>
-// Mobile Menu Toggle
-function toggleMobileMenu() {
-  const mobileNav = document.getElementById('mobileNav');
-  const toggle = document.querySelector('.mobile-menu-toggle');
-  mobileNav.classList.toggle('active');
-  toggle.classList.toggle('active');
-}
 
-// Close mobile menu when clicking on a link
-document.querySelectorAll('.mobile-nav a').forEach(link => {
-  link.addEventListener('click', () => {
-    document.getElementById('mobileNav').classList.remove('active');
-    document.querySelector('.mobile-menu-toggle').classList.remove('active');
-  });
-});
 
-// Close mobile menu when clicking outside
-document.addEventListener('click', (e) => {
-  const mobileNav = document.getElementById('mobileNav');
-  const toggle = document.querySelector('.mobile-menu-toggle');
-  if (!mobileNav.contains(e.target) && !toggle.contains(e.target)) {
-    mobileNav.classList.remove('active');
-    toggle.classList.remove('active');
-  }
-});
+<script src="data-manager.js"></script>
 
-// Stats Animation on Page Load
+<script src="auth-check.js"></script>
+<script>// Simple animation when page loads
 document.addEventListener("DOMContentLoaded", () => {
   const stats = document.querySelectorAll(".stat");
 
@@ -758,23 +600,14 @@ document.addEventListener("DOMContentLoaded", () => {
     stat.style.transform = "translateY(20px)";
 
     setTimeout(() => {
-      stat.style.transition = "all 0.6s ease";
+      stat.style.transition = "0.6s";
       stat.style.opacity = 1;
       stat.style.transform = "translateY(0)";
     }, index * 200);
   });
-});
-
-// Update cart count from localStorage
-function updateCartCount() {
-  const cart = JSON.parse(localStorage.getItem('cart')) || [];
-  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-  document.querySelectorAll('.cart-count').forEach(el => {
-    el.textContent = totalItems;
-  });
-}
-
-updateCartCount();
-</script>
+});</script>
 </body>
 </html>
+
+
+
