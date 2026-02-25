@@ -593,11 +593,34 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
     <!--<input type="text" placeholder="Search products..." />-->
   </div>
 
-  <div class="nav-icons">
+  <div class="nav-icons" id="nav-icons-container">
     <a href="login.html"><i class="fa fa-user"></i></a>
     <a href="cart.html"><i class="fa fa-shopping-cart"></i></a>
   </div>
 </nav>
+
+<script>
+  // Dynamic Dashboard Icon based on role
+  window.addEventListener('DOMContentLoaded', () => {
+    const user = DataManager.getCurrentUser();
+    if (user && (user.role === 'operator' || user.role === 'delivery')) {
+      const iconsContainer = document.getElementById('nav-icons-container');
+      const dashboardLink = document.createElement('a');
+      
+      if (user.role === 'operator') {
+        dashboardLink.href = "Operator's Dashboard-for businesses.html";
+        dashboardLink.title = "Operator Dashboard";
+        dashboardLink.innerHTML = '<i class="fas fa-briefcase"></i>';
+      } else if (user.role === 'delivery') {
+        dashboardLink.href = "Delivery services.html";
+        dashboardLink.title = "Delivery Dashboard";
+        dashboardLink.innerHTML = '<i class="fas fa-truck"></i>';
+      }
+      
+      iconsContainer.insertBefore(dashboardLink, iconsContainer.firstChild);
+    }
+  });
+</script>
 
 <div class="search-container">
   <input type="text" id="search-input" placeholder="Search...">

@@ -17,7 +17,9 @@ const DataManager = (() => {
     WAREHOUSE: 'ecommerce_warehouse',
     INVOICES: 'ecommerce_invoices',
     ONLINE_USERS: 'ecommerce_online_users',
-    CAMPAIGNS: 'ecommerce_campaigns'
+    CAMPAIGNS: 'ecommerce_campaigns',
+    DELIVERY_ORDERS: 'delivery_orders',
+    DELIVERY_EARNINGS: 'delivery_earnings'
   };
 
   // Initialize default products from both supermarket and second-hand categories
@@ -324,6 +326,34 @@ const DataManager = (() => {
   }
 
   /**
+   * Get a user-specific storage key to ensure isolation
+   * @param {string} baseKey - The global storage key
+   * @returns {string} - The scoped key (e.g., globalKey_userEmail)
+   */
+  function getUserScope(baseKey) {
+    const user = getCurrentUser();
+    if (!user) return baseKey;
+    // We use the email or ID to scope the data
+    return `${baseKey}_${user.email.replace(/[^a-zA-Z0-9]/g, '_')}`;
+  }
+
+  /**
+   * Get scoped data from localStorage
+   */
+  function getScopedData(baseKey, defaultValue = []) {
+    const scopedKey = getUserScope(baseKey);
+    return JSON.parse(localStorage.getItem(scopedKey)) || defaultValue;
+  }
+
+  /**
+   * Save scoped data to localStorage
+   */
+  function saveScopedData(baseKey, data) {
+    const scopedKey = getUserScope(baseKey);
+    localStorage.setItem(scopedKey, JSON.stringify(data));
+  }
+
+  /**
    * Set current user
    */
   function setCurrentUser(user) {
@@ -337,7 +367,7 @@ const DataManager = (() => {
   /**
    * Register a new user
    */
-  function registerUser(name, email, password, profileImage) {
+  function registerUser(name, email, password, profileImage, role = 'user', regDetails = null) {
     const users = JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS)) || [];
     
     if (users.find(u => u.email === email)) {
@@ -350,6 +380,8 @@ const DataManager = (() => {
       email,
       password, // In a real app, this should be hashed
       profileImage,
+      role, // 'user', 'operator', 'delivery'
+      regDetails,
       registeredDate: new Date().toISOString(), // Consistent with admin-manager.html
       createdAt: new Date().toISOString()
     };
@@ -450,10 +482,198 @@ const DataManager = (() => {
     return { success: true };
   }
 
+  /**
+   * Process a new order: save globally and scope it to relevant operators
+   */
+  function processNewOrder(order) {
+    // Ensure status is pending by default
+    if (!order.status) order.status = 'pending';
+    
+    // 1. Save Globally for Admin
+    const allOrders = getAllOrders();
+    allOrders.push(order);
+    saveOrders(allOrders);
+
+    // 2. Scope to Operators based on items
+    const items = order.items || order.products || [];
+    const operators = [...new Set(items.map(item => item.owner).filter(Boolean))];
+
+    operators.forEach(opEmail => {
+      // Find the user object to get the scope key correctly
+      const users = getAllUsers();
+      const opUser = users.find(u => u.email === opEmail);
+      if (opUser) {
+        // Create a scoped version of the order for this operator
+        // They only see the items THEY own
+        const scopedOrder = {
+          ...order,
+          items: items.filter(i => i.owner === opEmail),
+          grandTotal: items.filter(i => i.owner === opEmail).reduce((sum, i) => sum + (i.price * (i.qty || i.quantity || 1)), 0)
+        };
+
+        // We use a temporary trick to set the "current user" context for getUserScope
+        const originalUser = localStorage.getItem(STORAGE_KEYS.USER);
+        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(opUser));
+        
+        const scopedOrders = getScopedData('ecommerce_orders');
+        scopedOrders.push(scopedOrder);
+        saveScopedData('ecommerce_orders', scopedOrders);
+
+        // Restore original user context
+        if (originalUser) {
+          localStorage.setItem(STORAGE_KEYS.USER, originalUser);
+        } else {
+          localStorage.removeItem(STORAGE_KEYS.USER);
+        }
+      }
+    });
+
+    return { success: true };
+  }
+
   function deleteOrder(orderId) {
     let orders = getAllOrders();
     orders = orders.filter(o => o.id !== orderId);
     localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(orders));
+    return { success: true };
+  }
+
+  /**
+   * Assign an order to a delivery person
+   */
+  function assignOrder(orderId, deliveryPersonEmail) {
+    const users = getAllUsers();
+    const deliveryPerson = users.find(u => u.email === deliveryPersonEmail);
+    if (!deliveryPerson) return { success: false, message: 'Delivery person not found' };
+
+    // 1. Update Global Order
+    const allOrders = getAllOrders();
+    const globalOrder = allOrders.find(o => o.id === orderId);
+    if (!globalOrder) return { success: false, message: 'Order not found' };
+
+    globalOrder.status = 'assigned';
+    globalOrder.deliveryPersonEmail = deliveryPersonEmail;
+    saveOrders(allOrders);
+
+    // 2. Update Scoped Orders for Operators
+    const items = globalOrder.items || globalOrder.products || [];
+    const owners = [...new Set(items.map(item => item.owner).filter(Boolean))];
+
+    owners.forEach(opEmail => {
+      const opUser = users.find(u => u.email === opEmail);
+      if (opUser) {
+        const originalUser = localStorage.getItem(STORAGE_KEYS.USER);
+        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(opUser));
+        
+        const scopedOrders = getScopedData('ecommerce_orders');
+        const scopedOrder = scopedOrders.find(o => o.id === orderId);
+        if (scopedOrder) {
+          scopedOrder.status = 'assigned';
+          scopedOrder.deliveryPersonEmail = deliveryPersonEmail;
+          saveScopedData('ecommerce_orders', scopedOrders);
+        }
+
+        // Restore
+        if (originalUser) localStorage.setItem(STORAGE_KEYS.USER, originalUser);
+        else localStorage.removeItem(STORAGE_KEYS.USER);
+      }
+    });
+
+    // 3. Push to Delivery Person
+    const deliveryOrder = {
+      id: globalOrder.id,
+      client: globalOrder.customerName || globalOrder.customer?.name,
+      destination: globalOrder.deliveryLocation || 'See details',
+      status: 'assigned',
+      date: globalOrder.date
+    };
+
+    const originalUser = localStorage.getItem(STORAGE_KEYS.USER);
+    localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(deliveryPerson));
+    
+    const dOrders = getScopedData('delivery_orders');
+    const existingIndex = dOrders.findIndex(o => o.id === deliveryOrder.id);
+    if (existingIndex === -1) {
+      dOrders.push(deliveryOrder);
+    } else {
+      dOrders[existingIndex] = deliveryOrder;
+    }
+    saveScopedData('delivery_orders', dOrders);
+
+    if (originalUser) localStorage.setItem(STORAGE_KEYS.USER, originalUser);
+    else localStorage.removeItem(STORAGE_KEYS.USER);
+
+    return { success: true };
+  }
+
+  /**
+   * Update order status across all scopes
+   */
+  function updateOrderStatus(orderId, newStatus) {
+    const users = getAllUsers();
+    
+    // 1. Update Global Order
+    const allOrders = getAllOrders();
+    const globalOrder = allOrders.find(o => o.id === orderId);
+    if (!globalOrder) return { success: false, message: 'Order not found' };
+
+    const oldStatus = globalOrder.status;
+    globalOrder.status = newStatus;
+    saveOrders(allOrders);
+
+    // 2. Update Scoped Orders for Operators
+    const items = globalOrder.items || globalOrder.products || [];
+    const owners = [...new Set(items.map(item => item.owner).filter(Boolean))];
+
+    owners.forEach(opEmail => {
+      const opUser = users.find(u => u.email === opEmail);
+      if (opUser) {
+        const originalUser = localStorage.getItem(STORAGE_KEYS.USER);
+        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(opUser));
+        
+        const scopedOrders = getScopedData('ecommerce_orders');
+        const scopedOrder = scopedOrders.find(o => o.id === orderId);
+        if (scopedOrder) {
+          scopedOrder.status = newStatus;
+          saveScopedData('ecommerce_orders', scopedOrders);
+        }
+
+        if (originalUser) localStorage.setItem(STORAGE_KEYS.USER, originalUser);
+        else localStorage.removeItem(STORAGE_KEYS.USER);
+      }
+    });
+
+    // 3. Update for Delivery Person if assigned
+    if (globalOrder.deliveryPersonEmail) {
+      const deliveryPerson = users.find(u => u.email === globalOrder.deliveryPersonEmail);
+      if (deliveryPerson) {
+        const originalUser = localStorage.getItem(STORAGE_KEYS.USER);
+        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(deliveryPerson));
+        
+        const dOrders = getScopedData('delivery_orders');
+        const dOrder = dOrders.find(o => o.id === orderId);
+        if (dOrder) {
+          dOrder.status = newStatus;
+          saveScopedData('delivery_orders', dOrders);
+
+          // ADD PROFIT LOGIC HERE
+          if ((newStatus === 'completed' || newStatus === 'Delivered') && (oldStatus !== 'completed' && oldStatus !== 'Delivered')) {
+            const earnings = getScopedData('delivery_earnings', { total: 0, history: [] });
+            earnings.total = (earnings.total || 0) + 50;
+            earnings.history.push({
+              orderId,
+              amount: 50,
+              date: new Date().toISOString()
+            });
+            saveScopedData('delivery_earnings', earnings);
+          }
+        }
+
+        if (originalUser) localStorage.setItem(STORAGE_KEYS.USER, originalUser);
+        else localStorage.removeItem(STORAGE_KEYS.USER);
+      }
+    }
+
     return { success: true };
   }
 
@@ -836,6 +1056,9 @@ const DataManager = (() => {
     getAllOrders,
     saveOrders,
     deleteOrder,
+    assignOrder,
+    updateOrderStatus,
+    processNewOrder,
     getUserAddresses,
     addAddress,
     deleteAddress,
@@ -866,6 +1089,8 @@ const DataManager = (() => {
     clearAllData,
     getAllCampaigns,
     saveCampaign,
-    deleteCampaign
+    deleteCampaign,
+    getScopedData,
+    saveScopedData
   };
 })();

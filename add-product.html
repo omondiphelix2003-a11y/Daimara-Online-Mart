@@ -685,6 +685,7 @@
 
             const imageData = await convertImageToBase64(imageFile);
 
+            const user = DataManager.getCurrentUser();
             const product = {
                 id: generateId(),
                 name: document.getElementById('productName').value,
@@ -696,13 +697,21 @@
                 sku: document.getElementById('productSKU').value,
                 supplier: document.getElementById('productSupplier').value,
                 image: imageData,
-                createdAt: new Date().toLocaleDateString()
+                createdAt: new Date().toLocaleDateString(),
+                owner: user ? user.email : 'admin' // Track who added it
             };
 
-            // Add product to DataManager
+            // Add product to DataManager (Global)
             const result = DataManager.addProductFromAddPage(product);
             
             if (result.success) {
+                // Also add to scoped warehouse for Operator isolation
+                if (user && user.role === 'operator') {
+                    const scopedWarehouse = DataManager.getScopedData('ecommerce_warehouse');
+                    scopedWarehouse.push(product);
+                    DataManager.saveScopedData('ecommerce_warehouse', scopedWarehouse);
+                }
+
                 // Refresh local view from DataManager
                 loadProducts();
                 showAlert('✓ Product added successfully! It will appear on the store pages and warehouse.', 'success');

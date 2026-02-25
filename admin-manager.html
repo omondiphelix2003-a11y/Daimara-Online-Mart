@@ -22,7 +22,7 @@
     body { background: #0f172a; display: flex; min-height: 100vh; }
 
     /* SIDEBAR */
-    .sidebar {  width: 270px; background: var(--sidebar-bg); color: rgb(255, 255, 255); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; transition: all 0.3s; }
+    .sidebar {  width: 270px; background: var(--sidebar-bg); color: rgb(255, 255, 255); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; transition: all 0.3s; overflow-y: auto; }
     .sidebar-header { padding: 30px 20px; text-align: center; border-bottom: 1px solid #333; }
     .sidebar-header h2 { color: black; font-size: 33px; letter-spacing: 1px; }
     .nav-links { list-style: none; padding: 20px 0; flex: 1; }
@@ -179,12 +179,14 @@
       <li><a href="#" onclick="showTab('profits', this)"><i class="fas fa-chart-line"></i> Profits & Loss</a></li>
       <li><a href="#" onclick="showTab('users', this)"><i class="fas fa-users"></i> User Signups</a></li>    
       <li><a href="Daimara Department Head – Marketing.html"><i class="fas fa-bullhorn"></i> Marketing Department</a></li>
-    <li><a href="Daimara-operator.html"><i class="fas fa-bullhorn"></i> Operator Dept</a></li>
-    <li><a href="Delivery services.html"><i class="fas fa-bullhorn"></i> Delivery Services Dept</a></li>
-    <li><a href="employement.html"><i class="fas fa-bullhorn"></i> Employment Dept</a></li>
-    <li><a href="executives.html"><i class="fas fa-bullhorn"></i> Exercutive Dept</a></li>
-    <li><a href="manager.html"><i class="fas fa-bullhorn"></i> Manager Dept</a></li>
-    
+    <li><a href="Daimara-operator.html"><i class="fas fa-headset"></i></i> Operator Dept</a></li>
+    <li><a href="Delivery services.html"><i class="fas fa-truck-fast"></i> Delivery Services Dept</a></li>
+    <li><a href="employement.html"><i class="fas fa-user-plus"></i> Employment Dept</a></li>
+    <li><a href="executives.html"><i class="fas fa-user-tie"></i> Exercutive Dept</a></li>
+    <li><a href="manager.html"><i class="fas fa-users-cog"></i> Manager Dept</a></li>
+    <li><a href="order fulfillment specialists.html"><i class="fas fa-box"></i> Order Packaging</a></li>
+   <li><a href="Operator's Dashboard-for businesses.html"><i class="fas fa-headset"></i> Operator's Dashboard-for businesses</a></li>
+
     <div class="sidebar-footer">
       <button class="logout-btn" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
     </div>
@@ -444,11 +446,14 @@
       const orders = DataManager.getAllOrders() || [];
       const tbody = document.querySelector('#all-orders-table tbody');
       if (!tbody) return;
-      tbody.innerHTML = orders.map(o => `
+      tbody.innerHTML = orders.map(o => {
+        const items = o.items || o.products || [];
+        const isOperatorOrder = items.some(i => i.owner);
+        return `
         <tr>
           <td>#${(o.id || '').slice(-8)}</td>
           <td><span class="clickable-name" onclick="viewOrderDetails('${o.id}')">${o.customerName || o.customer?.name || 'N/A'}</span></td>
-          <td>${(o.items || o.products || []).length} items</td>
+          <td>${items.length} items</td>
           <td>KSH ${(o.grandTotal || o.totalPrice || 0).toLocaleString()}</td>
           <td><span class="status-pill status-${o.status || 'pending'}">${o.status || 'pending'}</span></td>
           <td>${o.date ? new Date(o.date).toLocaleDateString() : 'N/A'}</td>
@@ -456,12 +461,17 @@
             <div style="display:flex; gap:5px;">
               <button class="btn btn-info" style="padding:4px 8px; font-size:25px;" onclick="updateOrderStatus('${o.id}')">Status</button>
               <button class="btn btn-primary" style="padding:4px 8px; font-size:25px; background:#6c5ce7;" onclick="showAdminReceipt('${o.id}')">Receipt</button>
+              ${!isOperatorOrder ? `
+              <button class="btn btn-success" style="padding:4px 8px; font-size:25px; background:#2ecc71;" onclick="assignDelivery('${o.id}')">Assign</button>
+              ` : `
+              <button class="btn btn-success" style="padding:4px 8px; font-size:25px; background:#bdc3c7; cursor:not-allowed;" title="Operator must assign" disabled>Assign</button>
+              `}
               <button class="btn btn-danger" style="padding:4px 8px; font-size:25px;" onclick="returnOrder('${o.id}')">Return</button>
               <button class="btn btn-danger" style="padding:4px 8px; background:#333;" onclick="deleteOrder('${o.id}')"><i class="fas fa-trash"></i></button>
             </div>
           </td>
         </tr>
-      `).join('') || '<tr><td colspan="7" style="text-align:center">No orders found</td></tr>';
+      `}).join('') || '<tr><td colspan="7" style="text-align:center">No orders found</td></tr>';
     }
 
     function renderWarehouse() {
@@ -477,7 +487,12 @@
           <td>KSH ${(p.price || 0).toLocaleString()}</td>
           <td><span class="quantity-badge ${p.quantity < 10 ? 'qty-low' : 'qty-ok'}">${p.quantity || 0}</span></td>
           <td>${p.createdAt || p.addedDate || 'N/A'}</td>
-          <td><button class="btn btn-primary" style="padding:4px 8px" onclick="editStock('${p.id}')">Adjust</button></td>
+          <td>
+            <div style="display:flex; gap:5px;">
+              <button class="btn btn-primary" style="padding:4px 8px" onclick="editStock('${p.id}')">Adjust</button>
+              <button class="btn btn-success" style="padding:4px 8px; background:#27ae60;" onclick="postToWebsite('${p.id}')">Post</button>
+            </div>
+          </td>
         </tr>
       `).join('') || '<tr><td colspan="8" style="text-align:center">Warehouse is empty</td></tr>';
     }
@@ -803,13 +818,51 @@
       const orders = DataManager.getAllOrders();
       const order = orders.find(o => o.id === id);
       if (order) {
-        const statuses = ['pending', 'completed', 'cancelled', 'returned'];
+        const statuses = ['pending', 'assigned', 'Out for Delivery', 'Delivered', 'returned'];
         let currentIdx = statuses.indexOf(order.status);
-        let nextIdx = (currentIdx + 1) % (statuses.length - 1); // Cycle through first 3
-        order.status = statuses[nextIdx];
-        DataManager.saveOrders(orders);
-        renderOrders();
-        renderDashboard();
+        if (currentIdx === -1) currentIdx = 0;
+        let nextIdx = (currentIdx + 1) % statuses.length;
+        const newStatus = statuses[nextIdx];
+        
+        const result = DataManager.updateOrderStatus(id, newStatus);
+        if (result.success) {
+          renderOrders();
+          renderDashboard();
+        }
+      }
+    }
+
+    function assignDelivery(orderId) {
+      if (typeof DataManager === 'undefined') return;
+      
+      const users = DataManager.getAllUsers();
+      const deliveryPersonnel = users.filter(u => u.role === 'delivery');
+      
+      if (deliveryPersonnel.length === 0) {
+        return alert("No registered delivery personnel found.");
+      }
+      
+      let msg = "Select a delivery person to assign this order:\n";
+      deliveryPersonnel.forEach((p, idx) => {
+        msg += `${idx + 1}. ${p.name} (${p.email})\n`;
+      });
+      
+      const choice = prompt(msg);
+      if (choice) {
+        const idx = parseInt(choice) - 1;
+        if (deliveryPersonnel[idx]) {
+          const selectedPerson = deliveryPersonnel[idx];
+          const result = DataManager.assignOrder(orderId, selectedPerson.email);
+          if (result.success) {
+            alert(`Order assigned to ${selectedPerson.name}`);
+            renderOrders();
+            renderDashboard();
+          } else {
+            alert("Error: " + result.message);
+          }
+        } else {
+          alert("Invalid choice.");
+        }
       }
     }
 
@@ -873,6 +926,20 @@
         DataManager.updateWarehouseQuantity(id, parseInt(newQty));
         renderWarehouse();
         renderDashboard();
+      }
+    }
+
+    function postToWebsite(id) {
+      if (typeof DataManager === 'undefined') return;
+      
+      if (!confirm("Are you sure you want to post this product to the live website?")) return;
+      
+      const result = DataManager.pushWarehouseToWebsite(id);
+      if (result.success) {
+        alert("Product has been successfully posted to the website!");
+        renderDashboard();
+      } else {
+        alert("Error: " + (result.message || "Could not post product."));
       }
     }
 

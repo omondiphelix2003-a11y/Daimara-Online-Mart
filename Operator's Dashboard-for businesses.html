@@ -1,0 +1,2003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel | Daimara Online Mart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    :root {
+      --primary: rgb(233, 157, 17);
+      --primary-dark: #d97706;
+      --dark-bg: #0a0a0a;
+      --sidebar-bg: rgb(233, 157, 17);
+      --card-bg: #ffffff;
+      --text-main: #1f2937;
+      --text-muted: #6b7280;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --info: #2563eb;
+      --warning: #f59e0b;
+      --border: #e5e7eb;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    body { 
+      background: #1F2937; 
+      display: flex; 
+      min-height: 100vh;
+      color: var(--text-main);
+    }
+
+    /* MOBILE MENU TOGGLE */
+    .menu-toggle {
+      display: none;
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      z-index: 1001;
+      background: var(--primary);
+      color: #000;
+      border: none;
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 1.25rem;
+      box-shadow: var(--shadow);
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* SIDEBAR */
+    .sidebar {  
+      width: 280px; 
+      background: var(--sidebar-bg); 
+      color: #000; 
+      display: flex; 
+      flex-direction: column; 
+      position: fixed; 
+      height: 100vh; 
+      z-index: 100; 
+      transition: transform 0.3s ease;
+      overflow-y: auto;
+      box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+    }
+
+    .sidebar-header { 
+      padding: clamp(1.5rem, 4vw, 2rem) 1.5rem; 
+      text-align: center; 
+      border-bottom: 2px solid rgba(0,0,0,0.1);
+    }
+
+    .sidebar-header h2 { 
+      color: #000; 
+      font-size: clamp(1.25rem, 3vw, 1.5rem); 
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+    }
+
+    .nav-links { 
+      list-style: none; 
+      padding: 1rem 0; 
+      flex: 1; 
+    }
+
+    .nav-links li { 
+      padding: 0.5rem 1rem; 
+    }
+
+    .nav-links a { 
+      color: rgba(0,0,0,0.8); 
+      text-decoration: none; 
+      display: flex; 
+      align-items: center; 
+      padding: 0.875rem 1rem; 
+      border-radius: 12px; 
+      transition: all 0.3s; 
+      gap: 1rem; 
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    .nav-links a:hover, 
+    .nav-links a.active { 
+      background: rgba(0,0,0,0.1); 
+      color: #000;
+      transform: translateX(4px);
+    }
+
+    .nav-links i { 
+      width: 24px; 
+      font-size: 1.25rem; 
+      text-align: center;
+    }
+
+    .sidebar-footer { 
+      padding: 1.5rem; 
+      border-top: 2px solid rgba(0,0,0,0.1);
+    }
+
+    .logout-btn { 
+      background: rgba(0,0,0,0.8); 
+      color: var(--primary); 
+      border: none;
+      width: 100%; 
+      padding: 0.875rem; 
+      border-radius: 12px; 
+      cursor: pointer; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      gap: 0.75rem; 
+      font-weight: 600;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+
+    .logout-btn:hover {
+      background: #000;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    /* MAIN CONTENT */
+    .main-content { 
+      flex: 1; 
+      margin-left: 280px; 
+      padding: clamp(1rem, 3vw, 2rem);
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+    .page-header { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+      background: white;
+      padding: 1.25rem 1.5rem;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .page-title h1 { 
+      font-size: clamp(1.25rem, 3vw, 1.75rem); 
+      color: var(--text-main);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .admin-profile { 
+      display: flex; 
+      align-items: center; 
+      gap: 1rem;
+    }
+
+    .admin-info { 
+      text-align: right; 
+    }
+
+    .admin-info p { 
+      font-weight: 700; 
+      font-size: 1rem;
+      color: var(--text-main);
+    }
+
+    .admin-info span { 
+      font-size: 0.875rem; 
+      color: var(--text-muted); 
+    }
+
+    .admin-avatar { 
+      width: 48px; 
+      height: 48px; 
+      border-radius: 50%; 
+      background: var(--primary); 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      color: #000; 
+      font-weight: bold;
+      font-size: 1.125rem;
+      border: 3px solid var(--border);
+    }
+
+    /* STATS GRID */
+    .stats-grid { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); 
+      gap: clamp(1rem, 2vw, 1.5rem); 
+      margin-bottom: 2rem;
+    }
+
+    .stat-card { 
+      background: white; 
+      padding: clamp(1.25rem, 3vw, 1.5rem); 
+      border-radius: 16px; 
+      box-shadow: var(--shadow);
+      display: flex; 
+      align-items: center; 
+      gap: 1rem;
+      transition: all 0.3s;
+      border: 1px solid var(--border);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+    }
+
+    .stat-icon { 
+      width: 56px; 
+      height: 56px; 
+      border-radius: 14px; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .stat-info h3 { 
+      font-size: clamp(1.5rem, 4vw, 2rem); 
+      color: var(--text-main); 
+      margin-bottom: 0.25rem;
+      font-weight: 700;
+    }
+
+    .stat-info p { 
+      color: var(--text-muted); 
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    /* DATA CARDS */
+    .data-card { 
+      background: white; 
+      border-radius: 16px; 
+      padding: clamp(1.25rem, 3vw, 1.5rem); 
+      box-shadow: var(--shadow);
+      margin-bottom: 1.5rem;
+      border: 1px solid var(--border);
+    }
+
+    .card-header {
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      margin-bottom: 1.5rem; 
+      padding-bottom: 1rem; 
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .card-title { 
+      font-size: clamp(1.125rem, 2.5vw, 1.375rem); 
+      font-weight: 700; 
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    /* BUTTONS */
+    .btn { 
+      padding: 0.625rem 1.25rem; 
+      border-radius: 10px; 
+      cursor: pointer; 
+      border: none; 
+      font-weight: 600; 
+      font-size: 0.875rem; 
+      display: inline-flex; 
+      align-items: center; 
+      gap: 0.5rem; 
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn:hover { 
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .btn-primary { 
+      background: var(--primary); 
+      color: #000; 
+    }
+
+    .btn-success { 
+      background: var(--success); 
+      color: white; 
+    }
+
+    .btn-info { 
+      background: var(--info); 
+      color: white; 
+    }
+
+    .btn-danger { 
+      background: var(--danger); 
+      color: white; 
+    }
+
+    .btn-sm {
+      padding: 0.5rem 0.875rem;
+      font-size: 0.8125rem;
+    }
+
+    /* TABLES */
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    table { 
+      width: 100%; 
+      border-collapse: collapse;
+      min-width: 600px;
+    }
+
+    th { 
+      text-align: left; 
+      padding: 1rem; 
+      background: #f9fafb; 
+      color: var(--text-muted); 
+      font-size: 0.75rem; 
+      text-transform: uppercase; 
+      letter-spacing: 0.05em;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    td { 
+      padding: 1rem; 
+      border-bottom: 1px solid var(--border); 
+      font-size: 0.9375rem;
+      color: var(--text-main);
+      vertical-align: middle;
+    }
+
+    tbody tr {
+      transition: background 0.2s;
+    }
+
+    tbody tr:hover {
+      background: #f9fafb;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* STATUS PILLS */
+    .status-pill { 
+      padding: 0.375rem 0.875rem; 
+      border-radius: 9999px; 
+      font-size: 0.8125rem; 
+      font-weight: 600; 
+      text-transform: capitalize;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      white-space: nowrap;
+    }
+
+    .status-pill::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .status-in-transit { background: #fef3c7; color: #92400e; }
+    .status-completed { background: #d1fae5; color: #065f46; }
+    .status-paid { background: #d1fae5; color: #065f46; }
+    .status-unread { background: #dbeafe; color: #1e40af; }
+    .status-pending { background: #fee2e2; color: #991b1b; }
+    .status-packaging { background: #fce7f3; color: #9d174d; }
+
+    /* PRODUCT THUMBS */
+    .product-thumb { 
+      width: 48px; 
+      height: 48px; 
+      border-radius: 10px; 
+      object-fit: cover;
+      border: 2px solid var(--border);
+      transition: transform 0.2s;
+    }
+
+    .product-thumb:hover {
+      transform: scale(1.1);
+      border-color: var(--primary);
+    }
+
+    .quantity-badge { 
+      padding: 0.25rem 0.75rem; 
+      border-radius: 6px; 
+      font-weight: 700;
+      font-size: 0.875rem;
+    }
+
+    .qty-low { 
+      background: #fee2e2; 
+      color: #dc2626; 
+    }
+
+    .qty-ok { 
+      background: #d1fae5; 
+      color: #16a34a; 
+    }
+
+    /* BLURRY TEXT */
+    .blurry-text {
+      filter: blur(5px);
+      transition: filter 0.3s;
+      user-select: none;
+      cursor: pointer;
+    }
+
+    .blurry-text:hover {
+      filter: blur(3px);
+    }
+
+    .blurry-text.revealed {
+      filter: blur(0);
+      user-select: auto;
+    }
+
+    /* CLICKABLE NAMES */
+    .clickable-name {
+      color: var(--info);
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .clickable-name:hover {
+      text-decoration: underline;
+      color: var(--primary);
+    }
+
+    /* PROFIT & LOSS */
+    .pl-summary { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); 
+      gap: 1.5rem; 
+    }
+
+    .pl-item { 
+      display: flex; 
+      justify-content: space-between; 
+      padding: 1rem 0; 
+      border-bottom: 1px dashed var(--border);
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .pl-label { 
+      font-weight: 600; 
+      color: var(--text-muted); 
+    }
+
+    .pl-value { 
+      font-weight: 700; 
+      font-size: 1.125rem;
+    }
+
+    .pl-positive { color: var(--success); }
+    .pl-negative { color: var(--danger); }
+
+    .pl-highlight {
+      background: #f9fafb;
+      padding: 1.5rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .pl-highlight h3 {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+
+    .margin-value {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1;
+    }
+
+    /* MODAL */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-content {
+      background: #fff;
+      padding: clamp(1.5rem, 4vw, 2rem);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 800px;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+      animation: modalSlide 0.3s ease;
+    }
+
+    @keyframes modalSlide {
+      from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: all 0.2s;
+      background: #f3f4f6;
+      border: none;
+    }
+
+    .close-modal:hover {
+      background: var(--border);
+      color: var(--text-main);
+      transform: rotate(90deg);
+    }
+
+    .modal-header {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-header h2 {
+      font-size: clamp(1.25rem, 3vw, 1.5rem);
+      color: var(--text-main);
+      padding-right: 3rem;
+    }
+
+    /* RECEIPT */
+    .receipt { 
+      color: var(--text-main); 
+      background: #fff; 
+    }
+
+    .receipt-header { 
+      text-align: center; 
+      margin-bottom: 1.5rem; 
+      border-bottom: 2px dashed var(--border); 
+      padding-bottom: 1rem; 
+    }
+
+    .receipt-header h1 { 
+      color: var(--primary); 
+      font-size: clamp(1.5rem, 4vw, 1.75rem); 
+      margin-bottom: 0.5rem;
+    }
+
+    .receipt-header p {
+      color: var(--text-muted);
+      font-size: 0.9375rem;
+    }
+
+    .receipt-info { 
+      margin-bottom: 1.5rem; 
+      line-height: 1.8;
+      font-size: 0.9375rem;
+    }
+
+    .receipt-info p {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .receipt-info strong {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .receipt-table { 
+      width: 100%; 
+      border-collapse: collapse; 
+      margin-bottom: 1.5rem;
+    }
+
+    .receipt-table th { 
+      text-align: left; 
+      border-bottom: 2px solid var(--border); 
+      padding: 0.75rem 0;
+      font-size: 0.875rem;
+    }
+
+    .receipt-table td { 
+      padding: 0.75rem 0; 
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    .receipt-total { 
+      text-align: right; 
+      font-size: clamp(1.25rem, 3vw, 1.5rem); 
+      font-weight: 700; 
+      border-top: 2px solid var(--text-main); 
+      padding-top: 1rem;
+      margin-top: 1rem;
+    }
+
+    .print-btn {
+      display: block;
+      width: 100%;
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: var(--dark-bg);
+      color: var(--primary);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+
+    .print-btn:hover {
+      background: #000;
+      transform: translateY(-2px);
+    }
+
+    /* MOBILE CARDS (Alternative to tables) */
+    .mobile-cards {
+      display: none;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .data-card-mobile {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      box-shadow: var(--shadow);
+    }
+
+    .data-card-mobile .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .data-card-mobile .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .data-card-mobile .card-body {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .data-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9375rem;
+    }
+
+    .data-row .label {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .data-row .value {
+      font-weight: 600;
+      text-align: right;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .card-actions .btn {
+      flex: 1;
+      min-width: 80px;
+      justify-content: center;
+    }
+
+    /* RESPONSIVE BREAKPOINTS */
+    @media (max-width: 1024px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .menu-toggle {
+        display: flex;
+      }
+
+      .main-content {
+        margin-left: 0;
+        padding-top: 5rem;
+      }
+
+      .page-header {
+        margin-top: 0;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .table-wrapper {
+        display: none;
+      }
+
+      .mobile-cards {
+        display: flex;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .stat-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.75rem;
+      }
+
+      .stat-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 1.25rem;
+      }
+
+      .pl-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .admin-info {
+        display: none;
+      }
+
+      .card-header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .card-header .btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .modal-content {
+        padding: 1.25rem;
+        border-radius: 16px;
+      }
+    }
+
+    @media (min-width: 769px) {
+      .mobile-cards {
+        display: none !important;
+      }
+    }
+
+    /* TOUCH OPTIMIZATIONS */
+    @media (hover: none) and (pointer: coarse) {
+      .btn, .nav-links a, .logout-btn {
+        min-height: 44px;
+      }
+
+      .stat-card,
+      .data-card {
+        transform: none !important;
+      }
+    }
+
+    /* PRINT STYLES */
+    @media print {
+      body * { 
+        visibility: hidden; 
+      }
+      
+      #details-modal, 
+      #details-modal * { 
+        visibility: visible; 
+      }
+      
+      #details-modal { 
+        position: absolute; 
+        left: 0; 
+        top: 0; 
+        width: 100%; 
+        height: auto; 
+        display: block !important;
+        background: white;
+      }
+      
+      .close-modal, 
+      .btn-info,
+      .menu-toggle,
+      .sidebar,
+      .page-header {
+        display: none !important;
+      }
+      
+      .modal-content { 
+        box-shadow: none; 
+        border: none; 
+        width: 100%; 
+        max-width: 100%; 
+        padding: 0;
+      }
+
+      .blurry-text {
+        filter: none !important;
+      }
+    }
+
+    /* REDUCED MOTION */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* DARK MODE SUPPORT */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --card-bg: #1f2937;
+        --text-main: #f9fafb;
+        --text-muted: #9ca3af;
+        --border: #374151;
+      }
+
+      body {
+        background: #1F2937;
+      }
+
+      .data-card,
+      .stat-card,
+      .page-header {
+        background: #1f2937;
+        border-color: #374151;
+      }
+
+      th {
+        background: #374151;
+        color: #9ca3af;
+      }
+
+      tbody tr:hover {
+        background: #374151;
+      }
+
+      .modal-content {
+        background: #1f2937;
+        color: #f9fafb;
+      }
+
+      .receipt {
+        background: #1f2937;
+        color: #f9fafb;
+      }
+
+      .receipt-header h1 {
+        color: var(--primary);
+      }
+    }
+  </style>
+
+</head>
+<body>
+
+  <!-- MOBILE MENU TOGGLE -->
+  <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Toggle menu">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h2><i class="fas fa-warehouse"></i> Main Warehouse</h2>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#" class="active" onclick="showTab('dashboard', this)"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+      <li><a href="#" onclick="showTab('orders', this)"><i class="fas fa-shopping-cart"></i> Orders</a></li>
+      <li><a href="#" onclick="showTab('warehouse', this)"><i class="fas fa-warehouse"></i> Warehouse</a></li>
+      <li><a href="#" onclick="showTab('emails', this)"><i class="fas fa-envelope"></i> Client Emails</a></li>
+      <li><a href="#" onclick="showTab('profits', this)"><i class="fas fa-chart-line"></i> Profit & Loss</a></li>
+      <li><a href="#" onclick="showTab('users', this)"><i class="fas fa-users"></i> Users</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="adminLogout()">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+    <header class="page-header">
+      <div class="page-title">
+        <h1 id="tab-title"><i class="fas fa-tachometer-alt"></i> Dashboard Overview</h1>
+      </div>
+      <div class="admin-profile">
+        <div class="admin-info">
+          <p>Operator</p>
+          <span>Main Office</span>
+        </div>
+        <div class="admin-avatar">OP</div>
+      </div>
+    </header>
+
+    <!-- DASHBOARD TAB -->
+    <div id="dashboard" class="tab-content active">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon" style="background: rgba(39,174,96,0.1); color: var(--success);">
+            <i class="fas fa-shopping-bag"></i>
+          </div>
+          <div class="stat-info">
+            <h3 id="stat-orders">0</h3>
+            <p>Total Orders</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background: rgba(155,89,182,0.1); color: #9b59b6;">
+            <i class="fas fa-box"></i>
+          </div>
+          <div class="stat-info">
+            <h3 id="stat-warehouse">0</h3>
+            <p>Warehouse Items</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background: rgba(233,157,17,0.1); color: var(--primary);">
+            <i class="fas fa-users"></i>
+          </div>
+          <div class="stat-info">
+            <h3 id="stat-users">0</h3>
+            <p>Registered Users</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background: rgba(37,99,235,0.1); color: var(--info);">
+            <i class="fas fa-dollar-sign"></i>
+          </div>
+          <div class="stat-info">
+            <h3 id="stat-revenue">KSH 0</h3>
+            <p>Total Revenue</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="data-card">
+        <div class="card-header">
+          <h2 class="card-title"><i class="fas fa-clock"></i> Recent Orders</h2>
+          <button class="btn btn-primary" onclick="showTab('orders')">View All</button>
+        </div>
+        <div class="table-wrapper">
+          <table id="recent-orders-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <!-- Mobile Cards -->
+        <div class="mobile-cards" id="recent-orders-mobile"></div>
+      </div>
+    </div>
+
+    <!-- ORDERS TAB -->
+    <div id="orders" class="tab-content">
+      <div class="data-card">
+        <div class="card-header">
+          <h2 class="card-title"><i class="fas fa-list"></i> All Customer Orders</h2>
+        </div>
+        <div class="table-wrapper">
+          <table id="all-orders-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Items</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <!-- Mobile Cards -->
+        <div class="mobile-cards" id="all-orders-mobile"></div>
+      </div>
+    </div>
+
+    <!-- WAREHOUSE TAB -->
+    <div id="warehouse" class="tab-content">
+      <div class="data-card">
+        <div class="card-header">
+          <h2 class="card-title"><i class="fas fa-boxes"></i> Inventory Management</h2>
+          <a href="add-product.html" class="btn btn-success">
+            <i class="fas fa-plus"></i> Add New Product
+          </a>
+        </div>
+        <div class="table-wrapper">
+          <table id="warehouse-table">
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Product Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>In Stock</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <!-- Mobile Cards -->
+        <div class="mobile-cards" id="warehouse-mobile"></div>
+      </div>
+    </div>
+
+    <!-- EMAILS TAB -->
+    <div id="emails" class="tab-content">
+      <div class="data-card">
+        <div class="card-header">
+          <h2 class="card-title"><i class="fas fa-envelope-open-text"></i> Client Messages</h2>
+        </div>
+        <div class="table-wrapper">
+          <table id="emails-table">
+            <thead>
+              <tr>
+                <th>From</th>
+                <th>Subject</th>
+                <th>Message</th>
+                <th>Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <!-- Mobile Cards -->
+        <div class="mobile-cards" id="emails-mobile"></div>
+      </div>
+    </div>
+
+    <!-- PROFITS TAB -->
+    <div id="profits" class="tab-content">
+      <div class="data-card">
+        <div class="card-header">
+          <h2 class="card-title"><i class="fas fa-chart-pie"></i> Financial Analysis</h2>
+        </div>
+        <div class="pl-summary">
+          <div>
+            <div class="pl-item">
+              <span class="pl-label">Gross Revenue</span>
+              <span class="pl-value" id="pl-revenue">KSH 0</span>
+            </div>
+            <div class="pl-item">
+              <span class="pl-label">Inventory Value</span>
+              <span class="pl-value" id="pl-warehouse">KSH 0</span>
+            </div>
+            <div class="pl-item">
+              <span class="pl-label">Operating Costs (15%)</span>
+              <span class="pl-value pl-negative" id="pl-costs">-KSH 0</span>
+            </div>
+            <div class="pl-item" style="border-top: 2px solid var(--border); margin-top: 0.5rem; padding-top: 1rem;">
+              <span class="pl-label" style="font-size: 1.125rem;">Net Profit</span>
+              <span class="pl-value pl-positive" id="pl-profit" style="font-size: 1.25rem;">KSH 0</span>
+            </div>
+          </div>
+          <div class="pl-highlight">
+            <h3><i class="fas fa-percentage"></i> Profit Margin</h3>
+            <div class="margin-value" id="pl-margin">0%</div>
+            <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.5rem;">
+              Based on total sales and operating costs
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- USERS TAB -->
+    <div id="users" class="tab-content">
+      <div class="data-card">
+        <div class="card-header">
+          <h2 class="card-title"><i class="fas fa-users-cog"></i> Registered Users</h2>
+        </div>
+        <div class="table-wrapper">
+          <table id="users-table">
+            <thead>
+              <tr>
+                <th>User ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Signup Date</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <!-- Mobile Cards -->
+        <div class="mobile-cards" id="users-mobile"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- DETAILS MODAL -->
+  <div id="details-modal" class="modal">
+    <div class="modal-content">
+      <button class="close-modal" onclick="closeModal()" aria-label="Close modal">
+        <i class="fas fa-times"></i>
+      </button>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <script src="data-manager.js"></script>
+  <script>
+    // SECURITY: Check if user is logged in and has correct role
+    function checkDashboardAccess() {
+      if (typeof DataManager === 'undefined') return;
+      const user = DataManager.getCurrentUser();
+      if (!user) {
+        alert("Please login to access the dashboard.");
+        window.location.href = "login.html";
+        return false;
+      }
+      if (user.role !== 'operator') {
+        alert("Access Denied: This dashboard is for businesses/operators only.");
+        window.location.href = "home.html";
+        return false;
+      }
+      return true;
+    }
+
+    if (!checkDashboardAccess()) {
+      // Stop execution if no access
+      throw new Error("Access denied");
+    }
+
+    // SIDEBAR TOGGLE FOR MOBILE
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('open');
+    }
+
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', (e) => {
+      const sidebar = document.getElementById('sidebar');
+      const toggle = document.querySelector('.menu-toggle');
+      if (window.innerWidth <= 1024 && 
+          !sidebar.contains(e.target) && 
+          !toggle.contains(e.target) && 
+          sidebar.classList.contains('open')) {
+        sidebar.classList.remove('open');
+      }
+    });
+
+    // TAB SWITCHING
+    function showTab(tabId, el) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      
+      if (el) {
+        document.querySelectorAll('.nav-links a').forEach(link => link.classList.remove('active'));
+        el.classList.add('active');
+      }
+
+      const titleMap = {
+        'dashboard': '<i class="fas fa-tachometer-alt"></i> Dashboard Overview',
+        'orders': '<i class="fas fa-shopping-cart"></i> Order Management',
+        'warehouse': '<i class="fas fa-warehouse"></i> Warehouse & Inventory',
+        'emails': '<i class="fas fa-envelope"></i> Customer Communications',
+        'profits': '<i class="fas fa-chart-line"></i> Profit & Loss Analysis',
+        'users': '<i class="fas fa-users"></i> User Base Growth'
+      };
+      document.getElementById('tab-title').innerHTML = titleMap[tabId];
+      
+      loadTabData(tabId);
+
+      // Close sidebar on mobile after selection
+      if (window.innerWidth <= 1024) {
+        document.getElementById('sidebar').classList.remove('open');
+      }
+
+      // Auto refresh dashboard
+      if (tabId === 'dashboard') {
+        if (window.dashboardInterval) clearInterval(window.dashboardInterval);
+        window.dashboardInterval = setInterval(renderDashboard, 30000);
+      } else {
+        if (window.dashboardInterval) clearInterval(window.dashboardInterval);
+      }
+    }
+
+    function loadTabData(tabId) {
+      try {
+        switch(tabId) {
+          case 'dashboard': renderDashboard(); break;
+          case 'orders': renderOrders(); break;
+          case 'warehouse': renderWarehouse(); break;
+          case 'emails': renderEmails(); break;
+          case 'profits': renderProfits(); break;
+          case 'users': renderUsers(); break;
+        }
+      } catch (err) {
+        console.error('Error loading tab data:', err);
+      }
+    }
+
+    // RENDER FUNCTIONS
+    function renderDashboard() {
+      if (typeof DataManager === 'undefined') return;
+      
+      const user = DataManager.getCurrentUser();
+      const orders_all = DataManager.getScopedData('ecommerce_orders');
+      const warehouse_all = DataManager.getScopedData('ecommerce_warehouse').filter(p => p.owner === user.email);
+      const users_all = DataManager.getAllUsers();
+      
+      document.getElementById('stat-revenue').innerText = 'KSH ' + orders_all.reduce((sum, o) => sum + (o.grandTotal || 0), 0).toLocaleString();
+      document.getElementById('stat-orders').innerText = orders_all.length;
+      document.getElementById('stat-users').innerText = users_all.length;
+      document.getElementById('stat-warehouse').innerText = warehouse_all.length;
+
+      const orders = orders_all.slice(0, 5);
+      
+      // Desktop Table
+      const tbody = document.querySelector('#recent-orders-table tbody');
+      if (tbody) {
+        tbody.innerHTML = orders.map(o => `
+          <tr>
+            <td><strong>#${(o.id || '').slice(-6)}</strong></td>
+            <td><span class="clickable-name" onclick="viewOrderDetails('${o.id}')">${o.customerName || o.customer?.name || 'Guest'}</span></td>
+            <td>KSH ${(o.grandTotal || o.totalPrice || 0).toLocaleString()}</td>
+            <td><span class="status-pill status-${o.status || 'pending'}">${o.status || 'pending'}</span></td>
+            <td>${o.date ? new Date(o.date).toLocaleDateString() : 'N/A'}</td>
+          </tr>
+        `).join('') || '<tr><td colspan="5" style="text-align:center">No recent orders</td></tr>';
+      }
+
+      // Mobile Cards
+      const mobileContainer = document.getElementById('recent-orders-mobile');
+      if (mobileContainer) {
+        mobileContainer.innerHTML = orders.map(o => `
+          <div class="data-card-mobile">
+            <div class="card-header">
+              <span class="card-title">#${(o.id || '').slice(-6)}</span>
+              <span class="status-pill status-${o.status || 'pending'}">${o.status || 'pending'}</span>
+            </div>
+            <div class="card-body">
+              <div class="data-row">
+                <span class="label">Customer</span>
+                <span class="value clickable-name" onclick="viewOrderDetails('${o.id}')">${o.customerName || o.customer?.name || 'Guest'}</span>
+              </div>
+              <div class="data-row">
+                <span class="label">Amount</span>
+                <span class="value">KSH ${(o.grandTotal || o.totalPrice || 0).toLocaleString()}</span>
+              </div>
+              <div class="data-row">
+                <span class="label">Date</span>
+                <span class="value">${o.date ? new Date(o.date).toLocaleDateString() : 'N/A'}</span>
+              </div>
+            </div>
+          </div>
+        `).join('') || '<p style="text-align:center; color: var(--text-muted);">No recent orders</p>';
+      }
+    }
+
+    function renderOrders() {
+      if (typeof DataManager === 'undefined') return;
+      
+      const orders = DataManager.getScopedData('ecommerce_orders');
+      
+      // Desktop Table
+      const tbody = document.querySelector('#all-orders-table tbody');
+      if (tbody) {
+        tbody.innerHTML = orders.map(o => `
+          <tr>
+            <td><strong>#${(o.id || '').slice(-8)}</strong></td>
+            <td><span class="clickable-name" onclick="viewOrderDetails('${o.id}')">${o.customerName || o.customer?.name || 'N/A'}</span></td>
+            <td>${(o.items || o.products || []).length} items</td>
+            <td>KSH ${(o.grandTotal || o.totalPrice || 0).toLocaleString()}</td>
+            <td><span class="status-pill status-${o.status || 'pending'}">${o.status || 'pending'}</span></td>
+            <td>${o.date ? new Date(o.date).toLocaleDateString() : 'N/A'}</td>
+            <td>
+              <div style="display:flex; gap:0.5rem; flex-wrap: wrap;">
+                <button class="btn btn-success btn-sm" onclick="assignDelivery('${o.id}')">
+                  <i class="fas fa-truck"></i>
+                </button>
+                <button class="btn btn-primary btn-sm" onclick="showAdminReceipt('${o.id}')">
+                  <i class="fas fa-receipt"></i>
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="returnOrder('${o.id}')">
+                  <i class="fas fa-undo"></i>
+                </button>
+                <button class="btn btn-sm" style="background: #374151; color: white;" onclick="deleteOrder('${o.id}')">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `).join('') || '<tr><td colspan="7" style="text-align:center">No orders found</td></tr>';
+      }
+
+      // Mobile Cards
+      const mobileContainer = document.getElementById('all-orders-mobile');
+      if (mobileContainer) {
+        mobileContainer.innerHTML = orders.map(o => `
+          <div class="data-card-mobile">
+            <div class="card-header">
+              <span class="card-title">#${(o.id || '').slice(-8)}</span>
+              <span class="status-pill status-${o.status || 'pending'}">${o.status || 'pending'}</span>
+            </div>
+            <div class="card-body">
+              <div class="data-row">
+                <span class="label">Customer</span>
+                <span class="value clickable-name" onclick="viewOrderDetails('${o.id}')">${o.customerName || o.customer?.name || 'N/A'}</span>
+              </div>
+              <div class="data-row">
+                <span class="label">Items</span>
+                <span class="value">${(o.items || o.products || []).length} items</span>
+              </div>
+              <div class="data-row">
+                <span class="label">Total</span>
+                <span class="value">KSH ${(o.grandTotal || o.totalPrice || 0).toLocaleString()}</span>
+              </div>
+              <div class="data-row">
+                <span class="label">Date</span>
+                <span class="value">${o.date ? new Date(o.date).toLocaleDateString() : 'N/A'}</span>
+              </div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-success btn-sm" onclick="assignDelivery('${o.id}')">
+                <i class="fas fa-truck"></i> Assign
+              </button>
+              <button class="btn btn-primary btn-sm" onclick="showAdminReceipt('${o.id}')">
+                <i class="fas fa-receipt"></i> Receipt
+              </button>
+              <button class="btn btn-danger btn-sm" onclick="returnOrder('${o.id}')">
+                <i class="fas fa-undo"></i> Return
+              </button>
+              <button class="btn btn-sm" style="background: #374151; color: white;" onclick="deleteOrder('${o.id}')">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        `).join('') || '<p style="text-align:center; color: var(--text-muted);">No orders found</p>';
+      }
+    }
+
+    function renderWarehouse() {
+      if (typeof DataManager === 'undefined') return;
+      
+      const user = DataManager.getCurrentUser();
+      const warehouse = DataManager.getScopedData('ecommerce_warehouse').filter(p => p.owner === user.email);
+      
+      // Desktop Table
+      const tbody = document.querySelector('#warehouse-table tbody');
+      if (tbody) {
+        tbody.innerHTML = warehouse.map(p => `
+          <tr>
+            <td><img src="${p.image || ''}" class="product-thumb" alt="${p.name}"></td>
+            <td><strong>${p.name || 'Unknown'}</strong></td>
+            <td>${p.subcategory || 'General'}</td>
+            <td>KSH ${(p.price || 0).toLocaleString()}</td>
+            <td><span class="quantity-badge ${p.quantity < 10 ? 'qty-low' : 'qty-ok'}">${p.quantity || 0}</span></td>
+            <td>
+              <button class="btn btn-primary btn-sm" onclick="editStock('${p.id}')">
+                <i class="fas fa-edit"></i> Adjust
+              </button>
+            </td>
+          </tr>
+        `).join('') || '<tr><td colspan="6" style="text-align:center">Warehouse is empty</td></tr>';
+      }
+
+      // Mobile Cards
+      const mobileContainer = document.getElementById('warehouse-mobile');
+      if (mobileContainer) {
+        mobileContainer.innerHTML = warehouse.map(p => `
+          <div class="data-card-mobile">
+            <div class="card-header">
+              <div style="display:flex; align-items:center; gap:0.75rem;">
+                <img src="${p.image || ''}" class="product-thumb" style="width:40px; height:40px;" alt="${p.name}">
+                <span class="card-title">${p.name || 'Unknown'}</span>
+              </div>
+              <span class="quantity-badge ${p.quantity < 10 ? 'qty-low' : 'qty-ok'}">${p.quantity || 0}</span>
+            </div>
+            <div class="card-body">
+              <div class="data-row">
+                <span class="label">Category</span>
+                <span class="value">${p.subcategory || 'General'}</span>
+              </div>
+              <div class="data-row">
+                <span class="label">Price</span>
+                <span class="value">KSH ${(p.price || 0).toLocaleString()}</span>
+              </div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-primary btn-sm" onclick="editStock('${p.id}')">
+                <i class="fas fa-edit"></i> Adjust Stock
+              </button>
+            </div>
+          </div>
+        `).join('') || '<p style="text-align:center; color: var(--text-muted);">Warehouse is empty</p>';
+      }
+    }
+
+    function renderEmails() {
+      if (typeof DataManager === 'undefined') return;
+      
+      const emails = DataManager.getScopedData('ecommerce_messages');
+      
+      // Desktop Table
+      const tbody = document.querySelector('#emails-table tbody');
+      if (tbody) {
+        tbody.innerHTML = emails.map(e => {
+          const isRead = e.status === 'read';
+          return `
+            <tr>
+              <td><strong>${e.email || 'N/A'}</strong></td>
+              <td>${e.subject || 'No Subject'}</td>
+              <td class="blurry-text ${isRead ? 'revealed' : ''}" onclick="revealMessage('${e.id}', this)">
+                ${(e.message || '').substring(0, 50)}${e.message?.length > 50 ? '...' : ''}
+              </td>
+              <td>${e.receivedDate ? new Date(e.receivedDate).toLocaleDateString() : 'N/A'}</td>
+              <td><span class="status-pill status-${e.status || 'unread'}">${e.status || 'unread'}</span></td>
+            </tr>
+          `;
+        }).join('') || '<tr><td colspan="5" style="text-align:center">No messages</td></tr>';
+      }
+
+      // Mobile Cards
+      const mobileContainer = document.getElementById('emails-mobile');
+      if (mobileContainer) {
+        mobileContainer.innerHTML = emails.map(e => {
+          const isRead = e.status === 'read';
+          return `
+            <div class="data-card-mobile">
+              <div class="card-header">
+                <span class="card-title">${e.email || 'N/A'}</span>
+                <span class="status-pill status-${e.status || 'unread'}">${e.status || 'unread'}</span>
+              </div>
+              <div class="card-body">
+                <div class="data-row">
+                  <span class="label">Subject</span>
+                  <span class="value">${e.subject || 'No Subject'}</span>
+                </div>
+                <div class="data-row">
+                  <span class="label">Date</span>
+                  <span class="value">${e.receivedDate ? new Date(e.receivedDate).toLocaleDateString() : 'N/A'}</span>
+                </div>
+                <div class="data-row" style="flex-direction:column; align-items:flex-start; gap:0.5rem;">
+                  <span class="label">Message</span>
+                  <span class="value blurry-text ${isRead ? 'revealed' : ''}" 
+                        onclick="revealMessage('${e.id}', this)"
+                        style="font-size:0.875rem; line-height:1.5;">
+                    ${e.message || 'No message'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('') || '<p style="text-align:center; color: var(--text-muted);">No messages</p>';
+      }
+    }
+
+    function revealMessage(id, el) {
+      el.classList.add('revealed');
+      if (typeof DataManager !== 'undefined') {
+        const emails = DataManager.getScopedData('ecommerce_messages');
+        const email = emails.find(e => e.id === id);
+        if (email) {
+          email.status = 'read';
+          DataManager.saveScopedData('ecommerce_messages', emails);
+          renderEmails();
+        }
+      }
+    }
+
+    function renderProfits() {
+      if (typeof DataManager === 'undefined') return;
+      
+      const orders = DataManager.getScopedData('ecommerce_orders');
+      const warehouse = DataManager.getScopedData('ecommerce_warehouse');
+      
+      const totalRevenue = orders.reduce((sum, o) => sum + (o.grandTotal || 0), 0);
+      const warehouseValue = warehouse.reduce((sum, p) => sum + ((p.price || 0) * (p.quantity || 0)), 0);
+      const operatingCosts = Math.floor(totalRevenue * 0.15);
+      const profit = totalRevenue - operatingCosts;
+      const profitMargin = totalRevenue > 0 ? Math.round((profit / totalRevenue) * 100) + '%' : '0%';
+      
+      document.getElementById('pl-revenue').innerText = 'KSH ' + totalRevenue.toLocaleString();
+      document.getElementById('pl-warehouse').innerText = 'KSH ' + warehouseValue.toLocaleString();
+      document.getElementById('pl-costs').innerText = '-KSH ' + operatingCosts.toLocaleString();
+      document.getElementById('pl-profit').innerText = 'KSH ' + profit.toLocaleString();
+      document.getElementById('pl-margin').innerText = profitMargin;
+    }
+
+    function renderUsers() {
+      if (typeof DataManager === 'undefined') return;
+      
+      const users = DataManager.getAllUsers() || [];
+      
+      // Desktop Table
+      const tbody = document.querySelector('#users-table tbody');
+      if (tbody) {
+        tbody.innerHTML = users.map(u => `
+          <tr>
+            <td><code>${(u.id || '').slice(0, 8)}</code></td>
+            <td><span class="clickable-name" onclick="viewUserProfile('${u.id}')">${u.name || 'N/A'}</span></td>
+            <td>${u.email || 'N/A'}</td>
+            <td>${(u.registeredDate || u.createdAt) ? new Date(u.registeredDate || u.createdAt).toLocaleDateString() : 'N/A'}</td>
+          </tr>
+        `).join('') || '<tr><td colspan="4" style="text-align:center">No users registered</td></tr>';
+      }
+
+      // Mobile Cards
+      const mobileContainer = document.getElementById('users-mobile');
+      if (mobileContainer) {
+        mobileContainer.innerHTML = users.map(u => `
+          <div class="data-card-mobile">
+            <div class="card-header">
+              <span class="card-title">${u.name || 'N/A'}</span>
+              <code style="font-size:0.75rem;">${(u.id || '').slice(0, 8)}</code>
+            </div>
+            <div class="card-body">
+              <div class="data-row">
+                <span class="label">Email</span>
+                <span class="value">${u.email || 'N/A'}</span>
+              </div>
+              <div class="data-row">
+                <span class="label">Joined</span>
+                <span class="value">${(u.registeredDate || u.createdAt) ? new Date(u.registeredDate || u.createdAt).toLocaleDateString() : 'N/A'}</span>
+              </div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-primary btn-sm" onclick="viewUserProfile('${u.id}')">
+                <i class="fas fa-eye"></i> View Profile
+              </button>
+            </div>
+          </div>
+        `).join('') || '<p style="text-align:center; color: var(--text-muted);">No users registered</p>';
+      }
+    }
+
+    // MODAL FUNCTIONS
+    function viewOrderDetails(orderId) {
+      if (typeof DataManager === 'undefined') return;
+      
+      const orders = DataManager.getScopedData('ecommerce_orders');
+      const order = orders.find(o => o.id === orderId);
+      if (!order) return alert("Order not found");
+
+      const items = order.items || order.products || [];
+      const body = document.getElementById('modal-body');
+      
+      body.innerHTML = `
+        <div class="modal-header">
+          <h2><i class="fas fa-shopping-bag"></i> Order Details</h2>
+        </div>
+        <div style="margin-bottom:1.5rem; line-height:1.8;">
+          <p><strong>Order ID:</strong> ${order.id}</p>
+          <p><strong>Customer:</strong> ${order.customerName || order.customer?.name}</p>
+          <p><strong>Email:</strong> ${order.customerEmail || order.customer?.email || 'N/A'}</p>
+          <p><strong>Phone:</strong> ${order.customerPhone || order.customer?.phone || 'Not provided'}</p>
+          <p><strong>Date:</strong> ${new Date(order.date).toLocaleString()}</p>
+          <p><strong>Status:</strong> <span class="status-pill status-${order.status}">${order.status}</span></p>
+          ${order.deliveryLocation ? `<p style="margin-top:0.5rem; color:var(--primary);"><strong><i class="fas fa-map-marker-alt"></i> Delivery:</strong> ${order.deliveryLocation}</p>` : ''}
+        </div>
+        <h3 style="margin-bottom:1rem;"><i class="fas fa-list"></i> Items</h3>
+        <div class="table-wrapper">
+          <table style="min-width:100%;">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th style="text-align:center;">Qty</th>
+                <th style="text-align:right;">Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${items.map(i => `
+                <tr>
+                  <td style="display:flex; align-items:center; gap:0.75rem;">
+                    <img src="${i.image || ''}" style="width:40px; height:40px; object-fit:cover; border-radius:6px;">
+                    <span>${i.name}</span>
+                  </td>
+                  <td style="text-align:center;">${i.qty || i.quantity || 1}</td>
+                  <td style="text-align:right;">KES ${i.price.toLocaleString()}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+        <div style="margin-top:1.5rem; text-align:right; font-weight:700; font-size:1.25rem; border-top:2px solid var(--border); padding-top:1rem;">
+          Total: KES ${(order.grandTotal || order.totalPrice || 0).toLocaleString()}
+        </div>
+      `;
+      document.getElementById('details-modal').style.display = 'flex';
+    }
+
+    function showAdminReceipt(orderId) {
+      if (typeof DataManager === 'undefined') return;
+      
+      const orders = DataManager.getScopedData('ecommerce_orders');
+      const order = orders.find(o => o.id === orderId);
+      if (!order) return alert("Order not found");
+
+      const items = order.items || order.products || [];
+      const phone = order.customerPhone || order.customer?.phone || 'Not provided';
+      const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(order.id)}`;
+      const body = document.getElementById('modal-body');
+
+      body.innerHTML = `
+        <div class="receipt">
+          <div class="receipt-header">
+            <h1><i class="fas fa-store"></i> Daimara Online Mart</h1>
+            <p>Official Order Receipt</p>
+          </div>
+          <div class="receipt-info">
+            <p><span>Order ID:</span> <strong>${order.id}</strong></p>
+            <p><span>Date:</span> <strong>${new Date(order.date).toLocaleString()}</strong></p>
+            <p><span>Customer:</span> <strong>${order.customerName || order.customer?.name || 'Guest'}</strong></p>
+            <p><span>Phone:</span> <strong>${phone}</strong></p>
+            <p><span>Status:</span> <strong>${order.status.toUpperCase()}</strong></p>
+            ${order.deliveryLocation ? `<p style="color:var(--primary);"><span><i class="fas fa-map-marker-alt"></i> Delivery:</span> <strong>${order.deliveryLocation}</strong></p>` : ''}
+          </div>
+          <table class="receipt-table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th style="text-align:center;">Qty</th>
+                <th style="text-align:right;">Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${items.map(item => `
+                <tr>
+                  <td style="display:flex; align-items:center; gap:0.75rem;">
+                    <img src="${item.image || ''}" style="width:40px; height:40px; object-fit:cover; border-radius:6px;">
+                    <span>${item.name}</span>
+                  </td>
+                  <td style="text-align:center;">${item.qty || item.quantity || 1}</td>
+                  <td style="text-align:right;">KSH ${item.price.toLocaleString()}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          <div class="receipt-total">
+            TOTAL: KSH ${(order.grandTotal || order.totalPrice || 0).toLocaleString()}
+          </div>
+          <div style="text-align:center; margin-top:1.5rem;">
+            <img src="${qrUrl}" style="width:120px; height:120px; border-radius:12px;" alt="Order QR">
+            <div style="font-size:0.875rem; color:var(--text-muted); margin-top:0.5rem;">
+              Scan to verify order details
+            </div>
+            <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.25rem;">${order.id}</div>
+          </div>
+          <button class="print-btn" onclick="window.print()">
+            <i class="fas fa-print"></i> Print Receipt
+          </button>
+        </div>
+      `;
+      document.getElementById('details-modal').style.display = 'flex';
+    }
+
+    function viewUserProfile(userId) {
+      if (typeof DataManager === 'undefined') return;
+      
+      const users = DataManager.getAllUsers();
+      const user = users.find(u => u.id === userId);
+      if (!user) return alert("User not found");
+
+      const body = document.getElementById('modal-body');
+      const isRestricted = user.status === 'restricted';
+      const orders = DataManager.getAllOrders() || [];
+      const userOrders = orders.filter(o => (o.customerEmail || o.customer?.email) === user.email);
+      
+      body.innerHTML = `
+        <div class="modal-header">
+          <h2><i class="fas fa-user-circle"></i> ${user.name}</h2>
+        </div>
+        <div style="display:flex; gap:1.5rem; flex-wrap:wrap;">
+          <div style="flex:0 0 150px;">
+            <img src="${user.profileImage || 'https://via.placeholder.com/150'}" 
+                 style="width:150px; height:150px; border-radius:12px; object-fit:cover; border:3px solid var(--primary);">
+            <div style="margin-top:1rem; display:flex; flex-direction:column; gap:0.5rem;">
+              <button class="btn ${isRestricted ? 'btn-success' : 'btn-danger'}" 
+                      onclick="toggleUserRestriction('${user.id}')" style="width:100%;">
+                <i class="fas ${isRestricted ? 'fa-unlock' : 'fa-ban'}"></i> 
+                ${isRestricted ? 'Unrestrict' : 'Restrict'}
+              </button>
+              <button class="btn btn-sm" onclick="deleteUserAccount('${user.id}')" 
+                      style="width:100%; background:#374151; color:white;">
+                <i class="fas fa-trash"></i> Delete
+              </button>
+            </div>
+          </div>
+          <div style="flex:1; min-width:250px;">
+            <h3 style="margin-bottom:1rem; padding-bottom:0.5rem; border-bottom:1px solid var(--border);">
+              Account Information
+            </h3>
+            <div style="display:grid; gap:0.75rem; font-size:0.9375rem;">
+              <p><strong style="color:var(--text-muted);">Name:</strong> ${user.name}</p>
+              <p><strong style="color:var(--text-muted);">Email:</strong> ${user.email}</p>
+              <p><strong style="color:var(--text-muted);">ID:</strong> <code>${user.id}</code></p>
+              <p><strong style="color:var(--text-muted);">Status:</strong> 
+                <span class="status-pill ${isRestricted ? 'status-unread' : 'status-completed'}">
+                  ${user.status || 'Active'}
+                </span>
+              </p>
+              <p><strong style="color:var(--text-muted);">Registered:</strong> 
+                ${new Date(user.registeredDate || user.createdAt).toLocaleString()}
+              </p>
+            </div>
+            
+            <h3 style="margin-top:1.5rem; margin-bottom:1rem; padding-bottom:0.5rem; border-bottom:1px solid var(--border);">
+              Activity Stats
+            </h3>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:1rem;">
+              <div style="background:#f9fafb; padding:1rem; border-radius:10px; text-align:center;">
+                <div style="font-size:1.75rem; font-weight:700; color:var(--primary);">
+                  ${userOrders.length}
+                </div>
+                <div style="font-size:0.875rem; color:var(--text-muted);">Orders</div>
+              </div>
+              <div style="background:#f9fafb; padding:1rem; border-radius:10px; text-align:center;">
+                <div style="font-size:1.75rem; font-weight:700; color:var(--info);">
+                  ${(DataManager.getClientEmails() || []).filter(e => e.email === user.email).length}
+                </div>
+                <div style="font-size:0.875rem; color:var(--text-muted);">Messages</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      document.getElementById('details-modal').style.display = 'flex';
+    }
+
+    function toggleUserRestriction(userId) {
+      if (typeof DataManager === 'undefined') return;
+      
+      const users = DataManager.getAllUsers();
+      const user = users.find(u => u.id === userId);
+      if (!user) return;
+
+      const isRestricted = user.status === 'restricted';
+      const action = isRestricted ? "unrestrict" : "restrict";
+      
+      if (!confirm(`Are you sure you want to ${action} this user?`)) return;
+
+      user.status = isRestricted ? 'active' : 'restricted';
+      localStorage.setItem('ecommerce_all_users', JSON.stringify(users));
+      
+      alert(`User account has been ${action}ed.`);
+      viewUserProfile(userId);
+      renderUsers();
+    }
+
+    function deleteUserAccount(userId) {
+      if (!confirm("Permanently delete this user account? This cannot be undone.")) return;
+      
+      if (typeof DataManager !== 'undefined') {
+        DataManager.deleteUser(userId);
+      }
+      closeModal();
+      renderUsers();
+      renderDashboard();
+      alert("User account has been permanently deleted.");
+    }
+
+    function closeModal() {
+      document.getElementById('details-modal').style.display = 'none';
+    }
+
+    // Close modal on background click
+    window.onclick = function(event) {
+      const modal = document.getElementById('details-modal');
+      if (event.target === modal) {
+        closeModal();
+      }
+    }
+
+    // ACTION FUNCTIONS
+    function assignDelivery(orderId) {
+      if (typeof DataManager === 'undefined') return;
+      
+      const users = DataManager.getAllUsers();
+      const deliveryPersonnel = users.filter(u => u.role === 'delivery');
+      
+      if (deliveryPersonnel.length === 0) {
+        return alert("No registered delivery personnel found.");
+      }
+      
+      let msg = "Select a delivery person to assign this order:\n";
+      deliveryPersonnel.forEach((p, idx) => {
+        msg += `${idx + 1}. ${p.name} (${p.email})\n`;
+      });
+      
+      const choice = prompt(msg);
+      if (choice) {
+        const idx = parseInt(choice) - 1;
+        if (deliveryPersonnel[idx]) {
+          const selectedPerson = deliveryPersonnel[idx];
+          const result = DataManager.assignOrder(orderId, selectedPerson.email);
+          if (result.success) {
+            alert("Order assigned to " + selectedPerson.name);
+            renderOrders();
+            renderDashboard();
+          } else {
+            alert("Error: " + result.message);
+          }
+        } else {
+          alert("Invalid selection.");
+        }
+      }
+    }
+
+    function returnOrder(id) {
+      if (!confirm("Mark this order as returned?")) return;
+      
+      if (typeof DataManager === 'undefined') return;
+      
+      const orders = DataManager.getScopedData('ecommerce_orders');
+      const order = orders.find(o => o.id === id);
+      
+      if (order && order.status !== 'returned') {
+        order.status = 'returned';
+        DataManager.saveScopedData('ecommerce_orders', orders);
+        alert("Order marked as returned.");
+        renderOrders();
+        renderDashboard();
+      }
+    }
+
+    function deleteOrder(id) {
+      if (!confirm("Permanently delete this order record?")) return;
+      
+      if (typeof DataManager !== 'undefined') {
+        let orders = DataManager.getScopedData('ecommerce_orders');
+        orders = orders.filter(o => o.id !== id);
+        DataManager.saveScopedData('ecommerce_orders', orders);
+        renderOrders();
+        renderDashboard();
+        alert("Order record deleted.");
+      }
+    }
+
+    function editStock(id) {
+      if (typeof DataManager === 'undefined') return;
+      
+      const user = DataManager.getCurrentUser();
+      const warehouse = DataManager.getScopedData('ecommerce_warehouse');
+      const p = warehouse.find(x => x.id === id);
+      if (!p) return alert("Product not found in warehouse.");
+
+      const newQty = prompt(`Enter new stock quantity for ${p.name}:`, p.quantity);
+      if (newQty !== null && !isNaN(newQty) && newQty >= 0) {
+        const qty = parseInt(newQty);
+        p.quantity = qty;
+        
+        // Save to Scoped Warehouse
+        DataManager.saveScopedData('ecommerce_warehouse', warehouse);
+        
+        // Sync with Global Warehouse (admin view)
+        const globalWarehouse = DataManager.getWarehouse();
+        const gIdx = globalWarehouse.findIndex(item => item.id === id);
+        if (gIdx !== -1) {
+          globalWarehouse[gIdx].quantity = qty;
+          localStorage.setItem('ecommerce_warehouse', JSON.stringify(globalWarehouse));
+        }
+
+        renderWarehouse();
+        renderDashboard();
+        alert("Inventory updated.");
+      }
+    }
+
+    function adminLogout() {
+      if (typeof DataManager !== 'undefined') DataManager.logout();
+      window.location.href = "login.html";
+    }
+
+    // Initialize
+    window.onload = () => {
+      if (typeof DataManager === 'undefined') {
+        console.error("DataManager not loaded");
+        return;
+      }
+      renderDashboard();
+
+      // Sync with other tabs
+      window.addEventListener('storage', (e) => {
+        const ordersKey = DataManager.getScopedData ? DataManager.getUserScope ? DataManager.getUserScope('ecommerce_orders') : 'ecommerce_orders' : 'ecommerce_orders';
+        const warehouseKey = DataManager.getScopedData ? DataManager.getUserScope ? DataManager.getUserScope('ecommerce_warehouse') : 'ecommerce_warehouse' : 'ecommerce_warehouse';
+        
+        if (e.key === ordersKey || e.key === warehouseKey) {
+          renderDashboard();
+          const activeTab = document.querySelector('.nav-links a.active');
+          if (activeTab) {
+            const match = activeTab.getAttribute('onclick').match(/'([^']+)'/);
+            if (match) loadTabData(match[1]);
+          }
+        }
+      });
+    };
+  </script>
+</body>
+</html>

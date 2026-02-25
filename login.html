@@ -302,6 +302,16 @@ function showSignup() {
   document.getElementById("form-title").textContent = "Sign Up";
 }
 
+// Handle URL parameters for registration
+window.addEventListener('DOMContentLoaded', () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const regEmail = urlParams.get('reg_email');
+  if (regEmail) {
+    showSignup();
+    document.getElementById('signup-email').value = decodeURIComponent(regEmail);
+  }
+});
+
 function showLogin() {
   document.getElementById("signup-form").style.display = "none";
   document.getElementById("login-form").style.display = "block";
@@ -343,8 +353,24 @@ document.getElementById("signup-form").addEventListener("submit", e => {
   reader.onload = function(event) {
     const profileImage = event.target.result;
     
+    // Check if user was pre-registered for a page
+    const allUsers = DataManager.getAllUsers();
+    const existingReg = allUsers.find(u => u.email === email && u.role !== 'user');
+    
+    let role = 'user';
+    let regDetails = null;
+    
+    if (existingReg) {
+      // If user exists with a role, we update their info instead of creating new
+      // but DataManager.registerUser might fail if email exists.
+      // So we delete the "placeholder" user first if it exists.
+      DataManager.deleteUser(existingReg.id);
+      role = existingReg.role;
+      regDetails = existingReg.regDetails;
+    }
+    
     // Register user using DataManager
-    const result = DataManager.registerUser(name, email, password, profileImage);
+    const result = DataManager.registerUser(name, email, password, profileImage, role, regDetails);
 
     if (!result.success) {
       alert(result.message);

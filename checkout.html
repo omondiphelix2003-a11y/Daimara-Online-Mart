@@ -438,12 +438,11 @@
       date: new Date().toISOString(),
       status: 'pending',
       userId: currentUser ? currentUser.id : 'guest',
-      grandTotal: totalPrice // Align with admin-manager.html expectation
+      grandTotal: totalPrice 
     };
     
-    const allOrders = DataManager.getAllOrders();
-    allOrders.push(newOrder);
-    DataManager.saveOrders(allOrders);
+    // Process order globally and scope to operators
+    DataManager.processNewOrder(newOrder);
 
     // Generate Invoice
     const invoiceData = {

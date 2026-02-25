@@ -89,6 +89,62 @@ body{
   font-weight:bold;
 }
 
+/* MODAL STYLES */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.8);
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-content {
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+.close-modal {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+  border: none;
+  background: none;
+}
+.receipt { color: #333; }
+.receipt-header { text-align: center; margin-bottom: 20px; border-bottom: 2px dashed #ddd; padding-bottom: 15px; }
+.receipt-header h1 { color: var(--primary); margin: 0; }
+.receipt-info { margin-bottom: 20px; line-height: 1.6; }
+.receipt-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+.receipt-table th { text-align: left; border-bottom: 1px solid #eee; padding: 10px 0; }
+.receipt-table td { padding: 10px 0; border-bottom: 1px solid #f9f9f9; }
+.receipt-total { text-align: right; font-size: 20px; font-weight: bold; border-top: 2px solid #333; padding-top: 10px; }
+.dispatch-confirm-btn {
+  display: block;
+  width: 100%;
+  margin-top: 20px;
+  padding: 15px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 18px;
+}
+
 </style>
 </head>
 <body>
@@ -97,21 +153,33 @@ body{
   <h2>Daimara Delivery Services</h2>
 </div>
 
+<!-- DETAILS MODAL -->
+<div id="details-modal" class="modal">
+  <div class="modal-content">
+    <button class="close-modal" onclick="closeModal()">&times;</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
 <div class="container">
 
   <!-- SUMMARY -->
   <div class="grid">
     <div class="card">
       <h3>Orders Ready for Dispatch</h3>
-      <strong>22</strong>
+      <strong id="summary-ready">0</strong>
     </div>
     <div class="card">
       <h3>Out for Delivery</h3>
-      <strong>15</strong>
+      <strong id="summary-out">0</strong>
     </div>
     <div class="card">
       <h3>Delivered Today</h3>
-      <strong>31</strong>
+      <strong id="summary-delivered">0</strong>
+    </div>
+    <div class="card" style="background: #16a34a; color: white;">
+      <h3>Total Profit</h3>
+      <strong id="summary-profit">KES 0</strong>
     </div>
   </div>
 
@@ -157,13 +225,172 @@ body{
 
 </div>
 
+<script src="data-manager.js"></script>
 <script>
+function checkAccess() {
+  const user = DataManager.getCurrentUser();
+  if (!user) {
+    alert("Please login first.");
+    window.location.href = "login.html";
+    return false;
+  }
+  if (user.role !== 'delivery') {
+    alert("Access denied. This page is for delivery personnel only.");
+    window.location.href = "home.html";
+    return false;
+  }
+  return true;
+}
+
+if (checkAccess()) {
+  document.addEventListener('DOMContentLoaded', () => {
+    renderDeliveryData();
+    // Auto refresh every 30 seconds to catch new assignments
+    setInterval(renderDeliveryData, 30000);
+  });
+}
+
+function renderDeliveryData() {
+  const orders = DataManager.getScopedData('delivery_orders');
+  const earnings = DataManager.getScopedData('delivery_earnings', { total: 0 });
+  
+  const today = new Date().toLocaleDateString();
+  const summary = {
+    ready: orders.filter(o => o.status === 'assigned' || o.status === 'Packed').length,
+    out: orders.filter(o => o.status === 'Out for Delivery').length,
+    delivered: orders.filter(o => {
+      const isCompleted = o.status === 'completed' || o.status === 'Delivered';
+      const isToday = o.date && new Date(o.date).toLocaleDateString() === today;
+      return isCompleted && isToday;
+    }).length,
+    profit: earnings.total || 0
+  };
+
+  // Update Summary
+  document.getElementById('summary-ready').innerText = summary.ready;
+  document.getElementById('summary-out').innerText = summary.out;
+  document.getElementById('summary-delivered').innerText = summary.delivered;
+  document.getElementById('summary-profit').innerText = `KES ${summary.profit.toLocaleString()}`;
+
+  // Update Table
+  const tbody = document.querySelector('.table tbody');
+  tbody.innerHTML = orders.map(o => `
+    <tr>
+      <td>${o.id}</td>
+      <td>${o.client}</td>
+      <td>${o.destination}</td>
+      <td>${o.status}</td>
+      <td>
+        ${(o.status === 'assigned' || o.status === 'Packed') ? `<button class="action-btn dispatch" onclick="viewReceipt('${o.id}')">Send to Delivery</button>` : ''}
+        ${o.status === 'Out for Delivery' ? `<button class="action-btn delivered" onclick="updateStatus('${o.id}', 'completed')">Mark Delivered</button>` : ''}
+        ${(o.status === 'completed' || o.status === 'Delivered') ? '<span style="color:green">Completed</span>' : ''}
+      </td>
+    </tr>
+  `).join('') || '<tr><td colspan="5" style="text-align:center">No active delivery assignments</td></tr>';
+}
+
+function updateStatus(id, newStatus) {
+  const result = DataManager.updateOrderStatus(id, newStatus);
+  if (result.success) {
+    renderDeliveryData();
+    closeModal();
+  }
+}
+
+function viewReceipt(orderId) {
+  const orders = DataManager.getScopedData('delivery_orders');
+  const dOrder = orders.find(o => o.id === orderId);
+  if (!dOrder) return alert("Order not found");
+
+  // Get global order for full details
+  const allOrders = DataManager.getAllOrders();
+  const order = allOrders.find(o => o.id === orderId);
+  if (!order) return alert("Order full details not found");
+
+  const body = document.getElementById('modal-body');
+  const items = order.items || order.products || [];
+
+  body.innerHTML = `
+    <div class="receipt">
+      <div class="receipt-header">
+        <h1>DAIMARA ONLINE MART</h1>
+        <p>Delivery Dispatch Receipt</p>
+      </div>
+      <div class="receipt-info">
+        <p><strong>Order ID:</strong> ${order.id}</p>
+        <p><strong>Customer:</strong> ${order.customerName || order.customer?.name}</p>
+        <p><strong>Phone:</strong> ${order.customerPhone || order.customer?.phone || 'N/A'}</p>
+        <p><strong>Destination:</strong> ${order.deliveryLocation || 'N/A'}</p>
+        <p><strong>Date:</strong> ${new Date(order.date).toLocaleString()}</p>
+      </div>
+      <table class="receipt-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th style="text-align:center;">Qty</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${items.map(item => `
+            <tr>
+              <td>${item.name}</td>
+              <td style="text-align:center;">${item.qty || item.quantity || 1}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+      <div class="receipt-total">
+        Total: KES ${(order.grandTotal || order.totalPrice || 0).toLocaleString()}
+      </div>
+      <button class="dispatch-confirm-btn" onclick="updateStatus('${order.id}', 'Out for Delivery')">
+        <i class="fas fa-truck"></i> Confirm Dispatch & Start Delivery
+      </button>
+    </div>
+  `;
+  document.getElementById('details-modal').style.display = 'flex';
+}
+
+function closeModal() {
+  document.getElementById('details-modal').style.display = 'none';
+}
+
+// Close on background click
+window.onclick = function(event) {
+  const modal = document.getElementById('details-modal');
+  if (event.target == modal) closeModal();
+}
+
 function onScanSuccess(decodedText) {
-  document.getElementById("result").innerText = "Delivery Confirmed for Receipt: " + decodedText;
+  const resultDiv = document.getElementById("result");
+  const orders = DataManager.getScopedData('delivery_orders');
+  
+  // Try to find the order in the delivery person's assigned list
+  // Handle both with and without '#' prefix
+  const dOrder = orders.find(o => o.id === decodedText || o.id === '#' + decodedText);
+  
+  if (!dOrder) {
+    resultDiv.innerText = "Error: QR Code (" + decodedText + ") does not match any assigned order!";
+    resultDiv.style.color = "red";
+    alert("Error: Scanned QR code does not match the receipt details for your assigned orders.");
+    return;
+  }
+
+  // If found, update status
+  const result = DataManager.updateOrderStatus(dOrder.id, 'completed');
+  if (result.success) {
+    resultDiv.innerText = "Success: Order " + dOrder.id + " confirmed and marked as completed!";
+    resultDiv.style.color = "green";
+    renderDeliveryData();
+    alert("Order " + dOrder.id + " marked as completed via scan!");
+  } else {
+    resultDiv.innerText = "Error: Failed to update order status.";
+    resultDiv.style.color = "red";
+    alert("Failed to update order status. Please try again.");
+  }
 }
 
 function onScanError(error) {
-  console.warn(error);
+  // console.warn(error);
 }
 
 let html5QrcodeScanner = new Html5QrcodeScanner(
