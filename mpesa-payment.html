@@ -166,12 +166,12 @@ button:hover{
 <!-- NAVBAR -->
 <!--<nav class="navbar">
   <div class="logo">
-    <a href="home.html" style="color:inherit;text-decoration:none;"><!--Pay with-->
+    <a href="index.html" style="color:inherit;text-decoration:none;"><!--Pay with-->
 
     <!--</a>-->
  <!-- </div>
   <div>
-    <a href="shop.html"><div class="shop-icon"></div></a>
+    <a href="store.html"><div class="shop-icon"></div></a>
     <a href="cart.html" ><i class="fa fa-shopping-cart" ></i></a>
   </div>
 </nav>-->
@@ -244,6 +244,14 @@ function payNow(){
   setTimeout(() => {
     alert("Payment successful! Thank you for shopping with Daimara Online Mart.");
     
+    // CHECK IF THIS WAS A DELIVERY FEE ONLY PAYMENT
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('isDeliveryFee') === 'true') {
+      localStorage.removeItem('mpesaOrder');
+      window.location.href = "checkout.html?deliveryFeePaid=true";
+      return;
+    }
+
     // REDUCE WAREHOUSE STOCK
     const warehouse = DataManager.getWarehouse();
     if (orderData.items) {
@@ -257,12 +265,13 @@ function payNow(){
       });
     }
 
-    // UPDATE ORDER STATUS TO COMPLETED
-    const allOrders = DataManager.getAllOrders();
-    const currentOrder = allOrders.find(o => o.id === orderData.orderId);
-    if (currentOrder) {
-      currentOrder.status = 'completed';
-      DataManager.saveOrders(allOrders);
+    // SAVE THE ORDER IF IT WASN'T SAVED YET (FULL ORDER CASE)
+    if (orderData.fullOrder) {
+      DataManager.processNewOrder(orderData.fullOrder);
+    } else {
+      // UPDATE ORDER STATUS AND PAYMENT STATUS
+      DataManager.updateOrderStatus(orderData.orderId, 'completed');
+      DataManager.updateOrderPaymentStatus(orderData.orderId, 'paid');
     }
 
     // Clear cart AFTER payment success
@@ -270,7 +279,7 @@ function payNow(){
       DataManager.clearCart();
     }
     localStorage.removeItem('mpesaOrder');
-    window.location.href = "home.html";
+    window.location.href = "profile.html";
   }, 3000);
 }
 </script>

@@ -80,7 +80,7 @@ DataManager.clearAllData()             // Clear all storage
 
 ### 3. ✅ Updated Integration Points
 
-**home.html**
+**index.html**
 - Added "Manage Products" link in navbar
 - Links directly to add-product.html
 - Loads DataManager.js on page load
@@ -150,7 +150,7 @@ DataManager.clearAllData()             // Clear all storage
 │  add-product.html (Admin Panel)                 │
 │  supermarket.html (Store)                       │
 │  second-hand items.html (Store)                 │
-│  home.html (Navigation)                         │
+│  index.html (Navigation)                         │
 │  cart.html (Shopping)                           │
 └────────────────┬────────────────────────────────┘
                  │
@@ -293,7 +293,7 @@ Each product is stored as:
 
 ### Core Files Updated
 - ✅ `add-product.html` - Product management interface
-- ✅ `home.html` - Added navigation link
+- ✅ `index.html` - Added navigation link
 
 ### Documentation Files Created
 - ✅ `README_ADD_PRODUCT.md` - Main documentation
@@ -310,7 +310,7 @@ Each product is stored as:
 ## Quick Start
 
 ### For Administrators
-1. Click "Manage Products" in home.html navbar
+1. Click "Manage Products" in index.html navbar
 2. Fill product form
 3. Upload image
 4. Click "Add Product"
@@ -530,7 +530,7 @@ Each product is stored as:
 
 ✅ data-manager.js created and working
 ✅ add-product.html enhanced with full functionality
-✅ home.html updated with navigation link
+✅ index.html updated with navigation link
 ✅ supermarket.html integrated (no changes needed)
 ✅ second-hand items.html integrated (no changes needed)
 ✅ Sub-categories implemented correctly

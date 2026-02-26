@@ -103,7 +103,7 @@
 ### Make Product Available for Sale
 1. Product in warehouse list
 2. Click **Push to Website**
-3. ✅ Product now in shop.html
+3. ✅ Product now in store.html
 
 ### Process Customer Order
 1. Go to **Orders** tab
@@ -134,7 +134,7 @@
 | Task | Location | Result |
 |------|----------|--------|
 | Add Products | Warehouse tab | Products in inventory |
-| Sell Products | Push to Website | Products in shop.html |
+| Sell Products | Push to Website | Products in store.html |
 | Track Sales | Orders tab | Manage order status |
 | Generate Invoices | Invoices tab | Create customer bills |
 | See Profit | Profits tab | Financial metrics |
@@ -159,7 +159,7 @@
 
 ### Products not appearing in shop
 - Make sure you clicked "Push to Website"
-- Check shop.html to see if they appear
+- Check store.html to see if they appear
 
 ### Can't access admin-manager.html directly
 - You must be logged in first

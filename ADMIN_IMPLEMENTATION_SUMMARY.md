@@ -271,7 +271,7 @@ Load admin dashboard
    → Decides to list products on website
    
 3. Admin clicks "Push to Website"
-   → Products appear in shop.html
+   → Products appear in store.html
    
 4. Customer sees products
    → Adds to cart and purchases

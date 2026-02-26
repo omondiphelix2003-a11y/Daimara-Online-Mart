@@ -19,7 +19,9 @@ const DataManager = (() => {
     ONLINE_USERS: 'ecommerce_online_users',
     CAMPAIGNS: 'ecommerce_campaigns',
     DELIVERY_ORDERS: 'delivery_orders',
-    DELIVERY_EARNINGS: 'delivery_earnings'
+    DELIVERY_EARNINGS: 'delivery_earnings',
+    DELIVERY_DEDUCTIONS: 'ecommerce_delivery_deductions',
+    PAGE_REGISTRATIONS: 'ecommerce_page_registrations'
   };
 
   // Initialize default products from both supermarket and second-hand categories
@@ -328,28 +330,30 @@ const DataManager = (() => {
   /**
    * Get a user-specific storage key to ensure isolation
    * @param {string} baseKey - The global storage key
+   * @param {string} overrideEmail - Optional email to override current user (for admin view)
    * @returns {string} - The scoped key (e.g., globalKey_userEmail)
    */
-  function getUserScope(baseKey) {
+  function getUserScope(baseKey, overrideEmail = null) {
     const user = getCurrentUser();
-    if (!user) return baseKey;
+    const email = overrideEmail || (user ? user.email : null);
+    if (!email) return baseKey;
     // We use the email or ID to scope the data
-    return `${baseKey}_${user.email.replace(/[^a-zA-Z0-9]/g, '_')}`;
+    return `${baseKey}_${email.replace(/[^a-zA-Z0-9]/g, '_')}`;
   }
 
   /**
    * Get scoped data from localStorage
    */
-  function getScopedData(baseKey, defaultValue = []) {
-    const scopedKey = getUserScope(baseKey);
+  function getScopedData(baseKey, defaultValue = [], overrideEmail = null) {
+    const scopedKey = getUserScope(baseKey, overrideEmail);
     return JSON.parse(localStorage.getItem(scopedKey)) || defaultValue;
   }
 
   /**
    * Save scoped data to localStorage
    */
-  function saveScopedData(baseKey, data) {
-    const scopedKey = getUserScope(baseKey);
+  function saveScopedData(baseKey, data, overrideEmail = null) {
+    const scopedKey = getUserScope(baseKey, overrideEmail);
     localStorage.setItem(scopedKey, JSON.stringify(data));
   }
 
@@ -394,6 +398,37 @@ const DataManager = (() => {
 
   function getAllUsers() {
     return JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS)) || [];
+  }
+
+  /**
+   * Page Registration Requests
+   */
+  function addPageRegistration(regData) {
+    const regs = JSON.parse(localStorage.getItem(STORAGE_KEYS.PAGE_REGISTRATIONS)) || [];
+    const newReg = {
+      id: generateId(),
+      ...regData,
+      status: 'pending',
+      date: new Date().toISOString()
+    };
+    regs.push(newReg);
+    localStorage.setItem(STORAGE_KEYS.PAGE_REGISTRATIONS, JSON.stringify(regs));
+    return { success: true, registration: newReg };
+  }
+
+  function getPageRegistrations() {
+    return JSON.parse(localStorage.getItem(STORAGE_KEYS.PAGE_REGISTRATIONS)) || [];
+  }
+
+  function updatePageRegistrationStatus(regId, status) {
+    const regs = getPageRegistrations();
+    const index = regs.findIndex(r => r.id === regId);
+    if (index !== -1) {
+      regs[index].status = status;
+      localStorage.setItem(STORAGE_KEYS.PAGE_REGISTRATIONS, JSON.stringify(regs));
+      return { success: true };
+    }
+    return { success: false };
   }
 
   function deleteUser(userId) {
@@ -489,13 +524,33 @@ const DataManager = (() => {
     // Ensure status is pending by default
     if (!order.status) order.status = 'pending';
     
+    // CALCULATE COMMISSIONS (10% per item)
+    const items = order.items || order.products || [];
+    items.forEach(item => {
+      const price = item.price || 0;
+      const qty = item.qty || item.quantity || 1;
+      item.commission = (price * qty) * 0.10;
+    });
+    order.totalCommission = items.reduce((sum, i) => sum + (i.commission || 0), 0);
+
     // 1. Save Globally for Admin
     const allOrders = getAllOrders();
     allOrders.push(order);
     saveOrders(allOrders);
 
+    // 3. Update Inventory (Deduct items from warehouse)
+    const warehouse = JSON.parse(localStorage.getItem(STORAGE_KEYS.WAREHOUSE)) || { products: [] };
+    items.forEach(item => {
+      const itemId = item.id;
+      const wItem = warehouse.products.find(p => p.id === itemId || p.name === item.name);
+      if (wItem) {
+        const qtyToDeduct = item.qty || item.quantity || 1;
+        wItem.quantity = Math.max(0, (wItem.quantity || 0) - qtyToDeduct);
+      }
+    });
+    localStorage.setItem(STORAGE_KEYS.WAREHOUSE, JSON.stringify(warehouse));
+
     // 2. Scope to Operators based on items
-    const items = order.items || order.products || [];
     const operators = [...new Set(items.map(item => item.owner).filter(Boolean))];
 
     operators.forEach(opEmail => {
@@ -505,10 +560,12 @@ const DataManager = (() => {
       if (opUser) {
         // Create a scoped version of the order for this operator
         // They only see the items THEY own
+        const scopedItems = items.filter(i => i.owner === opEmail);
         const scopedOrder = {
           ...order,
-          items: items.filter(i => i.owner === opEmail),
-          grandTotal: items.filter(i => i.owner === opEmail).reduce((sum, i) => sum + (i.price * (i.qty || i.quantity || 1)), 0)
+          items: scopedItems,
+          grandTotal: scopedItems.reduce((sum, i) => sum + (i.price * (i.qty || i.quantity || 1)), 0),
+          totalCommission: scopedItems.reduce((sum, i) => sum + (i.commission || 0), 0)
         };
 
         // We use a temporary trick to set the "current user" context for getUserScope
@@ -666,6 +723,17 @@ const DataManager = (() => {
               date: new Date().toISOString()
             });
             saveScopedData('delivery_earnings', earnings);
+
+            // LOG 20 KSH DEDUCTION FOR ADMIN
+            const deductions = JSON.parse(localStorage.getItem(STORAGE_KEYS.DELIVERY_DEDUCTIONS)) || { total: 0, history: [] };
+            deductions.total += 20;
+            deductions.history.push({
+              orderId,
+              amount: 20,
+              deliveryPerson: deliveryPerson.email,
+              date: new Date().toISOString()
+            });
+            localStorage.setItem(STORAGE_KEYS.DELIVERY_DEDUCTIONS, JSON.stringify(deductions));
           }
         }
 
@@ -673,6 +741,45 @@ const DataManager = (() => {
         else localStorage.removeItem(STORAGE_KEYS.USER);
       }
     }
+
+    return { success: true };
+  }
+
+  /**
+   * Update order payment status across all scopes
+   */
+  function updateOrderPaymentStatus(orderId, newPaymentStatus) {
+    const users = getAllUsers();
+    
+    // 1. Update Global Order
+    const allOrders = getAllOrders();
+    const globalOrder = allOrders.find(o => o.id === orderId);
+    if (!globalOrder) return { success: false, message: 'Order not found' };
+
+    globalOrder.paymentStatus = newPaymentStatus;
+    saveOrders(allOrders);
+
+    // 2. Update Scoped Orders for Operators
+    const items = globalOrder.items || globalOrder.products || [];
+    const owners = [...new Set(items.map(item => item.owner).filter(Boolean))];
+
+    owners.forEach(opEmail => {
+      const opUser = users.find(u => u.email === opEmail);
+      if (opUser) {
+        const originalUser = localStorage.getItem(STORAGE_KEYS.USER);
+        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(opUser));
+        
+        const scopedOrders = getScopedData('ecommerce_orders');
+        const scopedOrder = scopedOrders.find(o => o.id === orderId);
+        if (scopedOrder) {
+          scopedOrder.paymentStatus = newPaymentStatus;
+          saveScopedData('ecommerce_orders', scopedOrders);
+        }
+
+        if (originalUser) localStorage.setItem(STORAGE_KEYS.USER, originalUser);
+        else localStorage.removeItem(STORAGE_KEYS.USER);
+      }
+    });
 
     return { success: true };
   }
@@ -853,23 +960,24 @@ const DataManager = (() => {
   function getProfitLossAnalysis() {
     const orders = JSON.parse(localStorage.getItem(STORAGE_KEYS.ORDERS)) || [];
     const warehouse = getWarehouse();
+    const deductionsData = JSON.parse(localStorage.getItem('ecommerce_delivery_deductions')) || { total: 0 };
     
-    // Only count completed orders in revenue
-    const totalRevenue = orders
-      .filter(o => o.status === 'completed')
-      .reduce((sum, o) => sum + (o.grandTotal || o.totalPrice || 0), 0);
-      
     const warehouseValue = warehouse.reduce((sum, p) => sum + (p.price * p.quantity), 0);
-    const operatingCosts = totalRevenue * 0.15; // Simulated 15% operating cost
-    const profit = totalRevenue - operatingCosts;
-    const margin = totalRevenue > 0 ? ((profit / totalRevenue) * 100).toFixed(1) + '%' : '0%';
+    const totalCommission = orders.reduce((sum, o) => {
+      if (o.totalCommission !== undefined) return sum + o.totalCommission;
+      return sum + ((o.grandTotal || o.totalPrice || 0) * 0.10);
+    }, 0);
+    
+    const deliveryDeductions = deductionsData.total || 0;
+    const totalEarnings = totalCommission + deliveryDeductions;
 
     return {
-      totalRevenue,
+      totalRevenue: totalEarnings, // Total platform take
       warehouseValue,
-      operatingCosts,
-      profit,
-      profitMargin: margin,
+      totalCommission,
+      deliveryDeductions,
+      profit: totalEarnings,
+      profitMargin: '100%', // Since these are earnings directly
       ordersCount: orders.length,
       returnedOrders: orders.filter(o => o.status === 'returned').length,
       analysisDate: new Date().toISOString()
@@ -887,7 +995,10 @@ const DataManager = (() => {
     const newUsersToday = users.filter(u => new Date(u.createdAt).toLocaleDateString() === today).length;
     const todaysRevenue = orders
       .filter(o => new Date(o.date).toLocaleDateString() === today)
-      .reduce((sum, o) => sum + (o.grandTotal || 0), 0);
+      .reduce((sum, o) => {
+        if (o.totalCommission !== undefined) return sum + o.totalCommission;
+        return sum + ((o.grandTotal || 0) * 0.10);
+      }, 0);
 
     return {
       totalUsers: users.length,
@@ -1058,6 +1169,7 @@ const DataManager = (() => {
     deleteOrder,
     assignOrder,
     updateOrderStatus,
+    updateOrderPaymentStatus,
     processNewOrder,
     getUserAddresses,
     addAddress,

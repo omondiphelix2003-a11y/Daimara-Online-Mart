@@ -204,10 +204,10 @@
 <!-- NAVBAR -->
 <nav class="navbar">
   <div class="logo">
-           <!-- <a href="home.html" style="text-decoration: none; color: inherit; font-size: 25px;"><span>Checkout</span></a>-->
+           <!-- <a href="index.html" style="text-decoration: none; color: inherit; font-size: 25px;"><span>Checkout</span></a>-->
    </div>
   <div>
-    <a href="shop.html"><div class="shop-icon"></div></a>
+    <a href="store.html"><div class="shop-icon"></div></a>
     <a href="Cart.html"><i class="fa fa-shopping-cart"></i></a>
   </div>
 </nav>
@@ -265,6 +265,8 @@
     </div>
 
    <button onclick="checkout()">Place Order</button>
+   <button onclick="initiatePayAfterDelivery()" style="margin-top: 10px; background: #e67e22; color: white;">Pay After Delivery</button>
+    
     
     
   </div>
@@ -317,7 +319,83 @@
       document.getElementById('email').value = currentUser.email || '';
     }
     renderCart();
+
+    // CHECK IF RETURNING FROM DELIVERY FEE PAYMENT
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('deliveryFeePaid') === 'true') {
+      const pendingOrder = JSON.parse(localStorage.getItem('pendingPayAfterDeliveryOrder'));
+      if (pendingOrder) {
+        // Complete the order as UNPAID
+        const result = DataManager.processNewOrder({
+          ...pendingOrder,
+          paymentStatus: 'unpaid',
+          date: new Date().toISOString(),
+          id: 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase()
+        });
+        
+        if (result.success) {
+          DataManager.clearCart();
+          localStorage.removeItem('pendingPayAfterDeliveryOrder');
+          alert("Order placed successfully! Please pay for your items on delivery.");
+          window.location.href = "profile.html";
+        }
+      }
+    }
   });
+
+  function initiatePayAfterDelivery() {
+    const deliveryCheckbox = document.getElementById('delivery-option');
+    const locationInput = document.getElementById('location-coords').value.trim();
+
+    if (!deliveryCheckbox.checked) {
+      alert("Please add a delivery option by clicking the delivery fee checkbox.");
+      return;
+    }
+    if (!locationInput) {
+      alert("Please paste your delivery co-ordinates or link in the location area.");
+      return;
+    }
+
+    const currentUser = DataManager.getCurrentUser();
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+
+    if (!name || !email) {
+      alert('Please fill all fields');
+      return;
+    }
+
+    const subtotal = cart.reduce((a, b) => a + b.price * (b.qty || 1), 0);
+    const deliveryFee = 70;
+    const totalPrice = subtotal + deliveryFee;
+
+    const orderData = {
+      items: cart,
+      subtotal: subtotal,
+      deliveryFee: deliveryFee,
+      totalPrice: totalPrice,
+      grandTotal: totalPrice,
+      customerName: name,
+      customerEmail: email,
+      userId: currentUser.id,
+      paymentMethod: 'Pay After Delivery',
+      deliveryLocation: locationInput,
+      paymentStatus: 'unpaid',
+      status: 'pending'
+    };
+
+    // Store for when we return
+    localStorage.setItem('pendingPayAfterDeliveryOrder', JSON.stringify(orderData));
+
+    // Redirect to pay delivery fee
+    const deliveryPaymentData = {
+      orderId: 'DEL-' + Math.random().toString(36).substr(2, 6).toUpperCase(),
+      total: 70,
+      isDeliveryFee: true
+    };
+    localStorage.setItem('mpesaOrder', JSON.stringify(deliveryPaymentData));
+    window.location.href = "mpesa-payment.html?isDeliveryFee=true";
+  }
 
   function renderCart() {
     const tbody = document.querySelector('#cartTable tbody');
@@ -398,80 +476,34 @@
       subtotal: subtotal,
       deliveryFee: deliveryFee,
       totalPrice: totalPrice,
+      grandTotal: totalPrice,
       paymentMethod,
-      customer: { 
-        name, 
-        email, 
-        phone: currentUser ? currentUser.phone : '' 
-      },
       customerName: name,
+      customerEmail: email,
       customerPhone: currentUser ? currentUser.phone : '',
-      deliveryLocation: deliveryCheckbox.checked ? locationInput : null
-    };
-
-    // Simulate backend call
-    console.log('Placing order...', orderData);
-    
-    // In a real app, you'd fetch here
-    /*
-    fetch('http://localhost:5000/api/orders',{ 
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'Authorization':'Bearer '+localStorage.getItem('token')
-      },
-      body:JSON.stringify(orderData)
-    })
-    */
-
-    // Simulate successful response
-    const data = {
-      success: true,
-      orderId: 'ORD-' + Date.now(),
-      totalPrice: totalPrice
-    };
-
-    // Save to DataManager orders
-    const newOrder = {
-      ...orderData,
-      id: data.orderId,
-      date: new Date().toISOString(),
-      status: 'pending',
       userId: currentUser ? currentUser.id : 'guest',
-      grandTotal: totalPrice 
+      deliveryLocation: deliveryCheckbox.checked ? locationInput : null,
+      paymentStatus: 'paid',
+      status: 'pending',
+      date: new Date().toISOString(),
+      id: 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase()
     };
-    
-    // Process order globally and scope to operators
-    DataManager.processNewOrder(newOrder);
-
-    // Generate Invoice
-    const invoiceData = {
-      orderId: data.orderId,
-      customerInfo: {
-        name: name,
-        email: email,
-        phone: currentUser ? currentUser.phone : ''
-      },
-      items: cart,
-      subtotal: subtotal,
-      tax: subtotal * 0.16, // 16% VAT
-      shipping: deliveryFee,
-      total: totalPrice
-    };
-    DataManager.addInvoice(invoiceData);
 
     localStorage.setItem('mpesaOrder', JSON.stringify({
-      orderId: data.orderId,
+      orderId: orderData.id,
       total: totalPrice,
-      items: cart
+      items: cart,
+      fullOrder: orderData
     }));
 
     if (paymentMethod === 'mpesa') {
       window.location.href = "mpesa-payment.html";
     } else {
-      alert('Order placed successfully! Order ID: ' + data.orderId);
+      // For other methods (if any)
+      DataManager.processNewOrder(orderData);
       DataManager.clearCart();
-      window.location.href = "home.html";
+      alert('Order placed successfully! Order ID: ' + orderData.id);
+      window.location.href = "profile.html";
     }
   }
 

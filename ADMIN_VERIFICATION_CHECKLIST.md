@@ -118,7 +118,7 @@
 - [x] Products added to warehouse (not directly to shop)
 - [x] Warehouse products stored separately
 - [x] "Push to Website" transfers warehouse product to shop
-- [x] Website now shows product in shop.html
+- [x] Website now shows product in store.html
 - [x] Customers can purchase pushed products
 - [x] Orders tracked in admin Orders tab
 
@@ -245,7 +245,7 @@
 - [ ] View warehouse inventory
 - [ ] See total warehouse value
 - [ ] Push product to website
-- [ ] Verify product appears in shop.html
+- [ ] Verify product appears in store.html
 
 ### Orders
 - [ ] Filter orders by status

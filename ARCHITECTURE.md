@@ -13,7 +13,7 @@
 ├────────────────────────────────────────────────────────────────┤
 │                                                                │
 │  ┌──────────────────┐  ┌──────────────────┐  ┌────────────┐  │
-│  │   home.html      │  │  add-product.html│  │  shop.html │  │
+│  │   index.html      │  │  add-product.html│  │  store.html │  │
 │  │                  │  │                  │  │            │  │
 │  │ • Main page      │  │ • Add Products   │  │ • Browse   │  │
 │  │ • Navigation     │  │ • Edit Products  │  │ • Search   │  │
@@ -364,7 +364,7 @@ No Server/Backend Required:
 |------|------|---------|
 | add-product.html | ~30KB | Product management UI |
 | data-manager.js | ~10KB | Data management logic |
-| home.html | ~8KB | Home page |
+| index.html | ~8KB | Home page |
 | supermarket.html | ~45KB | Supermarket store |
 | second-hand items.html | ~42KB | Second-hand store |
 | cart.html | ~20KB | Shopping cart |

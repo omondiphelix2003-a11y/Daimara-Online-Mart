@@ -5,7 +5,7 @@
 document.addEventListener("DOMContentLoaded", function() {
   const currentUser = DataManager.getCurrentUser();
   const navCenter = document.querySelector(".nav-center");
-  const navbarLinks = document.querySelector(".navbar div:nth-child(2)"); // For Shop.html style
+  const navbarLinks = document.querySelector(".navbar div:nth-child(2)"); // For store.html style
   const navRight = document.querySelector(".nav-right") || document.querySelector(".nav-icons");
 
   // Handle User Icon redirection to Profile
@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", function() {
     if (navCenter) {
       navCenter.appendChild(adminLink);
     } else if (navbarLinks) {
-      // For Shop.html which has a slightly different structure
+      // For store.html which has a slightly different structure
       navbarLinks.appendChild(adminLink);
     }
   }

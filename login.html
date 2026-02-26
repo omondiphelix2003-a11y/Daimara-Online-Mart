@@ -262,6 +262,12 @@ body {
       <input type="email" id="signup-email" placeholder="Email" required>
       <input type="password" id="signup-password" placeholder="Password" required>
       
+      <select id="signup-role" style="width:100%; padding:20px; border-radius:6px; border:1px solid #bdc3c7; font-size:25px; margin-bottom:10px;">
+        <option value="user">Customer</option>
+        <option value="operator">Operator / Business</option>
+        <option value="delivery">Delivery Personnel Staff</option>
+      </select>
+      
       <div class="profile-image-group">
         <label for="profile-image">Profile Picture:</label>
         <input type="file" id="profile-image" accept="image/*" required>
@@ -306,9 +312,18 @@ function showSignup() {
 window.addEventListener('DOMContentLoaded', () => {
   const urlParams = new URLSearchParams(window.location.search);
   const regEmail = urlParams.get('reg_email');
+  const regRole = urlParams.get('reg_role');
+
   if (regEmail) {
     showSignup();
     document.getElementById('signup-email').value = decodeURIComponent(regEmail);
+  }
+
+  // Only show role selection if reg_role param is present (e.g. from a specific "Register Business" page)
+  if (regRole) {
+    const roleSelect = document.getElementById('signup-role');
+    roleSelect.style.display = 'block';
+    roleSelect.value = regRole;
   }
 });
 
@@ -325,6 +340,7 @@ document.getElementById("signup-form").addEventListener("submit", e => {
   const name = document.getElementById("signup-name").value.trim();
   const email = document.getElementById("signup-email").value.trim();
   const password = document.getElementById("signup-password").value;
+  const roleSelection = document.getElementById("signup-role").value;
   const profileImageFile = document.getElementById("profile-image").files[0];
 
   // Validation
@@ -357,13 +373,11 @@ document.getElementById("signup-form").addEventListener("submit", e => {
     const allUsers = DataManager.getAllUsers();
     const existingReg = allUsers.find(u => u.email === email && u.role !== 'user');
     
-    let role = 'user';
+    let role = roleSelection;
     let regDetails = null;
     
     if (existingReg) {
       // If user exists with a role, we update their info instead of creating new
-      // but DataManager.registerUser might fail if email exists.
-      // So we delete the "placeholder" user first if it exists.
       DataManager.deleteUser(existingReg.id);
       role = existingReg.role;
       regDetails = existingReg.regDetails;
@@ -411,7 +425,7 @@ document.getElementById("login-form").addEventListener("submit", e => {
   if (email === "admin@gmail.com") {
     window.location.href = "admin-manager.html";
   } else {
-    window.location.href = "home.html";
+    window.location.href = "index.html";
   }
 });
 </script>

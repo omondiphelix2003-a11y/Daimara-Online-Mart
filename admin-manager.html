@@ -178,6 +178,7 @@
       <li><a href="#" onclick="showTab('emails', this)"><i class="fas fa-envelope"></i> Client Emails</a></li>
       <li><a href="#" onclick="showTab('profits', this)"><i class="fas fa-chart-line"></i> Profits & Loss</a></li>
       <li><a href="#" onclick="showTab('users', this)"><i class="fas fa-users"></i> User Signups</a></li>    
+      <li><a href="#" onclick="showTab('page-reviews', this)"><i class="fas fa-id-card"></i> Page Reviews</a></li>
       <li><a href="Daimara Department Head – Marketing.html"><i class="fas fa-bullhorn"></i> Marketing Department</a></li>
     <li><a href="Daimara-operator.html"><i class="fas fa-headset"></i></i> Operator Dept</a></li>
     <li><a href="Delivery services.html"><i class="fas fa-truck-fast"></i> Delivery Services Dept</a></li>
@@ -216,7 +217,7 @@
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-icon" style="background: rgba(233,157,17,0.1); color: var(--primary-color);"><i class="fas fa-dollar-sign"></i></div>
-          <div class="stat-info"><h3 id="stat-revenue">KSH 0</h3><p>Total Revenue</p></div>
+          <div class="stat-info"><h3 id="stat-revenue">KSH 0</h3><p>Platform Earnings</p></div>
         </div>
         <div class="stat-card">
           <div class="stat-icon" style="background: rgba(39,174,96,0.1); color: var(--success);"><i class="fas fa-shopping-bag"></i></div>
@@ -323,15 +324,14 @@
         </div>
         <div class="pl-summary">
           <div>
-            <div class="pl-item"><span class="pl-label">Gross Revenue:</span><span class="pl-value" id="pl-revenue">KSH 0</span></div>
             <div class="pl-item"><span class="pl-label">Inventory Value:</span><span class="pl-value" id="pl-warehouse">KSH 0</span></div>
-            <div class="pl-item"><span class="pl-label">Estimated Operating Costs (15%):</span><span class="pl-value pl-negative" id="pl-costs">-KSH 0</span></div>
-            <div class="pl-item" style="border-top: 2px solid #333; margin-top: 10px; padding-top: 20px;"><span class="pl-label" style="font-size: 35px;">Net Profit:</span><span class="pl-value pl-positive" id="pl-profit" style="font-size: 18px;">KSH 0</span></div>
+            <div class="pl-item"><span class="pl-label">Total Commission (10%):</span><span class="pl-value pl-positive" id="pl-total-commission" style="font-size: 24px;">KSH 0</span></div>
+            <div class="pl-item"><span class="pl-label">Delivery Deductions (KSH 20/order):</span><span class="pl-value pl-positive" id="pl-delivery-deductions" style="font-size: 24px;">KSH 0</span></div>
           </div>
           <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
-            <h3>Margin Analysis</h3>
-            <div style="font-size: 48px; font-weight: 800; color: var(--primary-color); margin: 20px 0;" id="pl-margin">0%</div>
-            <p>Your current profit margin based on total sales and operating costs.</p>
+            <h3>Financial Summary</h3>
+            <div style="font-size: 36px; font-weight: 800; color: var(--primary-color); margin: 20px 0;" id="pl-net-admin-take">KSH 0</div>
+            <p>Total platform earnings from commissions and delivery deductions.</p>
           </div>
         </div>
       </div>
@@ -344,6 +344,19 @@
         <table id="users-table">
           <thead>
             <tr><th>User ID</th><th>Name</th><th>Email</th><th>Signup Date</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PAGE REVIEWS TAB -->
+    <div id="page-reviews" class="tab-content">
+      <div class="data-card">
+        <div class="card-header"><h2 class="card-title">Daimara Page Requests</h2></div>
+        <table id="page-reviews-table">
+          <thead>
+            <tr><th>Name</th><th>Email</th><th>Role Requested</th><th>Date</th><th>Status</th><th>Action</th></tr>
           </thead>
           <tbody></tbody>
         </table>
@@ -383,7 +396,8 @@
         'invoices': 'Billing & Invoices',
         'emails': 'Customer Communications',
         'profits': 'Profit & Loss Analysis',
-        'users': 'User Base Growth'
+        'users': 'User Base Growth',
+        'page-reviews': 'Daimara Page Requests'
       };
       document.getElementById('tab-title').innerText = titleMap[tabId];
       
@@ -409,6 +423,7 @@
           case 'emails': renderEmails(); break;
           case 'profits': renderProfits(); break;
           case 'users': renderUsers(); break;
+          case 'page-reviews': renderPageReviews(); break;
         }
       } catch (err) {
         console.error('Error loading tab data:', err);
@@ -418,7 +433,15 @@
     // RENDER FUNCTIONS
     function renderDashboard() {
       const stats = DataManager.getAdminDashboardStats();
-      document.getElementById('stat-revenue').innerText = 'KSH ' + (stats.totalRevenue || 0).toLocaleString();
+      // Use platform earnings (commission + deductions) instead of gross revenue
+      const deductionsData = JSON.parse(localStorage.getItem('ecommerce_delivery_deductions')) || { total: 0 };
+      const totalCommission = (DataManager.getAllOrders() || []).reduce((sum, o) => {
+        if (o.totalCommission !== undefined) return sum + o.totalCommission;
+        return sum + ((o.grandTotal || 0) * 0.10);
+      }, 0);
+      const totalEarnings = totalCommission + (deductionsData.total || 0);
+
+      document.getElementById('stat-revenue').innerText = 'KSH ' + totalEarnings.toLocaleString();
       document.getElementById('stat-orders').innerText = stats.totalOrders || 0;
       document.getElementById('stat-users').innerText = stats.totalUsers || 0;
       document.getElementById('stat-warehouse').innerText = stats.warehouseProducts || 0;
@@ -436,7 +459,10 @@
           <td>#${(o.id || '').slice(-6)}</td>
           <td><span class="clickable-name" onclick="viewOrderDetails('${o.id}')">${o.customerName || o.customer?.name || 'Guest'}</span></td>
           <td>KSH ${(o.grandTotal || o.totalPrice || 0).toLocaleString()}</td>
-          <td><span class="status-pill status-${o.status || 'pending'}">${o.status || 'pending'}</span></td>
+          <td>
+            <span class="status-pill status-${o.status || 'pending'}">${o.status || 'pending'}</span>
+            <span class="status-pill status-${o.paymentStatus || 'unpaid'}" style="margin-left:5px; background:${o.paymentStatus === 'paid' ? '#2ecc71' : '#e74c3c'}; color:white;">${o.paymentStatus || 'unpaid'}</span>
+          </td>
           <td>${o.date ? new Date(o.date).toLocaleDateString() : 'N/A'}</td>
         </tr>
       `).join('') || '<tr><td colspan="5" style="text-align:center">No recent orders</td></tr>';
@@ -455,17 +481,16 @@
           <td><span class="clickable-name" onclick="viewOrderDetails('${o.id}')">${o.customerName || o.customer?.name || 'N/A'}</span></td>
           <td>${items.length} items</td>
           <td>KSH ${(o.grandTotal || o.totalPrice || 0).toLocaleString()}</td>
-          <td><span class="status-pill status-${o.status || 'pending'}">${o.status || 'pending'}</span></td>
+          <td>
+            <span class="status-pill status-${o.status || 'pending'}">${o.status || 'pending'}</span>
+            <span class="status-pill" style="margin-left:5px; background:${o.paymentStatus === 'paid' ? '#2ecc71' : '#e74c3c'}; color:white;">${o.paymentStatus || 'unpaid'}</span>
+          </td>
           <td>${o.date ? new Date(o.date).toLocaleDateString() : 'N/A'}</td>
           <td>
             <div style="display:flex; gap:5px;">
-              <button class="btn btn-info" style="padding:4px 8px; font-size:25px;" onclick="updateOrderStatus('${o.id}')">Status</button>
+              <button class="btn btn-info" style="padding:4px 8px; font-size:25px; cursor:not-allowed; opacity:0.6;" disabled>Status</button>
               <button class="btn btn-primary" style="padding:4px 8px; font-size:25px; background:#6c5ce7;" onclick="showAdminReceipt('${o.id}')">Receipt</button>
-              ${!isOperatorOrder ? `
-              <button class="btn btn-success" style="padding:4px 8px; font-size:25px; background:#2ecc71;" onclick="assignDelivery('${o.id}')">Assign</button>
-              ` : `
-              <button class="btn btn-success" style="padding:4px 8px; font-size:25px; background:#bdc3c7; cursor:not-allowed;" title="Operator must assign" disabled>Assign</button>
-              `}
+              <button class="btn btn-success" style="padding:4px 8px; font-size:25px; background:#bdc3c7; cursor:not-allowed;" title="Admin cannot assign" disabled>Assign</button>
               <button class="btn btn-danger" style="padding:4px 8px; font-size:25px;" onclick="returnOrder('${o.id}')">Return</button>
               <button class="btn btn-danger" style="padding:4px 8px; background:#333;" onclick="deleteOrder('${o.id}')"><i class="fas fa-trash"></i></button>
             </div>
@@ -537,18 +562,29 @@
     }
 
     function renderProfits() {
-      const pl = DataManager.getProfitLossAnalysis();
-      if (!pl) return;
-      document.getElementById('pl-revenue').innerText = 'KSH ' + (pl.totalRevenue || 0).toLocaleString();
-      document.getElementById('pl-warehouse').innerText = 'KSH ' + (pl.warehouseValue || 0).toLocaleString();
-      document.getElementById('pl-costs').innerText = '-KSH ' + (pl.operatingCosts || 0).toLocaleString();
-      document.getElementById('pl-profit').innerText = 'KSH ' + (pl.profit || 0).toLocaleString();
-      document.getElementById('pl-margin').innerText = pl.profitMargin || '0%';
+      const orders = DataManager.getAllOrders() || [];
+      const warehouse = DataManager.getWarehouse() || [];
+      const deductionsData = JSON.parse(localStorage.getItem('ecommerce_delivery_deductions')) || { total: 0 };
+      
+      const warehouseValue = warehouse.reduce((sum, p) => sum + ((p.price || 0) * (p.quantity || 0)), 0);
+      const totalCommission = orders.reduce((sum, o) => {
+        if (o.totalCommission !== undefined) return sum + o.totalCommission;
+        // Fallback for old orders
+        return sum + ((o.grandTotal || 0) * 0.10);
+      }, 0);
+      
+      const deliveryDeductions = deductionsData.total || 0;
+      const totalEarnings = totalCommission + deliveryDeductions;
+      
+      document.getElementById('pl-warehouse').innerText = 'KSH ' + warehouseValue.toLocaleString();
+      document.getElementById('pl-total-commission').innerText = 'KSH ' + totalCommission.toLocaleString();
+      document.getElementById('pl-delivery-deductions').innerText = 'KSH ' + deliveryDeductions.toLocaleString();
+      document.getElementById('pl-net-admin-take').innerText = 'KSH ' + totalEarnings.toLocaleString();
       
       // Update P&L summary info
       const plSummary = document.querySelector('#profits .card-header p');
       if (plSummary) {
-        plSummary.innerText = `Analysis based on ${pl.ordersCount || 0} orders (${pl.returnedOrders || 0} returned). Last updated: ${new Date(pl.analysisDate).toLocaleTimeString()}`;
+        plSummary.innerText = `Analysis based on ${orders.length} orders. Last updated: ${new Date().toLocaleTimeString()}`;
       }
     }
 

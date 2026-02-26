@@ -6,7 +6,7 @@
 |------|--------|---------|
 | `data-manager.js` | ✅ CREATED | Core data management system |
 | `add-product.html` | ✅ UPDATED | Product management interface |
-| `home.html` | ✅ UPDATED | Added "Manage Products" link |
+| `index.html` | ✅ UPDATED | Added "Manage Products" link |
 | `supermarket.html` | ✅ READY | Displays products via DataManager |
 | `second-hand items.html` | ✅ READY | Displays products via DataManager |
 
@@ -161,9 +161,9 @@ Product appears in correct category ✓
 ## Page Navigation
 
 ```
-home.html
+index.html
   ├─ "Manage Products" → add-product.html
-  ├─ "Shop" → shop.html
+  ├─ "Shop" → store.html
   ├─ "About" → about.html
   └─ "Contact" → contact.html
 

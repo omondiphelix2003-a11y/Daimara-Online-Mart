@@ -261,7 +261,7 @@
 
 - [ ] add-product.html in place
 - [ ] data-manager.js in place
-- [ ] home.html updated with link
+- [ ] index.html updated with link
 - [ ] supermarket.html unchanged (uses data-manager)
 - [ ] second-hand items.html unchanged (uses data-manager)
 - [ ] All CSS files present
@@ -301,12 +301,12 @@
 1. **Backup Existing Files**
    - [ ] Backup current supermarket.html
    - [ ] Backup current second-hand items.html
-   - [ ] Backup current home.html
+   - [ ] Backup current index.html
 
 2. **Deploy New Files**
    - [ ] Upload add-product.html
    - [ ] Upload data-manager.js
-   - [ ] Upload updated home.html
+   - [ ] Upload updated index.html
    - [ ] Upload documentation files
 
 3. **Verify Deployment**
@@ -361,7 +361,7 @@ If issues occur:
 1. **Immediate Rollback**
    - Remove add-product.html
    - Remove data-manager.js
-   - Revert home.html changes
+   - Revert index.html changes
    - Wait for CSS to clear cache
 
 2. **Investigation**

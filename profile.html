@@ -1137,14 +1137,14 @@ body {
 <!-- NAVBAR -->
 <nav class="navbar">
   <div class="nav-left">
-    <a href="home.html" style="text-decoration: none; color: inherit;">
+    <a href="index.html" style="text-decoration: none; color: inherit;">
       <span class="shop-name">Daimara Online Mart</span>
     </a>
   </div>
 
   <!--<ul class="nav-center">
-    <li><a href="home.html">Home</a></li>
-    <li><a href="shop.html">Shop</a></li>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="store.html">Shop</a></li>
     <li><a href="about.html">About</a></li>
     <li><a href="contact.html">Contact</a></li>
   </ul>-->
@@ -1159,7 +1159,7 @@ body {
       <a id="login-btn" href="login.html">Login</a>
     </div>
     <div class="nav-cart">
-      <a href="shop.html" style="text-decoration: none; color: inherit;">shop</a>
+      <a href="store.html" style="text-decoration: none; color: inherit;">shop</a>
     </div>
   </div>
 </nav>
@@ -1251,7 +1251,7 @@ body {
         <div class="detail-section">
           <h3>Quick Actions</h3>
           <div class="action-buttons">
-            <button class="btn btn-primary" onclick="location.href='shop.html'">🛍️ Continue Shopping</button>
+            <button class="btn btn-primary" onclick="location.href='store.html'">🛍️ Continue Shopping</button>
             <button class="btn btn-secondary" onclick="showTab('settings')">✏️ Edit Profile</button>
           </div>
         </div>
@@ -1264,7 +1264,7 @@ body {
       <div id="orders-list" class="orders-list">
         <div class="no-data">
           <p>📦 No orders yet</p>
-          <button class="btn btn-primary" onclick="location.href='shop.html'">Start Shopping</button>
+          <button class="btn btn-primary" onclick="location.href='store.html'">Start Shopping</button>
         </div>
       </div>
     </div>
@@ -1339,7 +1339,7 @@ body {
       <div id="favorites-list" class="favorites-grid">
         <div class="no-data">
           <p>❤️ No favorite products yet</p>
-          <button class="btn btn-primary" onclick="location.href='shop.html'">Browse Products</button>
+          <button class="btn btn-primary" onclick="location.href='store.html'">Browse Products</button>
         </div>
       </div>
     </div>
@@ -1500,7 +1500,7 @@ function loadUserOrders() {
   const ordersList = document.getElementById("orders-list");
 
   if (orders.length === 0) {
-    ordersList.innerHTML = '<div class="no-data"><p>📦 No current orders in the last 24 hours.</p><button class="btn btn-primary" onclick="location.href=\'shop.html\'">Start Shopping</button></div>';
+    ordersList.innerHTML = '<div class="no-data"><p>📦 No current orders in the last 24 hours.</p><button class="btn btn-primary" onclick="location.href=\'store.html\'">Start Shopping</button></div>';
     return;
   }
 
@@ -1533,7 +1533,10 @@ function loadUserOrders() {
           </div>
         </div>
         <div style="margin-top: 15px; text-align: right; display: flex; justify-content: flex-end; gap: 10px;">
-          <button class="btn btn-secondary" onclick="showReceipt('${order.id}')" style="background-color:black;color:rgb(233, 157, 17);" >📄 View Receipt </button>
+          ${order.paymentStatus === 'unpaid' ? 
+            `<button class="btn btn-primary" onclick="payForOrder('${order.id}')" style="background-color:#e67e22;color:white;border:none;">💳 Pay for this order</button>` : 
+            `<button class="btn btn-secondary" onclick="showReceipt('${order.id}')" style="background-color:black;color:rgb(233, 157, 17);" >📄 View Receipt </button>`
+          }
           <button class="btn btn-primary" onclick="trackOrder('${order.id}')" style="background-color:rgb(233, 157, 17);color:black;border:none;" >🚚 Track Order </button>
         </div>
       </div>
@@ -1544,6 +1547,19 @@ function loadUserOrders() {
 }
 
 // Receipt Functions
+function payForOrder(orderId) {
+  const orders = DataManager.getUserOrders(loggedInUser.id);
+  const order = orders.find(o => o.id === orderId);
+  if (!order) return;
+
+  localStorage.setItem('mpesaOrder', JSON.stringify({
+    orderId: order.id,
+    total: order.grandTotal || order.totalPrice,
+    isFinalPayment: true
+  }));
+  window.location.href = "mpesa-payment.html?isFinalPayment=true";
+}
+
 function showReceipt(orderId) {
   const orders = DataManager.getUserOrders(loggedInUser.id);
   const order = orders.find(o => o.id === orderId);
@@ -1622,7 +1638,7 @@ function trackOrder(orderId) {
     pending: { step: 1, label: 'Order Pending', desc: 'Your order has been received and is being processed.' },
     packed: { step: 1, label: 'Packed', desc: 'Your order has been packed and is ready for dispatch.' },
     assigned: { step: 1, label: 'Assigned', desc: 'A delivery person has been assigned to your order.' },
-    'Out for Delivery': { step: 2, label: 'Out for Delivery', desc: 'Your order is on its way to your destination.' },
+    'out for delivery': { step: 2, label: 'Out for Delivery', desc: 'Your order is on its way to your destination.' },
     completed: { step: 3, label: 'Order Completed', desc: 'Your order has been successfully delivered.' },
     delivered: { step: 3, label: 'Order Completed', desc: 'Your order has been successfully delivered.' }
   };
@@ -1681,7 +1697,7 @@ function loadFavoriteProducts() {
   const favoritesList = document.getElementById("favorites-list");
 
   if (favorites.length === 0) {
-    favoritesList.innerHTML = '<div class="no-data"><p>❤️ No favorite products yet</p><button class="btn btn-primary" onclick="location.href=\'shop.html\'">Browse Products</button></div>';
+    favoritesList.innerHTML = '<div class="no-data"><p>❤️ No favorite products yet</p><button class="btn btn-primary" onclick="location.href=\'store.html\'">Browse Products</button></div>';
     return;
   }
 
@@ -1950,13 +1966,22 @@ function logout() {
   if (confirm("Are you sure you want to logout?")) {
     DataManager.logoutUser();
     alert("You have been logged out");
-    window.location.href = "home.html";
+    window.location.href = "index.html";
   }
 }
 
 // Load profile on page load
 window.addEventListener("DOMContentLoaded", function() {
   loadUserProfile();
+
+  // CHECK IF RETURNING FROM FINAL PAYMENT
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('isFinalPayment') === 'true') {
+     alert("Payment successful! Your order is now officially paid.");
+     // We can remove the param from URL
+     window.history.replaceState({}, document.title, window.location.pathname);
+  }
+
   // Update profile nav if function exists
   if (typeof updateProfileNav === 'function') {
     setTimeout(updateProfileNav, 100);
@@ -2078,19 +2103,19 @@ function submitRegistration(type) {
     details = { means, email, locality: { state, city, street, address }, regnumber, krapin, serviceType, plate };
   }
 
-  // Register user with the role
-  const result = DataManager.registerUser(
-    regData.personal.fullname,
-    email,
-    "daimara123", // Default password for new pages, they can change it later
-    null,
+  // Create registration request instead of direct registration
+  const result = DataManager.addPageRegistration({
     type,
-    { ...regData.personal, ...details }
-  );
+    email,
+    details: { ...regData.personal, ...details }
+  });
 
   if (result.success) {
-    alert("Registration Successful! Redirecting to login page to sign up.");
-    window.location.href = "login.html?reg_email=" + encodeURIComponent(email);
+    // Save a verification message to localStorage for index.html to display
+    localStorage.setItem('daimara_reg_message', "Please wait for 30 min for account verification. A redirectory email will be sent to your email and incase you haven't received the email after 30min please contact us.");
+    
+    // Redirect to home page (index.html) as requested
+    window.location.href = "index.html";
   } else {
     alert(result.message);
   }

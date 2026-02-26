@@ -20,14 +20,14 @@
 - ✅ Integration with DataManager for store page synchronization
 
 ### 3. **Updated Page Links**
-- Added "Manage Products" link in home.html navbar
+- Added "Manage Products" link in index.html navbar
 - All pages load data-manager.js
 - Supermarket & second-hand pages automatically display added products
 
 ## How to Use
 
 ### Step 1: Open Add-Product Page
-Click "Manage Products" in home.html or open add-product.html directly
+Click "Manage Products" in index.html or open add-product.html directly
 
 ### Step 2: Add a Product
 1. Select Category (Supermarket or Second-hand)
@@ -74,7 +74,7 @@ add-product.html
 ├── data-manager.js           ← Data management system (CREATED)
 ├── supermarket.html          ← Displays supermarket products
 ├── second-hand items.html    ← Displays second-hand products
-├── home.html                 ← Updated with "Manage Products" link
+├── index.html                 ← Updated with "Manage Products" link
 └── INTEGRATION_GUIDE.md      ← Detailed documentation
 ```
 

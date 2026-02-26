@@ -964,12 +964,10 @@
       <h2><i class="fas fa-warehouse"></i> Main Warehouse</h2>
     </div>
     <ul class="nav-links">
-      <li><a href="#" class="active" onclick="showTab('dashboard', this)"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-      <li><a href="#" onclick="showTab('orders', this)"><i class="fas fa-shopping-cart"></i> Orders</a></li>
-      <li><a href="#" onclick="showTab('warehouse', this)"><i class="fas fa-warehouse"></i> Warehouse</a></li>
-      <li><a href="#" onclick="showTab('emails', this)"><i class="fas fa-envelope"></i> Client Emails</a></li>
-      <li><a href="#" onclick="showTab('profits', this)"><i class="fas fa-chart-line"></i> Profit & Loss</a></li>
-      <li><a href="#" onclick="showTab('users', this)"><i class="fas fa-users"></i> Users</a></li>
+      <li><a href="Operator's Dashboard-for businesses.html?tab=dashboard" target="_blank"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+      <li><a href="Operator's Dashboard-for businesses.html?tab=orders" target="_blank"><i class="fas fa-shopping-cart"></i> Orders</a></li>
+      <li><a href="Operator's Dashboard-for businesses.html?tab=warehouse" target="_blank"><i class="fas fa-warehouse"></i> Warehouse</a></li>
+      <li><a href="Operator's Dashboard-for businesses.html?tab=profits" target="_blank"><i class="fas fa-chart-line"></i> Profit & Loss</a></li>
     </ul>
     <div class="sidebar-footer">
       <button class="logout-btn" onclick="adminLogout()">
@@ -1012,15 +1010,6 @@
           <div class="stat-info">
             <h3 id="stat-warehouse">0</h3>
             <p>Warehouse Items</p>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon" style="background: rgba(233,157,17,0.1); color: var(--primary);">
-            <i class="fas fa-users"></i>
-          </div>
-          <div class="stat-info">
-            <h3 id="stat-users">0</h3>
-            <p>Registered Users</p>
           </div>
         </div>
         <div class="stat-card">
@@ -1114,31 +1103,6 @@
       </div>
     </div>
 
-    <!-- EMAILS TAB -->
-    <div id="emails" class="tab-content">
-      <div class="data-card">
-        <div class="card-header">
-          <h2 class="card-title"><i class="fas fa-envelope-open-text"></i> Client Messages</h2>
-        </div>
-        <div class="table-wrapper">
-          <table id="emails-table">
-            <thead>
-              <tr>
-                <th>From</th>
-                <th>Subject</th>
-                <th>Message</th>
-                <th>Date</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <!-- Mobile Cards -->
-        <div class="mobile-cards" id="emails-mobile"></div>
-      </div>
-    </div>
-
     <!-- PROFITS TAB -->
     <div id="profits" class="tab-content">
       <div class="data-card">
@@ -1156,11 +1120,11 @@
               <span class="pl-value" id="pl-warehouse">KSH 0</span>
             </div>
             <div class="pl-item">
-              <span class="pl-label">Operating Costs (15%)</span>
+              <span class="pl-label">Commission (10%)</span>
               <span class="pl-value pl-negative" id="pl-costs">-KSH 0</span>
             </div>
             <div class="pl-item" style="border-top: 2px solid var(--border); margin-top: 0.5rem; padding-top: 1rem;">
-              <span class="pl-label" style="font-size: 1.125rem;">Net Profit</span>
+              <span class="pl-label" style="font-size: 1.125rem;">Net Revenue (After Commission)</span>
               <span class="pl-value pl-positive" id="pl-profit" style="font-size: 1.25rem;">KSH 0</span>
             </div>
           </div>
@@ -1172,30 +1136,6 @@
             </p>
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- USERS TAB -->
-    <div id="users" class="tab-content">
-      <div class="data-card">
-        <div class="card-header">
-          <h2 class="card-title"><i class="fas fa-users-cog"></i> Registered Users</h2>
-        </div>
-        <div class="table-wrapper">
-          <table id="users-table">
-            <thead>
-              <tr>
-                <th>User ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Signup Date</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <!-- Mobile Cards -->
-        <div class="mobile-cards" id="users-mobile"></div>
       </div>
     </div>
   </main>
@@ -1221,9 +1161,18 @@
         window.location.href = "login.html";
         return false;
       }
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const viewUserEmail = urlParams.get('viewUserEmail');
+
+      // Allow admin to view any dashboard if they have the email param
+      if (user.role === 'admin' && viewUserEmail) {
+        return true;
+      }
+
       if (user.role !== 'operator') {
         alert("Access Denied: This dashboard is for businesses/operators only.");
-        window.location.href = "home.html";
+        window.location.href = "index.html";
         return false;
       }
       return true;
@@ -1233,6 +1182,22 @@
       // Stop execution if no access
       throw new Error("Access denied");
     }
+
+    // Get the email to view (for admin impersonation)
+    const urlParams = new URLSearchParams(window.location.search);
+    const viewUserEmail = urlParams.get('viewUserEmail');
+
+    // ON LOAD: HANDLE TAB PARAMETER
+    window.addEventListener('load', () => {
+      const tab = urlParams.get('tab');
+      if (tab) {
+        // Find the link corresponding to the tab
+        const link = document.querySelector(`.nav-links a[href*="tab=${tab}"]`);
+        showTab(tab, link);
+      } else {
+        renderDashboard();
+      }
+    });
 
     // SIDEBAR TOGGLE FOR MOBILE
     function toggleSidebar() {
@@ -1266,9 +1231,7 @@
         'dashboard': '<i class="fas fa-tachometer-alt"></i> Dashboard Overview',
         'orders': '<i class="fas fa-shopping-cart"></i> Order Management',
         'warehouse': '<i class="fas fa-warehouse"></i> Warehouse & Inventory',
-        'emails': '<i class="fas fa-envelope"></i> Customer Communications',
-        'profits': '<i class="fas fa-chart-line"></i> Profit & Loss Analysis',
-        'users': '<i class="fas fa-users"></i> User Base Growth'
+        'profits': '<i class="fas fa-chart-line"></i> Profit & Loss Analysis'
       };
       document.getElementById('tab-title').innerHTML = titleMap[tabId];
       
@@ -1294,9 +1257,7 @@
           case 'dashboard': renderDashboard(); break;
           case 'orders': renderOrders(); break;
           case 'warehouse': renderWarehouse(); break;
-          case 'emails': renderEmails(); break;
           case 'profits': renderProfits(); break;
-          case 'users': renderUsers(); break;
         }
       } catch (err) {
         console.error('Error loading tab data:', err);
@@ -1308,13 +1269,12 @@
       if (typeof DataManager === 'undefined') return;
       
       const user = DataManager.getCurrentUser();
-      const orders_all = DataManager.getScopedData('ecommerce_orders');
-      const warehouse_all = DataManager.getScopedData('ecommerce_warehouse').filter(p => p.owner === user.email);
-      const users_all = DataManager.getAllUsers();
+      const targetEmail = viewUserEmail || user.email;
+      const orders_all = DataManager.getScopedData('ecommerce_orders', [], viewUserEmail);
+      const warehouse_all = DataManager.getScopedData('ecommerce_warehouse').filter(p => p.owner === targetEmail);
       
       document.getElementById('stat-revenue').innerText = 'KSH ' + orders_all.reduce((sum, o) => sum + (o.grandTotal || 0), 0).toLocaleString();
       document.getElementById('stat-orders').innerText = orders_all.length;
-      document.getElementById('stat-users').innerText = users_all.length;
       document.getElementById('stat-warehouse').innerText = warehouse_all.length;
 
       const orders = orders_all.slice(0, 5);
@@ -1327,7 +1287,10 @@
             <td><strong>#${(o.id || '').slice(-6)}</strong></td>
             <td><span class="clickable-name" onclick="viewOrderDetails('${o.id}')">${o.customerName || o.customer?.name || 'Guest'}</span></td>
             <td>KSH ${(o.grandTotal || o.totalPrice || 0).toLocaleString()}</td>
-            <td><span class="status-pill status-${o.status || 'pending'}">${o.status || 'pending'}</span></td>
+            <td>
+              <span class="status-pill status-${o.status || 'pending'}">${o.status || 'pending'}</span>
+              <span class="status-pill status-${o.paymentStatus || 'unpaid'}" style="margin-left:5px; background:${o.paymentStatus === 'paid' ? '#2ecc71' : '#e74c3c'}; color:white;">${o.paymentStatus || 'unpaid'}</span>
+            </td>
             <td>${o.date ? new Date(o.date).toLocaleDateString() : 'N/A'}</td>
           </tr>
         `).join('') || '<tr><td colspan="5" style="text-align:center">No recent orders</td></tr>';
@@ -1364,43 +1327,51 @@
     function renderOrders() {
       if (typeof DataManager === 'undefined') return;
       
-      const orders = DataManager.getScopedData('ecommerce_orders');
+      const orders = DataManager.getScopedData('ecommerce_orders', [], viewUserEmail);
       
       // Desktop Table
       const tbody = document.querySelector('#all-orders-table tbody');
       if (tbody) {
-        tbody.innerHTML = orders.map(o => `
-          <tr>
-            <td><strong>#${(o.id || '').slice(-8)}</strong></td>
-            <td><span class="clickable-name" onclick="viewOrderDetails('${o.id}')">${o.customerName || o.customer?.name || 'N/A'}</span></td>
-            <td>${(o.items || o.products || []).length} items</td>
-            <td>KSH ${(o.grandTotal || o.totalPrice || 0).toLocaleString()}</td>
-            <td><span class="status-pill status-${o.status || 'pending'}">${o.status || 'pending'}</span></td>
-            <td>${o.date ? new Date(o.date).toLocaleDateString() : 'N/A'}</td>
-            <td>
-              <div style="display:flex; gap:0.5rem; flex-wrap: wrap;">
-                <button class="btn btn-success btn-sm" onclick="assignDelivery('${o.id}')">
-                  <i class="fas fa-truck"></i>
-                </button>
-                <button class="btn btn-primary btn-sm" onclick="showAdminReceipt('${o.id}')">
-                  <i class="fas fa-receipt"></i>
-                </button>
-                <button class="btn btn-danger btn-sm" onclick="returnOrder('${o.id}')">
-                  <i class="fas fa-undo"></i>
-                </button>
-                <button class="btn btn-sm" style="background: #374151; color: white;" onclick="deleteOrder('${o.id}')">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </div>
-            </td>
-          </tr>
-        `).join('') || '<tr><td colspan="7" style="text-align:center">No orders found</td></tr>';
+        tbody.innerHTML = orders.map(o => {
+          const isAssigned = !!o.deliveryPersonEmail;
+          return `
+            <tr>
+              <td><strong>#${(o.id || '').slice(-8)}</strong></td>
+              <td><span class="clickable-name" onclick="viewOrderDetails('${o.id}')">${o.customerName || o.customer?.name || 'N/A'}</span></td>
+              <td>${(o.items || o.products || []).length} items</td>
+              <td>KSH ${(o.grandTotal || o.totalPrice || 0).toLocaleString()}</td>
+              <td>
+                <span class="status-pill status-${o.status || 'pending'}">${o.status || 'pending'}</span>
+                <span class="status-pill" style="margin-left:5px; background:${o.paymentStatus === 'paid' ? '#2ecc71' : '#e74c3c'}; color:white;">${o.paymentStatus || 'unpaid'}</span>
+              </td>
+              <td>${o.date ? new Date(o.date).toLocaleDateString() : 'N/A'}</td>
+              <td>
+                <div style="display:flex; gap:0.5rem; flex-wrap: wrap;">
+                  <button class="btn btn-success btn-sm" onclick="assignDelivery('${o.id}')" ${isAssigned ? 'disabled style="background:#bdc3c7; cursor:not-allowed;" title="Already assigned"' : ''}>
+                    <i class="fas fa-truck"></i>
+                  </button>
+                  <button class="btn btn-primary btn-sm" onclick="showAdminReceipt('${o.id}')">
+                    <i class="fas fa-receipt"></i>
+                  </button>
+                  <button class="btn btn-danger btn-sm" onclick="returnOrder('${o.id}')">
+                    <i class="fas fa-undo"></i>
+                  </button>
+                  <button class="btn btn-sm" style="background: #374151; color: white;" onclick="deleteOrder('${o.id}')">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('') || '<tr><td colspan="7" style="text-align:center">No orders found</td></tr>';
       }
 
       // Mobile Cards
       const mobileContainer = document.getElementById('all-orders-mobile');
       if (mobileContainer) {
-        mobileContainer.innerHTML = orders.map(o => `
+        mobileContainer.innerHTML = orders.map(o => {
+          const isAssigned = !!o.deliveryPersonEmail;
+          return `
           <div class="data-card-mobile">
             <div class="card-header">
               <span class="card-title">#${(o.id || '').slice(-8)}</span>
@@ -1425,7 +1396,7 @@
               </div>
             </div>
             <div class="card-actions">
-              <button class="btn btn-success btn-sm" onclick="assignDelivery('${o.id}')">
+              <button class="btn btn-success btn-sm" onclick="assignDelivery('${o.id}')" ${isAssigned ? 'disabled style="background:#bdc3c7; cursor:not-allowed;" title="Already assigned"' : ''}>
                 <i class="fas fa-truck"></i> Assign
               </button>
               <button class="btn btn-primary btn-sm" onclick="showAdminReceipt('${o.id}')">
@@ -1439,7 +1410,8 @@
               </button>
             </div>
           </div>
-        `).join('') || '<p style="text-align:center; color: var(--text-muted);">No orders found</p>';
+        `;
+        }).join('') || '<p style="text-align:center; color: var(--text-muted);">No orders found</p>';
       }
     }
 
@@ -1447,7 +1419,8 @@
       if (typeof DataManager === 'undefined') return;
       
       const user = DataManager.getCurrentUser();
-      const warehouse = DataManager.getScopedData('ecommerce_warehouse').filter(p => p.owner === user.email);
+      const targetEmail = viewUserEmail || user.email;
+      const warehouse = DataManager.getScopedData('ecommerce_warehouse').filter(p => p.owner === targetEmail);
       
       // Desktop Table
       const tbody = document.querySelector('#warehouse-table tbody');
@@ -1500,149 +1473,39 @@
       }
     }
 
-    function renderEmails() {
-      if (typeof DataManager === 'undefined') return;
-      
-      const emails = DataManager.getScopedData('ecommerce_messages');
-      
-      // Desktop Table
-      const tbody = document.querySelector('#emails-table tbody');
-      if (tbody) {
-        tbody.innerHTML = emails.map(e => {
-          const isRead = e.status === 'read';
-          return `
-            <tr>
-              <td><strong>${e.email || 'N/A'}</strong></td>
-              <td>${e.subject || 'No Subject'}</td>
-              <td class="blurry-text ${isRead ? 'revealed' : ''}" onclick="revealMessage('${e.id}', this)">
-                ${(e.message || '').substring(0, 50)}${e.message?.length > 50 ? '...' : ''}
-              </td>
-              <td>${e.receivedDate ? new Date(e.receivedDate).toLocaleDateString() : 'N/A'}</td>
-              <td><span class="status-pill status-${e.status || 'unread'}">${e.status || 'unread'}</span></td>
-            </tr>
-          `;
-        }).join('') || '<tr><td colspan="5" style="text-align:center">No messages</td></tr>';
-      }
-
-      // Mobile Cards
-      const mobileContainer = document.getElementById('emails-mobile');
-      if (mobileContainer) {
-        mobileContainer.innerHTML = emails.map(e => {
-          const isRead = e.status === 'read';
-          return `
-            <div class="data-card-mobile">
-              <div class="card-header">
-                <span class="card-title">${e.email || 'N/A'}</span>
-                <span class="status-pill status-${e.status || 'unread'}">${e.status || 'unread'}</span>
-              </div>
-              <div class="card-body">
-                <div class="data-row">
-                  <span class="label">Subject</span>
-                  <span class="value">${e.subject || 'No Subject'}</span>
-                </div>
-                <div class="data-row">
-                  <span class="label">Date</span>
-                  <span class="value">${e.receivedDate ? new Date(e.receivedDate).toLocaleDateString() : 'N/A'}</span>
-                </div>
-                <div class="data-row" style="flex-direction:column; align-items:flex-start; gap:0.5rem;">
-                  <span class="label">Message</span>
-                  <span class="value blurry-text ${isRead ? 'revealed' : ''}" 
-                        onclick="revealMessage('${e.id}', this)"
-                        style="font-size:0.875rem; line-height:1.5;">
-                    ${e.message || 'No message'}
-                  </span>
-                </div>
-              </div>
-            </div>
-          `;
-        }).join('') || '<p style="text-align:center; color: var(--text-muted);">No messages</p>';
-      }
-    }
-
-    function revealMessage(id, el) {
-      el.classList.add('revealed');
-      if (typeof DataManager !== 'undefined') {
-        const emails = DataManager.getScopedData('ecommerce_messages');
-        const email = emails.find(e => e.id === id);
-        if (email) {
-          email.status = 'read';
-          DataManager.saveScopedData('ecommerce_messages', emails);
-          renderEmails();
-        }
-      }
-    }
-
     function renderProfits() {
       if (typeof DataManager === 'undefined') return;
       
-      const orders = DataManager.getScopedData('ecommerce_orders');
-      const warehouse = DataManager.getScopedData('ecommerce_warehouse');
+      const user = DataManager.getCurrentUser();
+      const targetEmail = viewUserEmail || user.email;
+      const orders = DataManager.getScopedData('ecommerce_orders', [], viewUserEmail);
+      const warehouse = DataManager.getScopedData('ecommerce_warehouse').filter(p => p.owner === targetEmail);
       
       const totalRevenue = orders.reduce((sum, o) => sum + (o.grandTotal || 0), 0);
       const warehouseValue = warehouse.reduce((sum, p) => sum + ((p.price || 0) * (p.quantity || 0)), 0);
-      const operatingCosts = Math.floor(totalRevenue * 0.15);
-      const profit = totalRevenue - operatingCosts;
-      const profitMargin = totalRevenue > 0 ? Math.round((profit / totalRevenue) * 100) + '%' : '0%';
+      
+      // Calculate commission from orders (it might already be stored or needs to be calculated)
+      const commission = orders.reduce((sum, o) => {
+        if (o.totalCommission !== undefined) return sum + o.totalCommission;
+        // Fallback for old orders
+        return sum + ((o.grandTotal || 0) * 0.10);
+      }, 0);
+      
+      const netRevenue = totalRevenue - commission;
+      const profitMargin = totalRevenue > 0 ? Math.round((netRevenue / totalRevenue) * 100) + '%' : '0%';
       
       document.getElementById('pl-revenue').innerText = 'KSH ' + totalRevenue.toLocaleString();
       document.getElementById('pl-warehouse').innerText = 'KSH ' + warehouseValue.toLocaleString();
-      document.getElementById('pl-costs').innerText = '-KSH ' + operatingCosts.toLocaleString();
-      document.getElementById('pl-profit').innerText = 'KSH ' + profit.toLocaleString();
+      document.getElementById('pl-costs').innerText = '-KSH ' + commission.toLocaleString();
+      document.getElementById('pl-profit').innerText = 'KSH ' + netRevenue.toLocaleString();
       document.getElementById('pl-margin').innerText = profitMargin;
-    }
-
-    function renderUsers() {
-      if (typeof DataManager === 'undefined') return;
-      
-      const users = DataManager.getAllUsers() || [];
-      
-      // Desktop Table
-      const tbody = document.querySelector('#users-table tbody');
-      if (tbody) {
-        tbody.innerHTML = users.map(u => `
-          <tr>
-            <td><code>${(u.id || '').slice(0, 8)}</code></td>
-            <td><span class="clickable-name" onclick="viewUserProfile('${u.id}')">${u.name || 'N/A'}</span></td>
-            <td>${u.email || 'N/A'}</td>
-            <td>${(u.registeredDate || u.createdAt) ? new Date(u.registeredDate || u.createdAt).toLocaleDateString() : 'N/A'}</td>
-          </tr>
-        `).join('') || '<tr><td colspan="4" style="text-align:center">No users registered</td></tr>';
-      }
-
-      // Mobile Cards
-      const mobileContainer = document.getElementById('users-mobile');
-      if (mobileContainer) {
-        mobileContainer.innerHTML = users.map(u => `
-          <div class="data-card-mobile">
-            <div class="card-header">
-              <span class="card-title">${u.name || 'N/A'}</span>
-              <code style="font-size:0.75rem;">${(u.id || '').slice(0, 8)}</code>
-            </div>
-            <div class="card-body">
-              <div class="data-row">
-                <span class="label">Email</span>
-                <span class="value">${u.email || 'N/A'}</span>
-              </div>
-              <div class="data-row">
-                <span class="label">Joined</span>
-                <span class="value">${(u.registeredDate || u.createdAt) ? new Date(u.registeredDate || u.createdAt).toLocaleDateString() : 'N/A'}</span>
-              </div>
-            </div>
-            <div class="card-actions">
-              <button class="btn btn-primary btn-sm" onclick="viewUserProfile('${u.id}')">
-                <i class="fas fa-eye"></i> View Profile
-              </button>
-            </div>
-          </div>
-        `).join('') || '<p style="text-align:center; color: var(--text-muted);">No users registered</p>';
-      }
     }
 
     // MODAL FUNCTIONS
     function viewOrderDetails(orderId) {
       if (typeof DataManager === 'undefined') return;
       
-      const orders = DataManager.getScopedData('ecommerce_orders');
+      const orders = DataManager.getScopedData('ecommerce_orders', [], viewUserEmail);
       const order = orders.find(o => o.id === orderId);
       if (!order) return alert("Order not found");
 
@@ -1696,7 +1559,7 @@
     function showAdminReceipt(orderId) {
       if (typeof DataManager === 'undefined') return;
       
-      const orders = DataManager.getScopedData('ecommerce_orders');
+      const orders = DataManager.getScopedData('ecommerce_orders', [], viewUserEmail);
       const order = orders.find(o => o.id === orderId);
       if (!order) return alert("Order not found");
 
@@ -1756,111 +1619,6 @@
         </div>
       `;
       document.getElementById('details-modal').style.display = 'flex';
-    }
-
-    function viewUserProfile(userId) {
-      if (typeof DataManager === 'undefined') return;
-      
-      const users = DataManager.getAllUsers();
-      const user = users.find(u => u.id === userId);
-      if (!user) return alert("User not found");
-
-      const body = document.getElementById('modal-body');
-      const isRestricted = user.status === 'restricted';
-      const orders = DataManager.getAllOrders() || [];
-      const userOrders = orders.filter(o => (o.customerEmail || o.customer?.email) === user.email);
-      
-      body.innerHTML = `
-        <div class="modal-header">
-          <h2><i class="fas fa-user-circle"></i> ${user.name}</h2>
-        </div>
-        <div style="display:flex; gap:1.5rem; flex-wrap:wrap;">
-          <div style="flex:0 0 150px;">
-            <img src="${user.profileImage || 'https://via.placeholder.com/150'}" 
-                 style="width:150px; height:150px; border-radius:12px; object-fit:cover; border:3px solid var(--primary);">
-            <div style="margin-top:1rem; display:flex; flex-direction:column; gap:0.5rem;">
-              <button class="btn ${isRestricted ? 'btn-success' : 'btn-danger'}" 
-                      onclick="toggleUserRestriction('${user.id}')" style="width:100%;">
-                <i class="fas ${isRestricted ? 'fa-unlock' : 'fa-ban'}"></i> 
-                ${isRestricted ? 'Unrestrict' : 'Restrict'}
-              </button>
-              <button class="btn btn-sm" onclick="deleteUserAccount('${user.id}')" 
-                      style="width:100%; background:#374151; color:white;">
-                <i class="fas fa-trash"></i> Delete
-              </button>
-            </div>
-          </div>
-          <div style="flex:1; min-width:250px;">
-            <h3 style="margin-bottom:1rem; padding-bottom:0.5rem; border-bottom:1px solid var(--border);">
-              Account Information
-            </h3>
-            <div style="display:grid; gap:0.75rem; font-size:0.9375rem;">
-              <p><strong style="color:var(--text-muted);">Name:</strong> ${user.name}</p>
-              <p><strong style="color:var(--text-muted);">Email:</strong> ${user.email}</p>
-              <p><strong style="color:var(--text-muted);">ID:</strong> <code>${user.id}</code></p>
-              <p><strong style="color:var(--text-muted);">Status:</strong> 
-                <span class="status-pill ${isRestricted ? 'status-unread' : 'status-completed'}">
-                  ${user.status || 'Active'}
-                </span>
-              </p>
-              <p><strong style="color:var(--text-muted);">Registered:</strong> 
-                ${new Date(user.registeredDate || user.createdAt).toLocaleString()}
-              </p>
-            </div>
-            
-            <h3 style="margin-top:1.5rem; margin-bottom:1rem; padding-bottom:0.5rem; border-bottom:1px solid var(--border);">
-              Activity Stats
-            </h3>
-            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:1rem;">
-              <div style="background:#f9fafb; padding:1rem; border-radius:10px; text-align:center;">
-                <div style="font-size:1.75rem; font-weight:700; color:var(--primary);">
-                  ${userOrders.length}
-                </div>
-                <div style="font-size:0.875rem; color:var(--text-muted);">Orders</div>
-              </div>
-              <div style="background:#f9fafb; padding:1rem; border-radius:10px; text-align:center;">
-                <div style="font-size:1.75rem; font-weight:700; color:var(--info);">
-                  ${(DataManager.getClientEmails() || []).filter(e => e.email === user.email).length}
-                </div>
-                <div style="font-size:0.875rem; color:var(--text-muted);">Messages</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-      document.getElementById('details-modal').style.display = 'flex';
-    }
-
-    function toggleUserRestriction(userId) {
-      if (typeof DataManager === 'undefined') return;
-      
-      const users = DataManager.getAllUsers();
-      const user = users.find(u => u.id === userId);
-      if (!user) return;
-
-      const isRestricted = user.status === 'restricted';
-      const action = isRestricted ? "unrestrict" : "restrict";
-      
-      if (!confirm(`Are you sure you want to ${action} this user?`)) return;
-
-      user.status = isRestricted ? 'active' : 'restricted';
-      localStorage.setItem('ecommerce_all_users', JSON.stringify(users));
-      
-      alert(`User account has been ${action}ed.`);
-      viewUserProfile(userId);
-      renderUsers();
-    }
-
-    function deleteUserAccount(userId) {
-      if (!confirm("Permanently delete this user account? This cannot be undone.")) return;
-      
-      if (typeof DataManager !== 'undefined') {
-        DataManager.deleteUser(userId);
-      }
-      closeModal();
-      renderUsers();
-      renderDashboard();
-      alert("User account has been permanently deleted.");
     }
 
     function closeModal() {

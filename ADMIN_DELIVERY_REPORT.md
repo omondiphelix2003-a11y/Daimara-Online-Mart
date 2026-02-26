@@ -537,7 +537,7 @@ Evening:
 ### File Access
 - **Admin Panel**: [admin-manager.html](admin-manager.html)
 - **Main Website**: [index.html](index.html)
-- **Shop**: [shop.html](shop.html)
+- **Shop**: [store.html](store.html)
 
 ---
 

@@ -59,7 +59,7 @@ Navigate to `add-product.html` and:
    - Full CRUD operations
    - Image upload functionality
 
-2. **`home.html`** - Added:
+2. **`index.html`** - Added:
    - "Manage Products" link in navbar
    - DataManager script loading
 

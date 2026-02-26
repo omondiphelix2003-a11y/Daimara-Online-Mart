@@ -44,7 +44,7 @@ data-manager.js           ← Centralized data manager
 supermarket.html          ← Displays Supermarket products
 second-hand items.html    ← Displays Second-hand products
 cart.html                 ← Shopping cart
-home.html                 ← Home page with link to manage products
+index.html                 ← Home page with link to manage products
 ```
 
 ### 6. **How to Access**

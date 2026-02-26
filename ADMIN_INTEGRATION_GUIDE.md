@@ -93,7 +93,7 @@ All systems are working correctly with full admin-manager integration.
 - Links to Shop, About, Contact pages
 - All navigation working
 
-### Shop Page (shop.html)
+### Shop Page (store.html)
 - Product categories filter
 - Products display with add-to-cart buttons
 - Cart modal shows items
@@ -292,7 +292,7 @@ DataManager.getCart();
 
 ✅ **HTML Files** (9 total)
 - index.html
-- shop.html
+- store.html
 - profile.html
 - cart.html
 - checkout.html

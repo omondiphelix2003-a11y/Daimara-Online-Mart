@@ -159,9 +159,9 @@ button.order{width:100%;margin-top:20px;padding:12px;background:#111;color:#e99d
 <body>
 
 <nav class="navbar">
-  <!--<a href="home.html" class="logo">Daimara Online Mart</a>-->
+  <!--<a href="index.html" class="logo">Daimara Online Mart</a>-->
   <div class="nav-links">
-    <a href="home.html"style="font-weight:bold;font-size:25px;color:rgb(233, 157, 17);">Daimara-Gas</div></a>
+    <a href="index.html"style="font-weight:bold;font-size:25px;color:rgb(233, 157, 17);">Daimara-Gas</div></a>
   </div>
 </nav>
 
@@ -292,9 +292,9 @@ function placeGasOrder(){
 
     if (results.length > 0) {
       searchResults.innerHTML = results.map(p => {
-        let url = 'Shop.html?search=' + encodeURIComponent(p.name);
+        let url = 'store.html?search=' + encodeURIComponent(p.name);
         if (p.subcategory === 'Gas') url = 'gas-refill.html';
-        if (p.subcategory === 'Water') url = 'water-refill.html';
+        if (p.subcategory === 'Water') url = 'Water-Refilling.html';
         
         return `
           <div onclick="window.location.href='${url}'">

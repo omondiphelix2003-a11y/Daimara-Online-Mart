@@ -461,7 +461,7 @@ h4 {
 
     <nav class="navbar">
         <div class="nav-left">
-           <!-- <a href="home.html" style="text-decoration: none; color: inherit;"><span>Cart</span></a>-->
+           <!-- <a href="index.html" style="text-decoration: none; color: inherit;"><span>Cart</span></a>-->
         </div>
         <div class="nav-right" style="display: flex; gap: 15px; align-items: center;">
             <!--<div class="nav-profile-icon">
@@ -496,7 +496,7 @@ h4 {
 
         <nav class="checkout">
             <a href="checkout.html" id="checkout">Checkout</a>
-            <a href="shop.html">Continue Shopping</a>
+            <a href="store.html">Continue Shopping</a>
         </nav>
     </div>
 
@@ -525,7 +525,7 @@ function renderCart() {
   cartItems.innerHTML = '';
 
   if (cart.length === 0) {
-    cartItems.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">Your cart is empty. <a href="shop.html">Continue shopping</a></p>';
+    cartItems.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">Your cart is empty. <a href="store.html">Continue shopping</a></p>';
     document.getElementById('total').textContent = '0';
     return;
   }

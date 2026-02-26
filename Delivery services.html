@@ -51,6 +51,15 @@ body{
   margin-top:30px;color: #064e1f;
 }
 
+.table-container {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 500px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
 .table{
   width:100%;
   border-collapse:collapse;
@@ -186,33 +195,35 @@ body{
   <!-- DISPATCH LIST -->
   <div class="section">
     <h2>Dispatch Packed Orders</h2>
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Order ID</th>
-          <th>Client</th>
-          <th>Destination</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>#DM2042</td>
-          <td>Peter Otieno</td>
-          <td>Karen</td>
-          <td>Packed</td>
-          <td><button class="action-btn dispatch">Send to Delivery</button></td>
-        </tr>
-        <tr>
-          <td>#DM2043</td>
-          <td>Grace Njeri</td>
-          <td>Kilimani</td>
-          <td>Out for Delivery</td>
-          <td><button class="action-btn delivered">Mark Delivered</button></td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-container">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Client</th>
+            <th>Destination</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>#DM2042</td>
+            <td>Peter Otieno</td>
+            <td>Karen</td>
+            <td>Packed</td>
+            <td><button class="action-btn dispatch">Send to Delivery</button></td>
+          </tr>
+          <tr>
+            <td>#DM2043</td>
+            <td>Grace Njeri</td>
+            <td>Kilimani</td>
+            <td>Out for Delivery</td>
+            <td><button class="action-btn delivered">Mark Delivered</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <!-- QR CODE SCANNER -->
@@ -234,13 +245,26 @@ function checkAccess() {
     window.location.href = "login.html";
     return false;
   }
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const viewUserEmail = urlParams.get('viewUserEmail');
+
+  // Allow admin to view any delivery page if they have the email param
+  if (user.role === 'admin' && viewUserEmail) {
+    return true;
+  }
+
   if (user.role !== 'delivery') {
     alert("Access denied. This page is for delivery personnel only.");
-    window.location.href = "home.html";
+    window.location.href = "index.html";
     return false;
   }
   return true;
 }
+
+// Get the email to view (for admin impersonation)
+const urlParams = new URLSearchParams(window.location.search);
+const viewUserEmail = urlParams.get('viewUserEmail');
 
 if (checkAccess()) {
   document.addEventListener('DOMContentLoaded', () => {
@@ -251,8 +275,8 @@ if (checkAccess()) {
 }
 
 function renderDeliveryData() {
-  const orders = DataManager.getScopedData('delivery_orders');
-  const earnings = DataManager.getScopedData('delivery_earnings', { total: 0 });
+  const orders = DataManager.getScopedData('delivery_orders', [], viewUserEmail);
+  const earnings = DataManager.getScopedData('delivery_earnings', { total: 0 }, viewUserEmail);
   
   const today = new Date().toLocaleDateString();
   const summary = {
@@ -278,7 +302,7 @@ function renderDeliveryData() {
     <tr>
       <td>${o.id}</td>
       <td>${o.client}</td>
-      <td>${o.destination}</td>
+      <td><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(o.destination)}" target="_blank" style="color:var(--accent); text-decoration:none;"><i class="fas fa-map-marker-alt"></i> ${o.destination}</a></td>
       <td>${o.status}</td>
       <td>
         ${(o.status === 'assigned' || o.status === 'Packed') ? `<button class="action-btn dispatch" onclick="viewReceipt('${o.id}')">Send to Delivery</button>` : ''}
@@ -298,7 +322,7 @@ function updateStatus(id, newStatus) {
 }
 
 function viewReceipt(orderId) {
-  const orders = DataManager.getScopedData('delivery_orders');
+  const orders = DataManager.getScopedData('delivery_orders', [], viewUserEmail);
   const dOrder = orders.find(o => o.id === orderId);
   if (!dOrder) return alert("Order not found");
 
@@ -320,7 +344,7 @@ function viewReceipt(orderId) {
         <p><strong>Order ID:</strong> ${order.id}</p>
         <p><strong>Customer:</strong> ${order.customerName || order.customer?.name}</p>
         <p><strong>Phone:</strong> ${order.customerPhone || order.customer?.phone || 'N/A'}</p>
-        <p><strong>Destination:</strong> ${order.deliveryLocation || 'N/A'}</p>
+        <p><strong>Destination:</strong> <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(order.deliveryLocation || dOrder.destination)}" target="_blank" style="color:var(--accent); text-decoration:none;"><i class="fas fa-map-marker-alt"></i> ${order.deliveryLocation || 'N/A'}</a></p>
         <p><strong>Date:</strong> ${new Date(order.date).toLocaleString()}</p>
       </div>
       <table class="receipt-table">
