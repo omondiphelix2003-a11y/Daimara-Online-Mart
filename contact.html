@@ -2,16 +2,28 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Daimara Online Mart | Contact Us</title>
+  <title>Daimara Stores | Contact Us</title>
   <meta name="viewport" content="width=1200">
   <link rel="stylesheet" href="contact.css">
 
-<style>* {
+<style>
+:root{
+      --primary:#e99d11;
+      --dark:#111;
+      --bg:#f5f5f5;
+      --card:#ffffff;
+      --text:#1f2937;
+      --border:#e5e7eb;
+      --shadow:0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+* {
   box-sizing: border-box;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin: 0;
 }
 
+ 
 body {
   background: #f5f5f5;
   font-size: 25px;
@@ -20,8 +32,7 @@ body {
 
 /* FOOTER */
 .footer {
-  background: #0a0a0a;
-  color: white;
+  background: none;
   padding: 30px 20px;
   text-align: center;
   position: fixed;
@@ -31,7 +42,7 @@ body {
   z-index: 1000;
 }
 .footer p {
-  color: rgb(233, 157, 17);
+  color: rgb(0, 0, 0);
 }
 
 /* PARA */
@@ -49,15 +60,16 @@ body {
     background-color: #000000; /* Add your desired background color */
     z-index: 1000; /* Ensure it's on top of other elements */ 
     }
-    .logo{color:rgb(233, 157, 17);font-size:25px;font-weight:bold}
-    .nav-center{display:flex;align-items:center;gap:20px}
-    .nav-center a{color:#fff;text-decoration:none;padding-left: 20px;margin-right: 40px;}
+    .logo{color:#e99d11;font-size:25px;font-weight:bold}
+    .nav-center{display:flex;align-items:center;gap:10px}
+    .nav-center a{color: #e99d11; font-size: 17px; transition: 0.3s; text-decoration: none;
+      padding-left: 5px;margin-right: 20px;}
     .nav-center input{padding:7px 10px;border-radius:5px;border:none}
     .nav-icons a{color:#fff;margin-left:15px;font-size:14px}
 
 .nav-center a:hover,
 .nav-center a.active {
-  color: rgb(233, 157, 17);
+  color: rgb(255, 255, 255);
 }
 
 .nav-icons a:hover,
@@ -201,14 +213,13 @@ body {
 
 /* FOOTER */
 .footer-old {
-  background: #0a0a0a;
-  color: white;
+  background: none;
   padding: 30px 20px;
   text-align: center;
 }
 
 .footer p {
-  color: rgb(233, 157, 17);
+  color: rgb(0, 0, 0);
 }
 
 
@@ -342,25 +353,27 @@ body {
 <!-- NAVBAR -->
 <nav class="navbar">
   
-   <div class="logo">
-            <a href="index.html" style="text-decoration: none; color: inherit;"><span>Daimara Online Mart</span></a>
-   </div>
+   <!-- <div class="logo">
+            <a href="index.html" style="text-decoration: none; color:  #fff;font-size:22px;font-weight:bold;"><span>Daimara Stores</span></a>
+   </div> -->
+
   <div class="nav-center">
-    <a href="index.html">Home</a>
-    <a href="store.html"><div class="shop-icon"></div></a>
+    <!--<a href="index.html"style="color:#e99d11;">Back</a>-->
     <a href="about.html">About</a>
+    <a href="store.html">Store</div></a>
+     
   </div>
 
-  <div class="nav-icons">
+  <!--<div class="nav-icons">
     <a href="login.html"><i class="fa fa-user"></i></a>
     <a href="cart.html"><i class="fa fa-shopping-cart"></i></a>
-  </div>
+  </div>-->
 </nav>
 
 <!-- CONTACT SECTION -->
 <section class="contact-container">
   <h1>Contact Us</h1>
-  <p>We’d love to hear from you. Send us a message below.</p>
+  <p>We'd love to hear from you. Send us a message below.</p>
 
   <div class="contact-grid">
 
@@ -376,7 +389,7 @@ body {
     <!-- CONTACT INFO -->
     <div class="contact-info">
       <h3>Our Store</h3>
-      <p><strong>Email:</strong> omondiphelix2003@gmail.com</p>
+      <p><strong>Email:</strong> daimarastores.Ke@gmail.com</p>
       <p><strong>Phone:</strong> +254 745431472</p>
       <p><strong>Location:</strong> Nakuru, Kenya</p>
 
@@ -390,9 +403,9 @@ body {
   </div>
 </section>
 
-<footer class="footer">
+<!-- <footer class="footer">
   <p>Copyright © 2026 Daimara Online Mart.All rights reserved.</p>
-</footer>
+</footer>-->
 
 <script src="data-manager.js"></script>
 <script src="auth-check.js"></script>

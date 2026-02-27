@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Daimara Online Mart | Home</title>
+  <title>Daimara Stores | Home</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
 :root{
@@ -52,7 +52,7 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
     z-index: 1000;
     flex-wrap: wrap;
     }
-    .logo{color:rgb(233, 157, 17);font-size:22px;font-weight:bold;
+    .logo{color:white;font-size:20px;font-weight:bold;
     display: flex;
     align-items: center;
     transition: color 0.3s;
@@ -81,13 +81,8 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
 
 
    .search-container {
-  position: fixed;
-  top: 150px;
-  left: 5%;
-  width: 90%;
-  max-width: 650px;
-  margin: 0;
-  z-index: 1001;
+ position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
+      width: 90%; max-width: 600px; z-index: 1001;margin-top: 35px;
  }
 
 
@@ -171,9 +166,14 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
 
 
     /* SLIDER */
-    .slider{position:relative;width:100%;height:auto;aspect-ratio:16/9;overflow:hidden;margin-top:140px;box-shadow:6px 5px 15px rgba(0, 0, 0, 0.397);}
-    .slide{display:none}
-    .slide img{width:100%;height:100%;object-fit:cover}
+     /* SLIDER */
+        .slider {
+            width: 100%; max-width: 1350px; aspect-ratio: 16/9; max-height: 400px;
+            margin: 30px auto; overflow: hidden; border-radius: none;margin-top: 180px;
+        }
+        .slide { display: none; height: 100%; }
+        .slide img { width: 100%; height: 100%; object-fit: cover; }
+
     
     @media (max-width: 768px) {
       .slider { margin-top: 180px; }
@@ -182,7 +182,7 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
 
     /* DELIVERY SECTIONS */
     section{padding:20px 15px}
-    h2{color: rgb(0, 0, 0);text-align:center;margin-bottom:20px; font-size: 1.5rem;}
+    h2{color: rgb(0, 0, 0);text-align:center;margin-bottom:50px; font-size: 2.5rem;}
     
 
     /* DELIVERY */
@@ -193,7 +193,7 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
       .delivery-card img{width:100%;height:auto;aspect-ratio:1/1;object-fit:cover;border-radius: 5px;}
       
     
-    .delivery-card i{font-size:30px;margin-bottom:10px;color:#111}
+    .delivery-card i{font-size:25px;margin-bottom:15px;color:#111}
     button{
       margin-top:10px;padding:8px 15px;border:none;border-radius:5px;
       background:#111;color:rgb(233, 157, 17);cursor:pointer
@@ -243,9 +243,9 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
       padding:0;transition:transform 0.4s ease;
     }
 
-    .product:hover img{
+    /*.product:hover img{
       transform:scale(1.05);
-    }
+    }*/
 
     .product-details{
       padding:12px;flex-grow:1;display:flex;flex-direction:column;
@@ -271,17 +271,17 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
 
     /* FOOTER */
     .footer {
-      background: #000;
-      color: #e99d11;
+      background: none;
       padding: 15px;
       text-align: center;
       position: static;
       width: 100%;
-      margin-top: 40px;
+      margin-top:60px;
+      margin-bottom: -80px;
     }
     .footer p {
-      color: #e99d11;
-      font-size: 16px;
+      color: #000000;
+      font-size: 14px;
       font-weight: bold;
     }
 
@@ -327,18 +327,18 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
     /* RESPONSIVE BREAKPOINTS */
     @media (max-width: 768px) {
       body { font-size: 16px; padding-bottom: 20px; }
-      .navbar { top: 40px; }
-      .nav-center { width: 100%; justify-content: center; padding: 5px 0; }
-      .nav-icons { width: 100%; justify-content: center; display: flex; padding-bottom: 5px; }
-      .search-container { top: 180px; }
+      .navbar { top: 50px; }
+      .nav-center { width: 100%; justify-content: center; padding: 5px 0;margin-top: -30px;margin-left: 200px; }
+      .nav-icons { width: 100%; justify-content: center; display: flex; padding-bottom: 5px;margin-top: -29px;margin-left: 660px; }
+      .search-container { top: 80px; }
     }
     
     @media (max-width: 480px) {
       .ad-bar { font-size: 14px; padding: 0.5rem; }
       .navbar { top: 35px; }
-      .nav-center a { font-size: 14px; }
-      .nav-icons a { font-size: 18px; }
-      .search-container { top: 170px; }
+      .nav-center  { font-size: 14px;margin-left: 190px; }
+      .nav-icons { font-size: 18px;margin-left: 340px;margin-top: 5px; }
+      .search-container { top: 100px; }
       .delivery-card img { height: 200px; }
     }
 
@@ -375,14 +375,13 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
   </div>
 
    <nav class="navbar">
-      <a href="index.html" class="logo">
-        <i class="fas fa-store" style="font-size:27px;color:rgb(233,157,17);"></i>
-        <span style="font-size:23px;color:white;margin-left:10px;">Daimara Stores</span>
+      <a class="logo">
+        <span style="font-size:20px;color:white;margin-left:10px;margin-left: -3px;">Daimara Stores</span>
       </a>
 
 
   <div class="nav-center">
-    <a href="store.html"><div class="shop-icon"></div></a>
+    <a href="store.html"><div class="fa fa-shopping-bag"></div></a>
      <a href="about.html" title="About"><i class="fas fa-info-circle"></i></a>
     <a href="contact.html" title="Contact"><i class="fas fa-phone"></i></a>
     
@@ -429,7 +428,7 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
 </script>
 
 <div class="search-container">
-  <input type="text" id="search-input" placeholder="Search...">
+  <input type="text" id="search-input" placeholder="Search products...">
   <!--<button id="search-btn">🔍</button>-->
   <div id="search-results"></div>
 </div>
@@ -500,7 +499,7 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
 
 
 <footer class="footer">
-  <p>Copyright © 2026 Daimara Online Mart.All rights reserved.</p>
+  <p>Copyright © 2026 Daimara Stores.All rights reserved.</p>
 </footer>
 
 <script src="data-manager.js"></script>
