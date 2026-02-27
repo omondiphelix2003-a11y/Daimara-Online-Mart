@@ -1,569 +1,349 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=1200">
-  <title>Daimara Online Mart | Checkout</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
-    body{background:#f5f5f5; font-size: 22px; padding-bottom: 100px; padding-top: 80px;}
-
-/* FOOTER */
-.footer {
-  background: #0a0a0a;
-  color: white;
-  padding: 30px 20px;
-  text-align: center;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  z-index: 1000;
-}
-.footer p {
-  color: rgb(233, 157, 17);
-}
-
-/* PARA */
-.para{
- color: #f5f5f5;
-}
-
-    .navbar{display:flex;align-items:center;justify-content:space-between;padding:-8px 40px;
-      background:#111;color:#fff;  position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    background-color: #000000; /* Add your desired background color */
-    z-index: 1000; /* Ensure it's on top of other elements */  }
-    .logo{color:rgb(233, 157, 17);font-size:25px;font-weight:bold}
-    .navbar a{color:#f5f5f5;text-decoration:none;font-size: 25px;margin-left:15px;}
-
-
-.navbar a:hover,
-.navbar a.active {
-  color: rgb(233, 157, 17);
-}
-
-@media (max-width: 768px) {
-  .navbar a { font-size: 18px; }
-}
-
-    .container{padding:40px 30px;max-width:1000px;margin:auto; margin-top: 40px;}
-    h2{text-align:center;font-size:27px;margin-bottom:20px;color: rgb(0, 0, 0);}
-    h3{text-align:center;font-size:27px;margin-left: 125px;color: rgb(0, 0, 0);}
-    table{width:100%;border-collapse:collapse;margin-bottom:30px;color: rgb(233, 157, 17);}
-    table th, table td{padding:15px;border-bottom:1px solid #ddd;text-align:left;font-size: 30;}
-    table img{width:90px;height:70px;object-fit:cover;border-radius:5px}
-    .total{float:right;font-size:29px;margin-bottom:20px}
-    .checkout-form{background:#fff;margin-top: 95px;padding:80px 80px;border-radius:10px;font-size: 32px;box-shadow:0 5px 15px rgba(0,0,0,.1)}
-    .checkout-form input, .checkout-form select{width:100%;padding:10px;font-size: 27px;margin:10px 0;border:1px solid #ccc;border-radius:6px}
-    .checkout-form button{padding:12px 20px;font-size: 27px;background:#111;color:rgb(233, 157, 17);border:none;border-radius:6px;cursor:pointer;width:100%}
-
-    /* MAP BOX */
-    #map-container {
-      display: none;
-      margin-top: 15px;
-      padding: 15px;
-      background: #f9f9f9;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-    }
-    #map {
-      height: 300px;
-      width: 100%;
-      border-radius: 8px;
-      margin-top: 10px;
-      font-size: 27px;
-    }
-    .map-btn {
-      background: #111;
-      color: #e99d11;
-      padding: 8px 15px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 25px;
-      margin-bottom: 10px;
-    }
-
-.shop-icon {
-            position: relative;
-            width: 30px;
-            height: 30px;
-            background-color: transparent;
-            border: 3px solid rgb(233, 157, 17);
-            border-radius: 4px;
-            margin: 20px;
-            left: -8px;
-            top: -5px;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daimara Online Mart | Checkout</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        :root {
+            --primary: #e99d11;
+            --dark: #111;
+            --bg: #f5f5f5;
+            --card: #ffffff;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
-        .shop-icon::before {
-            content: '';
-            position: absolute;
-            top: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 10px;
-            height: 12px;
-            border: 3px solid rgb(233, 157, 17);
-            border-bottom: none;
-            border-radius: 10px 10px 0 0;
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, Helvetica, sans-serif; }
+        body { background: var(--bg); font-size: 16px; padding-bottom: 20px; }
+
+        /* NAVBAR */
+        .navbar {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 20px; background: var(--dark); color: #fff;
+            position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+        }
+        .logo { color: var(--primary); font-size: 20px; font-weight: bold; text-decoration: none; }
+        .nav-icons { display: flex; align-items: center; gap: 15px; }
+        .nav-icons a { color: #fff; font-size: 18px; transition: 0.3s; text-decoration: none; }
+        .nav-icons a:hover { color: var(--primary); }
+
+        /* CONTAINER */
+        .container { width: 95%; max-width: 1000px; margin: 80px auto 30px auto; }
+        h2, h3 { color: #333; margin: 20px 0; text-align: center; }
+
+        /* CART TABLE */
+        .table-responsive { width: 100%; overflow-x: auto; background: #fff; border-radius: 8px; box-shadow: var(--shadow); margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
+        th { background: #f9f9f9; color: #555; }
+        td img { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; }
+
+        /* TOTAL SECTION */
+        .total-section { text-align: right; padding: 15px; background: #fff; border-radius: 8px; box-shadow: var(--shadow); margin-bottom: 30px; }
+        .total-section div { margin: 5px 0; font-size: 16px; color: #555; }
+        .grand-total { font-size: 22px !important; font-weight: bold; color: var(--dark) !important; margin-top: 10px !important; }
+
+        /* CHECKOUT FORM */
+        .checkout-form { background: #fff; padding: 25px; border-radius: 12px; box-shadow: var(--shadow); }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; color: #333; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+        
+        .delivery-box { background: #f9f9f9; padding: 15px; border-radius: 8px; margin: 15px 0; }
+        .checkbox-label { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 14px; }
+        .checkbox-label input { width: 18px; height: 18px; }
+
+        #map-container { display: none; margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px; }
+        .map-btn { display: inline-block; background: var(--dark); color: var(--primary); padding: 8px 15px; border-radius: 4px; text-decoration: none; font-size: 12px; font-weight: bold; margin-bottom: 10px; }
+        
+        .btn-group { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+        .btn-primary { background: var(--dark); color: var(--primary); padding: 15px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        .btn-secondary { background: #e67e22; color: #fff; padding: 15px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        .btn-primary:hover, .btn-secondary:hover { opacity: 0.9; }
+
+        @media (max-width: 600px) {
+            .container { padding: 0; }
+            .checkout-form { padding: 15px; }
+            th, td { padding: 8px; font-size: 12px; }
+            .logo { font-size: 18px; }
         }
 
-        .shop-icon::after {
-            content: '';
-            position: absolute;
-            top: 10px;
-            left: 8px;
-            width: 14px;
-            height: 2px;
-            background-color: #ffffff;
-            box-shadow: 0 6px 0 #a7884f;
-        }
+        /* SLIDER & PRODUCTS */
+        .slider { width: 100%; aspect-ratio: 16/9; max-height: 300px; overflow: hidden; margin: 30px 0; border-radius: 12px; }
+        .slide { display: none; height: 100%; }
+        .slide img { width: 100%; height: 100%; object-fit: cover; }
 
+        .products-preview { margin-top: 40px; }
+        #random-products { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
+        .product { background: #fff; padding: 10px; border-radius: 10px; box-shadow: var(--shadow); text-align: center; }
+        .product img { width: 100%; height: 100px; object-fit: cover; border-radius: 6px; }
+        .product h4 { font-size: 13px; margin: 8px 0; color: #333; }
+        .product p { font-size: 14px; font-weight: bold; color: var(--primary); }
+        .product button { width: 100%; margin-top: 8px; padding: 8px; border: none; border-radius: 4px; background: var(--dark); color: var(--primary); cursor: pointer; font-size: 11px; font-weight: bold; }
 
-
-  </style>
-  <style>
-    /* SLIDER */
-    .slider {
-      position: relative;
-      width: 100%;
-      height: 400px;
-      overflow: hidden;
-      margin-top: 30px;
-    }
-    .slide {
-      display: none;
-    }
-    .slide img {
-      width: 100%;
-      height: 400px;
-      object-fit: cover;
-    }
-
-    /* RANDOM PRODUCTS */
-    .products-preview {
-      padding: 40px 30px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    .products-preview h2 {
-      color: rgb(233, 157, 17);
-      text-align: center;
-      margin-bottom: 25px;
-      font-size: 35px;
-    }
-    #random-products {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 20px;
-    }
-    .product {
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, .1);
-      text-align: center;
-    }
-    .product img {
-      width: 100%;
-      height: 160px;
-      object-fit: cover;
-      border-radius: 8px;
-    }
-    .product h4 {
-      font-size: 24px;
-      margin: 10px 0;
-      text-align: center;
-      color: #000;
-    }
-    .product p {
-      font-size: 22px;
-      color: #000000;
-      font-weight: bold;
-    }
-    .product button {
-      margin-top: 10px;
-      padding: 8px 15px;
-      border: none;
-      border-radius: 5px;
-      background: #111;
-      color: rgb(233, 157, 17);
-      cursor: pointer;
-      font-size: 20px;
-    }
-  </style>
+        /* FOOTER */
+        .footer { background: var(--dark); color: #fff; padding: 15px; text-align: center; margin-top: 40px; }
+        .footer p { color: var(--primary); font-size: 12px; }
+    </style>
 </head>
 <body>
 
-
-<!-- NAVBAR -->
 <nav class="navbar">
-  <div class="logo">
-           <!-- <a href="index.html" style="text-decoration: none; color: inherit; font-size: 25px;"><span>Checkout</span></a>-->
-   </div>
-  <div>
-    <a href="store.html"><div class="shop-icon"></div></a>
-    <a href="Cart.html"><i class="fa fa-shopping-cart"></i></a>
-  </div>
+    <a href="index.html" class="logo">Daimara Mart</a>
+    <div class="nav-icons">
+        <a href="store.html" title="Store"><i class="fa fa-shopping-bag"></i></a>
+        <a href="cart.html" title="Cart"><i class="fa fa-shopping-cart"></i></a>
+    </div>
 </nav>
 
-<footer class="footer">
-  <p>Copyright © 2026 Daimara Online Mart.All rights reserved.</p>
-</footer>
-
 <div class="container">
-  <h2>Your Cart</h2>
-  <table id="cartTable">
-    <thead>
-      <tr>
-        <th>Product</th>
-        <th>Details</th>
-        <th>Price</th>
-        <th>Quantity</th>
-        <th>Subtotal</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-  <div class="total">
-    <div id="subtotalPrice">Subtotal: KES 0</div>
-    <div id="deliveryFeeDisplay" style="display: none; margin-top: 10px;">Delivery Fee: KES 70</div>
-    <div id="totalPrice" style="margin-top: 10px; font-weight: bold; font-size: 31px;">Total: KES 0</div>
-  </div>
-
-
-  <h3>Checkout</h3>
-  <div class="checkout-form">
-    <input type="text" id="name" placeholder="Full Name" required />
-    <input type="email" id="email" placeholder="Email" required />
-    <label for="paymentMethod">Payment Method</label>
-    <select id="paymentMethod" title="Payment Method" aria-label="Payment Method">
-      <option value="mpesa">M-Pesa</option>
-      <!--<option value="googlepay">Google Pay</option>
-      <option value="card">Card</option>-->
-    </select>
-    <div style="margin: 15px 0; padding: 15px; background: #f9f9f9; border-radius: 6px;">
-      <label for="delivery-option" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-        <input type="checkbox" id="delivery-option" style="width: 18px; height: 18px; cursor: pointer;" onchange="toggleMap()">
-        <span>Add Delivery (KES 70)</span>
-      </label>
-
-      <!-- Map Container -->
-      <div id="map-container">
-        <a href="https://www.google.com/maps/@-0.2802098,36.0567096,15z?entry=ttu&g_ep=EgoyMDI2MDIwNC4wIKXMDSoASAFQAw%3D%3D" target="_blank">
-          <button type="button" class="map-btn"><i class="fas fa-map-marker-alt"></i> Open Google Maps to find your location</button>
-        </a>
-        <p style="font-size: 25px; color: #666; margin-top: 10px; margin-bottom: 5px;">Paste your location coordinates or link below:</p>
-        <input type="text" id="location-coords" placeholder="Paste location here (e.g. -1.28, 36.82 or Google Maps link)" style="margin-top: 5px; font-size: 25px;">
-      </div>
+    <h2>Your Cart Items</h2>
+    <div class="table-responsive">
+        <table id="cartTable">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Details</th>
+                    <th>Price</th>
+                    <th>Qty</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
     </div>
 
-   <button onclick="checkout()">Place Order</button>
-   <button onclick="initiatePayAfterDelivery()" style="margin-top: 10px; background: #e67e22; color: white;">Pay After Delivery</button>
-    
-    
-    
-  </div>
+    <div class="total-section">
+        <div id="subtotalPrice">Subtotal: KES 0</div>
+        <div id="deliveryFeeDisplay" style="display: none;">Delivery Fee: KES 0</div>
+        <div id="totalPrice" class="grand-total">Total: KES 0</div>
+    </div>
+
+    <h3>Checkout Details</h3>
+    <div class="checkout-form">
+        <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="name" placeholder="Enter your full name">
+        </div>
+        <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="email" placeholder="Enter your email">
+        </div>
+        <div class="form-group">
+            <label>Payment Method</label>
+            <select id="paymentMethod">
+                <option value="mpesa">M-Pesa</option>
+            </select>
+        </div>
+
+        <div class="delivery-box">
+            <label class="checkbox-label">
+                <input type="checkbox" id="delivery-option" onchange="toggleMap()">
+                <span id="deliveryLabelText">Add Delivery (KES 0)</span>
+            </label>
+
+            <div id="map-container">
+                <a href="https://www.google.com/maps" target="_blank" class="map-btn">
+                    <i class="fas fa-map-marker-alt"></i> Open Google Maps
+                </a>
+                <p style="font-size: 12px; color: #666; margin-bottom: 5px;">Paste coordinates or link below:</p>
+                <input type="text" id="location-coords" placeholder="e.g. -1.28, 36.82 or Maps link">
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button onclick="checkout()" class="btn-primary">Place Order Now</button>
+            <button onclick="initiatePayAfterDelivery()" class="btn-secondary">Pay After Delivery</button>
+        </div>
+    </div>
+
+    <div class="slider" id="checkout-slider">
+        <div class="slide"><img src="https://picsum.photos/1000/300?1"></div>
+        <div class="slide"><img src="https://picsum.photos/1000/300?2"></div>
+        <div class="slide"><img src="https://picsum.photos/1000/300?3"></div>
+    </div>
+
+    <section class="products-preview">
+        <h2>Continue Shopping</h2>
+        <div id="random-products"></div>
+    </section>
 </div>
 
-<!-- SLIDESHOW -->
-<div class="slider">
-  <div class="slide"><img src="https://picsum.photos/1200/400?1"></div>
-  <div class="slide"><img src="https://picsum.photos/1200/400?2"></div>
-  <div class="slide"><img src="https://picsum.photos/1200/400?3"></div>
-</div>
-
-<!-- RANDOM PRODUCTS -->
-<section class="products-preview">
-  <h2>Continue Shopping</h2>
-  <div id="random-products"></div>
-</section>
+<footer class="footer">
+    <p>Copyright © 2026 Daimara Online Mart. All rights reserved.</p>
+</footer>
 
 <script src="data-manager.js"></script>
 <script>
-  // Authentication check - Inaccessible unless logged in
-  (function() {
-    const currentUser = DataManager.getCurrentUser();
-    if (!currentUser) {
-      alert("Please login or sign up to proceed with checkout.");
-      window.location.href = "login.html";
+    (function() {
+        const user = DataManager.getCurrentUser();
+        if (!user) { alert("Please login to proceed"); window.location.href = "login.html"; }
+    })();
+
+    let cart = DataManager.getCart();
+
+    function toggleMap() {
+        const cb = document.getElementById('delivery-option');
+        const mc = document.getElementById('map-container');
+        mc.style.display = cb.checked ? 'block' : 'none';
+        if (!cb.checked) document.getElementById('location-coords').value = '';
+        updateTotals();
     }
-  })();
 
-  let cart = DataManager.getCart();
-
-  function toggleMap() {
-    const deliveryCheckbox = document.getElementById('delivery-option');
-    const mapContainer = document.getElementById('map-container');
-    
-    if (deliveryCheckbox.checked) {
-      mapContainer.style.display = 'block';
-    } else {
-      mapContainer.style.display = 'none';
-      document.getElementById('location-coords').value = '';
-    }
-    updateCheckoutTotal();
-  }
-
-  // Pre-fill user details if logged in
-  document.addEventListener("DOMContentLoaded", function() {
-    const currentUser = DataManager.getCurrentUser();
-    if (currentUser) {
-      document.getElementById('name').value = currentUser.name || '';
-      document.getElementById('email').value = currentUser.email || '';
-    }
-    renderCart();
-
-    // CHECK IF RETURNING FROM DELIVERY FEE PAYMENT
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('deliveryFeePaid') === 'true') {
-      const pendingOrder = JSON.parse(localStorage.getItem('pendingPayAfterDeliveryOrder'));
-      if (pendingOrder) {
-        // Complete the order as UNPAID
-        const result = DataManager.processNewOrder({
-          ...pendingOrder,
-          paymentStatus: 'unpaid',
-          date: new Date().toISOString(),
-          id: 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase()
-        });
+    function updateTotals() {
+        const subtotal = cart.reduce((a, b) => a + b.price * (b.qty || 1), 0);
+        const config = DataManager.getSystemConfig();
+        const df = config.deliveryFee;
+        const addDelivery = document.getElementById('delivery-option').checked;
         
-        if (result.success) {
-          DataManager.clearCart();
-          localStorage.removeItem('pendingPayAfterDeliveryOrder');
-          alert("Order placed successfully! Please pay for your items on delivery.");
-          window.location.href = "profile.html";
+        document.getElementById('subtotalPrice').innerText = `Subtotal: KES ${subtotal.toLocaleString()}`;
+        const dfd = document.getElementById('deliveryFeeDisplay');
+        dfd.style.display = addDelivery ? 'block' : 'none';
+        dfd.innerText = `Delivery Fee: KES ${df.toLocaleString()}`;
+        
+        const total = addDelivery ? subtotal + df : subtotal;
+        document.getElementById('totalPrice').innerText = `Total: KES ${total.toLocaleString()}`;
+    }
+
+    function renderCart() {
+        const tbody = document.querySelector('#cartTable tbody');
+        tbody.innerHTML = '';
+        cart.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><img src="${item.image || 'https://picsum.photos/50/50'}"></td>
+                <td><strong>${item.name}</strong></td>
+                <td>KES ${item.price.toLocaleString()}</td>
+                <td>${item.qty || 1}</td>
+                <td>KES ${(item.price * (item.qty || 1)).toLocaleString()}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+        updateTotals();
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const user = DataManager.getCurrentUser();
+        if (user) {
+            document.getElementById('name').value = user.name || '';
+            document.getElementById('email').value = user.email || '';
         }
-      }
-    }
-  });
+        const config = DataManager.getSystemConfig();
+        document.getElementById('deliveryLabelText').innerText = `Add Delivery (KES ${config.deliveryFee})`;
+        renderCart();
+        initSlideshow();
+        renderRandom();
 
-  function initiatePayAfterDelivery() {
-    const deliveryCheckbox = document.getElementById('delivery-option');
-    const locationInput = document.getElementById('location-coords').value.trim();
-
-    if (!deliveryCheckbox.checked) {
-      alert("Please add a delivery option by clicking the delivery fee checkbox.");
-      return;
-    }
-    if (!locationInput) {
-      alert("Please paste your delivery co-ordinates or link in the location area.");
-      return;
-    }
-
-    const currentUser = DataManager.getCurrentUser();
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-
-    if (!name || !email) {
-      alert('Please fill all fields');
-      return;
-    }
-
-    const subtotal = cart.reduce((a, b) => a + b.price * (b.qty || 1), 0);
-    const deliveryFee = 70;
-    const totalPrice = subtotal + deliveryFee;
-
-    const orderData = {
-      items: cart,
-      subtotal: subtotal,
-      deliveryFee: deliveryFee,
-      totalPrice: totalPrice,
-      grandTotal: totalPrice,
-      customerName: name,
-      customerEmail: email,
-      userId: currentUser.id,
-      paymentMethod: 'Pay After Delivery',
-      deliveryLocation: locationInput,
-      paymentStatus: 'unpaid',
-      status: 'pending'
-    };
-
-    // Store for when we return
-    localStorage.setItem('pendingPayAfterDeliveryOrder', JSON.stringify(orderData));
-
-    // Redirect to pay delivery fee
-    const deliveryPaymentData = {
-      orderId: 'DEL-' + Math.random().toString(36).substr(2, 6).toUpperCase(),
-      total: 70,
-      isDeliveryFee: true
-    };
-    localStorage.setItem('mpesaOrder', JSON.stringify(deliveryPaymentData));
-    window.location.href = "mpesa-payment.html?isDeliveryFee=true";
-  }
-
-  function renderCart() {
-    const tbody = document.querySelector('#cartTable tbody');
-    tbody.innerHTML='';
-    let subtotal=0;
-    cart.forEach((item,index)=>{
-      const qty = item.qty || 1;
-      const itemSubtotal = item.price * qty;
-      subtotal+=itemSubtotal;
-      const imageSrc = item.image || 'image-placeholder.jpg';
-      tbody.innerHTML+=`<tr>
-        <td><img src="${imageSrc}" style="width:80px;height:60px;object-fit:cover;border-radius:5px;"></td>
-        <td style="font-size:0.9em;">
-          <p><strong>${item.name}</strong></p>
-          ${item.subcategory ? `<p>Sub-Category: ${item.subcategory}</p>` : ''}
-          ${item.sku ? `<p>SKU: ${item.sku}</p>` : ''}
-          ${item.supplier ? `<p>Supplier: ${item.supplier}</p>` : ''}
-          ${item.createdAt ? `<p>Added: ${item.createdAt}</p>` : ''}
-        </td>
-        <td>KES ${item.price}</td>
-        <td><input type='number' min='1' value='${qty}' onchange='updateQuantity("${item.id}",this.value)'></td>
-        <td>KES ${itemSubtotal}</td>
-        <td><button onclick='removeItem("${item.id}")' style="padding:8px 12px;background:#e74c3c;color:white;border:none;border-radius:4px;cursor:pointer;">Remove</button></td>
-      </tr>`;
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('deliveryFeePaid') === 'true') {
+            const pending = JSON.parse(localStorage.getItem('pendingPayAfterDeliveryOrder'));
+            if (pending) {
+                const res = DataManager.processNewOrder({...pending, paymentStatus: 'unpaid', date: new Date().toISOString(), id: 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase()});
+                if (res.success) { DataManager.clearCart(); localStorage.removeItem('pendingPayAfterDeliveryOrder'); alert('Order placed! You will pay items on delivery.'); window.location.href = "profile.html"; }
+            }
+        }
     });
-    document.getElementById('subtotalPrice').innerText = 'Subtotal: KES '+subtotal;
-    updateCheckoutTotal();
-  }
 
-  function updateCheckoutTotal() {
-    const deliveryCheckbox = document.getElementById('delivery-option');
-    const subtotal = cart.reduce((a, b) => a + b.price * (b.qty || 1), 0);
-    const deliveryFee = deliveryCheckbox.checked ? 70 : 0;
-    const total = subtotal + deliveryFee;
-    
-    document.getElementById('deliveryFeeDisplay').style.display = deliveryCheckbox.checked ? 'block' : 'none';
-    document.getElementById('totalPrice').innerText = 'Total: KES ' + total;
-  }
+    function checkout() {
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const locationCoords = document.getElementById('location-coords').value;
+        const addDelivery = document.getElementById('delivery-option').checked;
 
-  function updateQuantity(productId, qty){
-    const result = DataManager.updateCartQuantity(productId, parseInt(qty));
-    if(result && result.success){
-      cart = DataManager.getCart();
-      renderCart();
-      updateCheckoutTotal();
-    }
-  }
+        if (!name || !email) { alert('Fill all fields'); return; }
+        if (addDelivery && !locationCoords) { alert('Provide location'); return; }
 
-  function removeItem(productId){
-    const result = DataManager.removeFromCart(productId);
-    if(result && result.success){
-      cart = DataManager.getCart();
-      renderCart();
-      updateCheckoutTotal();
-    }
-  }
+        const config = DataManager.getSystemConfig();
+        const subtotal = cart.reduce((a, b) => a + b.price * (b.qty || 1), 0);
+        const total = addDelivery ? subtotal + config.deliveryFee : subtotal;
 
-  function checkout(){
-    const currentUser = DataManager.getCurrentUser();
-    const name=document.getElementById('name').value;
-    const email=document.getElementById('email').value;
-    const paymentMethod=document.getElementById('paymentMethod').value;
-    if(!name||!email){alert('Please fill all fields'); return;}
+        const order = {
+            id: 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
+            items: cart,
+            totalPrice: total,
+            customerName: name,
+            customerEmail: email,
+            userId: DataManager.getCurrentUser().id,
+            paymentMethod: document.getElementById('paymentMethod').value,
+            deliveryLocation: addDelivery ? locationCoords : 'N/A',
+            date: new Date().toISOString(),
+            status: 'pending',
+            paymentStatus: 'paid'
+        };
 
-    const subtotal = cart.reduce((a,b)=>a+b.price*(b.qty||1),0);
-    const deliveryCheckbox = document.getElementById('delivery-option');
-    const deliveryFee = deliveryCheckbox.checked ? 70 : 0;
-    const totalPrice = subtotal + deliveryFee;
-
-    const locationInput = document.getElementById('location-coords').value.trim();
-    if (deliveryCheckbox.checked && !locationInput) {
-      alert('Please paste your delivery location or link.');
-      return;
+        const res = DataManager.processNewOrder(order);
+        if (res.success) { DataManager.clearCart(); alert('Order placed successfully!'); window.location.href = "profile.html"; }
     }
 
-    const orderData = {
-      items: cart,
-      subtotal: subtotal,
-      deliveryFee: deliveryFee,
-      totalPrice: totalPrice,
-      grandTotal: totalPrice,
-      paymentMethod,
-      customerName: name,
-      customerEmail: email,
-      customerPhone: currentUser ? currentUser.phone : '',
-      userId: currentUser ? currentUser.id : 'guest',
-      deliveryLocation: deliveryCheckbox.checked ? locationInput : null,
-      paymentStatus: 'paid',
-      status: 'pending',
-      date: new Date().toISOString(),
-      id: 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase()
-    };
+    function initiatePayAfterDelivery() {
+        const cb = document.getElementById('delivery-option');
+        const loc = document.getElementById('location-coords').value;
+        if (!cb.checked || !loc) { alert("Select delivery and provide location coordinates."); return; }
+        
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        if (!name || !email) { alert('Fill all fields'); return; }
 
-    localStorage.setItem('mpesaOrder', JSON.stringify({
-      orderId: orderData.id,
-      total: totalPrice,
-      items: cart,
-      fullOrder: orderData
-    }));
+        const subtotal = cart.reduce((a, b) => a + b.price * (b.qty || 1), 0);
+        const config = DataManager.getSystemConfig();
+        
+        const order = {
+            items: cart,
+            subtotal: subtotal,
+            deliveryFee: config.deliveryFee,
+            totalPrice: subtotal,
+            grandTotal: subtotal,
+            customerName: name,
+            customerEmail: email,
+            userId: DataManager.getCurrentUser().id,
+            paymentMethod: 'Pay After Delivery',
+            deliveryLocation: loc,
+            paymentStatus: 'unpaid',
+            status: 'pending'
+        };
 
-    if (paymentMethod === 'mpesa') {
-      window.location.href = "mpesa-payment.html";
-    } else {
-      // For other methods (if any)
-      DataManager.processNewOrder(orderData);
-      DataManager.clearCart();
-      alert('Order placed successfully! Order ID: ' + orderData.id);
-      window.location.href = "profile.html";
-    }
-  }
-
-
-  renderCart();
-
-  // Add delivery option listener
-  const deliveryCheckbox = document.getElementById('delivery-option');
-  if (deliveryCheckbox) {
-    deliveryCheckbox.addEventListener('change', updateCheckoutTotal);
-  }
-
-  // SLIDER
-  let sliderIndex = 0;
-  const slides = document.querySelectorAll('.slide');
-  function showSlides() {
-    slides.forEach(s => s.style.display = 'none');
-    sliderIndex = (sliderIndex + 1) > slides.length ? 1 : sliderIndex + 1;
-    if (slides[sliderIndex - 1]) slides[sliderIndex - 1].style.display = 'block';
-    setTimeout(showSlides, 3000);
-  }
-  showSlides();
-
-  // RANDOM PRODUCTS
-  (function() {
-    const rndContainer = document.getElementById('random-products');
-    function getAllFlattened() {
-      const all = DataManager.getAllProducts();
-      return Object.keys(all).reduce((acc, k) => acc.concat(all[k] || []), []);
+        localStorage.setItem('pendingPayAfterDeliveryOrder', JSON.stringify(order));
+        alert(`Proceeding to pay delivery fee of KES ${config.deliveryFee}...`);
+        window.location.href = `mpesa-payment.html?amount=${config.deliveryFee}&purpose=delivery-fee&orderId=temp-${Date.now()}`;
     }
 
-    window.addToCartById = function(id) {
-      const prod = getAllFlattened().find(p => p.id === id);
-      if (!prod) { alert('Product not found'); return; }
-      DataManager.addToCart(prod);
-      cart = DataManager.getCart();
-      renderCart();
-      updateCheckoutTotal();
-      alert('Added to cart');
-    };
-
-    function renderRandom(n = 8) {
-      if (!rndContainer) return;
-      const all = getAllFlattened();
-      if (all.length === 0) { rndContainer.innerHTML = '<p>No products available yet.</p>'; return; }
-      const shuffled = all.slice().sort(() => 0.5 - Math.random()).slice(0, n);
-      rndContainer.innerHTML = '';
-      shuffled.forEach(p => {
-        const img = p.image || 'https://picsum.photos/300/200';
-        rndContainer.innerHTML += `
-          <div class="product">
-            <img src="${img}">
-            <h4>${p.name}</h4>
-            <p>Ksh ${p.price}</p>
-            <button onclick="addToCartById('${p.id}')">Add to Cart</button>
-          </div>`;
-      });
+    function initSlideshow() {
+        const camp = DataManager.getAllCampaigns().filter(c => c.adType === 'slideshow' && c.targetPage === 'checkout');
+        const slider = document.getElementById('checkout-slider');
+        if (camp.length > 0) slider.innerHTML = camp.map(c => `<div class="slide"><img src="${c.media}"></div>`).join('');
+        const slides = document.querySelectorAll('.slide');
+        if (slides.length === 0) return;
+        let idx = 0;
+        function show() {
+            slides.forEach(s => s.style.display = 'none');
+            idx = (idx + 1) > slides.length ? 1 : idx + 1;
+            slides[idx-1].style.display = 'block';
+            setTimeout(show, 3000);
+        }
+        show();
     }
-    renderRandom(8);
-  })();
+
+    function renderRandom() {
+        const container = document.getElementById('random-products');
+        const all = DataManager.getAllProducts();
+        const flat = Object.keys(all).reduce((acc,k) => acc.concat(all[k]||[]), []);
+        const shuffled = flat.sort(() => 0.5 - Math.random()).slice(0, 8);
+        container.innerHTML = shuffled.map(p => `
+            <div class="product">
+                <img src="${p.image || 'https://picsum.photos/150/150'}">
+                <h4>${p.name}</h4>
+                <p>KES ${p.price}</p>
+                <button onclick="addRec('${p.id}')">Add to Cart</button>
+            </div>
+        `).join('');
+    }
+    window.addRec = (id) => {
+        const all = DataManager.getAllProducts();
+        const flat = Object.keys(all).reduce((acc,k) => acc.concat(all[k]||[]), []);
+        const p = flat.find(x => x.id === id);
+        if (p) { DataManager.addToCart(p); alert('Added to cart!'); }
+    }
 </script>
 </body>
 </html>

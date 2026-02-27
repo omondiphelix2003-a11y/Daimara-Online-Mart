@@ -1433,9 +1433,14 @@
             <td>KSH ${(p.price || 0).toLocaleString()}</td>
             <td><span class="quantity-badge ${p.quantity < 10 ? 'qty-low' : 'qty-ok'}">${p.quantity || 0}</span></td>
             <td>
-              <button class="btn btn-primary btn-sm" onclick="editStock('${p.id}')">
-                <i class="fas fa-edit"></i> Adjust
-              </button>
+              <div style="display:flex; gap:0.5rem;">
+                <button class="btn btn-primary btn-sm" onclick="editStock('${p.id}')">
+                  <i class="fas fa-edit"></i> Adjust
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="deleteProduct('${p.id}')">
+                  <i class="fas fa-trash"></i> Delete
+                </button>
+              </div>
             </td>
           </tr>
         `).join('') || '<tr><td colspan="6" style="text-align:center">Warehouse is empty</td></tr>';
@@ -1466,6 +1471,9 @@
             <div class="card-actions">
               <button class="btn btn-primary btn-sm" onclick="editStock('${p.id}')">
                 <i class="fas fa-edit"></i> Adjust Stock
+              </button>
+              <button class="btn btn-danger btn-sm" onclick="deleteProduct('${p.id}')">
+                <i class="fas fa-trash"></i> Delete
               </button>
             </div>
           </div>
@@ -1725,6 +1733,20 @@
         renderWarehouse();
         renderDashboard();
         alert("Inventory updated.");
+      }
+    }
+
+    function deleteProduct(id) {
+      if (typeof DataManager === 'undefined') return;
+      if (!confirm("Are you sure you want to permanently delete this product from your inventory and the website?")) return;
+
+      const result = DataManager.deleteProduct(id);
+      if (result.success) {
+        alert("Product deleted successfully.");
+        renderWarehouse();
+        renderDashboard();
+      } else {
+        alert("Error: " + result.message);
       }
     }
 

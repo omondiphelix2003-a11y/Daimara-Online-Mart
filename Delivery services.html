@@ -333,6 +333,7 @@ function viewReceipt(orderId) {
 
   const body = document.getElementById('modal-body');
   const items = order.items || order.products || [];
+  const config = DataManager.getSystemConfig();
 
   body.innerHTML = `
     <div class="receipt">
@@ -364,7 +365,11 @@ function viewReceipt(orderId) {
         </tbody>
       </table>
       <div class="receipt-total">
-        Total: KES ${(order.grandTotal || order.totalPrice || 0).toLocaleString()}
+        ${order.paymentMethod === 'Pay After Delivery' ? 
+          `<div style="font-size:0.8em; color:#16a34a;">Delivery Fee (KES ${config.deliveryFee}): PAID UPFRONT</div>
+           COLLECT ON DELIVERY: KES ${(order.grandTotal || order.totalPrice || 0).toLocaleString()}` : 
+          `Total: KES ${(order.grandTotal || order.totalPrice || 0).toLocaleString()}`
+        }
       </div>
       <button class="dispatch-confirm-btn" onclick="updateStatus('${order.id}', 'Out for Delivery')">
         <i class="fas fa-truck"></i> Confirm Dispatch & Start Delivery

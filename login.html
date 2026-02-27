@@ -3,431 +3,181 @@
 <head>
   <meta charset="UTF-8">
   <title>Daimara Online Mart | Login</title>
-  <meta name="viewport" content="width=1200">
-  <link rel="stylesheet" href="login.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --primary: #e99d11;
+      --dark: #111;
+      --bg: #0a0a0a;
+      --text: #ecf0f1;
+    }
 
-<style>* {
-  box-sizing: border-box;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
+    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body {
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+      margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      padding: 20px; color: var(--text);
+    }
 
-body {
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-  margin: 0;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  font-size: 22px;
-  padding-bottom: 100px;
-}
+    .auth-box {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      width: 100%; max-width: 450px; padding: 40px 30px;
+      border-radius: 16px; border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      animation: fadeIn 0.5s ease;
+    }
 
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+    h2 { text-align: center; font-size: 32px; margin-bottom: 30px; color: var(--primary); font-weight: 700; }
+    form { display: flex; flex-direction: column; gap: 20px; }
+    
+    input, select {
+      width: 100%; padding: 12px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.1); color: #fff; font-size: 16px; outline: none; transition: 0.3s;
+    }
+    input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(233,157,17,0.3); }
+    input::placeholder { color: #aaa; }
 
-#dropdown-menu a,
-#dropdown-menu button {
-  display: block;
-  width: 100%;
-  padding: 12px 20px;
-  color: #ecf0f1;
-  text-decoration: none;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 14px;
-  text-align: left;
-  font-family: inherit;
-}
+    .profile-image-group { text-align: center; margin: 10px 0; }
+    .profile-image-group label { display: block; margin-bottom: 10px; font-size: 14px; color: var(--primary); font-weight: 600; }
+    .profile-preview {
+      width: 100px; height: 100px; border-radius: 50%; border: 2px solid var(--primary);
+      margin: 10px auto; overflow: hidden; background: rgba(255,255,255,0.1);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .profile-preview img { width: 100%; height: 100%; object-fit: cover; }
 
-#dropdown-menu a:hover,
-#dropdown-menu button:hover {
-  background: rgba(233, 157, 17, 0.2);
-  color: rgb(233, 157, 17);
-  padding-left: 25px;
-}
+    button {
+      width: 100%; padding: 14px; border: none; border-radius: 8px;
+      background: var(--primary); color: #fff; font-size: 18px; font-weight: bold;
+      cursor: pointer; transition: 0.3s; margin-top: 10px;
+    }
+    button:hover { background: #d48b0d; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(233,157,17,0.3); }
 
-#dropdown-menu button {
-  color: #e74c3c;
-  font-weight: 600;
-}
+    .switch { text-align: center; margin-top: 20px; font-size: 14px; color: #aaa; }
+    .switch span { color: var(--primary); cursor: pointer; font-weight: bold; }
+    .switch span:hover { text-decoration: underline; }
 
-#dropdown-menu button:hover {
-  background: rgba(231, 76, 60, 0.2);
-  color: #ff6b6b;
-}
-
-.navbar a {
-  text-decoration: none;
-}
-
-/* AUTH BOX */
-.auth-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex: 1;
-  padding: 20px;
-}
-
-.auth-box {
-    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-  width: 200%;
-  max-width: 820px;
-
-
-  padding: 40px;
-  border-radius: 12px;
-  /*box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);*/
-  animation: slideUp 0.4s ease;
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.auth-box h2 {
-  text-align: center;
-  margin-bottom: 30px;
-  color: #2c3e50;
-  font-size: 86px;
-  font-weight: 700;
-}
-
-.auth-box form {
-  display: flex;
-  flex-direction: column;
-  gap: 35px;
-}
-
-.auth-box input {
-  width: 100%;
-  padding: 43px 55px;
-  border-radius: 6px;
-  border: 1px solid #bdc3c7;
-  font-size: 45px;
-  font-family: inherit;
-  transition: all 0.3s ease;
-}
-
-.auth-box input:focus {
-  outline: none;
-  border-color: rgb(233, 157, 17);
-  box-shadow: 0 0 8px rgba(233, 157, 17, 0.3);
-}
-
-.profile-image-group {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin: 10px 0;
-}
-
-.profile-image-group label {
-  font-weight: 600;
-  color: rgb(233, 157, 17);
-  font-size: 54px;
-}
-
-.profile-image-group input[type="file"] {
-  padding: 10px;
-  border: 2px solid #ecf0f1;
-  border-radius: 6px;
-  background: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 35px;
-}
-
-.profile-image-group input[type="file"]:hover {
-  border-color: rgb(233, 157, 17);
-}
-
-.profile-preview {
-  width: 320px;
-  height: 320px;
-  border: 2px solid #ecf0f1;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f9f9f9;
-  overflow: hidden;
-  margin: 0 auto;
-}
-
-.profile-preview img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.auth-box button {
-  width: 100%;
-  padding: 13px;
-  background: linear-gradient(135deg, rgb(233, 157, 17) 0%, #e67e22 100%);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 35px;
-  transition: all 0.3s ease;
-  margin-top: 5px;
-}
-
-.auth-box button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(233, 157, 17, 0.3);
-}
-
-.auth-box button:active {
-  transform: translateY(0);
-}
-
-.switch {
-  text-align: center;
-  margin-top: 10px;
-  font-size: 31px;
-  color: #555;
-}
-
-.switch span {
-  color: rgb(233, 157, 17);
-  cursor: pointer;
-  font-weight: 600;
-  transition: color 0.3s ease;
-}
-
-.switch span:hover {
-  color: #e67e22;
-}
-
-/* Login Button */
-#login-btn {
-  color: white;
-  text-decoration: none;
-  font-size: 16px;
-  padding: 8px 12px;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  display: none;
-}
-
-#login-btn:hover {
-  color: rgb(233, 157, 17);
-}
-
-
-</style>
-
+    @media (max-width: 480px) {
+      .auth-box { padding: 30px 20px; }
+      h2 { font-size: 28px; }
+    }
+  </style>
 </head>
 <body>
 
+<div class="auth-box">
+  <h2 id="form-title">Login</h2>
 
-<div class="auth-container">
-  <div class="auth-box">
-    <h2 id="form-title">Login</h2>
+  <!-- LOGIN FORM -->
+  <form id="login-form">
+    <input type="email" id="login-email" placeholder="Email" required>
+    <input type="password" id="login-password" placeholder="Password" required>
+    <button type="submit">Login</button>
+    <p class="switch">Don’t have an account? <span onclick="showSignup()">Sign up</span></p>
+  </form>
 
-    <!-- LOGIN FORM -->
-    <form id="login-form">
-      <input type="email" id="login-email" placeholder="Email" required>
-      <input type="password" id="login-password" placeholder="Password" required>
-      <button type="submit">Login</button>
-      <p class="switch">
-        Don’t have an account?
-        <span onclick="showSignup()">Sign up</span>
-      </p>
-    </form>
-
-    <!-- SIGNUP FORM -->
-    <form id="signup-form" style="display:none;">
-      <input type="text" id="signup-name" placeholder="Full Name" required>
-      <input type="email" id="signup-email" placeholder="Email" required>
-      <input type="password" id="signup-password" placeholder="Password" required>
-      
-      <select id="signup-role" style="width:100%; padding:20px; border-radius:6px; border:1px solid #bdc3c7; font-size:25px; margin-bottom:10px;">
-        <option value="user">Customer</option>
-        <option value="operator">Operator / Business</option>
-        <option value="delivery">Delivery Personnel Staff</option>
-      </select>
-      
-      <div class="profile-image-group">
-        <label for="profile-image">Profile Picture:</label>
-        <input type="file" id="profile-image" accept="image/*" required>
-        <div id="profile-preview" class="profile-preview"></div>
-      </div>
-
-      <button type="submit">Sign Up</button>
-      <p class="switch">
-        Already have an account?
-        <span onclick="showLogin()">Login</span>
-      </p>
-    </form>
-  </div>
+  <!-- SIGNUP FORM -->
+  <form id="signup-form" style="display:none;">
+    <input type="text" id="signup-name" placeholder="Full Name" required>
+    <input type="email" id="signup-email" placeholder="Email" required>
+    <input type="password" id="signup-password" placeholder="Password" required>
+    <select id="signup-role">
+      <option value="user">Customer</option>
+      <option value="operator">Operator / Business</option>
+      <option value="delivery">Delivery Personnel</option>
+    </select>
+    <div class="profile-image-group">
+      <label for="profile-image">Profile Picture</label>
+      <input type="file" id="profile-image" accept="image/*" required>
+      <div id="profile-preview" class="profile-preview"></div>
+    </div>
+    <button type="submit">Sign Up</button>
+    <p class="switch">Already have an account? <span onclick="showLogin()">Login</span></p>
+  </form>
 </div>
 
 <script src="data-manager.js"></script>
-<script src="auth-check.js"></script>
-<script>// Profile image preview
-const profileImageInput = document.getElementById("profile-image");
-if (profileImageInput) {
-  profileImageInput.addEventListener("change", function(e) {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        const preview = document.getElementById("profile-preview");
-        preview.innerHTML = `<img src="${event.target.result}" alt="Profile Preview">`;
-      };
-      reader.readAsDataURL(file);
+<script>
+  const profileImageInput = document.getElementById("profile-image");
+  if (profileImageInput) {
+    profileImageInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          document.getElementById("profile-preview").innerHTML = `<img src="${event.target.result}">`;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  function showSignup() {
+    document.getElementById("login-form").style.display = "none";
+    document.getElementById("signup-form").style.display = "flex";
+    document.getElementById("form-title").textContent = "Sign Up";
+  }
+
+  function showLogin() {
+    document.getElementById("signup-form").style.display = "none";
+    document.getElementById("login-form").style.display = "flex";
+    document.getElementById("form-title").textContent = "Login";
+  }
+
+  // Handle URL parameters for registration
+  window.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('reg_email')) {
+      showSignup();
+      document.getElementById('signup-email').value = decodeURIComponent(urlParams.get('reg_email'));
+    }
+    if (urlParams.get('reg_role')) {
+      document.getElementById('signup-role').value = urlParams.get('reg_role');
     }
   });
-}
 
-// TOGGLE FORMS
-function showSignup() {
-  document.getElementById("login-form").style.display = "none";
-  document.getElementById("signup-form").style.display = "block";
-  document.getElementById("form-title").textContent = "Sign Up";
-}
-
-// Handle URL parameters for registration
-window.addEventListener('DOMContentLoaded', () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const regEmail = urlParams.get('reg_email');
-  const regRole = urlParams.get('reg_role');
-
-  if (regEmail) {
-    showSignup();
-    document.getElementById('signup-email').value = decodeURIComponent(regEmail);
-  }
-
-  // Only show role selection if reg_role param is present (e.g. from a specific "Register Business" page)
-  if (regRole) {
-    const roleSelect = document.getElementById('signup-role');
-    roleSelect.style.display = 'block';
-    roleSelect.value = regRole;
-  }
-});
-
-function showLogin() {
-  document.getElementById("signup-form").style.display = "none";
-  document.getElementById("login-form").style.display = "block";
-  document.getElementById("form-title").textContent = "Login";
-}
-
-// SIGN UP WITH PROFILE PICTURE
-document.getElementById("signup-form").addEventListener("submit", e => {
-  e.preventDefault();
-
-  const name = document.getElementById("signup-name").value.trim();
-  const email = document.getElementById("signup-email").value.trim();
-  const password = document.getElementById("signup-password").value;
-  const roleSelection = document.getElementById("signup-role").value;
-  const profileImageFile = document.getElementById("profile-image").files[0];
-
-  // Validation
-  if (!name) {
-    alert("Please enter your name");
-    return;
-  }
-
-  if (!email.includes("@")) {
-    alert("Please enter a valid email");
-    return;
-  }
-
-  if (password.length < 6) {
-    alert("Password must be at least 6 characters");
-    return;
-  }
-
-  if (!profileImageFile) {
-    alert("Please select a profile picture");
-    return;
-  }
-
-  // Convert image to base64
-  const reader = new FileReader();
-  reader.onload = function(event) {
-    const profileImage = event.target.result;
-    
-    // Check if user was pre-registered for a page
-    const allUsers = DataManager.getAllUsers();
-    const existingReg = allUsers.find(u => u.email === email && u.role !== 'user');
-    
-    let role = roleSelection;
-    let regDetails = null;
-    
-    if (existingReg) {
-      // If user exists with a role, we update their info instead of creating new
-      DataManager.deleteUser(existingReg.id);
-      role = existingReg.role;
-      regDetails = existingReg.regDetails;
-    }
-    
-    // Register user using DataManager
-    const result = DataManager.registerUser(name, email, password, profileImage, role, regDetails);
-
-    if (!result.success) {
+  document.getElementById("login-form").addEventListener("submit", e => {
+    e.preventDefault();
+    const email = document.getElementById("login-email").value;
+    const password = document.getElementById("login-password").value;
+    const result = DataManager.loginUser(email, password);
+    if (result.success) {
+      const user = result.user;
+      if (user.role === 'admin') window.location.href = "admin-manager.html";
+      else if (user.role === 'operator') window.location.href = "Operator's Dashboard-for businesses.html";
+      else if (user.role === 'delivery') window.location.href = "Delivery services.html";
+      else window.location.href = "profile.html";
+    } else {
       alert(result.message);
-      return;
     }
+  });
 
-    alert("Account created! Please login.");
-    showLogin();
-    document.getElementById("signup-form").reset();
-    document.getElementById("profile-preview").innerHTML = "";
-  };
-  reader.readAsDataURL(profileImageFile);
-});
+  document.getElementById("signup-form").addEventListener("submit", e => {
+    e.preventDefault();
+    const name = document.getElementById("signup-name").value.trim();
+    const email = document.getElementById("signup-email").value.trim();
+    const password = document.getElementById("signup-password").value;
+    const role = document.getElementById("signup-role").value;
+    const profileImageFile = document.getElementById("profile-image").files[0];
 
-// LOGIN
-document.getElementById("login-form").addEventListener("submit", e => {
-  e.preventDefault();
+    if (password.length < 6) { alert("Password must be at least 6 characters"); return; }
+    if (!profileImageFile) { alert("Please select a profile picture"); return; }
 
-  const email = document.getElementById("login-email").value.trim();
-  const password = document.getElementById("login-password").value;
-
-  if (!email || !password) {
-    alert("Please enter email and password");
-    return;
-  }
-
-  // Login using DataManager
-  const result = DataManager.loginUser(email, password);
-
-  if (!result.success) {
-    alert(result.message);
-    return;
-  }
-
-  alert(`Welcome ${result.user.name}!`);
-  
-  // Check if it's the admin
-  if (email === "admin@gmail.com") {
-    window.location.href = "admin-manager.html";
-  } else {
-    window.location.href = "index.html";
-  }
-});
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const res = DataManager.registerUser(name, email, password, event.target.result, role);
+      if (res.success) {
+        alert("Account created! Please login.");
+        showLogin();
+      } else {
+        alert(res.message);
+      }
+    };
+    reader.readAsDataURL(profileImageFile);
+  });
 </script>
 </body>
 </html>

@@ -326,6 +326,30 @@ td { padding: 12px; border-bottom: 1px solid #2d3748; }
     <div class="chart-box ad-form">
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
             <div>
+                <label>Ad Type</label>
+                <select id="ad-type" onchange="toggleAdOptions()" style="width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #2d3748; background: #0f172a; color: white;">
+                    <option value="slideshow">Slideshow Image</option>
+                    <option value="video">Video Advert</option>
+                </select>
+
+                <div id="slideshow-options">
+                    <label>Target Page</label>
+                    <select id="target-page" style="width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #2d3748; background: #0f172a; color: white;">
+                        <option value="home">Home Page</option>
+                        <option value="store">Store Page</option>
+                        <option value="cart">Cart Page</option>
+                        <option value="checkout">Checkout Page</option>
+                    </select>
+                </div>
+
+                <div id="video-options" style="display: none;">
+                    <label>Video Audio Type</label>
+                    <select id="video-audio-type" style="width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #2d3748; background: #0f172a; color: white;">
+                        <option value="audioated">Audioated (Home Page)</option>
+                        <option value="non-audio">Non-Audio (Store Page)</option>
+                    </select>
+                </div>
+
                 <label>Campaign Title</label>
                 <input type="text" id="ad-title" placeholder="e.g., 50% Off Everything!" oninput="updatePreview()">
                 
@@ -437,6 +461,12 @@ let selectedPlatforms = new Set();
 let uploadedMediaUrl = "";
 let isVideo = false;
 
+function toggleAdOptions() {
+    const adType = document.getElementById('ad-type').value;
+    document.getElementById('slideshow-options').style.display = adType === 'slideshow' ? 'block' : 'none';
+    document.getElementById('video-options').style.display = adType === 'video' ? 'block' : 'none';
+}
+
 function handleMediaUpload(input) {
     const file = input.files[0];
     if (file) {
@@ -486,12 +516,18 @@ function postAdvert() {
     if (!title || !msg) return alert("Title and Message are required.");
 
     const mediaUrl = uploadedMediaUrl || document.getElementById('ad-media-url').value;
+    const adType = document.getElementById('ad-type').value;
+    const targetPage = document.getElementById('target-page').value;
+    const videoAudioType = document.getElementById('video-audio-type').value;
 
     const campaign = {
         title: title,
         message: msg,
         media: mediaUrl,
-        isVideo: isVideo || (mediaUrl && (mediaUrl.match(/\.(mp4|webm|ogg)$/i) || mediaUrl.includes('video'))),
+        isVideo: adType === 'video' || isVideo || (mediaUrl && (mediaUrl.match(/\.(mp4|webm|ogg)$/i) || mediaUrl.includes('video'))),
+        adType: adType,
+        targetPage: adType === 'slideshow' ? targetPage : null,
+        videoAudioType: adType === 'video' ? videoAudioType : null,
         platforms: Array.from(selectedPlatforms)
     };
 
@@ -527,6 +563,11 @@ function renderCampaigns() {
             <div class="campaign-info">
                 <h3 class="campaign-title">${c.title}</h3>
                 <p class="campaign-msg">${c.message}</p>
+                <div style="margin-top: 10px;">
+                    <span style="font-size: 12px; background: rgba(233, 157, 17, 0.4); color: white; padding: 2px 8px; border-radius: 10px; margin-right: 5px;">${c.adType.toUpperCase()}</span>
+                    ${c.targetPage ? `<span style="font-size: 12px; background: rgba(0, 150, 255, 0.4); color: white; padding: 2px 8px; border-radius: 10px; margin-right: 5px;">PAGE: ${c.targetPage.toUpperCase()}</span>` : ''}
+                    ${c.videoAudioType ? `<span style="font-size: 12px; background: rgba(150, 0, 255, 0.4); color: white; padding: 2px 8px; border-radius: 10px; margin-right: 5px;">AUDIO: ${c.videoAudioType.toUpperCase()}</span>` : ''}
+                </div>
                 <div style="margin-top: 10px;">
                     ${c.platforms.map(p => `<span style="font-size: 12px; background: rgba(233, 157, 17, 0.2); color: #e99d11; padding: 2px 8px; border-radius: 10px; margin-right: 5px;">${p}</span>`).join('')}
                 </div>

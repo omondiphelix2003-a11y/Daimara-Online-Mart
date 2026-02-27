@@ -294,7 +294,7 @@ function placeGasOrder(){
       searchResults.innerHTML = results.map(p => {
         let url = 'store.html?search=' + encodeURIComponent(p.name);
         if (p.subcategory === 'Gas') url = 'gas-refill.html';
-        if (p.subcategory === 'Water') url = 'Water-Refilling.html';
+        if (p.subcategory === 'Water') url = 'water refil.html';
         
         return `
           <div onclick="window.location.href='${url}'">

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Admin Panel | Daimara Online Mart</title>
-  <meta name="viewport" content="width=1200">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
     :root {
@@ -22,26 +22,44 @@
     body { background: #0f172a; display: flex; min-height: 100vh; }
 
     /* SIDEBAR */
-    .sidebar {  width: 270px; background: var(--sidebar-bg); color: rgb(255, 255, 255); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; transition: all 0.3s; overflow-y: auto; }
-    .sidebar-header { padding: 30px 20px; text-align: center; border-bottom: 1px solid #333; }
-    .sidebar-header h2 { color: black; font-size: 33px; letter-spacing: 1px; }
+    .sidebar {  width: 270px; background: var(--sidebar-bg); color: rgb(255, 255, 255); display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 1000; transition: all 0.3s; overflow-y: auto; left: 0; }
+    .sidebar.hidden { left: -270px; }
+    .sidebar-header { padding: 30px 20px; text-align: center; border-bottom: 1px solid rgba(0,0,0,0.1); }
+    .sidebar-header h2 { color: black; font-size: 24px; letter-spacing: 1px; }
     .nav-links { list-style: none; padding: 20px 0; flex: 1; }
-    .nav-links li { padding: 5px 20px; }
-    .nav-links a { color: #bdc3c7; text-decoration: none; display: flex; align-items: center; padding: 12px 15px; border-radius: 8px; transition: all 0.3s; gap: 16px; font-size: 23px; }
-    .nav-links a:hover, .nav-links a.active { background: rgba(233, 157, 17, 0.15); color: black }
-    .nav-links i { width: 20px; font-size: 25px; }
-    .sidebar-footer { padding: 20px; border-top: 1px solid #333; }
-    .logout-btn { background: var(--danger); color: white; border: none;font-size: 27; width: 100%; padding: 12px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 600; }
+    .nav-links li { padding: 5px 15px; }
+    .nav-links a { color: #333; text-decoration: none; display: flex; align-items: center; padding: 10px 15px; border-radius: 8px; transition: all 0.3s; gap: 12px; font-size: 16px; font-weight: 500; }
+    .nav-links a:hover, .nav-links a.active { background: rgba(0, 0, 0, 0.1); color: black; }
+    .nav-links i { width: 20px; font-size: 18px; }
+    .sidebar-footer { padding: 20px; border-top: 1px solid rgba(0,0,0,0.1); }
+    .logout-btn { background: var(--danger); color: white; border: none; font-size: 16px; width: 100%; padding: 12px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 600; }
+
+    /* MOBILE TOGGLE */
+    .menu-toggle { display: none; position: fixed; top: 15px; left: 15px; z-index: 1100; background: var(--primary-color); color: white; border: none; width: 40px; height: 40px; border-radius: 8px; cursor: pointer; font-size: 20px; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
 
     /* MAIN CONTENT */
-    .main-content { flex: 1; margin-left: 260px; padding: 30px; }
-    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-    .page-title h1 { font-size: 25px; color: var(--text-main); }
-    .admin-profile { display: flex; align-items: center; gap: 15px; }
-    .admin-info { text-align: right; }
-    .admin-info p { font-weight: 700; font-size: 23px; }
-    .admin-info span { font-size: 21px; color: var(--text-muted); }
-    .admin-avatar { width: 45px; height: 45px; border-radius: 50%; background: var(--primary-color); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+    .main-content { flex: 1; margin-left: 270px; padding: 30px; transition: all 0.3s; width: calc(100% - 270px); }
+    .main-content.full-width { margin-left: 0; width: 100%; }
+
+    @media (max-width: 992px) {
+      .sidebar { left: -270px; }
+      .sidebar.active { left: 0; }
+      .main-content { margin-left: 0; width: 100%; padding: 20px; padding-top: 70px; }
+      .menu-toggle { display: flex; }
+      .stats-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+      .card-title { font-size: 24px !important; }
+    }
+
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .page-header { flex-direction: column; align-items: flex-start; gap: 15px; }
+      .admin-info { text-align: left; }
+    }
+
+    /* DATA TABLES RESPONSIVE */
+    .table-container { width: 100%; overflow-x: auto; margin-top: 15px; }
+    table { min-width: 800px; }
+    td, th { padding: 12px; font-size: 14px !important; }
 
     /* DASHBOARD CARDS */
     .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 30px; }
@@ -72,6 +90,8 @@
     .status-pending { background: #fff3e0; color: #ff9800; }
     .status-completed { background: #e8f5e9; color: #4caf50; }
     .status-unread { background: #e3f2fd; color: #2196f3; }
+    .status-approved { background: #e8f5e9; color: #4caf50; }
+    .status-rejected { background: #ffebee; color: #e74c3c; }
 
     /* WAREHOUSE IMAGES */
     .product-thumb { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; }
@@ -180,12 +200,12 @@
       <li><a href="#" onclick="showTab('users', this)"><i class="fas fa-users"></i> User Signups</a></li>    
       <li><a href="#" onclick="showTab('page-reviews', this)"><i class="fas fa-id-card"></i> Page Reviews</a></li>
       <li><a href="Daimara Department Head – Marketing.html"><i class="fas fa-bullhorn"></i> Marketing Department</a></li>
-    <li><a href="Daimara-operator.html"><i class="fas fa-headset"></i></i> Operator Dept</a></li>
+    <li><a href="Daimara-operator(disabled).html"><i class="fas fa-headset"></i></i> Operator Dept</a></li>
     <li><a href="Delivery services.html"><i class="fas fa-truck-fast"></i> Delivery Services Dept</a></li>
     <li><a href="employement.html"><i class="fas fa-user-plus"></i> Employment Dept</a></li>
-    <li><a href="executives.html"><i class="fas fa-user-tie"></i> Exercutive Dept</a></li>
-    <li><a href="manager.html"><i class="fas fa-users-cog"></i> Manager Dept</a></li>
-    <li><a href="order fulfillment specialists.html"><i class="fas fa-box"></i> Order Packaging</a></li>
+    <li><a href="executives(disabled).html"><i class="fas fa-user-tie"></i> Exercutive Dept</a></li>
+    <li><a href="manager(disabled).html"><i class="fas fa-users-cog"></i> Manager Dept</a></li>
+    <li><a href="order fulfillment specialists(disabled).html"><i class="fas fa-box"></i> Order Packaging</a></li>
    <li><a href="Operator's Dashboard-for businesses.html"><i class="fas fa-headset"></i> Operator's Dashboard-for businesses</a></li>
 
     <div class="sidebar-footer">
@@ -234,6 +254,10 @@
         <div class="stat-card">
           <div class="stat-icon" style="background: rgba(231,76,60,0.1); color: #e74c3c;"><i class="fas fa-signal"></i></div>
           <div class="stat-info"><h3 id="stat-online">0</h3><p>Online Users</p></div>
+        </div>
+        <div class="stat-card" onclick="showTab('page-reviews')" style="cursor:pointer;">
+          <div class="stat-icon" style="background: rgba(108,92,231,0.1); color: #6c5ce7;"><i class="fas fa-id-card"></i></div>
+          <div class="stat-info"><h3 id="stat-pending-requests">0</h3><p>Pending Page Requests</p></div>
         </div>
       </div>
 
@@ -325,13 +349,38 @@
         <div class="pl-summary">
           <div>
             <div class="pl-item"><span class="pl-label">Inventory Value:</span><span class="pl-value" id="pl-warehouse">KSH 0</span></div>
-            <div class="pl-item"><span class="pl-label">Total Commission (10%):</span><span class="pl-value pl-positive" id="pl-total-commission" style="font-size: 24px;">KSH 0</span></div>
-            <div class="pl-item"><span class="pl-label">Delivery Deductions (KSH 20/order):</span><span class="pl-value pl-positive" id="pl-delivery-deductions" style="font-size: 24px;">KSH 0</span></div>
+            <div class="pl-item"><span class="pl-label">Total Commission:</span><span class="pl-value pl-positive" id="pl-total-commission" style="font-size: 24px;">KSH 0</span></div>
+            <div class="pl-item"><span class="pl-label">Delivery Deductions:</span><span class="pl-value pl-positive" id="pl-delivery-deductions" style="font-size: 24px;">KSH 0</span></div>
           </div>
           <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
             <h3>Financial Summary</h3>
             <div style="font-size: 36px; font-weight: 800; color: var(--primary-color); margin: 20px 0;" id="pl-net-admin-take">KSH 0</div>
             <p>Total platform earnings from commissions and delivery deductions.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SYSTEM CONFIGURATION SECTION -->
+      <div class="data-card">
+        <div class="card-header">
+          <h2 class="card-title">System Configuration</h2>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-top: 20px;">
+          <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+            <label style="display: block; margin-bottom: 10px; font-weight: bold; font-size: 20px;">Commission Percentage (%)</label>
+            <div style="display: flex; gap: 10px;">
+              <input type="number" id="config-commission" style="flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 18px;" min="0" max="100">
+              <button class="btn btn-primary" onclick="saveCommissionConfig()">Update</button>
+            </div>
+            <p style="font-size: 14px; color: #666; margin-top: 10px;">Current percentage charged on each item sold.</p>
+          </div>
+          <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+            <label style="display: block; margin-bottom: 10px; font-weight: bold; font-size: 20px;">Standard Delivery Fee (KSH)</label>
+            <div style="display: flex; gap: 10px;">
+              <input type="number" id="config-delivery" style="flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 18px;" min="0">
+              <button class="btn btn-primary" onclick="saveDeliveryConfig()">Update</button>
+            </div>
+            <p style="font-size: 14px; color: #666; margin-top: 10px;">Flat rate delivery fee charged during checkout.</p>
           </div>
         </div>
       </div>
@@ -451,6 +500,11 @@
         document.getElementById('stat-online').innerText = DataManager.getOnlineUserCount() || 0;
       }
 
+      // Update pending requests
+      if (document.getElementById('stat-pending-requests')) {
+        document.getElementById('stat-pending-requests').innerText = stats.pendingPageRequests || 0;
+      }
+
       const orders = (DataManager.getAllOrders() || []).slice(0, 5);
       const tbody = document.querySelector('#recent-orders-table tbody');
       if (!tbody) return;
@@ -515,7 +569,7 @@
           <td>
             <div style="display:flex; gap:5px;">
               <button class="btn btn-primary" style="padding:4px 8px" onclick="editStock('${p.id}')">Adjust</button>
-              <button class="btn btn-success" style="padding:4px 8px; background:#27ae60;" onclick="postToWebsite('${p.id}')">Post</button>
+              <button class="btn btn-danger" style="padding:4px 8px;" onclick="deleteProductFromWarehouse('${p.id}')"><i class="fas fa-trash"></i> Delete</button>
             </div>
           </td>
         </tr>
@@ -565,12 +619,13 @@
       const orders = DataManager.getAllOrders() || [];
       const warehouse = DataManager.getWarehouse() || [];
       const deductionsData = JSON.parse(localStorage.getItem('ecommerce_delivery_deductions')) || { total: 0 };
+      const config = DataManager.getSystemConfig();
       
       const warehouseValue = warehouse.reduce((sum, p) => sum + ((p.price || 0) * (p.quantity || 0)), 0);
       const totalCommission = orders.reduce((sum, o) => {
         if (o.totalCommission !== undefined) return sum + o.totalCommission;
         // Fallback for old orders
-        return sum + ((o.grandTotal || 0) * 0.10);
+        return sum + ((o.grandTotal || 0) * (config.commissionPercentage / 100));
       }, 0);
       
       const deliveryDeductions = deductionsData.total || 0;
@@ -581,11 +636,39 @@
       document.getElementById('pl-delivery-deductions').innerText = 'KSH ' + deliveryDeductions.toLocaleString();
       document.getElementById('pl-net-admin-take').innerText = 'KSH ' + totalEarnings.toLocaleString();
       
+      // Update config inputs
+      document.getElementById('config-commission').value = config.commissionPercentage;
+      document.getElementById('config-delivery').value = config.deliveryFee;
+
       // Update P&L summary info
       const plSummary = document.querySelector('#profits .card-header p');
       if (plSummary) {
         plSummary.innerText = `Analysis based on ${orders.length} orders. Last updated: ${new Date().toLocaleTimeString()}`;
       }
+    }
+
+    function saveCommissionConfig() {
+      const val = document.getElementById('config-commission').value;
+      if (val === '' || isNaN(val)) return alert("Please enter a valid percentage");
+      
+      const percent = parseFloat(val);
+      if (percent < 0 || percent > 100) return alert("Percentage must be between 0 and 100");
+
+      DataManager.updateSystemConfig({ commissionPercentage: percent });
+      alert("Commission percentage updated successfully!");
+      renderProfits();
+    }
+
+    function saveDeliveryConfig() {
+      const val = document.getElementById('config-delivery').value;
+      if (val === '' || isNaN(val)) return alert("Please enter a valid amount");
+      
+      const fee = parseFloat(val);
+      if (fee < 0) return alert("Delivery fee cannot be negative");
+
+      DataManager.updateSystemConfig({ deliveryFee: fee });
+      alert("Delivery fee updated successfully!");
+      renderProfits();
     }
 
     function renderUsers() {
@@ -600,6 +683,125 @@
           <td>${(u.registeredDate || u.createdAt) ? new Date(u.registeredDate || u.createdAt).toLocaleDateString() : 'N/A'}</td>
         </tr>
       `).join('') || '<tr><td colspan="4" style="text-align:center">No users registered</td></tr>';
+    }
+
+    function renderPageReviews() {
+      const regs = DataManager.getPageRegistrations() || [];
+      const tbody = document.querySelector('#page-reviews-table tbody');
+      if (!tbody) return;
+      
+      tbody.innerHTML = regs.map(r => `
+        <tr>
+          <td>${r.details?.name || 'N/A'}</td>
+          <td>${r.email || 'N/A'}</td>
+          <td style="text-transform: capitalize;">${r.type || 'N/A'}</td>
+          <td>${r.date ? new Date(r.date).toLocaleDateString() : 'N/A'}</td>
+          <td><span class="status-pill status-${r.status}">${r.status}</span></td>
+          <td>
+            <div style="display:flex; gap:5px;">
+              <button class="btn btn-info" style="padding:4px 8px" onclick="viewPageRequestDetails('${r.id}')">View</button>
+              ${r.status === 'pending' ? `
+                <button class="btn btn-success" style="padding:4px 8px" onclick="approvePageRequest('${r.id}')">Approve</button>
+                <button class="btn btn-danger" style="padding:4px 8px" onclick="rejectPageRequest('${r.id}')">Reject</button>
+              ` : ''}
+            </div>
+          </td>
+        </tr>
+      `).join('') || '<tr><td colspan="6" style="text-align:center">No page requests found</td></tr>';
+    }
+
+    function viewPageRequestDetails(regId) {
+      const regs = DataManager.getPageRegistrations();
+      const reg = regs.find(r => r.id === regId);
+      if (!reg) return alert("Request not found");
+
+      const body = document.getElementById('modal-body');
+      const details = reg.details || {};
+      
+      let detailsHtml = '';
+      if (reg.type === 'business') {
+        detailsHtml = `
+          <div style="display:grid; grid-template-columns: 150px 1fr; gap:10px; font-size:20px;">
+            <strong>Company:</strong> <span>${details.company || 'N/A'}</span>
+            <strong>Business Type:</strong> <span>${details.businessType || 'N/A'}</span>
+            <strong>Reg Number:</strong> <span>${details.regnumber || 'N/A'}</span>
+            <strong>Location:</strong> <span>${details.location?.street || ''}, ${details.location?.city || ''}, ${details.location?.state || ''}</span>
+            <strong>Exact Address:</strong> <span>${details.location?.address || 'N/A'}</span>
+          </div>
+        `;
+      } else {
+        detailsHtml = `
+          <div style="display:grid; grid-template-columns: 150px 1fr; gap:10px; font-size:20px;">
+            <strong>Means:</strong> <span>${details.means || 'N/A'}</span>
+            <strong>Service Type:</strong> <span>${details.serviceType || 'N/A'}</span>
+            <strong>Plate No:</strong> <span>${details.plate || 'N/A'}</span>
+            <strong>Reg Number:</strong> <span>${details.regnumber || 'N/A'}</span>
+            <strong>KRA PIN:</strong> <span>${details.krapin || 'N/A'}</span>
+            <strong>Location:</strong> <span>${details.locality?.street || ''}, ${details.locality?.city || ''}, ${details.locality?.state || ''}</span>
+            <strong>Exact Address:</strong> <span>${details.locality?.address || 'N/A'}</span>
+          </div>
+        `;
+      }
+
+      body.innerHTML = `
+        <div class="modal-header">
+          <h2>Page Request Details</h2>
+        </div>
+        <div style="padding:20px;">
+          <h3 style="margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">Personal Information</h3>
+          <div style="display:grid; grid-template-columns: 150px 1fr; gap:10px; font-size:20px; margin-bottom:20px;">
+            <strong>Full Name:</strong> <span>${details.name || 'N/A'}</span>
+            <strong>Email:</strong> <span>${reg.email}</span>
+            <strong>Phone:</strong> <span>${details.phone || 'N/A'}</span>
+            <strong>Requested Role:</strong> <span style="text-transform:capitalize;">${reg.type}</span>
+          </div>
+          
+          <h3 style="margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">${reg.type === 'business' ? 'Business' : 'Delivery'} Information</h3>
+          ${detailsHtml}
+          
+          <div style="margin-top:30px; display:flex; gap:10px; justify-content:center;">
+            ${reg.status === 'pending' ? `
+              <button class="btn btn-success" onclick="approvePageRequest('${reg.id}')"><i class="fas fa-check"></i> Approve Request</button>
+              <button class="btn btn-danger" onclick="rejectPageRequest('${reg.id}')"><i class="fas fa-times"></i> Reject Request</button>
+            ` : `<p>Status: <strong>${reg.status.toUpperCase()}</strong></p>`}
+          </div>
+        </div>
+      `;
+      document.getElementById('details-modal').style.display = 'flex';
+    }
+
+    function approvePageRequest(regId) {
+      if (!confirm("Are you sure you want to approve this request? The user will be granted the requested role.")) return;
+      
+      const regs = DataManager.getPageRegistrations();
+      const reg = regs.find(r => r.id === regId);
+      if (!reg) return;
+
+      // 1. Update user role in system
+      const users = DataManager.getAllUsers();
+      const user = users.find(u => u.email === reg.email);
+      if (user) {
+        user.role = reg.type === 'business' ? 'operator' : 'delivery';
+        user.regDetails = reg.details;
+        localStorage.setItem('ecommerce_all_users', JSON.stringify(users));
+      }
+
+      // 2. Update request status
+      DataManager.updatePageRegistrationStatus(regId, 'approved');
+      
+      alert("Request approved successfully.");
+      closeModal();
+      renderPageReviews();
+    }
+
+    function rejectPageRequest(regId) {
+      if (!confirm("Are you sure you want to reject this request?")) return;
+      
+      DataManager.updatePageRegistrationStatus(regId, 'rejected');
+      
+      alert("Request rejected.");
+      closeModal();
+      renderPageReviews();
     }
 
     function viewUserProfile(userId) {
@@ -758,6 +960,7 @@
         }
       }
 
+      const config = DataManager.getSystemConfig();
       body.innerHTML = `
         <div class="receipt">
           <div class="receipt-header"style="font-size:27px">
@@ -794,7 +997,11 @@
             </tbody>
           </table>
           <div class="receipt-total">
-            TOTAL: KSH ${(order.grandTotal || order.totalPrice || 0).toLocaleString()}
+            ${order.paymentMethod === 'Pay After Delivery' ? 
+              `<div style="font-size:0.6em; color:#27ae60;">Delivery Fee (KES ${config.deliveryFee}): PAID UPFRONT</div>
+               DUE ON DELIVERY: KSH ${(order.grandTotal || order.totalPrice || 0).toLocaleString()}` : 
+              `TOTAL: KSH ${(order.grandTotal || order.totalPrice || 0).toLocaleString()}`
+            }
           </div>
           <div style="text-align:center; margin-top:20px;">
             <img src="${qrUrl}" style="width:120px; height:120px;" alt="Order QR Code">
@@ -965,17 +1172,16 @@
       }
     }
 
-    function postToWebsite(id) {
-      if (typeof DataManager === 'undefined') return;
+    function deleteProductFromWarehouse(id) {
+      if (!confirm("Are you sure you want to permanently delete this product from the warehouse and website?")) return;
       
-      if (!confirm("Are you sure you want to post this product to the live website?")) return;
-      
-      const result = DataManager.pushWarehouseToWebsite(id);
+      const result = DataManager.deleteProduct(id);
       if (result.success) {
-        alert("Product has been successfully posted to the website!");
+        alert("Product has been successfully deleted.");
+        renderWarehouse();
         renderDashboard();
       } else {
-        alert("Error: " + (result.message || "Could not post product."));
+        alert("Error: " + (result.message || "Could not delete product."));
       }
     }
 

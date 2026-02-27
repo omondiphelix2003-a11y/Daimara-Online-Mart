@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=1200" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Daimara Online Mart | Home</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
@@ -43,30 +43,24 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
     /* NAVBAR */
     .navbar{
     display:flex;align-items:center;justify-content:space-between;
-    padding:15px 30px;background:#111;color:#fff;
+    padding:10px 20px;background:#111;color:#fff;
     position: fixed;
     top: 50px;
     left: 0;
     width: 100%;
-    background-color: #000000; /* Add your desired background color */
-    z-index: 1000; /* Ensure it's on top of other elements */
-
+    background-color: #000000;
+    z-index: 1000;
+    flex-wrap: wrap;
     }
-    .logo{color:rgb(233, 157, 17);font-size:25px;font-weight:bold;
+    .logo{color:rgb(233, 157, 17);font-size:22px;font-weight:bold;
     display: flex;
-     align-items: center;
-     gap: -5px;
-     display: inline-block;
-      transition: color 0.3s;
-        justify-content: center;
-        padding-right: 10px;
-        margin-right: 10px;
-        right: 10px;
-        cursor: pointer;
+    align-items: center;
+    transition: color 0.3s;
+    cursor: pointer;
     }
-    .nav-center{display:flex;align-items:center;padding-left: 20px;margin-left:70px;gap:20px}
-    .nav-center a{color:rgb(233,157,17);text-decoration:none;font-size:28px;}
-    .nav-icons a{color:rgb(255, 255, 255);margin-left:15px;font-size:28px}
+    .nav-center{display:flex;align-items:center;gap:15px; margin-left: auto; margin-right: auto;}
+    .nav-center a{color:rgb(233,157,17);text-decoration:none;font-size:20px;}
+    .nav-icons a{color:rgb(255, 255, 255);margin-left:10px;font-size:22px}
 
 .nav-center a:hover,
 .nav-center a.active {
@@ -78,31 +72,33 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
 }
 
 @media (max-width: 768px) {
-  .logo {font-size: 25px;}
-  .nav-center a { font-size: 25px; }
-  .nav-icons a { font-size: 25px; }
+  .logo {font-size: 18px;}
+  .nav-center { gap: 10px; }
+  .nav-center a { font-size: 16px; }
+  .nav-icons a { font-size: 18px; }
+  .navbar { padding: 8px 10px; top: 40px; }
 }
 
 
    .search-container {
   position: fixed;
-  top: 170px;
-  left: -22px;
-  width: 650px;
-  margin: 0 0 0 30px;
+  top: 150px;
+  left: 5%;
+  width: 90%;
+  max-width: 650px;
+  margin: 0;
   z-index: 1001;
  }
 
 
 #search-input {
   width: 100%;
-  padding: 10px;
+  padding: 12px 20px;
   border: none;
   background-color: #f5f5f5;
-  border-radius: 19px;
+  border-radius: 25px;
   color:#000000;
-   font-size: 18px;
-     padding-top: 5%;
+   font-size: 16px;
      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.726);
 }
 
@@ -175,25 +171,29 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
 
 
     /* SLIDER */
-    .slider{position:relative;width:100%;height:400px;overflow:hidden;margin-top:220px;box-shadow:6px 5px 15px rgba(0, 0, 0, 0.397);}
+    .slider{position:relative;width:100%;height:auto;aspect-ratio:16/9;overflow:hidden;margin-top:140px;box-shadow:6px 5px 15px rgba(0, 0, 0, 0.397);}
     .slide{display:none}
-    .slide img{width:100%;height:400px;object-fit:cover}
+    .slide img{width:100%;height:100%;object-fit:cover}
     
+    @media (max-width: 768px) {
+      .slider { margin-top: 180px; }
+    }
+
 
     /* DELIVERY SECTIONS */
-    section{padding:40px 30px}
-    h2{color: rgb(0, 0, 0);text-align:center;margin-bottom:25px}
+    section{padding:20px 15px}
+    h2{color: rgb(0, 0, 0);text-align:center;margin-bottom:20px; font-size: 1.5rem;}
     
 
     /* DELIVERY */
-    .delivery{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px}
+    .delivery{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px}
     .delivery-card{
-      background:#ffffff77;padding:25px;border-radius:10px;
+      background:#ffffff77;padding:15px;border-radius:10px;
       box-shadow:0 5px 15px rgba(0, 0, 0, 0.397);text-align:center;}
-      .delivery-card img{width:100%;height:400px;object-fit:cover;border-radius: 5px;}
+      .delivery-card img{width:100%;height:auto;aspect-ratio:1/1;object-fit:cover;border-radius: 5px;}
       
     
-    .delivery-card i{font-size:40px;margin-bottom:15px;color:#111}
+    .delivery-card i{font-size:30px;margin-bottom:10px;color:#111}
     button{
       margin-top:10px;padding:8px 15px;border:none;border-radius:5px;
       background:#111;color:rgb(233, 157, 17);cursor:pointer
@@ -204,12 +204,15 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
     .video-box{
       display:flex;
       justify-content:center;
-      padding:0 1rem;
+      padding:1rem;
+      width: 100%;
+      overflow: hidden;
     }
 
     video{
-      width:460%;
+      width:100%;
       max-width:1200px;
+      height: auto;
       border-radius:16px;
       box-shadow:var(--shadow);
     }
@@ -217,23 +220,16 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
     /* PRODUCTS GRID */
     .products {
       display:grid;
-      grid-template-columns:repeat(auto-fill, minmax(min(100%, 250px),3 1fr));
-      gap:clamp(1rem, 3vw, 1.5rem);
-      padding:0;
-      
-       /*width:280%;
-      height:100px;*/
+      grid-template-columns:repeat(auto-fill, minmax(180px, 1fr));
+      gap:15px;
+      padding:10px;
     }
     
-    @media (max-width: 1024px) {
-      .products {display: grid;grid-template-columns: repeat(2, 1fr);gap: 15px;
-      }
-    }
-
     .product{
       background:#a3a4a79c;border-radius:12px;overflow:hidden;box-shadow:0 5px 15px rgba(0, 0, 0, 0.329);
       transition:all 0.3s ease;cursor:pointer;border:0.5px solid rgba(168, 163, 163, 0.363);
       display:flex;flex-direction:column;
+      width: 100%;
     }
 
     .product:hover{
@@ -243,29 +239,29 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
     }
 
     .product img{
-      width:100%;height:220px;object-fit:cover;border-radius:12px 12px 0 0;display:block;margin:0;
+      width:100%;height:180px;object-fit:cover;border-radius:12px 12px 0 0;display:block;margin:0;
       padding:0;transition:transform 0.4s ease;
     }
 
     .product:hover img{
-      transform:scale(1.08);
+      transform:scale(1.05);
     }
 
     .product-details{
-      padding:18px;flex-grow:1;display:flex;flex-direction:column;
+      padding:12px;flex-grow:1;display:flex;flex-direction:column;
     }
 
     .product h4{
-      font-size:18px;margin:0 0 8px 0;color:#000000;font-weight:600;flex-grow:1;
+      font-size:16px;margin:0 0 5px 0;color:#000000;font-weight:600;flex-grow:1;
     }
 
     .product p{
-      color:#000000;font-size:20px;font-weight:bold;margin:10px 0;
+      color:#000000;font-size:18px;font-weight:bold;margin:5px 0;
     }
 
     .product button{
-      width:100%;margin-top:12px;padding:12px;border:none;border-radius:6px;background:#000000;
-      color:rgb(233, 157, 17);cursor:pointer;font-size:15px;font-weight:600;
+      width:100%;margin-top:10px;padding:10px;border:none;border-radius:6px;background:#000000;
+      color:rgb(233, 157, 17);cursor:pointer;font-size:14px;font-weight:600;
       transition:all 0.3s ease;box-shadow:0 2px 8px rgba(0, 0, 0, 0.3);
     }
 
@@ -275,20 +271,29 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
 
     /* FOOTER */
     .footer {
-      background: none;
-      color: white;
-      padding: 20px;
+      background: #000;
+      color: #e99d11;
+      padding: 15px;
       text-align: center;
-      position: fixed;
-      bottom: 0;
-      left: 0;
+      position: static;
       width: 100%;
-      z-index: 1000;
+      margin-top: 40px;
     }
     .footer p {
-      color: rgb(2, 2, 2);
-      font-size: 20px;
+      color: #e99d11;
+      font-size: 16px;
       font-weight: bold;
+    }
+
+    @media (max-width: 480px) {
+      .products {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        padding: 5px;
+      }
+      .product img { height: 140px; }
+      .product h4 { font-size: 14px; }
+      .product p { font-size: 16px; }
     }
 
     /* LOADING STATE */
@@ -320,231 +325,21 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
     }
 
     /* RESPONSIVE BREAKPOINTS */
-    @media (max-width:640px){
-      .navbar{
-        padding:0.75rem;
-        color: black;
-      }
-
-      .nav-center{
-        order:3;
-        width:100%;
-        justify-content:center;
-        gap:1.5rem;
-        border-top:1px solid #fff;
-        padding-top:1rem;
-      }
-
-      .slider{
-        border-radius:0 0 16px 16px;
-        height:200px;
-      }
-
-      .delivery-card img{
-        height:150px;
-      }
-
-      .product img{
-        height:140px;
-      }
-    }
-
-    
-
-    @media (max-width:641px) and (max-width:1024px){
-      .products{
-        grid-template-columns:repeat(3, 1fr);
-      }
-
-    }
-
-
-    @media (min-width:1025px){
-      .products{
-        grid-template-columns:repeat(4, 1fr);
-      }
-
-    }
-
-
-    /* Tablet and smaller (768px and below) */
     @media (max-width: 768px) {
-      body {
-        font-size: 14px;
-        padding-bottom: 70px;
-      }
-      
-      .navbar {
-        padding: 12px 20px;
-        flex-wrap: wrap;
-      }
-      
-      .logo {
-        display:none;
-      }
-      
-      .nav-links {
-        order: 3;
-        width: 100%;
-        justify-content: center;
-        margin-top: 10px;
-        padding-top: 10px;
-        border-top: 1px solid #333;
-      }
-      
-      .navbar a {
-        font-size: 22px;
-        padding: 6px 12px;
-      }
-      
-      .nav-icons a {
-        font-size: 21px;
-      }
-      
-      .search-container {
-        top: 180px;
-        width: 95%;
-      }
-      
-      #search-input {
-        padding: 10px 40px 10px 15px;
-        font-size: 14px;
-      }
-      
-      .slider {
-        height: 300px;
-        margin-top: 180px;
-      }
-      
-      .slide img {
-        height: 300px;
-      }
-      
-      h2 {
-        font-size: 24px;
-        margin: 25px 0 15px;
-      }
-      
-    .video-box{
-      display:flex;
-      justify-content:center;
-      padding:0 1rem;
+      body { font-size: 16px; padding-bottom: 20px; }
+      .navbar { top: 40px; }
+      .nav-center { width: 100%; justify-content: center; padding: 5px 0; }
+      .nav-icons { width: 100%; justify-content: center; display: flex; padding-bottom: 5px; }
+      .search-container { top: 180px; }
     }
-
-    video{
-      width:250%;
-      max-width:700px;
-      border-radius:16px;
-      box-shadow:var(--shadow);
-    }
-
-      .products {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 15px;
-        padding: 20px;
-      }
-      
-      .product {
-        padding: 15px;
-      }
-      
-      .product img {
-         width:130%;height:220px;object-fit:cover;border-radius:0 0 0 0;display:block;margin:0;
-      margin-right:50px;margin-left:-35px;margin-top:-16px;transition:transform 0.4s ease;
-      }
-      
-      .product h4 {
-        font-size: 16px;
-        margin-top:11px;
-      }
-      
-      .product p {
-        font-size: 17px;
-      }
-      
-      .product button {
-        padding: 10px 20px;
-        font-size: 13px;
-      }
-      
-      .footer {
-        padding: 15px;
-      }
-      
-      .footer p {
-        font-size: 12px;
-        font-weight:bolder;
-        color: #000;
-      }
-    }
-
-    /* TOUCH PHONE OPTIMIZATIONS */
-    @media (hover:none) and (pointer:coarse){
-       .ad-bar{
-         font-size: 33px;
-       }
-      
-      .delivery-card,
-      .product{
-        transform:none !important;
-      }
-
-      .navbar{
-        margin-top: 24px;
-      }
-      .logo{display: none;}
-
-      .nav-center a,
-      .nav-icons a{
-        
-        font-size: 29px;
-      }
-
-    .fas {
-      font-size: 29px;
-    }
-
- .search-container {
-        top: 190px;
-        
-      }
-
- .video-box{
-      display:flex;
-      justify-content:center;
-      padding:0 1rem;
-    }
-
-    video{
-      width:250%;
-      max-width:1100px;
-      border-radius:16px;
-      box-shadow:var(--shadow);
-    }
-
-      .products{
-        grid-template-columns:repeat(3, 1fr);
-      }
-
-     .product h4 {
-        font-size: 19px;
-        margin-top:11px;
-      }
-      
-      .product p {
-        font-size: 18px;
-      }
-      
-      .product button {
-        padding: 10px 20px;
-        font-size: 16px;
-      }
-
-       .footer p {
-        font-size: 25px;
-        font-weight:bolder;
-        color: #000;
-      }
+    
+    @media (max-width: 480px) {
+      .ad-bar { font-size: 14px; padding: 0.5rem; }
+      .navbar { top: 35px; }
+      .nav-center a { font-size: 14px; }
+      .nav-icons a { font-size: 18px; }
+      .search-container { top: 170px; }
+      .delivery-card img { height: 200px; }
     }
 
     /* DARK MODE */
@@ -580,9 +375,10 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
   </div>
 
    <nav class="navbar">
-      <i class="fas fa-store"style="font-size:27px;color:rgb(233,157,17);"></i>
-      <div class="logo"style="font-size:23px;color:white;margin-left:-17.5%;">Daimara Stores</div> 
-    </a>
+      <a href="index.html" class="logo">
+        <i class="fas fa-store" style="font-size:27px;color:rgb(233,157,17);"></i>
+        <span style="font-size:23px;color:white;margin-left:10px;">Daimara Stores</span>
+      </a>
 
 
   <div class="nav-center">
@@ -641,7 +437,7 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
 
 
 <!-- SLIDESHOW -->
-<div class="slider">
+<div class="slider" id="main-slider">
   <div class="slide"><img src="https://picsum.photos/1200/400?1"></div>
   <div class="slide"><img src="https://picsum.photos/1200/400?2"></div>
   <div class="slide"><img src="https://picsum.photos/1200/400?3"></div>
@@ -658,7 +454,7 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
        <h3>Water Refilling & Delivery</h3>
        <div class="product-card"><img src="https://images.unsplash.com/photo-1548839140-29a749e1cf4d?w=400&h=300&fit=crop" alt="Water"></div>
        <p>Clean and safe water delivered to your doorstep.</p>
-       <a href="Water-Refilling.html"><button>Order Now</button></a>
+       <a href="water refil.html"><button>Order Now</button></a>
       </div>
      
       <div class="delivery-card i">
@@ -677,10 +473,14 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
   
   <h2>Featured Promotion</h2>
   
-  <div class="video-box">
-    <video controls autoplay muted loop>
+  <div class="video-box" id="featured-promotion-home" style="position: relative;">
+    <video id="promo-video-home" autoplay muted loop style="width: 100%; max-width: 1200px; border-radius: 16px;">
       <source src="video2.mp4" type="video/mp4">
     </video>
+    <div class="video-controls-overlay" style="position: absolute; bottom: 20px; right: 40px; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 30px; display: flex; align-items: center; gap: 10px;">
+        <i class="fas fa-volume-up" style="color: white; font-size: 20px;"></i>
+        <input type="range" id="volume-slider-home" min="0" max="1" step="0.1" value="0" style="width: 100px; cursor: pointer;">
+    </div>
   </div>
 
 </section>
@@ -707,15 +507,53 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
 <script src="auth-check.js"></script>
 <script>
   // SLIDER
-  let index = 0;
-  const slides = document.querySelectorAll('.slide');
-  function showSlides(){
-    slides.forEach(s => s.style.display='none');
-    index = (index + 1) > slides.length ? 1 : index + 1;
-    slides[index-1].style.display='block';
-    setTimeout(showSlides, 3000);
+  let slideIndex = 0;
+  function initSlideshow() {
+    const campaigns = DataManager.getAllCampaigns();
+    const homeSlides = campaigns.filter(c => c.adType === 'slideshow' && c.targetPage === 'home');
+    const slider = document.getElementById('main-slider');
+    
+    if (homeSlides.length > 0) {
+      slider.innerHTML = homeSlides.map(c => `
+        <div class="slide"><img src="${c.media}"></div>
+      `).join('');
+    }
+    
+    const slides = document.querySelectorAll('.slide');
+    if (slides.length === 0) return;
+
+    function showSlides(){
+      slides.forEach(s => s.style.display='none');
+      slideIndex = (slideIndex + 1) > slides.length ? 1 : slideIndex + 1;
+      slides[slideIndex-1].style.display='block';
+      setTimeout(showSlides, 3000);
+    }
+    showSlides();
   }
-  showSlides();
+
+  // FEATURED PROMOTION (VIDEO)
+  function initHomePromotion() {
+    const campaigns = DataManager.getAllCampaigns();
+    const promo = campaigns.find(c => c.adType === 'video' && c.videoAudioType === 'audioated');
+    const video = document.getElementById('promo-video-home');
+    const volumeSlider = document.getElementById('volume-slider-home');
+    
+    if (promo && video) {
+      video.src = promo.media;
+    }
+
+    if (video && volumeSlider) {
+      volumeSlider.addEventListener('input', (e) => {
+        video.volume = e.target.value;
+        video.muted = (video.volume === 0);
+      });
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    initSlideshow();
+    initHomePromotion();
+  });
 
   // RANDOM PRODUCTS (from DataManager)
   (function(){
@@ -780,7 +618,7 @@ function performSearch() {
     searchResults.innerHTML = results.map(p => {
       let url = 'store.html?search=' + encodeURIComponent(p.name);
       if (p.subcategory === 'Gas') url = 'gas-refill.html';
-      if (p.subcategory === 'Water') url = 'Water-Refilling.html';
+      if (p.subcategory === 'Water') url = 'water refil.html';
       
       return `
         <div onclick="window.location.href='${url}'">

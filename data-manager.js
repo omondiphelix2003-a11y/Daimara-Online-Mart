@@ -21,7 +21,8 @@ const DataManager = (() => {
     DELIVERY_ORDERS: 'delivery_orders',
     DELIVERY_EARNINGS: 'delivery_earnings',
     DELIVERY_DEDUCTIONS: 'ecommerce_delivery_deductions',
-    PAGE_REGISTRATIONS: 'ecommerce_page_registrations'
+    PAGE_REGISTRATIONS: 'ecommerce_page_registrations',
+    SYSTEM_CONFIG: 'ecommerce_system_config'
   };
 
   // Initialize default products from both supermarket and second-hand categories
@@ -197,33 +198,65 @@ const DataManager = (() => {
    * Delete a product
    */
   function deleteProduct(productId) {
-    const products = getAllProducts();
-    let deleted = false;
+    let deletedAnywhere = false;
 
+    // 1. Remove from STOREFRONT PRODUCTS (website)
+    const products = getAllProducts();
     for (const category in products) {
       const productIndex = products[category].findIndex(p => p.id === productId);
       if (productIndex !== -1) {
         products[category].splice(productIndex, 1);
-        deleted = true;
+        localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
+        deletedAnywhere = true;
         break;
       }
     }
 
-    if (deleted) {
-      localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
-      
-      // Remove from added products as well
-      const addedProducts = JSON.parse(localStorage.getItem(STORAGE_KEYS.ADDED_PRODUCTS)) || [];
-      const addedIndex = addedProducts.findIndex(p => p.id === productId);
-      if (addedIndex !== -1) {
-        addedProducts.splice(addedIndex, 1);
-        localStorage.setItem(STORAGE_KEYS.ADDED_PRODUCTS, JSON.stringify(addedProducts));
-      }
-      
-      return { success: true, message: 'Product deleted successfully' };
+    // 2. Remove from MAIN WAREHOUSE
+    const warehouse = JSON.parse(localStorage.getItem(STORAGE_KEYS.WAREHOUSE)) || { products: [] };
+    const originalLength = warehouse.products.length;
+    warehouse.products = warehouse.products.filter(p => p.id !== productId);
+    if (warehouse.products.length !== originalLength) {
+      localStorage.setItem(STORAGE_KEYS.WAREHOUSE, JSON.stringify(warehouse));
+      deletedAnywhere = true;
     }
 
-    return { success: false, message: 'Product not found' };
+    // 3. Remove from ADDED PRODUCTS (global list)
+    const addedProducts = JSON.parse(localStorage.getItem(STORAGE_KEYS.ADDED_PRODUCTS)) || [];
+    const originalAddedLength = addedProducts.length;
+    const filteredAdded = addedProducts.filter(p => p.id !== productId);
+    if (filteredAdded.length !== originalAddedLength) {
+      localStorage.setItem(STORAGE_KEYS.ADDED_PRODUCTS, JSON.stringify(filteredAdded));
+      deletedAnywhere = true;
+    }
+
+    // 4. Remove from PRIVATE WAREHOUSES (scoped storage)
+    // We iterate through all localStorage keys to find scoped warehouses
+    const warehousePrefix = STORAGE_KEYS.WAREHOUSE + "_";
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith(warehousePrefix)) {
+        try {
+          let scopedData = JSON.parse(localStorage.getItem(key));
+          if (Array.isArray(scopedData)) {
+            const originalScopedLength = scopedData.length;
+            scopedData = scopedData.filter(p => p.id !== productId);
+            if (scopedData.length !== originalScopedLength) {
+              localStorage.setItem(key, JSON.stringify(scopedData));
+              deletedAnywhere = true;
+            }
+          }
+        } catch (e) {
+          console.error("Error cleaning scoped warehouse for key: " + key, e);
+        }
+      }
+    }
+
+    if (deletedAnywhere) {
+      return { success: true, message: 'Product deleted successfully from all locations' };
+    }
+
+    return { success: false, message: 'Product not found in any storage' };
   }
 
   /**
@@ -524,12 +557,15 @@ const DataManager = (() => {
     // Ensure status is pending by default
     if (!order.status) order.status = 'pending';
     
-    // CALCULATE COMMISSIONS (10% per item)
+    // CALCULATE COMMISSIONS
+    const config = getSystemConfig();
+    const commissionFactor = (config.commissionPercentage || 10) / 100;
+    
     const items = order.items || order.products || [];
     items.forEach(item => {
       const price = item.price || 0;
       const qty = item.qty || item.quantity || 1;
-      item.commission = (price * qty) * 0.10;
+      item.commission = (price * qty) * commissionFactor;
     });
     order.totalCommission = items.reduce((sum, i) => sum + (i.commission || 0), 0);
 
@@ -583,6 +619,16 @@ const DataManager = (() => {
           localStorage.removeItem(STORAGE_KEYS.USER);
         }
       }
+    });
+    
+    // 4. Create Invoice for the order
+    addInvoice({
+      orderId: order.id,
+      customerName: order.customerName || (order.customer && order.customer.name) || 'Guest',
+      customerEmail: order.customerEmail || (order.customer && order.customer.email) || '',
+      amount: order.grandTotal || order.totalPrice || 0,
+      total: order.grandTotal || order.totalPrice || 0,
+      items: items
     });
 
     return { success: true };
@@ -947,6 +993,12 @@ const DataManager = (() => {
 
   function addInvoice(invoice) {
     const invoices = getInvoices();
+    
+    // Check if invoice already exists for this orderId to prevent duplicates
+    if (invoice.orderId && invoices.some(inv => inv.orderId === invoice.orderId)) {
+      return { success: false, message: 'Invoice already exists for this order' };
+    }
+
     const newInvoice = {
       ...invoice,
       id: invoice.id || ('INV-' + Date.now()),
@@ -1012,7 +1064,8 @@ const DataManager = (() => {
       warehouseProducts: warehouse.length,
       warehouseValue: analysis.warehouseValue,
       totalEmails: messages.length,
-      unreadEmails: messages.filter(m => m.status === 'unread').length
+      unreadEmails: messages.filter(m => m.status === 'unread').length,
+      pendingPageRequests: (getPageRegistrations() || []).filter(r => r.status === 'pending').length
     };
   }
 
@@ -1138,6 +1191,25 @@ const DataManager = (() => {
     return { success: true };
   }
 
+  /**
+   * System Configuration
+   */
+  function getSystemConfig() {
+    const defaultConfig = {
+      commissionPercentage: 10,
+      deliveryFee: 70
+    };
+    const config = JSON.parse(localStorage.getItem(STORAGE_KEYS.SYSTEM_CONFIG));
+    return config || defaultConfig;
+  }
+
+  function updateSystemConfig(newConfig) {
+    const config = getSystemConfig();
+    const updated = { ...config, ...newConfig };
+    localStorage.setItem(STORAGE_KEYS.SYSTEM_CONFIG, JSON.stringify(updated));
+    return { success: true, config: updated };
+  }
+
   // Initialize on load
   initializeStorage();
   updateOnlineStatus();
@@ -1193,6 +1265,8 @@ const DataManager = (() => {
     addInvoice,
     deleteInvoice,
     getProfitLossAnalysis,
+    getSystemConfig,
+    updateSystemConfig,
     getAdminDashboardStats,
     getOnlineUserCount,
     getClientEmails,
@@ -1202,6 +1276,9 @@ const DataManager = (() => {
     getAllCampaigns,
     saveCampaign,
     deleteCampaign,
+    addPageRegistration,
+    getPageRegistrations,
+    updatePageRegistrationStatus,
     getScopedData,
     saveScopedData
   };
