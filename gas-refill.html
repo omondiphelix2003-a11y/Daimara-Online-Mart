@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Daimara Stores | Gas Refilling</title>
-<meta name="viewport" content="width=1200">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body{font-family:Arial;background:#f5f5f5;padding:20px;padding-top: 160px; font-size: 25px; padding-bottom: 100px;}
@@ -41,7 +41,49 @@ body{font-family:Arial;background:#f5f5f5;padding:20px;padding-top: 160px; font-
 .logo { color: #e99d11; font-weight: bold; text-decoration: none; font-size: 18px; }
 .nav-links a { color: #fff; text-decoration: none; margin-left: 10px; font-size: 18px; }
 @media (max-width: 768px) {
-  .nav-links a { font-size: 18px; }
+  body { padding-top: 80px; font-size: 16px; padding-bottom: 80px; }
+  .navbar { padding: 10px; flex-direction: row; height: 60px; justify-content: space-between; align-items: center; }
+  .nav-links a { font-size: 16px; margin-left: 0; }
+  .container { margin-top: 30px; padding: 15px; }
+  .sizes { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .card { padding: 5px; }
+  .card img { height: 80px; }
+  .card h3 { font-size: 11px; margin: 4px 0; }
+  .card p { font-size: 10px; margin: 2px 0; }
+  .card strong { font-size: 11px; }
+  .card button { padding: 5px; font-size: 10px; }
+  
+  /* BOTTOM NAV */
+  .bottom-nav {
+    display: flex !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #000;
+    height: 60px;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 2000;
+    border-top: 2px solid rgb(233, 157, 17);
+  }
+  .bottom-nav a {
+    color: white;
+    text-decoration: none;
+    font-size: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .bottom-nav a.active { color: rgb(233, 157, 17); }
+  .bottom-nav a span { font-size: 10px; margin-top: 4px; }
+}
+
+.bottom-nav { display: none; }
+
+@media (max-width: 480px) {
+  h2 { font-size: 1.2rem; }
+  .sizes { grid-template-columns: repeat(3, 1fr); }
 }
  /*.search-container {
   position: fixed;
@@ -159,11 +201,18 @@ button.order{width:100%;margin-top:20px;padding:12px;background:#111;color:#e99d
 <body>
 
 <nav class="navbar">
-  <!--<a href="index.html" class="logo">Daimara Online Mart</a>-->
   <div class="nav-links">
-    <a href="index.html"style="font-weight:bold;font-size:25px;color:rgb(233, 157, 17);">Daimara-Gas</div></a>
+    <a href="index.html" style="font-weight:bold;font-size:25px;color:rgb(233, 157, 17);">Daimara-Gas</a>
   </div>
 </nav>
+
+<div class="bottom-nav">
+  <a href="index.html"><i class="fa fa-home"></i><span>Home</span></a>
+  <a href="about.html"><i class="fas fa-info-circle"></i><span>About</span></a>
+  <a href="contact.html"><i class="fas fa-phone"></i><span>Contact</span></a>
+  <a href="cart.html"><i class="fa fa-shopping-cart"></i><span>Cart</span></a>
+  <a href="profile.html"><i class="fa fa-user"></i><span>Profile</span></a>
+</div>
 
 <!--<footer class="footer">
   <p>Copyright © 2026 Daimara Online Mart.All rights reserved.</p>

@@ -49,7 +49,7 @@ body {
 }
 
 .shop-name {
-  color: rgb(233, 157, 17);
+  color: rgb(247, 247, 247);
   font-size: 20px;
   font-weight: 700;
   text-decoration: none;
@@ -69,9 +69,44 @@ body {
 }
 
 @media (max-width: 768px) {
-  .navbar { padding: 10px; }
+  body { padding-bottom: 80px; }
+  .navbar { padding: 10px; height: 60px; justify-content: space-between; align-items: center; }
   .shop-name { font-size: 18px; }
-  .nav-right a { font-size: 16px; }
+  .nav-right { display: none !important; }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    display: flex !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #000;
+    height: 60px;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 2000;
+    border-top: 2px solid rgb(233, 157, 17);
+  }
+  .bottom-nav a {
+    color: white;
+    text-decoration: none;
+    font-size: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .bottom-nav a.active { color: rgb(233, 157, 17); }
+  .bottom-nav a span { font-size: 10px; margin-top: 4px; }
+}
+
+.bottom-nav { display: none; }
+
+/* HORIZONTAL SCROLL FOR LONG TEXT */
+.scrollable-content {
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Nav Profile Icon Container */
@@ -158,99 +193,7 @@ body {
   object-fit: cover;
 }
 
-/* Dropdown Menu */
-#dropdown-menu {
-  display: none;
-  position: absolute;
-  top: 70px;
-  right: 20px;
-  background: #000000;
-  border: 2px solid rgb(233, 157, 17);
-  border-radius: 10px;
-  padding: 10px 0;
-  min-width: 180px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-  z-index: 2000;
-}
 
-#dropdown-menu.show {
-  display: block;
-}
-
-#dropdown-menu a,
-#dropdown-menu button {
-  display: block;
-  width: 100%;
-  padding: 12px 20px;
-  color: #ecf0f1;
-  text-decoration: none;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 14px;
-  text-align: left;
-}
-
-#dropdown-menu a:hover,
-#dropdown-menu button:hover {
-  background: rgba(0, 0, 0, 0.2);
-  color: rgb(233, 157, 17);
-  padding-left: 25px;
-}
-
-#dropdown-menu button {
-  color: #e74c3c;
-  font-weight: 600;
-}
-
-#dropdown-menu button:hover {
-  background: rgba(231, 76, 60, 0.2);
-  color: #ff6b6b;
-}
-
-.dropdown-menu {
-  position: absolute;
-  top: 50px;
-  right: 0;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  min-width: 180px;
-  display: none;
-  flex-direction: column;
-  overflow: hidden;
-  z-index: 1001;
-}
-
-.profile-dropdown:hover .dropdown-menu,
-.dropdown-menu.show {
-  display: flex;
-}
-
-.dropdown-item {
-  padding: 12px 20px;
-  color: #000000;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  display: block;
-  border-bottom: 1px solid #ecf0f1;
-}
-
-.dropdown-item:last-child {
-  border-bottom: none;
-}
-
-.dropdown-item:hover {
-  background: #f9f9f9;
-  color: rgb(233, 157, 17);
-}
-
-.dropdown-item.active {
-  background: rgba(0, 0, 0, 0.1);
-  color: rgb(233, 157, 17);
-  font-weight: 600;
-}
 
 .logout-btn:hover {
   background: #fee !important;
@@ -288,6 +231,21 @@ body {
   .profile-sidebar {
     width: 100%;
     margin-bottom: 20px;
+  }
+  .profile-header-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+  }
+  .profile-image-large {
+    width: 120px;
+    height: 120px;
+  }
+  .profile-stats {
+    grid-template-columns: 1fr;
+  }
+  .profile-sections {
+    grid-template-columns: 1fr;
   }
   .id-upload-grid {
     display: flex;
@@ -1136,7 +1094,7 @@ body {
 <nav class="navbar">
   <div class="nav-left">
     <a href="index.html" style="text-decoration: none; color: inherit;">
-      <span class="shop-name">Daimara Online Mart</span>
+      <span class="shop-name">Daimara Stores</span>
     </a>
   </div>
 
@@ -1150,21 +1108,29 @@ body {
   <div class="nav-right" style="display: flex; gap: 15px; align-items: center;">
     <div class="nav-profile-icon">
       <a id="profile-icon" href="profile.html" title="Profile" style="text-decoration: none; color: inherit;">
-        <span style="font-size: 20px; color: rgb(233, 157, 17);"></span>
+        <i class="fa fa-user-circle" style="font-size: 24px; color: rgb(233, 157, 17);"></i>
       </a>
     </div>
     <div class="nav-login">
-      <a id="login-btn" href="login.html">Login</a>
+      <a id="login-btn" href="login.html"><i class="fa fa-user"></i> Login</a>
     </div>
     <div class="nav-cart">
-      <a href="store.html" style="text-decoration: none; color: inherit;">shop</a>
+      <a href="store.html" style="text-decoration: none; color: inherit;"><i class="fa fa-shopping-bag"></i> Shop</a>
     </div>
   </div>
 </nav>
 
-<footer class="footer">
+<div class="bottom-nav">
+  <a href="index.html"><i class="fa fa-home"></i><span>Home</span></a>
+  <a href="about.html"><i class="fas fa-info-circle"></i><span>About</span></a>
+  <a href="contact.html"><i class="fas fa-phone"></i><span>Contact</span></a>
+  <a href="cart.html"><i class="fa fa-shopping-cart"></i><span>Cart</span></a>
+  <a href="profile.html" class="active"><i class="fa fa-user"></i><span>Profile</span></a>
+</div>
+
+<!--<footer class="footer">
   <p>Copyright © 2026 Daimara Online Mart.All rights reserved.</p>
-</footer>
+</footer>-->
 
 <!-- PROFILE PAGE -->
 <div class="profile-container">

@@ -51,7 +51,11 @@
     }
 
     @media (max-width: 480px) {
-      .stats-grid { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+      .stat-card { padding: 10px; flex-direction: column; text-align: center; gap: 5px; }
+      .stat-icon { width: 40px; height: 40px; font-size: 16px; }
+      .stat-info h3 { font-size: 14px; }
+      .stat-info p { font-size: 12px; }
       .page-header { flex-direction: column; align-items: flex-start; gap: 15px; }
       .admin-info { text-align: left; }
     }
@@ -184,6 +188,9 @@
   </style>
 </head>
 <body>
+
+  <!-- MOBILE TOGGLE -->
+  <button class="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
@@ -430,6 +437,11 @@
   <script>
     // TAB SWITCHING
     function showTab(tabId, el) {
+      // Close sidebar on mobile
+      const sidebar = document.querySelector('.sidebar');
+      if (window.innerWidth <= 992) {
+        sidebar.classList.remove('active');
+      }
       document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
       document.getElementById(tabId).classList.add('active');
       
@@ -1240,6 +1252,11 @@
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
+    }
+
+    function toggleSidebar() {
+      const sidebar = document.querySelector('.sidebar');
+      sidebar.classList.toggle('active');
     }
 
     function adminLogout() {

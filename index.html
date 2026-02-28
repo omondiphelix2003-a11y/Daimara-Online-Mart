@@ -38,19 +38,23 @@
       z-index:1001;
     }
 
-div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top: 20px; margin-bottom: 20px;}
+div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px;
+   margin-top: 20px; margin-bottom: 20px;padding-top: 12px;}
 
     /* NAVBAR */
     .navbar{
     display:flex;align-items:center;justify-content:space-between;
     padding:10px 20px;background:#111;color:#fff;
     position: fixed;
-    top: 50px;
+    top: 30px;
     left: 0;
     width: 100%;
     background-color: #000000;
     z-index: 1000;
     flex-wrap: wrap;
+     margin-top: 9px;
+     padding-top: 24px;
+     padding-bottom: 24px;
     }
     .logo{color:white;font-size:20px;font-weight:bold;
     display: flex;
@@ -81,17 +85,17 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
 
 
    .search-container {
- position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
-      width: 90%; max-width: 600px; z-index: 1001;margin-top: 35px;
+ position: fixed; top: 75px; left: 50%; transform: translateX(-50%);
+      width: 90%; max-width: 400px; z-index: 1001;margin-top: -15px;margin-left: -300px;
  }
 
 
 #search-input {
   width: 100%;
-  padding: 12px 20px;
+  padding: 8px 20px;
   border: none;
   background-color: #f5f5f5;
-  border-radius: 25px;
+  border-radius: 12px;
   color:#000000;
    font-size: 16px;
      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.726);
@@ -169,7 +173,7 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
      /* SLIDER */
         .slider {
             width: 100%; max-width: 1350px; aspect-ratio: 16/9; max-height: 400px;
-            margin: 30px auto; overflow: hidden; border-radius: none;margin-top: 180px;
+            margin: 30px auto; overflow: hidden; border-radius: none;margin-top: 100px;
         }
         .slide { display: none; height: 100%; }
         .slide img { width: 100%; height: 100%; object-fit: cover; }
@@ -226,7 +230,7 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
     }
     
     .product{
-      background:#a3a4a79c;border-radius:12px;overflow:hidden;box-shadow:0 5px 15px rgba(0, 0, 0, 0.329);
+      background:white;border-radius:12px;overflow:hidden;box-shadow:0 5px 15px rgba(0, 0, 0, 0.329);
       transition:all 0.3s ease;cursor:pointer;border:0.5px solid rgba(168, 163, 163, 0.363);
       display:flex;flex-direction:column;
       width: 100%;
@@ -287,13 +291,14 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
 
     @media (max-width: 480px) {
       .products {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
         padding: 5px;
       }
-      .product img { height: 140px; }
-      .product h4 { font-size: 14px; }
-      .product p { font-size: 16px; }
+      .product img { height: 100px; }
+      .product h4 { font-size: 11px; }
+      .product p { font-size: 13px; }
+      .product button { padding: 5px; font-size: 11px; }
     }
 
     /* LOADING STATE */
@@ -326,20 +331,63 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
 
     /* RESPONSIVE BREAKPOINTS */
     @media (max-width: 768px) {
-      body { font-size: 16px; padding-bottom: 20px; }
-      .navbar { top: 50px; }
-      .nav-center { width: 100%; justify-content: center; padding: 5px 0;margin-top: -30px;margin-left: 200px; }
-      .nav-icons { width: 100%; justify-content: center; display: flex; padding-bottom: 5px;margin-top: -29px;margin-left: 660px; }
-      .search-container { top: 80px; }
+      body { font-size: 16px; padding-bottom: 80px; }
+      .navbar { top: 35px; flex-direction: row; height: 60px; padding: 10px; justify-content: space-between; align-items: center; }
+      .nav-center, .nav-icons { display: none !important; }
+      .search-container { top: 73px; width: 95%;margin-left: 34px; }
+      .slider { margin-top: 100px; }
+      
+     /* BOTTOM NAV */
+      .bottom-nav {
+        display: flex !important;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: #000;
+        height: 60px;
+        justify-content: space-around;
+        align-items: center;
+        z-index: 2000;
+        border-top: 2px solid var(--primary);
+      }
+      .bottom-nav a {
+        color: white;
+        text-decoration: none;
+        font-size: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .bottom-nav a.active { color: var(--primary); }
+      .bottom-nav a span { font-size: 10px; margin-top: 4px; }
+
+      .nav-toggle {
+        display: block !important;
+        background: var(--primary);
+        color: #000;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+    }
+
+    .nav-toggle { display: none; }
+    /* HORIZONTAL SCROLL FOR LONG TEXT */
+    .scrollable-text {
+      overflow-x: auto;
+      white-space: nowrap;
+      /*-webkit-overflow-scrolling: touch;*/
     }
     
     @media (max-width: 480px) {
-      .ad-bar { font-size: 14px; padding: 0.5rem; }
-      .navbar { top: 35px; }
-      .nav-center  { font-size: 14px;margin-left: 190px; }
-      .nav-icons { font-size: 18px;margin-left: 340px;margin-top: 5px; }
-      .search-container { top: 100px; }
-      .delivery-card img { height: 200px; }
+      .ad-bar { font-size: 12px; padding: 0.5rem; }
+      .navbar { top: 23px; height: 50px;padding-top: 13px;padding-bottom: 13px; }
+      .search-container { top: 54px;max-width: 235px;margin-left: 78px; }
+      .slider { margin-top: 80px; }
+      .delivery-card img { height: 150px; }
     }
 
     /* DARK MODE */
@@ -393,6 +441,14 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
     <a href="cart.html"><i class="fa fa-shopping-cart"></i></a>
   </div>
 </nav>
+
+<div class="bottom-nav">
+  <a href="store.html"><i class="fa fa-shopping-bag"></i><span>Store</span></a>
+  <a href="about.html"><i class="fas fa-info-circle"></i><span>About</span></a>
+  <a href="contact.html"><i class="fas fa-phone"></i><span>Contact</span></a>
+  <a href="cart.html"><i class="fa fa-shopping-cart"></i><span>Cart</span></a>
+  <a href="profile.html"><i class="fa fa-user"></i><span>Profile</span></a>
+</div>
 
 <script src="data-manager.js"></script>
 <script>
@@ -498,9 +554,9 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px; margin-top
   </section>
 
 
-<footer class="footer">
+<!--<footer class="footer">
   <p>Copyright © 2026 Daimara Stores.All rights reserved.</p>
-</footer>
+</footer>-->
 
 <script src="data-manager.js"></script>
 <script src="auth-check.js"></script>

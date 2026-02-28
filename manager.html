@@ -90,7 +90,19 @@ iframe{
   border:none;
   border-radius:12px;
   margin-top:10px;
-  
+}
+
+@media (max-width: 768px) {
+  .topbar { padding: 12px 15px; text-align: center; }
+  .topbar h1 { font-size: 16px; }
+  .container { padding: 15px; }
+  .grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .card { padding: 10px; }
+  .card h3 { font-size: 11px; }
+  .card strong { font-size: 14px; }
+  .table { display: block; overflow-x: auto; }
+  .table th, .table td { padding: 8px; font-size: 13px; }
+  iframe { height: 300px; }
 }
 
 </style>

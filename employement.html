@@ -198,6 +198,13 @@ body{
 .icon-operator { background: #2563eb; }
 .icon-delivery { background: #16a34a; }
 
+@media (max-width: 768px) {
+  .topbar { flex-direction: column; gap: 10px; text-align: center; }
+  .container { padding: 10px; }
+  .grid { grid-template-columns: 1fr; }
+  .table-container { overflow-x: auto; }
+  .table th, .table td { padding: 10px; font-size: 14px; }
+}
 </style>
 </head>
 <body>

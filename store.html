@@ -41,13 +41,19 @@
 
     /* SEARCH */
     .search-container {
-      position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
-      width: 90%; max-width: 600px; z-index: 1001;
+      position: fixed; top: 5px; left: 50%; transform: translateX(-50%);
+      width: 90%; max-width: 400px; z-index: 1001;margin-left: -283px;
     }
     #search-input {
-      width: 100%; padding: 12px 20px; border: none; border-radius: 25px;
-      background: #fff; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.726); font-size: 16px;
-    }
+  width: 100%;
+  padding: 8px 20px;
+  border: none;
+  background-color: #f5f5f5;
+  border-radius: 12px;
+  color:#000000;
+   font-size: 16px;
+     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.726);
+}
     #search-results {
       position: absolute; top: 50px; width: 100%; background: #fff;
       border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
@@ -62,13 +68,14 @@
     /* SLIDER */
         .slider {
            width: 100%; max-width: 1350px; aspect-ratio: 16/9; max-height: 400px;
-            margin: 30px auto; overflow: hidden; border-radius: none;margin-top: 180px;
+            margin: 30px auto; overflow: hidden; border-radius: none;margin-top: 80px;
         }
         .slide { display: none; height: 100%; }
         .slide img { width: 100%; height: 100%; object-fit: cover; }
 
     section{padding:20px 15px}
     h2{color: rgb(0, 0, 0);text-align:center;margin-bottom:50px; font-size: 2.5rem;}
+
 
    /* PRODUCTS GRID */
     .products {
@@ -79,7 +86,7 @@
     }
     
     .product{
-      background:#a3a4a79c;border-radius:12px;overflow:hidden;box-shadow:0 5px 15px rgba(0, 0, 0, 0.329);
+      background:white;border-radius:12px;overflow:hidden;box-shadow:0 5px 15px rgba(0, 0, 0, 0.329);
       transition:all 0.3s ease;cursor:pointer;border:0.5px solid rgba(168, 163, 163, 0.363);
       display:flex;flex-direction:column;
       width: 100%;
@@ -124,11 +131,11 @@
 
 
     @media (max-width: 480px) {
-      .products { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-      .product { padding: 10px; }
-      .product img { height: 140px; }
-      .product h4 { font-size: 14px; }
-      .product p { font-size: 16px; }
+      .products { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .product { padding: 5px; }
+      .product img { height: 100px; }
+      .product h4 { font-size: 11px; }
+      .product p { font-size: 13px; }
       .slider { margin-top: 130px; }
     }
 
@@ -141,80 +148,88 @@
     .footer p { color: black; font-size: 14px;font-weight: bold; }
 
     
-    /* RESPONSIVE BREAKPOINTS */
     @media (max-width: 768px) {
-      body { font-size: 16px; padding-bottom: 20px; }
-      .navbar { top: 5px; }
-      .logo { display: none; }
-      .nav-center { width: 100%; justify-content: center; padding: 5px 0;font-size: 14px;padding-top: 22px; }
-      .nav-icons { width: 100%; justify-content: flex-end; display: flex; 
-        padding-bottom: 5px;font-size: 14px;padding-top: 12px; }
-      .search-container { top: 100px; }
+      body { font-size: 16px; padding-bottom: 80px; }
+      .navbar { top: 0; flex-direction: row; height: 60px; padding: 10px; justify-content: space-between; align-items: center; }
+      .nav-links { 
+        display: none; 
+        position: fixed; 
+        top: 60px; 
+        left: 0; 
+        width: 100%; 
+        background: #000; 
+        flex-direction: column; 
+        padding: 10px; 
+        z-index: 1000;
+      }
+      .nav-links.active { display: flex; }
+      .nav-links a { font-size: 14px; padding: 10px; width: 100%; text-align: center; }
+      .nav-icons { display: none !important; }
+      .search-container { top: 10px; width: 95%;margin-left: -160px; }
+      .slider { margin-top: 100px; }
+
+      /* BOTTOM NAV */
+      .bottom-nav {
+        display: flex !important;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: #000;
+        height: 60px;
+        justify-content: space-around;
+        align-items: center;
+        z-index: 2000;
+        border-top: 2px solid var(--primary);
+      }
+      .bottom-nav a {
+        color: white;
+        text-decoration: none;
+        font-size: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .bottom-nav a.active { color: var(--primary); }
+      .bottom-nav a span { font-size: 10px; margin-top: 4px; }
+
+      .nav-toggle {
+        display: block !important;
+        background: var(--primary);
+        color: #000;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-weight: bold;
+        cursor: pointer;
+      }
     }
+
+    .nav-toggle { display: none; }
     
     @media (max-width: 480px) {
-      .ad-bar { font-size: 14px; padding: 0.5rem; }
-      .navbar { top: 5px; }
-      .logo { display: none; }
-      .nav-center a { font-size: 14px;margin-top: 10px; }
-      .nav-icons a { font-size: 18px;margin-top: -29px; }
-      .search-container { top: 80px; }
-      .slider { height: 150px;margin-top: 150px; }
-       section{padding:20px 15px}
-    
-       h2{color: rgb(0, 0, 0);text-align:center;margin-bottom:50px; font-size: 1.5rem;}
-   
-       /* PRODUCTS GRID */
-     .products {
-      display:grid;
-      grid-template-columns:repeat(auto-fill, minmax(3, 1fr));
-      gap:15px;
-      padding:10px;
-    }
-    
-    .product{
-      border-radius:2px;overflow:hidden;box-shadow:0 5px 15px rgba(0, 0, 0, 0.329);
-      transition:all 0.3s ease;cursor:pointer;border:0.5px solid rgba(168, 163, 163, 0.363);
-      display:flex;flex-direction:column;
-      width: 100%;
+      .navbar { top: 0; height: 50px; }
+      .search-container { top: 60px; }
+      .slider { max-height: 200px; margin-top: 60px; }
+      h2 { font-size: 1.5rem; margin-bottom: 20px; }
+      .products {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        padding: 5px;
+      }
+      .product img { height: 100px; }
+      .product h4 { font-size: 11px; }
+      .product p { font-size: 13px; }
+      .product button { padding: 5px; font-size: 11px; }
     }
 
-    .product:hover{
-      transform:translateY(-4px);
-      box-shadow:0 20px 25px -5px rgba(0,0,0,0.1);
-      border-color:#e99d11;
-    }
-
-    .product img{
-      width:100%;height:180px;object-fit:cover;border-radius:2px 2px 0 0;display:flex;margin:0 ;
-      padding:0;transition:transform 0.4s ease;
-    }
-
-    .product:hover img{
-      transform:scale(1.05);
-    }
-
-    .product-details{
-      padding:12px;flex-grow:1;display:flex;flex-direction:column;
-    }
-
-    .product h4{
-      font-size:16px;margin:0 0 5px 0;color:#000000;font-weight:600;flex-grow:1;
-    }
-
-    .product p{
-      color:#000000;font-size:18px;font-weight:bold;margin:5px 0;
-    }
-
-    .product button{
-      width:100%;margin-top:10px;padding:10px;border:none;border-radius:6px;background:#000000;
-      color:rgb(233, 157, 17);cursor:pointer;font-size:14px;font-weight:600;
-      transition:all 0.3s ease;box-shadow:0 2px 8px rgba(0, 0, 0, 0.3);
-    }
-
-    .product button:hover{
-      background-color:#ffffff;color:#000;transform:translateY(-2px);box-shadow:0 8px 15px rgba(0, 0, 0, 0.4);
-    }
+ @media (max-width: 480px) {
+      .ad-bar { font-size: 12px; padding: 0.5rem; }
+      .navbar { top: 5px; height: 50px;padding-top: 13px;padding-bottom: 13px; }
+      .logo {display: none;}
+      .search-container { top: 13px;max-width: 255px;margin-left: 58px; }
+      .slider { margin-top: 80px; }
+      .delivery-card img { height: 150px; }
     }
 
   </style>
@@ -224,7 +239,8 @@
 <!-- NAVBAR -->
 <nav class="navbar">
   <a href="index.html" class="logo">Daimara Stores</a>
-  <div class="nav-links">
+  <button class="nav-toggle" onclick="toggleNav()">Menu <i class="fas fa-bars"></i></button>
+  <div class="nav-links" id="storeNav">
     <a href="supermarket.html">Supermarket</a>
     <a href="second-hand items.html">Second-hand</a>
   </div>
@@ -233,6 +249,14 @@
     <a href="cart.html" title="Cart"><i class="fa fa-shopping-cart"></i></a>
   </div>
 </nav>
+
+<div class="bottom-nav">
+  <a href="index.html"><i class="fa fa-home"></i><span>Home</span></a>
+  <a href="about.html"><i class="fas fa-info-circle"></i><span>About</span></a>
+  <a href="contact.html"><i class="fas fa-phone"></i><span>Contact</span></a>
+  <a href="cart.html"><i class="fa fa-shopping-cart"></i><span>Cart</span></a>
+  <a href="profile.html"><i class="fa fa-user"></i><span>Profile</span></a>
+</div>
 
 <!-- SEARCH -->
 <div class="search-container">
@@ -253,13 +277,16 @@
   <div class="products" id="productContainer"></div>
 </section>
 
-<footer class="footer">
+<!--<footer class="footer">
   <p>Copyright © 2026 Daimara Stores.All rights reserved.</p>
-</footer>
+</footer>-->
 
 <script src="data-manager.js"></script>
 <script src="auth-check.js"></script>
 <script>
+  function toggleNav() {
+    document.getElementById('storeNav').classList.toggle('active');
+  }
   // SLIDER
   let slideIndex = 0;
   function initSlideshow() {

@@ -23,6 +23,14 @@
             padding: 10px 20px; background: var(--dark); color: #fff;
             position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
         }
+
+         .logo { color: white; font-size: 20px; font-weight: bold; text-decoration: none; }
+        .nav-links { display: flex; align-items: center; gap: 15px; }
+        .nav-links a { color: #e99d11; text-decoration: none; font-size: 14px; transition: 0.3s; }
+        .nav-links a:hover { color: white; }
+        .nav-icons { display: flex; align-items: center; gap: 15px; }
+        .nav-icons a { color: #fff; font-size: 18px; transition: 0.3s; }
+
         .logo { color: white; font-size: 20px; font-weight: bold; text-decoration: none; }
         .nav-icons { display: flex; align-items: center; gap: 15px; }
         .nav-icons a { color: #fff; font-size: 18px; transition: 0.3s; text-decoration: none; }
@@ -62,11 +70,81 @@
         .btn-secondary { background: #e67e22; color: #fff; padding: 15px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
         .btn-primary:hover, .btn-secondary:hover { opacity: 0.9; }
 
-        @media (max-width: 600px) {
-            .container { padding: 0; }
+        @media (max-width: 768px) {
+            body { padding-bottom: 80px; }
+            .navbar { padding: 10px; height: 60px; justify-content: space-between; align-items: center; }
+            .nav-links { 
+                display: none; 
+                position: fixed; 
+                top: 60px; 
+                left: 0; 
+                width: 100%; 
+                background: #000; 
+                flex-direction: column; 
+                padding: 10px; 
+                z-index: 1000;
+            }
+            .nav-links.active { display: flex; }
+            .nav-links a { color: #fff; text-decoration: none; font-size: 14px; padding: 10px; width: 100%; text-align: center; }
+            .nav-icons { display: none !important; }
+            .container { padding: 10px; margin-top: 80px; }
             .checkout-form { padding: 15px; }
             th, td { padding: 8px; font-size: 12px; }
             .logo { font-size: 18px; }
+            .btn-group { flex-direction: column; }
+            .btn-primary, .btn-secondary { width: 100%; padding: 12px; font-size: 14px; }
+            #random-products { grid-template-columns: repeat(3, 1fr) !important; gap: 8px !important; }
+            .product img { height: 80px; }
+            .product h4 { font-size: 11px; }
+            .product p { font-size: 12px; }
+            .product button { padding: 5px; font-size: 10px; }
+            .slider { max-height: 200px; margin-top: 20px; }
+
+            /* BOTTOM NAV */
+            .bottom-nav {
+                display: flex !important;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                background: #000;
+                height: 60px;
+                justify-content: space-around;
+                align-items: center;
+                z-index: 2000;
+                border-top: 2px solid var(--primary);
+            }
+            .bottom-nav a {
+                color: white;
+                text-decoration: none;
+                font-size: 20px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            .bottom-nav a.active { color: var(--primary); }
+            .bottom-nav a span { font-size: 10px; margin-top: 4px; }
+
+            .nav-toggle {
+                display: block !important;
+                background: var(--primary);
+                color: #000;
+                border: none;
+                padding: 5px 10px;
+                border-radius: 5px;
+                font-weight: bold;
+                cursor: pointer;
+            }
+        }
+
+        .nav-toggle { display: none; }
+        .bottom-nav { display: none; }
+
+        @media (max-width: 400px) {
+            .nav-icons { gap: 10px; }
+            .nav-icons a { font-size: 16px; }
+            .logo { font-size: 16px; }
+            th, td { padding: 5px; font-size: 11px; }
         }
 
         /* SLIDER & PRODUCTS */
@@ -92,11 +170,24 @@
 
 <nav class="navbar">
     <a href="index.html" class="logo">Daimara Stores</a>
+    <button class="nav-toggle" onclick="toggleNav()">Menu <i class="fas fa-bars"></i></button>
+    <div class="nav-links" id="checkoutNav">
+        <a href="supermarket.html">Supermarket</a>
+        <a href="second-hand items.html">Second-hand</a>
+    </div>
     <div class="nav-icons">
         <a href="store.html" title="Store"><i class="fa fa-shopping-bag"></i></a>
         <a href="cart.html" title="Cart"><i class="fa fa-shopping-cart"></i></a>
     </div>
 </nav>
+
+<div class="bottom-nav">
+  <a href="index.html"><i class="fa fa-home"></i><span>Home</span></a>
+  <a href="about.html"><i class="fas fa-info-circle"></i><span>About</span></a>
+  <a href="contact.html"><i class="fas fa-phone"></i><span>Contact</span></a>
+  <a href="cart.html"><i class="fa fa-shopping-cart"></i><span>Cart</span></a>
+  <a href="profile.html"><i class="fa fa-user"></i><span>Profile</span></a>
+</div>
 
 <div class="container">
     <h2>Your Cart Items</h2>
@@ -171,12 +262,16 @@
     </section>
 </div>
 
-<footer class="footer">
+<!--<footer class="footer">
     <p>Copyright © 2026 Daimara Stores. All rights reserved.</p>
-</footer>
+</footer>-->
 
 <script src="data-manager.js"></script>
 <script>
+    function toggleNav() {
+        document.getElementById('checkoutNav').classList.toggle('active');
+    }
+
     (function() {
         const user = DataManager.getCurrentUser();
         if (!user) { alert("Please login to proceed"); window.location.href = "login.html"; }

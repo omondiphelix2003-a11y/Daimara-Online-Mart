@@ -29,6 +29,18 @@ input[type='number']{width:70px;padding:5px;}
 .whatsapp{background:#25D366;color:black;}
 .gmail{background:#EA4335;color:black;}
 .hidden{display:none;}
+
+@media (max-width: 768px) {
+  .topbar { flex-direction: column; gap: 15px; text-align: center; }
+  .topbar div { display: flex; flex-direction: column; width: 100%; gap: 10px; }
+  .btn { width: 100%; }
+  .container { padding: 15px; }
+  .grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .card { padding: 10px; }
+  .card h3 { font-size: 11px; }
+  .card strong { font-size: 14px; }
+  .table { display: block; overflow-x: auto; }
+}
 </style>
 </head>
 <body>

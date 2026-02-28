@@ -280,10 +280,55 @@ td { padding: 12px; border-bottom: 1px solid #2d3748; }
 
    
 
+/* MOBILE RESPONSIVENESS */
+.menu-toggle {
+    display: none;
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    z-index: 1100;
+    background: #e99d11;
+    color: black;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+@media (max-width: 768px) {
+    body { flex-direction: column; }
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: fixed;
+        top: 0;
+        left: -100%;
+        transition: 0.3s;
+    }
+    .sidebar.active { left: 0; height: 100vh; }
+    .menu-toggle { display: block; }
+    .main {
+        margin-left: 0 !important;
+        width: 100% !important;
+        margin-top: 60px;
+        padding: 15px;
+    }
+    .cards { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .card { padding: 10px; text-align: center; }
+    .card h3 { font-size: 18px !important; }
+    .card p { font-size: 11px; }
+    .campaign-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .campaign-card { font-size: 12px; }
+    .campaign-media { height: 80px; }
+    .ad-form > div { grid-template-columns: 1fr !important; }
+}
 </style>
 </head>
 
 <body>
+
+<button class="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
 
 <div class="sidebar">
 <h2>DAIMARA MARKETING</h2>
@@ -421,6 +466,10 @@ td { padding: 12px; border-bottom: 1px solid #2d3748; }
 /* ===========================
    TAB SWITCHING
 =========================== */
+function toggleSidebar() {
+    document.querySelector('.sidebar').classList.toggle('active');
+}
+
 function showTab(tabId, el) {
     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
     document.getElementById(tabId).classList.add('active');
@@ -434,6 +483,11 @@ function showTab(tabId, el) {
     }
     if(tabId === 'campaigns') {
         renderCampaigns();
+    }
+    
+    // Close sidebar on mobile after selection
+    if (window.innerWidth <= 768) {
+        document.querySelector('.sidebar').classList.remove('active');
     }
 }
 

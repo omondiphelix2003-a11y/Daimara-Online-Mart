@@ -26,16 +26,83 @@
         }
         .logo { color: white; font-size: 20px; font-weight: bold; text-decoration: none; }
         .nav-links { display: flex; align-items: center; gap: 15px; }
-        .nav-links a { color: #fff; text-decoration: none; font-size: 14px; transition: 0.3s; }
-        .nav-links a:hover { color: var(--primary); }
+        .nav-links a { color: #e99d11; text-decoration: none; font-size: 14px; transition: 0.3s; }
+        .nav-links a:hover { color: white; }
         .nav-icons { display: flex; align-items: center; gap: 15px; }
         .nav-icons a { color: #fff; font-size: 18px; transition: 0.3s; }
 
-        @media (max-width: 600px) {
-            .navbar { padding: 8px 10px; }
+        @media (max-width: 768px) {
+            body { padding-bottom: 80px; }
+            .navbar { padding: 10px; flex-direction: row; justify-content: space-between; align-items: center; height: 60px; }
             .logo { font-size: 18px; }
-            .nav-links { gap: 10px; }
-            .nav-links a { font-size: 12px; }
+            .nav-links { 
+                display: none; 
+                position: fixed; 
+                top: 60px; 
+                left: 0; 
+                width: 100%; 
+                background: #000; 
+                flex-direction: column; 
+                padding: 10px; 
+                z-index: 1000;
+            }
+            .nav-links.active { display: flex; }
+            .nav-links a { font-size: 14px; padding: 10px; width: 100%; text-align: center; }
+            .nav-icons { display: none !important; }
+            
+            .cart-item-card { grid-template-columns: 80px 1fr; }
+            .cart-item-action { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px solid #f0f0f0; padding-top: 10px; }
+            .cart-container { padding: 15px; margin-top: 80px; }
+            h4 { font-size: 20px; }
+            #random-products { grid-template-columns: repeat(3, 1fr) !important; gap: 8px !important; }
+            .product img { height: 80px; }
+            .product h4 { font-size: 11px; }
+            .product p { font-size: 12px; }
+            .product button { padding: 5px; font-size: 10px; }
+            .slider { max-height: 200px; }
+
+            /* BOTTOM NAV */
+            .bottom-nav {
+                display: flex !important;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                background: #000;
+                height: 60px;
+                justify-content: space-around;
+                align-items: center;
+                z-index: 2000;
+                border-top: 2px solid var(--primary);
+            }
+            .bottom-nav a {
+                color: white;
+                text-decoration: none;
+                font-size: 20px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            .bottom-nav a.active { color: var(--primary); }
+            .bottom-nav a span { font-size: 10px; margin-top: 4px; }
+
+            .nav-toggle {
+                display: block !important;
+                background: var(--primary);
+                color: #000;
+                border: none;
+                padding: 5px 10px;
+                border-radius: 5px;
+                font-weight: bold;
+                cursor: pointer;
+            }
+        }
+
+        .bottom-nav { display: none; }
+        .nav-toggle { display: none; }
+
+        @media (max-width: 400px) {
+            .cart-container { margin-top: 80px; }
         }
 
         /* CART CONTAINER */
@@ -71,12 +138,7 @@
             border: none; border-radius: 4px; cursor: pointer; font-size: 12px;
         }
 
-        @media (max-width: 600px) {
-            .cart-item-card { grid-template-columns: 80px 1fr; }
-            .cart-item-action { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
-            .cart-container { padding: 10px; }
-            h4 { font-size: 20px; }
-        }
+
 
         /* TOTAL & CHECKOUT */
         .cart-total {
@@ -135,14 +197,24 @@
 
 <nav class="navbar">
     <a href="index.html" class="logo">Daimara Stores</a>
-    <div class="nav-links">
+    <button class="nav-toggle" onclick="toggleNav()">Menu <i class="fas fa-bars"></i></button>
+    <div class="nav-links" id="cartNav">
         <a href="supermarket.html">Supermarket</a>
         <a href="second-hand items.html">Second-hand</a>
     </div>
     <div class="nav-icons">
+        <a href="store.html" title="Store"><i class="fa fa-shopping-bag"></i></a>
         <a href="login.html" title="Profile"><i class="fa fa-user"></i></a>
     </div>
 </nav>
+
+<div class="bottom-nav">
+  <a href="index.html"><i class="fa fa-home"></i><span>Home</span></a>
+  <a href="about.html"><i class="fas fa-info-circle"></i><span>About</span></a>
+  <a href="contact.html"><i class="fas fa-phone"></i><span>Contact</span></a>
+  <a href="cart.html" class="active"><i class="fa fa-shopping-cart"></i><span>Cart</span></a>
+  <a href="profile.html"><i class="fa fa-user"></i><span>Profile</span></a>
+</div>
 
 <div class="cart-container">
     <h4>Your Cart</h4>
@@ -167,13 +239,17 @@
     <div id="random-products"></div>
 </section>
 
-<footer class="footer">
+<!--<footer class="footer">
     <p>Copyright © 2026 Daimara Online Mart. All rights reserved.</p>
-</footer>
+</footer>-->
 
 <script src="data-manager.js"></script>
 <script src="auth-check.js"></script>
 <script>
+    function toggleNav() {
+        document.getElementById('cartNav').classList.toggle('active');
+    }
+
     let cart = DataManager.getCart();
     let listenersAttached = false;
 

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=1200">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daimara Stores | Add Product - Refilling,Supermarket & Second-hand Items</title>
     <script src="data-manager.js"></script>
     <style>
@@ -381,6 +381,21 @@
 
 
 
+        @media (max-width: 768px) {
+            header h1 { font-size: 2em; }
+            .content { padding: 15px; }
+            .form-section { padding: 15px; }
+            .button-group { flex-direction: column; }
+            .btn-add, .btn-reset { width: 100%; margin-bottom: 10px; }
+            .products-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 480px) {
+            header h1 { font-size: 1.5em; }
+            header p { font-size: 0.9em; }
+            body { padding: 10px; }
+            .container { border-radius: 0; }
+        }
     </style>
 </head>
 <body>
