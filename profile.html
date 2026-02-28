@@ -2076,7 +2076,7 @@ function submitRegistration(type) {
 
   if (result.success) {
     // Save a verification message to localStorage for index.html to display
-    localStorage.setItem('daimara_reg_message', "Please wait for 30 min for account verification. A redirectory email will be sent to your email and incase you haven't received the email after 30min please contact us.");
+    localStorage.setItem('daimara_reg_message', "Please wait for atleast 10 min for account verification. A redirectory email will be sent to your email and incase you haven't received the email after 30min please contact us.");
     
     // Redirect to home page (index.html) as requested
     window.location.href = "index.html";
@@ -2091,11 +2091,11 @@ function submitRegistration(type) {
   <div class="modal-content" style="max-width: 800px;">
     <span class="close" onclick="closeRegistrationModal()">&times;</span>
     <div id="reg-step-1" class="reg-step active">
-      <h2 style="border:none; margin-bottom: 20px; font-size: 24px;">Register for a Page</h2>
+      <h2 style="border:none; margin-bottom: 20px; font-size: 18px;">Daimara business Panel</h2>
       <p style="font-size: 16px; margin-bottom: 20px;">Choose the type of page you want to register for:</p>
       <div style="display: flex; flex-direction: column; gap: 15px;">
-        <button class="btn btn-primary" style="padding: 20px; font-size: 16px;" onclick="startRegistration('operator')">🏢 Register for an Operator Panel</button>
-        <button class="btn btn-primary" style="padding: 20px; font-size: 16px;" onclick="startRegistration('delivery')">🚚 Register as Delivery Personnel</button>
+        <button class="btn btn-primary" style="padding: 20px; font-size: 16px;" onclick="startRegistration('operator')">Register for Business Operator Panel 🏢</button>
+        <button class="btn btn-primary" style="padding: 20px; font-size: 16px;" onclick="startRegistration('delivery')">Register for Delivery Personnel panel 🚚</button>
       </div>
     </div>
 
