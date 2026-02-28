@@ -1147,7 +1147,7 @@ body {
       <a href="#" class="menu-item" onclick="showTab('addresses', this); return false;">📍 Addresses</a>
       <a href="#" class="menu-item" onclick="showTab('settings', this); return false;">⚙️ Settings</a>
       <a href="#" class="menu-item" onclick="showTab('favorites', this); return false;">❤️ Favorites</a>
-      <a href="#" class="menu-item" onclick="openRegistrationModal(); return false;">📝 Register for a Page</a>
+      <a href="#" class="menu-item" onclick="openRegistrationModal(); return false;">📝 Daimara business Panel</a>
     </nav>
     <button class="btn btn-danger btn-full" onclick="logout()">🚪 Logout</button>
   </aside>
@@ -2094,8 +2094,8 @@ function submitRegistration(type) {
       <h2 style="border:none; margin-bottom: 20px; font-size: 18px;">Daimara business Panel</h2>
       <p style="font-size: 16px; margin-bottom: 20px;">Choose the type of page you want to register for:</p>
       <div style="display: flex; flex-direction: column; gap: 15px;">
-        <button class="btn btn-primary" style="padding: 20px; font-size: 16px;" onclick="startRegistration('operator')">Register for Business Operator Panel 🏢</button>
-        <button class="btn btn-primary" style="padding: 20px; font-size: 16px;" onclick="startRegistration('delivery')">Register for Delivery Personnel panel 🚚</button>
+        <button class="btn btn-primary" style="padding: 20px; font-size: 16px;" onclick="startRegistration('operator')">Register for a Business Operator Panel 🏢</button>
+        <button class="btn btn-primary" style="padding: 20px; font-size: 16px;" onclick="startRegistration('delivery')">Register for a Delivery Personnel panel 🚚</button>
       </div>
     </div>
 
@@ -2176,8 +2176,8 @@ function submitRegistration(type) {
       <div class="form-group">
         <label>Means of Delivery</label>
         <select id="del-means" style="width:100%; padding:12px; border-radius:6px; border:1px solid #bdc3c7;">
-          <option value="cycled-bike">Cycled-bike</option>
-          <option value="motor-bike">Motor-bike</option>
+          <option value="cycled-bike">Bicycle</option>
+          <option value="motor-bike">Motorbike</option>
           <option value="vehicle">Vehicle</option>
         </select>
       </div>
