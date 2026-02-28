@@ -56,6 +56,16 @@
       justify-content: center;
     }
 
+.topbar{
+  background:var(--primary);
+  color:rgb(0, 0, 0);
+  padding:16px 24px;
+  display:flex;
+  justify-content:space-between;
+  justify-content: left;
+  align-items:center;
+}
+
     /* SIDEBAR */
     .sidebar {  
       width: 280px; 
@@ -964,6 +974,10 @@
   <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Toggle menu">
     <i class="fas fa-bars"></i>
   </button>
+
+  <div class="topbar"></div>
+   <a href="index.html" class="logo">Operator Panel</a>
+  </div>
 
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
