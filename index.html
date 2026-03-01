@@ -75,6 +75,24 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px;
   color:rgb(233,157,17);
 }
 
+.cart-icon-container {
+  position: relative;
+  display: inline-block;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: red;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 12px;
+  font-weight: bold;
+  display: none;
+}
+
 @media (max-width: 768px) {
   .logo {font-size: 18px;}
   .nav-center { gap: 10px; }
@@ -437,8 +455,11 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px;
   </div>
 
   <div class="nav-icons" id="nav-icons-container">
-    <a href="login.html"><i class="fa fa-user"></i></a>
-    <a href="cart.html"><i class="fa fa-shopping-cart"></i></a>
+    <a href="login.html" id="userIconLink"><i class="fa fa-user"></i></a>
+    <a href="cart.html" title="Cart" class="cart-icon-container">
+      <i class="fa fa-shopping-cart"></i>
+      <span class="cart-badge" id="cartBadge">0</span>
+    </a>
   </div>
 </nav>
 
@@ -446,7 +467,11 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px;
   <a href="store.html"><i class="fa fa-shopping-bag"></i><span>Store</span></a>
   <a href="about.html"><i class="fas fa-info-circle"></i><span>About</span></a>
   <a href="contact.html"><i class="fas fa-phone"></i><span>Contact</span></a>
-  <a href="cart.html"><i class="fa fa-shopping-cart"></i><span>Cart</span></a>
+  <a href="cart.html" style="position:relative;">
+    <i class="fa fa-shopping-cart"></i>
+    <span class="cart-badge" style="position:absolute; top:-5px; right:15px; background:red; color:white; border-radius:50%; padding:2px 5px; font-size:10px; display:none;">0</span>
+    <span>Cart</span>
+  </a>
   <a href="profile.html"><i class="fa fa-user"></i><span>Profile</span></a>
 </div>
 
@@ -461,25 +486,8 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px;
     }
   });
 
-  // Dynamic Dashboard Icon based on role
   window.addEventListener('DOMContentLoaded', () => {
-    const user = DataManager.getCurrentUser();
-    if (user && (user.role === 'operator' || user.role === 'delivery')) {
-      const iconsContainer = document.getElementById('nav-icons-container');
-      const dashboardLink = document.createElement('a');
-      
-      if (user.role === 'operator') {
-        dashboardLink.href = "Operator's Dashboard-for businesses.html";
-        dashboardLink.title = "Operator Dashboard";
-        dashboardLink.innerHTML = '<i class="fas fa-briefcase"></i>';
-      } else if (user.role === 'delivery') {
-        dashboardLink.href = "Delivery services.html";
-        dashboardLink.title = "Delivery Dashboard";
-        dashboardLink.innerHTML = '<i class="fas fa-truck"></i>';
-      }
-      
-      iconsContainer.insertBefore(dashboardLink, iconsContainer.firstChild);
-    }
+    // Auth-check.js handles badge and role-based UI
   });
 </script>
 

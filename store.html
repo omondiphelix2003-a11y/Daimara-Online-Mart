@@ -32,6 +32,24 @@
     .nav-icons a { color: #ffffff; font-size: 18px; transition: 0.3s; }
     .nav-icons a:hover { color: var(--primary); }
 
+    .cart-icon-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    .cart-badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: red;
+      color: white;
+      border-radius: 50%;
+      padding: 2px 6px;
+      font-size: 12px;
+      font-weight: bold;
+      display: none;
+    }
+
     @media (max-width: 768px) {
       .navbar { padding: 10px; }
       .logo { font-size: 18px; }
@@ -227,7 +245,7 @@
       .ad-bar { font-size: 12px; padding: 0.5rem; }
       .navbar { top: 5px; height: 50px;padding-top: 13px;padding-bottom: 13px; }
       .logo {display: none;}
-      .search-container { top: 13px;max-width: 255px;margin-left: 58px; }
+      .search-container { top: 13px;max-width: 230px;margin-left: 48px; }
       .slider { margin-top: 80px; }
       .delivery-card img { height: 150px; }
     }
@@ -239,14 +257,17 @@
 <!-- NAVBAR -->
 <nav class="navbar">
   <a href="index.html" class="logo">Daimara Stores</a>
-  <button class="nav-toggle" onclick="toggleNav(Menu)"></button> <i class="fas fa-bars"></i></button>
+  <button class="nav-toggle" onclick="toggleNav()"><i class="fas fa-bars"></i></button>
   <div class="nav-links" id="storeNav">
     <a href="supermarket.html">Supermarket</a>
     <a href="second-hand items.html">Second-hand</a>
   </div>
-  <div class="nav-icons">
+  <div class="nav-icons" id="nav-icons-container">
     <a href="login.html" title="Profile"><i class="fa fa-user"></i></a>
-    <a href="cart.html" title="Cart"><i class="fa fa-shopping-cart"></i></a>
+    <a href="cart.html" title="Cart" class="cart-icon-container">
+      <i class="fa fa-shopping-cart"></i>
+      <span class="cart-badge" id="cartBadge">0</span>
+    </a>
   </div>
 </nav>
 
@@ -254,7 +275,11 @@
   <a href="index.html"><i class="fa fa-home"></i><span>Home</span></a>
   <a href="about.html"><i class="fas fa-info-circle"></i><span>About</span></a>
   <a href="contact.html"><i class="fas fa-phone"></i><span>Contact</span></a>
-  <a href="cart.html"><i class="fa fa-shopping-cart"></i><span>Cart</span></a>
+  <a href="cart.html" style="position:relative;">
+    <i class="fa fa-shopping-cart"></i>
+    <span class="cart-badge" style="position:absolute; top:-5px; right:15px; background:red; color:white; border-radius:50%; padding:2px 5px; font-size:10px; display:none;">0</span>
+    <span>Cart</span>
+  </a>
   <a href="profile.html"><i class="fa fa-user"></i><span>Profile</span></a>
 </div>
 
@@ -287,6 +312,7 @@
   function toggleNav() {
     document.getElementById('storeNav').classList.toggle('active');
   }
+
   // SLIDER
   let slideIndex = 0;
   function initSlideshow() {
@@ -327,6 +353,7 @@
     if(!prod){ alert('Product not found'); return; }
     DataManager.addToCart(prod);
     alert('Added to cart');
+    updateCartBadge();
   }
 
   function renderProducts(productList, title = "Featured Products"){

@@ -358,7 +358,12 @@ td { padding: 12px; border-bottom: 1px solid #2d3748; }
 </div>
 
 <div id="map" class="tab-content">
-    <h1>Regional Deep-Dive</h1>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h1>Regional Deep-Dive</h1>
+        <button class="btn" style="background: #e99d11; color: black;" onclick="showTab('dashboard', document.querySelector('.sidebar a:first-of-type'))">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </button>
+    </div>
     <p>Click on any country on the globe to view its specific counties and local data.</p>
     <div class="map-container">
         <button id="back-to-globe" class="back-btn" onclick="backToGlobe()"><i class="fas fa-arrow-left"></i> Back to Globe</button>

@@ -1283,3 +1283,44 @@ const DataManager = (() => {
     saveScopedData
   };
 })();
+
+// GLOBAL CLICK-AWAY LOGIC
+document.addEventListener('click', (e) => {
+  // Dropdowns (e.g. Profile, Search)
+  const dropdowns = document.querySelectorAll('#dropdown-menu, #search-results, .dropdown-content, .cart-modal');
+  dropdowns.forEach(dropdown => {
+    // Only close if it's currently showing and the click was outside
+    if (window.getComputedStyle(dropdown).display !== 'none') {
+       // Find the toggle button associated with this dropdown if possible
+       // This is a bit generic, so we check if the click target is the dropdown itself or its parent toggle
+       const isClickInside = dropdown.contains(e.target);
+       const isClickOnToggle = e.target.closest('#profile-icon, #profile-btn, .search-container, .cart-icon, #cart-btn, .user-icon, .dropdown-toggle');
+       
+       if (!isClickInside && !isClickOnToggle) {
+         if (dropdown.id === 'cart-modal') {
+           // Modal closing might need special handling
+           if (typeof closeModal === 'function') closeModal();
+           else dropdown.classList.remove('open');
+         } else if (dropdown.id === 'search-results') {
+           dropdown.style.display = 'none';
+         } else {
+           dropdown.classList.remove('show');
+           dropdown.style.display = 'none';
+         }
+       }
+    }
+  });
+
+  // Mobile Toggles (e.g. Categories, Sidebar)
+  const mobileMenus = document.querySelectorAll('.nav-links, .sidebar');
+  mobileMenus.forEach(menu => {
+    if (menu.classList.contains('active')) {
+      const isClickInside = menu.contains(e.target);
+      const isClickOnToggle = e.target.closest('.category-toggle, .menu-toggle, .navbar-toggler');
+      
+      if (!isClickInside && !isClickOnToggle) {
+        menu.classList.remove('active');
+      }
+    }
+  });
+});

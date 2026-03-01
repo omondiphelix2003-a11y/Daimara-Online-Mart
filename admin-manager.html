@@ -51,19 +51,23 @@
     }
 
     @media (max-width: 480px) {
-      .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
-      .stat-card { padding: 10px; flex-direction: column; text-align: center; gap: 5px; }
-      .stat-icon { width: 40px; height: 40px; font-size: 16px; }
-      .stat-info h3 { font-size: 14px; }
-      .stat-info p { font-size: 12px; }
+      .stats-grid { grid-template-columns: 1fr; gap: 15px; }
+      .stat-card { padding: 15px; flex-direction: row; text-align: left; gap: 15px; }
+      .stat-icon { width: 50px; height: 50px; font-size: 20px; }
+      .stat-info h3 { font-size: 20px; }
+      .stat-info p { font-size: 16px; }
       .page-header { flex-direction: column; align-items: flex-start; gap: 15px; }
       .admin-info { text-align: left; }
     }
 
     /* DATA TABLES RESPONSIVE */
-    .table-container { width: 100%; overflow-x: auto; margin-top: 15px; }
-    table { min-width: 800px; }
+    .table-container { width: 100%; overflow: auto; margin-top: 15px; max-height: 500px; }
+    table { width: 100%; min-width: 600px; }
     td, th { padding: 12px; font-size: 14px !important; }
+
+    /* Ensure other content wraps */
+    .card-header { flex-wrap: wrap; gap: 10px; }
+    .btn { white-space: nowrap; }
 
     /* DASHBOARD CARDS */
     .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 30px; }
@@ -273,12 +277,14 @@
           <h2 class="card-title">Recent Orders</h2>
           <button class="btn btn-primary" onclick="showTab('orders')">View All</button>
         </div>
-        <table id="recent-orders-table">
-          <thead>
-            <tr><th>Order ID</th><th>Customer</th><th>Amount</th><th>Status</th><th>Date</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <div class="table-container">
+          <table id="recent-orders-table">
+            <thead>
+              <tr><th>Order ID</th><th>Customer</th><th>Amount</th><th>Status</th><th>Date</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -288,12 +294,14 @@
         <div class="card-header">
           <h2 class="card-title">All Customer Orders</h2>
         </div>
-        <table id="all-orders-table">
-          <thead>
-            <tr><th>Order ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th><th>Action</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <div class="table-container">
+          <table id="all-orders-table">
+            <thead>
+              <tr><th>Order ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th><th>Action</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -306,12 +314,14 @@
             <a href="add-product.html" class="btn btn-success"><i class="fas fa-plus"></i> Add New Product</a>
           </div>
         </div>
-        <table id="warehouse-table">
-          <thead>
-            <tr><th>Image</th><th>Product Name</th><th>Sub-Category</th><th>Supplier</th><th>Price</th><th>In Stock</th><th>Added Date</th><th>Action</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <div class="table-container">
+          <table id="warehouse-table">
+            <thead>
+              <tr><th>Image</th><th>Product Name</th><th>Sub-Category</th><th>Supplier</th><th>Price</th><th>In Stock</th><th>Added Date</th><th>Action</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -322,12 +332,14 @@
           <h2 class="card-title">Invoice History</h2>
           <button class="btn btn-info" onclick="exportInvoicesToExcel()"><i class="fas fa-file-excel"></i> Export to Excel (CSV)</button>
         </div>
-        <table id="invoices-table">
-          <thead>
-            <tr><th>Invoice #</th><th>Customer</th><th>Order ID</th><th>Amount</th><th>Date</th><th>Action</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <div class="table-container">
+          <table id="invoices-table">
+            <thead>
+              <tr><th>Invoice #</th><th>Customer</th><th>Order ID</th><th>Amount</th><th>Date</th><th>Action</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -337,12 +349,14 @@
         <div class="card-header">
           <h2 class="card-title">Client Messages</h2>
         </div>
-        <table id="emails-table">
-          <thead>
-            <tr><th>From</th><th>Subject</th><th>Message</th><th>Date</th><th>Status</th><th>Action</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <div class="table-container">
+          <table id="emails-table">
+            <thead>
+              <tr><th>From</th><th>Subject</th><th>Message</th><th>Date</th><th>Status</th><th>Action</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -397,12 +411,14 @@
     <div id="users" class="tab-content">
       <div class="data-card">
         <div class="card-header"><h2 class="card-title">Registered Users</h2></div>
-        <table id="users-table">
-          <thead>
-            <tr><th>User ID</th><th>Name</th><th>Email</th><th>Signup Date</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <div class="table-container">
+          <table id="users-table">
+            <thead>
+              <tr><th>User ID</th><th>Name</th><th>Email</th><th>Signup Date</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -410,12 +426,14 @@
     <div id="page-reviews" class="tab-content">
       <div class="data-card">
         <div class="card-header"><h2 class="card-title">Daimara Page Requests</h2></div>
-        <table id="page-reviews-table">
-          <thead>
-            <tr><th>Name</th><th>Email</th><th>Role Requested</th><th>Date</th><th>Status</th><th>Action</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <div class="table-container">
+          <table id="page-reviews-table">
+            <thead>
+              <tr><th>Name</th><th>Email</th><th>Role Requested</th><th>Date</th><th>Status</th><th>Action</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -752,6 +770,21 @@
             <strong>Location:</strong> <span>${details.locality?.street || ''}, ${details.locality?.city || ''}, ${details.locality?.state || ''}</span>
             <strong>Exact Address:</strong> <span>${details.locality?.address || 'N/A'}</span>
           </div>
+          <h3 style="margin-top:20px; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:5px;">Vehicle Photos</h3>
+          <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
+            <div>
+              <p style="font-size:12px; text-align:center;">Front View</p>
+              <img src="${details.vehiclePhotos?.front || 'image-placeholder.jpg'}" style="width:100%; height:100px; object-fit:cover; border-radius:8px; border:1px solid #ddd;">
+            </div>
+            <div>
+              <p style="font-size:12px; text-align:center;">Side View</p>
+              <img src="${details.vehiclePhotos?.side || 'image-placeholder.jpg'}" style="width:100%; height:100px; object-fit:cover; border-radius:8px; border:1px solid #ddd;">
+            </div>
+            <div>
+              <p style="font-size:12px; text-align:center;">Back View</p>
+              <img src="${details.vehiclePhotos?.back || 'image-placeholder.jpg'}" style="width:100%; height:100px; object-fit:cover; border-radius:8px; border:1px solid #ddd;">
+            </div>
+          </div>
         `;
       }
 
@@ -762,10 +795,24 @@
         <div style="padding:20px;">
           <h3 style="margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">Personal Information</h3>
           <div style="display:grid; grid-template-columns: 150px 1fr; gap:10px; font-size:20px; margin-bottom:20px;">
-            <strong>Full Name:</strong> <span>${details.name || 'N/A'}</span>
+            <strong>Full Name:</strong> <span>${details.fullname || details.name || 'N/A'}</span>
             <strong>Email:</strong> <span>${reg.email}</span>
             <strong>Phone:</strong> <span>${details.phone || 'N/A'}</span>
-            <strong>Requested Role:</strong> <span style="text-transform:capitalize;">${reg.type}</span>
+            <strong>ID Number:</strong> <span>${details.idnumber || 'N/A'}</span>
+            <strong>Date of Birth:</strong> <span>${details.dob || 'N/A'}</span>
+            <strong>District:</strong> <span>${details.district || 'N/A'}</span>
+          </div>
+
+          <h3 style="margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:5px;">ID Photos</h3>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-bottom:20px;">
+            <div>
+              <p style="font-size:12px; text-align:center;">Front of ID</p>
+              <img src="${details.idPhotos?.front || 'image-placeholder.jpg'}" style="width:100%; height:120px; object-fit:contain; border-radius:8px; border:1px solid #ddd; background:#f9f9f9;">
+            </div>
+            <div>
+              <p style="font-size:12px; text-align:center;">Back of ID</p>
+              <img src="${details.idPhotos?.back || 'image-placeholder.jpg'}" style="width:100%; height:120px; object-fit:contain; border-radius:8px; border:1px solid #ddd; background:#f9f9f9;">
+            </div>
           </div>
           
           <h3 style="margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">${reg.type === 'business' ? 'Business' : 'Delivery'} Information</h3>
