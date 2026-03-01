@@ -685,11 +685,16 @@ body {
       .slider { margin-top: 160px; }}
 
 @media (max-width: 480px) {
-      .ad-bar { font-size: 12px; padding: 0.5rem; }
-      .navbar { top: 5px; height: 50px;padding-top: 13px;padding-bottom: 13px; }
+     .ad-bar { font-size: 12px; padding: 0.5rem; }
+      .navbar { top: 1px; height: 50px;padding-top: 13px;padding-bottom: 13px; }
+      .nav-links li {padding-top:5px;padding-bottom: 5px;margin-bottom: -5px;}
+      .nav-links li:hover,
+      .nav-links li.active {
+       color: rgb(233, 157, 17);
+}
       .logo {display: none;}
-      .search-container { top: 10px;max-width: 250px;margin-left: -18px; }
-       .product-container {margin-top: 20%;min-width: 600px;max-height: 1150%;
+      .search-container { top: 10px;max-width: 250px;margin-left: -170px; }
+      .product-container {margin-top: 20%;min-width: 600px;max-height: 1150%;
   padding-top: -50px;
   display: grid;
   flex-wrap: wrap;
@@ -701,7 +706,7 @@ body {
       }
 
 .product-card {
-  background: white;
+  background: rgb(255, 253, 253);
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -773,7 +778,8 @@ body {
   color: #000000;
 }
 
-.product-card .add-to-cart {
+.product-card
+ .add-to-cart {
   width: 100%;
   margin: 12px 0 0 0;
   padding: 12px;
@@ -803,7 +809,6 @@ body {
       .slider { margin-top: 150px; }
       .delivery-card img { height: 150px; }
     }
-
 </style>
 
 </head>
