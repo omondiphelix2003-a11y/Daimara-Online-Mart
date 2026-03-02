@@ -15,16 +15,24 @@ document.addEventListener("DOMContentLoaded", function() {
     userIconLink.title = "View Profile";
   }
 
+  // Helper: check if the logged in email has an operator page registration
+  function hasOperatorRegistration(email) {
+    if (!email || typeof DataManager === 'undefined' || !DataManager.getPageRegistrations) return false;
+    const regs = DataManager.getPageRegistrations();
+    return regs.some(r => r.type === 'operator' && r.email === email);
+  }
+
   // Handle Dashboard Icons for Different Roles
   if (currentUser && navRight) {
     let dashboardLink = null;
+    const knownOperator = currentUser.role === 'operator' || hasOperatorRegistration(currentUser.email);
     
     if (currentUser.role === 'admin' || currentUser.email === "omondiphelix2003@gmail.com") {
       dashboardLink = document.createElement("a");
       dashboardLink.href = "admin-manager.html";
       dashboardLink.title = "Admin Dashboard";
       dashboardLink.innerHTML = '<i class="fas fa-user-shield"></i>';
-    } else if (currentUser.role === 'operator') {
+    } else if (knownOperator) {
       dashboardLink = document.createElement("a");
       dashboardLink.href = "Operator's Dashboard-for businesses.html";
       dashboardLink.title = "Operator Dashboard";
@@ -46,6 +54,14 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // Global Cart Badge Update
   updateGlobalCartBadges();
+
+  // Listen for cart updates in current window
+  window.addEventListener('cartUpdated', updateGlobalCartBadges);
+  
+  // Listen for cart updates from other tabs
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'ecommerce_cart') updateGlobalCartBadges();
+  });
 });
 
 function updateGlobalCartBadges() {

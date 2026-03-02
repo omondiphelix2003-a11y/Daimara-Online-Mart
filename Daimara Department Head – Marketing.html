@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Daimara Stores | Daimara Marketing Intelligence</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 
 <!-- AMCHARTS -->
@@ -171,15 +171,21 @@ margin-bottom:20px;
     font-size: 14px;
 }
 .platform-btn {
-    font-size: 28px;
+    font-size: 32px;
     cursor: pointer;
-    transition: 0.3s;
-    opacity: 0.5;
-    
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    opacity: 0.3;
+    padding: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid transparent;
 }
 .platform-btn.selected {
     opacity: 1;
-    transform: scale(1.2);
+    transform: scale(1.1);
+    background: rgba(233, 157, 17, 0.1);
+    border-color: #e99d11;
+    box-shadow: 0 0 15px rgba(233, 157, 17, 0.3);
 }
 
 /* CAMPAIGN LIST STYLES */
@@ -412,13 +418,13 @@ td { padding: 12px; border-bottom: 1px solid #2d3748; }
                 <label>Or Paste URL</label>
                 <input type="text" id="ad-media-url" placeholder="https://image-or-video-url.com" oninput="updatePreview()">
                 
-                <label>Select Platforms</label>
-                <div style="display: flex; gap: 20px; margin: 15px 0;">
-                    <i class="fab fa-facebook platform-btn" style="color:#1877F2" onclick="togglePlatform(this, 'Facebook')"></i>
-                    <i class="fab fa-x-twitter platform-btn" style="color:white" onclick="togglePlatform(this, 'X')"></i>
-                    <i class="fab fa-instagram platform-btn" style="color:#E4405F" onclick="togglePlatform(this, 'Instagram')"></i>
-                    <i class="fab fa-linkedin platform-btn" style="color:#0A66C2" onclick="togglePlatform(this, 'LinkedIn')"></i>
-                    <i class="fas fa-envelope platform-btn" style="color:#EA4335" onclick="togglePlatform(this, 'Gmail')"></i>
+                <label>Select Platforms (Click to select)</label>
+                <div style="display: flex; gap: 15px; margin: 15px 0; flex-wrap: wrap;">
+                    <i class="fab fa-facebook platform-btn" style="color:#1877F2" onclick="togglePlatform(this, 'Facebook')" title="Facebook"></i>
+                    <i class="fab fa-x-twitter platform-btn" style="color:white" onclick="togglePlatform(this, 'X')" title="X (Twitter)"></i>
+                    <i class="fab fa-instagram platform-btn" style="color:#E4405F" onclick="togglePlatform(this, 'Instagram')" title="Instagram"></i>
+                    <i class="fab fa-linkedin platform-btn" style="color:#0A66C2" onclick="togglePlatform(this, 'LinkedIn')" title="LinkedIn"></i>
+                    <i class="fas fa-envelope platform-btn" style="color:#EA4335" onclick="togglePlatform(this, 'Gmail')" title="Email Marketing"></i>
                 </div>
                 
                 <button class="btn" style="background:#e99d11; color:black; width:100%; font-size:18px;" onclick="postAdvert()">Post Campaign</button>
@@ -569,39 +575,69 @@ function updatePreview() {
 }
 
 function postAdvert() {
-    if (selectedPlatforms.size === 0) return alert("Please select at least one platform.");
-    const title = document.getElementById('ad-title').value;
-    const msg = document.getElementById('ad-message').value;
-    if (!title || !msg) return alert("Title and Message are required.");
+    try {
+        if (selectedPlatforms.size === 0) return alert("Please select at least one platform (e.g. Facebook, X, Instagram).");
+        
+        const titleEl = document.getElementById('ad-title');
+        const msgEl = document.getElementById('ad-message');
+        const mediaUrlEl = document.getElementById('ad-media-url');
+        
+        if (!titleEl || !msgEl) {
+            console.error("Required form elements missing");
+            return alert("Critical error: Ad form elements not found.");
+        }
 
-    const mediaUrl = uploadedMediaUrl || document.getElementById('ad-media-url').value;
-    const adType = document.getElementById('ad-type').value;
-    const targetPage = document.getElementById('target-page').value;
-    const videoAudioType = document.getElementById('video-audio-type').value;
+        const title = titleEl.value.trim();
+        const msg = msgEl.value.trim();
+        
+        if (!title || !msg) return alert("Title and Message are required to post a campaign.");
 
-    const campaign = {
-        title: title,
-        message: msg,
-        media: mediaUrl,
-        isVideo: adType === 'video' || isVideo || (mediaUrl && (mediaUrl.match(/\.(mp4|webm|ogg)$/i) || mediaUrl.includes('video'))),
-        adType: adType,
-        targetPage: adType === 'slideshow' ? targetPage : null,
-        videoAudioType: adType === 'video' ? videoAudioType : null,
-        platforms: Array.from(selectedPlatforms)
-    };
+        const mediaUrl = uploadedMediaUrl || (mediaUrlEl ? mediaUrlEl.value.trim() : "");
+        
+        // Size warning (base64 of 2MB is roughly 2.7MB)
+        if (uploadedMediaUrl && uploadedMediaUrl.length > 3 * 1024 * 1024) {
+            return alert("The uploaded file is too large for local storage. Please use a smaller file (under 2MB) or use a URL instead.");
+        }
 
-    DataManager.saveCampaign(campaign);
-    alert(`Successfully posted campaign to ${campaign.platforms.join(", ")}! It is now live on the platform.`);
-    
-    // Clear form
-    document.getElementById('ad-title').value = "";
-    document.getElementById('ad-message').value = "";
-    document.getElementById('ad-media-url').value = "";
-    uploadedMediaUrl = "";
-    isVideo = false;
-    selectedPlatforms.clear();
-    document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('selected'));
-    updatePreview();
+        const adType = document.getElementById('ad-type').value;
+        const targetPage = document.getElementById('target-page')?.value;
+        const videoAudioType = document.getElementById('video-audio-type')?.value;
+
+        const campaign = {
+            title: title,
+            message: msg,
+            media: mediaUrl,
+            isVideo: adType === 'video' || isVideo || (mediaUrl && (mediaUrl.match(/\.(mp4|webm|ogg)$/i) || mediaUrl.includes('video'))),
+            adType: adType,
+            targetPage: adType === 'slideshow' ? targetPage : null,
+            videoAudioType: adType === 'video' ? videoAudioType : null,
+            platforms: Array.from(selectedPlatforms),
+            createdAt: new Date().toISOString()
+        };
+
+        const result = DataManager.saveCampaign(campaign);
+        
+        if (result && result.success) {
+            alert(`Successfully posted campaign "${campaign.title}" to ${campaign.platforms.join(", ")}!`);
+            
+            // Clear form
+            titleEl.value = "";
+            msgEl.value = "";
+            if (mediaUrlEl) mediaUrlEl.value = "";
+            uploadedMediaUrl = "";
+            isVideo = false;
+            selectedPlatforms.clear();
+            document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('selected'));
+            updatePreview();
+            
+            if (typeof renderCampaigns === 'function') renderCampaigns();
+        } else {
+            alert("Error saving campaign: " + (result?.message || "Unknown error"));
+        }
+    } catch (err) {
+        console.error("Post Campaign Error:", err);
+        alert("An unexpected error occurred while posting the campaign. Check console for details.");
+    }
 }
 
 function renderCampaigns() {

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Daimara Stores | Home</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
@@ -36,6 +36,21 @@
       position:sticky;
       top:0;
       z-index:1001;
+      animation: adBarPulse 4s infinite ease-in-out, adBarFlicker 3s infinite;
+    }
+
+    @keyframes adBarPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    @keyframes adBarFlicker {
+      0%, 100% { opacity: 1; }
+      41% { opacity: 1; }
+      42% { opacity: 0.4; }
+      43% { opacity: 1; }
+      45% { opacity: 0.4; }
+      46% { opacity: 1; }
     }
 
 div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px;
@@ -209,6 +224,23 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px;
 
     /* DELIVERY */
     .delivery{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px}
+    
+    @media (max-width: 768px) {
+      .delivery {
+        display: flex !important;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        gap: 15px;
+        padding: 10px 5px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none; /* Hide scrollbar Firefox */
+      }
+      .delivery::-webkit-scrollbar { display: none; } /* Hide scrollbar Chrome/Safari */
+      .delivery-card {
+        flex: 0 0 280px; /* Fixed width for horizontal scroll */
+      }
+    }
+
     .delivery-card{
       background:#ffffff77;padding:15px;border-radius:10px;
       box-shadow:0 5px 15px rgba(0, 0, 0, 0.397);text-align:center;}
@@ -654,7 +686,44 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px;
     renderRandom(50);
   })();
 
-// Search functionality
+// DELIVERY AUTO-SCROLL
+  (function() {
+    const delivery = document.querySelector('.delivery');
+    if (!delivery) return;
+
+    let isScrolling = false;
+    let scrollInterval;
+    let resumeTimeout;
+
+    function startAutoScroll() {
+      if (window.innerWidth > 768) return; // Only for small screens
+      scrollInterval = setInterval(() => {
+        if (!isScrolling) {
+          delivery.scrollLeft += 1;
+          if (delivery.scrollLeft >= (delivery.scrollWidth - delivery.clientWidth)) {
+            delivery.scrollLeft = 0;
+          }
+        }
+      }, 30);
+    }
+
+    delivery.addEventListener('scroll', () => {
+      isScrolling = true;
+      clearTimeout(resumeTimeout);
+      resumeTimeout = setTimeout(() => {
+        isScrolling = false;
+      }, 2000);
+    });
+
+    delivery.addEventListener('touchstart', () => {
+      isScrolling = true;
+      clearTimeout(resumeTimeout);
+    });
+
+    startAutoScroll();
+  })();
+
+  // Search functionality
 const searchInput = document.getElementById('search-input');
 const searchBtn = document.getElementById('search-btn');
 const searchResults = document.getElementById('search-results');

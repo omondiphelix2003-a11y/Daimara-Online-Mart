@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Daimara Stores | Second-hand Items</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link rel="stylesheet" href="second-hand items.css">
 
@@ -85,18 +85,28 @@ body {
 
 
     
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  list-style: none;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+  max-width: 60%;
+  padding: 5px 0;
+}
+
+.nav-links::-webkit-scrollbar {
+  display: none;
+}
+
 .nav-links li{
-        display:flex;
-        align-items:center;
-        gap:20px;
         display: inline-block;
         font-size: 18px;
         transition: color 0.3s;
-        justify-content: center;
-       right: 20px;
-         padding-right: -1px;
-        margin-left: 70px;
-        
      }
 
 .nav-links li:hover,
@@ -142,34 +152,45 @@ body {
   .product-info .price { font-size: 16px; }
 }
 
+@media (max-width: 1024px) {
+  .category-toggle {
+    display: block !important;
+    background: rgb(233, 157, 17);
+    color: #000;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 0 10px;
+  }
+  
+  .nav-links {
+    display: none;
+    position: fixed;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    background: #000;
+    flex-direction: row;
+    padding: 10px;
+    z-index: 1002;
+    overflow-x: auto;
+    white-space: nowrap;
+    border-bottom: 1px solid rgb(233, 157, 17);
+    max-width: 100%;
+  }
+  
+  .nav-links.active {
+    display: flex;
+  }
+}
+
 @media (max-width: 768px) {
   body { font-size: 16px; padding-bottom: 80px; }
   .navbar { padding: 10px 15px; flex-wrap: nowrap; justify-content: space-between; align-items: center; height: 60px; }
   .logo { font-size: 20px; }
-  .nav-links { 
-    display: flex !important; 
-    position: fixed; 
-    top: 60px; 
-    left: 0; 
-    width: 100%; 
-    background: #000; 
-    flex-direction: row !important; 
-    padding: 10px; 
-    z-index: 1002;
-    overflow-x: auto !important;
-    white-space: nowrap;
-    border-bottom: 1px solid rgb(233, 157, 17);
-    -webkit-overflow-scrolling: touch;
-  }
-  .nav-links li { 
-    margin: 0 15px; 
-    display: inline-block !important;
-    width: auto !important;
-    text-align: center; 
-    margin-left: 0; 
-  }
   .nav-icons { display: none !important; }
-  .category-toggle { display: none !important; }
   .search-container { margin-top: 0; width: 95%; top: 120px; }
   .product-container { margin-top: 180px; }
   

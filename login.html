@@ -77,7 +77,7 @@
     <input type="email" id="login-email" placeholder="Email" required>
     <input type="password" id="login-password" placeholder="Password" required>
     <button type="submit">Login</button>
-    <p class="switch">Don’t have an account? <span onclick="showSignup()">Sign up</span></p>
+    <p class="switch">Don’t have an account? <span id="show-signup" class="switch-link" tabindex="0">Sign up</span></p>
   </form>
 
   <!-- SIGNUP FORM -->
@@ -96,7 +96,7 @@
       <div id="profile-preview" class="profile-preview"></div>
     </div>
     <button type="submit">Sign Up</button>
-    <p class="switch">Already have an account? <span onclick="showLogin()">Login</span></p>
+    <p class="switch">Already have an account? <span id="show-login" class="switch-link" tabindex="0">Login</span></p>
   </form>
 </div>
 
@@ -128,6 +128,22 @@
     document.getElementById("form-title").textContent = "Login";
   }
 
+  // directly hook switch links (script runs after DOM elements exist)
+  const signupLink = document.getElementById('show-signup');
+  if (signupLink) {
+    signupLink.addEventListener('click', showSignup);
+    signupLink.addEventListener('keypress', e => {
+      if (e.key === 'Enter' || e.key === ' ') showSignup();
+    });
+  }
+  const loginLink = document.getElementById('show-login');
+  if (loginLink) {
+    loginLink.addEventListener('click', showLogin);
+    loginLink.addEventListener('keypress', e => {
+      if (e.key === 'Enter' || e.key === ' ') showLogin();
+    });
+  }
+
   // Handle URL parameters for registration
   window.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -136,7 +152,8 @@
       document.getElementById('signup-email').value = decodeURIComponent(urlParams.get('reg_email'));
     }
     if (urlParams.get('reg_role')) {
-      document.getElementById('signup-role').value = urlParams.get('reg_role');
+      const roleElem = document.getElementById('signup-role');
+      if (roleElem) roleElem.value = urlParams.get('reg_role');
     }
   });
 
@@ -157,7 +174,8 @@
     const name = document.getElementById("signup-name").value.trim();
     const email = document.getElementById("signup-email").value.trim();
     const password = document.getElementById("signup-password").value;
-    const role = document.getElementById("signup-role").value;
+    const roleElem = document.getElementById("signup-role");
+    const role = roleElem ? roleElem.value : 'user';
     const profileImageFile = document.getElementById("profile-image").files[0];
 
     if (password.length < 6) { alert("Password must be at least 6 characters"); return; }

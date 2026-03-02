@@ -22,7 +22,11 @@ const DataManager = (() => {
     DELIVERY_EARNINGS: 'delivery_earnings',
     DELIVERY_DEDUCTIONS: 'ecommerce_delivery_deductions',
     PAGE_REGISTRATIONS: 'ecommerce_page_registrations',
-    SYSTEM_CONFIG: 'ecommerce_system_config'
+    SYSTEM_CONFIG: 'ecommerce_system_config',
+    PERMANENT_EARNINGS: 'ecommerce_permanent_earnings',
+    OPERATOR_EARNINGS: 'ecommerce_operator_earnings',
+    OPERATOR_REVENUE: 'ecommerce_operator_revenue',
+    USER_LOYALTY: 'ecommerce_user_loyalty'
   };
 
   // Initialize default products from both supermarket and second-hand categories
@@ -90,6 +94,60 @@ const DataManager = (() => {
     if (!localStorage.getItem(STORAGE_KEYS.ADDED_PRODUCTS)) {
       localStorage.setItem(STORAGE_KEYS.ADDED_PRODUCTS, JSON.stringify([]));
     }
+    if (!localStorage.getItem(STORAGE_KEYS.PERMANENT_EARNINGS)) {
+      localStorage.setItem(STORAGE_KEYS.PERMANENT_EARNINGS, '0');
+    }
+    if (!localStorage.getItem(STORAGE_KEYS.OPERATOR_EARNINGS)) {
+      localStorage.setItem(STORAGE_KEYS.OPERATOR_EARNINGS, JSON.stringify({}));
+    }
+    if (!localStorage.getItem(STORAGE_KEYS.OPERATOR_REVENUE)) {
+      localStorage.setItem(STORAGE_KEYS.OPERATOR_REVENUE, JSON.stringify({}));
+    }
+    if (!localStorage.getItem(STORAGE_KEYS.USER_LOYALTY)) {
+      localStorage.setItem(STORAGE_KEYS.USER_LOYALTY, JSON.stringify({}));
+    }
+  }
+
+  function getUserLoyaltyPoints(userId) {
+    const all = JSON.parse(localStorage.getItem(STORAGE_KEYS.USER_LOYALTY)) || {};
+    return all[userId] || 0;
+  }
+
+  function addUserLoyaltyPoints(userId, points) {
+    const all = JSON.parse(localStorage.getItem(STORAGE_KEYS.USER_LOYALTY)) || {};
+    all[userId] = (all[userId] || 0) + points;
+    localStorage.setItem(STORAGE_KEYS.USER_LOYALTY, JSON.stringify(all));
+  }
+
+  function getPermanentEarnings() {
+    return parseFloat(localStorage.getItem(STORAGE_KEYS.PERMANENT_EARNINGS)) || 0;
+  }
+
+  function addPermanentEarnings(amount) {
+    const current = getPermanentEarnings();
+    localStorage.setItem(STORAGE_KEYS.PERMANENT_EARNINGS, (current + amount).toString());
+  }
+
+  function getOperatorEarnings(email) {
+    const all = JSON.parse(localStorage.getItem(STORAGE_KEYS.OPERATOR_EARNINGS)) || {};
+    return all[email] || 0;
+  }
+
+  function addOperatorEarnings(email, amount) {
+    const all = JSON.parse(localStorage.getItem(STORAGE_KEYS.OPERATOR_EARNINGS)) || {};
+    all[email] = (all[email] || 0) + amount;
+    localStorage.setItem(STORAGE_KEYS.OPERATOR_EARNINGS, JSON.stringify(all));
+  }
+
+  function getOperatorRevenue(email) {
+    const all = JSON.parse(localStorage.getItem(STORAGE_KEYS.OPERATOR_REVENUE)) || {};
+    return all[email] || 0;
+  }
+
+  function addOperatorRevenue(email, amount) {
+    const all = JSON.parse(localStorage.getItem(STORAGE_KEYS.OPERATOR_REVENUE)) || {};
+    all[email] = (all[email] || 0) + amount;
+    localStorage.setItem(STORAGE_KEYS.OPERATOR_REVENUE, JSON.stringify(all));
   }
 
   /**
@@ -307,6 +365,10 @@ const DataManager = (() => {
     }
 
     localStorage.setItem(STORAGE_KEYS.CART, JSON.stringify(cart));
+    
+    // Dispatch event for current window
+    window.dispatchEvent(new Event('cartUpdated'));
+    
     return { success: true, message: 'Item added to cart', product };
   }
 
@@ -438,15 +500,50 @@ const DataManager = (() => {
    */
   function addPageRegistration(regData) {
     const regs = JSON.parse(localStorage.getItem(STORAGE_KEYS.PAGE_REGISTRATIONS)) || [];
+    
+    // To avoid localStorage quota exceeded errors with large images, we strip
+    // out image base64 data before storing. We preserve all other metadata.
+    const regDataCopy = { ...regData };
+    if (regDataCopy.details) {
+      regDataCopy.details = { ...regDataCopy.details };
+      // remove large base64 image fields
+      delete regDataCopy.details.idPhotos;
+      delete regDataCopy.details.vehiclePhotos;
+      delete regDataCopy.details.profileImage;
+    }
+
     const newReg = {
       id: generateId(),
-      ...regData,
+      ...regDataCopy,
       status: 'pending',
       date: new Date().toISOString()
     };
     regs.push(newReg);
-    localStorage.setItem(STORAGE_KEYS.PAGE_REGISTRATIONS, JSON.stringify(regs));
-    return { success: true, registration: newReg };
+    try {
+      localStorage.setItem(STORAGE_KEYS.PAGE_REGISTRATIONS, JSON.stringify(regs));
+      return { success: true, registration: newReg };
+    } catch (e) {
+      console.error('DataManager.addPageRegistration error:', e);
+      if (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
+        // try again without details to see if that helps
+        const minimalReg = {
+          id: generateId(),
+          type: regData.type,
+          email: regData.email,
+          status: 'pending',
+          date: new Date().toISOString(),
+          details: { name: regData.details?.fullname || regData.details?.name || 'N/A' }
+        };
+        try {
+          regs[regs.length - 1] = minimalReg;
+          localStorage.setItem(STORAGE_KEYS.PAGE_REGISTRATIONS, JSON.stringify(regs));
+          return { success: true, registration: minimalReg, warning: 'Registration saved with minimal data due to storage constraints.' };
+        } catch (e2) {
+          return { success: false, message: 'Storage quota exceeded. Unable to save registration. Please clear browser cache and try again.' };
+        }
+      }
+      return { success: false, message: 'Registration failed to save: ' + e.message };
+    }
   }
 
   function getPageRegistrations() {
@@ -520,25 +617,68 @@ const DataManager = (() => {
     return { success: false, message: 'User not found' };
   }
 
+  /**
+   * Update a specific user's role by their email address.
+   * Used by admin workflows when approving page registrations.
+   * @param {string} email - target user's email
+   * @param {string} newRole - one of 'user','operator','delivery','admin' etc.
+   * @returns {{success:boolean,message?:string,user?:object}}
+   */
+  function updateUserRoleByEmail(email, newRole) {
+    if (!email) return { success: false, message: 'Email required' };
+    const users = JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS)) || [];
+    const idx = users.findIndex(u => u.email === email);
+    if (idx === -1) return { success: false, message: 'User not found' };
+    users[idx].role = newRole;
+    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+
+    // also update current user if it matches
+    const current = getCurrentUser();
+    if (current && current.email === email) {
+      const { password, ...safe } = users[idx];
+      setCurrentUser(safe);
+    }
+
+    return { success: true, user: users[idx] };
+  }
+
   function getUserOrders(userId) {
     const allOrders = JSON.parse(localStorage.getItem(STORAGE_KEYS.ORDERS)) || [];
     const userOrders = allOrders.filter(o => o.userId === userId);
     if (userOrders.length === 0) return [];
 
-    // Sort by date descending to get the current (latest) one
-    userOrders.sort((a, b) => new Date(b.date) - new Date(a.date));
-    
-    const latestOrder = userOrders[0];
-    const orderTime = new Date(latestOrder.date).getTime();
     const now = Date.now();
-    const twentyFourHours = 24 * 60 * 60 * 1000;
+    const thirtyMinutes = 30 * 60 * 1000;
 
-    // Only return if it's within the last 24 hours
-    if (now - orderTime < twentyFourHours) {
-      return [latestOrder];
+    // Identify orders that SHOULD be deleted permanently (30 mins after COMPLETION)
+    const ordersToDelete = userOrders.filter(o => {
+      const isCompleted = o.status === 'completed' || o.status === 'Delivered';
+      if (!isCompleted) return false;
+      const refTime = o.completionDate || o.date;
+      const orderTime = new Date(refTime).getTime();
+      return (now - orderTime) >= thirtyMinutes;
+    });
+
+    if (ordersToDelete.length > 0) {
+      const idsToDelete = ordersToDelete.map(o => o.id);
+      const updatedAllOrders = allOrders.filter(o => !idsToDelete.includes(o.id));
+      localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(updatedAllOrders));
     }
+
+    // Filter orders based on user requirements (re-filter for safety)
+    const filteredOrders = userOrders.filter(o => {
+      const isCompleted = o.status === 'completed' || o.status === 'Delivered';
+      if (!isCompleted) return true;
+
+      const refTime = o.completionDate || o.date;
+      const orderTime = new Date(refTime).getTime();
+      return (now - orderTime) < thirtyMinutes;
+    });
+
+    // Sort by date descending
+    filteredOrders.sort((a, b) => new Date(b.date) - new Date(a.date));
     
-    return [];
+    return filteredOrders;
   }
 
   function getAllOrders() {
@@ -722,7 +862,54 @@ const DataManager = (() => {
 
     const oldStatus = globalOrder.status;
     globalOrder.status = newStatus;
+    
+    // Set completion date for auto-deletion logic (30 mins after completion)
+    if ((newStatus === 'completed' || newStatus === 'Delivered') && (oldStatus !== 'completed' && oldStatus !== 'Delivered')) {
+      globalOrder.completionDate = new Date().toISOString();
+    }
+    
     saveOrders(allOrders);
+
+    // NEW: Handle Permanent Earnings for Platform and Operators
+    if ((newStatus === 'completed' || newStatus === 'Delivered') && (oldStatus !== 'completed' && oldStatus !== 'Delivered')) {
+      const commission = globalOrder.totalCommission !== undefined ? globalOrder.totalCommission : ((globalOrder.grandTotal || globalOrder.totalPrice || 0) * 0.10);
+      addPermanentEarnings(commission);
+
+      const items = globalOrder.items || globalOrder.products || [];
+      items.forEach(item => {
+        if (item.owner) {
+          const itemTotal = (item.price || 0) * (item.qty || item.quantity || 1);
+          const operatorEarning = itemTotal * 0.90;
+          addOperatorEarnings(item.owner, operatorEarning);
+          addOperatorRevenue(item.owner, itemTotal);
+        }
+      });
+
+      // NEW: User Loyalty Points
+      if (globalOrder.userId) {
+        const points = Math.floor((globalOrder.grandTotal || globalOrder.totalPrice || 0) / 100);
+        addUserLoyaltyPoints(globalOrder.userId, points);
+      }
+    } else if (newStatus === 'returned' && (oldStatus === 'completed' || oldStatus === 'Delivered')) {
+      const commission = globalOrder.totalCommission !== undefined ? globalOrder.totalCommission : ((globalOrder.grandTotal || globalOrder.totalPrice || 0) * 0.10);
+      addPermanentEarnings(-commission);
+
+      const items = globalOrder.items || globalOrder.products || [];
+      items.forEach(item => {
+        if (item.owner) {
+          const itemTotal = (item.price || 0) * (item.qty || item.quantity || 1);
+          const operatorEarning = itemTotal * 0.90;
+          addOperatorEarnings(item.owner, -operatorEarning);
+          addOperatorRevenue(item.owner, -itemTotal);
+        }
+      });
+
+      // NEW: REVOKE Loyalty Points on Return
+      if (globalOrder.userId) {
+        const points = Math.floor((globalOrder.grandTotal || globalOrder.totalPrice || 0) / 100);
+        addUserLoyaltyPoints(globalOrder.userId, -points);
+      }
+    }
 
     // 2. Update Scoped Orders for Operators
     const items = globalOrder.items || globalOrder.products || [];
@@ -1180,8 +1367,16 @@ const DataManager = (() => {
       campaign.createdAt = new Date().toISOString();
       campaigns.push(campaign);
     }
-    localStorage.setItem(STORAGE_KEYS.CAMPAIGNS, JSON.stringify(campaigns));
-    return { success: true, campaign };
+    try {
+      localStorage.setItem(STORAGE_KEYS.CAMPAIGNS, JSON.stringify(campaigns));
+      return { success: true, campaign };
+    } catch (e) {
+      console.error('DataManager.saveCampaign error:', e);
+      if (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
+        return { success: false, message: 'Storage quota exceeded. The image or video file is too large for local storage. Please use a smaller file or a URL instead.' };
+      }
+      return { success: false, message: 'Failed to save campaign: ' + e.message };
+    }
   }
 
   function deleteCampaign(id) {
@@ -1215,6 +1410,18 @@ const DataManager = (() => {
   updateOnlineStatus();
   // Update status every 2 minutes while page is open
   setInterval(updateOnlineStatus, 2 * 60 * 1000);
+
+  // Sync cart across tabs/windows
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'ecommerce_cart') {
+      if (typeof updateCartBadge === 'function') updateCartBadge();
+      // If we are on the cart page, we might want to refresh the list
+      const cartContainer = document.getElementById('cart-items') || document.getElementById('cart-items-container');
+      if (cartContainer && typeof renderCart === 'function') renderCart();
+      // If we are on checkout page
+      if (window.location.pathname.includes('checkout.html') && typeof renderCheckout === 'function') renderCheckout();
+    }
+  });
 
   // Public API
   return {
@@ -1279,8 +1486,17 @@ const DataManager = (() => {
     addPageRegistration,
     getPageRegistrations,
     updatePageRegistrationStatus,
+    updateUserRoleByEmail,
     getScopedData,
-    saveScopedData
+    saveScopedData,
+    getPermanentEarnings,
+    addPermanentEarnings,
+    getOperatorEarnings,
+    addOperatorEarnings,
+    getOperatorRevenue,
+    addOperatorRevenue,
+    getUserLoyaltyPoints,
+    addUserLoyaltyPoints
   };
 })();
 

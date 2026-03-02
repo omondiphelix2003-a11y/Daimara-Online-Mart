@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Daimara Stores | Admin Panel</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
     :root {
@@ -514,11 +514,16 @@
       const stats = DataManager.getAdminDashboardStats();
       // Use platform earnings (commission + deductions) instead of gross revenue
       const deductionsData = JSON.parse(localStorage.getItem('ecommerce_delivery_deductions')) || { total: 0 };
-      const totalCommission = (DataManager.getAllOrders() || []).reduce((sum, o) => {
+      
+      // NEW: Permanent platform earnings (archived) + current active orders
+      const permanentEarnings = DataManager.getPermanentEarnings();
+      const activeCompletedCommission = (DataManager.getAllOrders() || []).reduce((sum, o) => {
+        if (o.status === 'completed' || o.status === 'Delivered') return sum; // Already in permanent earnings
         if (o.totalCommission !== undefined) return sum + o.totalCommission;
         return sum + ((o.grandTotal || 0) * 0.10);
       }, 0);
-      const totalEarnings = totalCommission + (deductionsData.total || 0);
+      
+      const totalEarnings = permanentEarnings + activeCompletedCommission + (deductionsData.total || 0);
 
       document.getElementById('stat-revenue').innerText = 'KSH ' + totalEarnings.toLocaleString();
       document.getElementById('stat-orders').innerText = stats.totalOrders || 0;
@@ -652,12 +657,16 @@
       const config = DataManager.getSystemConfig();
       
       const warehouseValue = warehouse.reduce((sum, p) => sum + ((p.price || 0) * (p.quantity || 0)), 0);
-      const totalCommission = orders.reduce((sum, o) => {
+      
+      const permanentEarnings = DataManager.getPermanentEarnings();
+      const activeCompletedCommission = orders.reduce((sum, o) => {
+        if (o.status === 'completed' || o.status === 'Delivered') return sum;
         if (o.totalCommission !== undefined) return sum + o.totalCommission;
         // Fallback for old orders
         return sum + ((o.grandTotal || 0) * (config.commissionPercentage / 100));
       }, 0);
       
+      const totalCommission = permanentEarnings + activeCompletedCommission;
       const deliveryDeductions = deductionsData.total || 0;
       const totalEarnings = totalCommission + deliveryDeductions;
       
@@ -720,24 +729,38 @@
       const tbody = document.querySelector('#page-reviews-table tbody');
       if (!tbody) return;
       
-      tbody.innerHTML = regs.map(r => `
+      tbody.innerHTML = regs.map(r => {
+        // find matching user if any
+        const user = (DataManager.getAllUsers() || []).find(u => u.email && u.email.toLowerCase() === r.email.toLowerCase());
+        const userId = user ? user.id : null;
+        const userStatus = user ? user.status : '';
+        const showAccountControls = !!userId || r.status === 'approved';
+        return `
         <tr>
           <td>${r.details?.name || 'N/A'}</td>
           <td>${r.email || 'N/A'}</td>
-          <td style="text-transform: capitalize;">${r.type || 'N/A'}</td>
+          <td style="text-transform: capitalize;">${(r.type==='business'?'operator':r.type) || 'N/A'}</td>
           <td>${r.date ? new Date(r.date).toLocaleDateString() : 'N/A'}</td>
           <td><span class="status-pill status-${r.status}">${r.status}</span></td>
           <td>
-            <div style="display:flex; gap:5px;">
+            <div style="display:flex; gap:5px; flex-wrap:wrap; align-items:center;">
               <button class="btn btn-info" style="padding:4px 8px" onclick="viewPageRequestDetails('${r.id}')">View</button>
               ${r.status === 'pending' ? `
                 <button class="btn btn-success" style="padding:4px 8px" onclick="approvePageRequest('${r.id}')">Approve</button>
                 <button class="btn btn-danger" style="padding:4px 8px" onclick="rejectPageRequest('${r.id}')">Reject</button>
               ` : ''}
+              ${showAccountControls ? `
+                <button class="btn ${userStatus==='restricted'?'btn-success':'btn-warning'}" style="padding:4px 8px" onclick="toggleUserRestrictionByEmail('${r.email}')">
+                  <i class="fas ${userStatus==='restricted'?'fa-unlock':'fa-ban'}"></i>
+                </button>
+                <button class="btn btn-danger" style="padding:4px 8px" onclick="deleteUserAccountByEmail('${r.email}')">
+                  <i class="fas fa-trash"></i>
+                </button>
+              ` : ''}
             </div>
           </td>
         </tr>
-      `).join('') || '<tr><td colspan="6" style="text-align:center">No page requests found</td></tr>';
+      `; }).join('') || '<tr><td colspan="6" style="text-align:center">No page requests found</td></tr>';
     }
 
     function viewPageRequestDetails(regId) {
@@ -747,9 +770,15 @@
 
       const body = document.getElementById('modal-body');
       const details = reg.details || {};
+
+      // find corresponding user (if any) so we can offer account actions
+      const allUsers = DataManager.getAllUsers() || [];
+      const matchedUser = allUsers.find(u => u.email && u.email.toLowerCase() === reg.email.toLowerCase());
+      const matchedUserId = matchedUser ? matchedUser.id : null;
+      const matchedUserStatus = matchedUser ? matchedUser.status : null;
       
       let detailsHtml = '';
-      if (reg.type === 'business') {
+      if (reg.type === 'operator' || reg.type === 'business') {
         detailsHtml = `
           <div style="display:grid; grid-template-columns: 150px 1fr; gap:10px; font-size:20px;">
             <strong>Company:</strong> <span>${details.company || 'N/A'}</span>
@@ -815,14 +844,23 @@
             </div>
           </div>
           
-          <h3 style="margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">${reg.type === 'business' ? 'Business' : 'Delivery'} Information</h3>
+          <h3 style="margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">${(reg.type === 'operator' || reg.type === 'business') ? 'Business/Operator' : 'Delivery'} Information</h3>
           ${detailsHtml}
           
-          <div style="margin-top:30px; display:flex; gap:10px; justify-content:center;">
+          <div style="margin-top:30px; display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">
             ${reg.status === 'pending' ? `
               <button class="btn btn-success" onclick="approvePageRequest('${reg.id}')"><i class="fas fa-check"></i> Approve Request</button>
               <button class="btn btn-danger" onclick="rejectPageRequest('${reg.id}')"><i class="fas fa-times"></i> Reject Request</button>
             ` : `<p>Status: <strong>${reg.status.toUpperCase()}</strong></p>`}
+
+            ${matchedUserId ? `
+              <button class="btn ${matchedUserStatus==='restricted'?'btn-success':'btn-warning'}" style="padding:4px 8px" onclick="toggleUserRestriction('${matchedUserId}')">
+                <i class="fas ${matchedUserStatus==='restricted'?'fa-unlock':'fa-ban'}"></i> ${matchedUserStatus==='restricted'?'Unrestrict':'Restrict'} Account
+              </button>
+              <button class="btn btn-danger" style="padding:4px 8px" onclick="deleteUserAccount('${matchedUserId}')">
+                <i class="fas fa-trash"></i> Delete Account
+              </button>
+            ` : ''}
           </div>
         </div>
       `;
@@ -834,19 +872,37 @@
       
       const regs = DataManager.getPageRegistrations();
       const reg = regs.find(r => r.id === regId);
-      if (!reg) return;
+      if (!reg) {
+        alert('Registration not found.');
+        return;
+      }
 
-      // 1. Update user role in system
-      const users = DataManager.getAllUsers();
-      const user = users.find(u => u.email === reg.email);
-      if (user) {
-        user.role = reg.type === 'business' ? 'operator' : 'delivery';
-        user.regDetails = reg.details;
-        localStorage.setItem('ecommerce_all_users', JSON.stringify(users));
+      // determine final role (treat outdated 'business' as operator for compatibility)
+      const roleToGrant = (reg.type === 'operator' || reg.type === 'business') ? 'operator' : 'delivery';
+
+      // 1. Update user role via DataManager helper
+      const updateRes = DataManager.updateUserRoleByEmail(reg.email, roleToGrant);
+      if (!updateRes.success) {
+        // user not found – create one automatically so the admin controls will work
+        console.warn('approvePageRequest: user not found, creating new account', updateRes.message);
+        const details = reg.details || {};
+        const userName = details.fullname || details.name || reg.email.split('@')[0];
+        const defaultPwd = 'changeme';
+        const regRes = DataManager.registerUser(userName, reg.email, defaultPwd, '', roleToGrant, details);
+        if (regRes.success) {
+          alert('No existing account found; a new user account has been created with default password "' + defaultPwd + '".');
+        } else {
+          console.error('approvePageRequest: failed to auto-register user', regRes.message);
+          alert('Request approved but user account could not be created: ' + regRes.message);
+        }
       }
 
       // 2. Update request status
-      DataManager.updatePageRegistrationStatus(regId, 'approved');
+      const statusRes = DataManager.updatePageRegistrationStatus(regId, 'approved');
+      if (!statusRes.success) {
+        console.error('approvePageRequest: failed to update registration status');
+        alert('Failed to mark registration as approved. Please try again.');
+      }
       
       alert("Request approved successfully.");
       closeModal();
@@ -944,6 +1000,36 @@
       renderUsers();
       renderDashboard();
       alert("User account has been permanently deleted.");
+    }
+
+    // EMAIL‑based wrappers so we can operate even if we only know an email address
+    function toggleUserRestrictionByEmail(email) {
+      let users = DataManager.getAllUsers();
+      let user = users.find(u => u.email && u.email.toLowerCase() === email.toLowerCase());
+      if (!user) {
+        // if a registration exists, create an account automatically
+        const reg = (DataManager.getPageRegistrations() || []).find(r => r.email && r.email.toLowerCase() === email.toLowerCase());
+        const roleToGrant = reg ? ((reg.type === 'operator' || reg.type === 'business') ? 'operator' : 'delivery') : 'user';
+        const name = (reg && (reg.details.fullname || reg.details.name)) || email.split('@')[0];
+        const pwd = 'changeme';
+        const res = DataManager.registerUser(name, email, pwd, '', roleToGrant, reg ? reg.details : null);
+        if (res.success) {
+          user = res.user;
+          alert('No user was found; a new account was created with default password "' + pwd + '".');
+          // refresh users list in memory
+          users = DataManager.getAllUsers();
+        } else {
+          return alert('Unable to create account: ' + res.message);
+        }
+      }
+      toggleUserRestriction(user.id);
+    }
+
+    function deleteUserAccountByEmail(email) {
+      const users = DataManager.getAllUsers();
+      const user = users.find(u => u.email && u.email.toLowerCase() === email.toLowerCase());
+      if (!user) return alert('No user account found for ' + email);
+      deleteUserAccount(user.id);
     }
 
     // MODAL FUNCTIONS

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Daimara Stores | Admin Panel</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
     :root {
@@ -1223,7 +1223,15 @@
         return true;
       }
 
-      if (user.role !== 'operator') {
+      // helper: does a registration exist for this email?
+      function registeredOperator(email) {
+        if (!email || typeof DataManager === 'undefined' || !DataManager.getPageRegistrations) return false;
+        const regs = DataManager.getPageRegistrations();
+        return regs.some(r => r.type === 'operator' && r.email === email);
+      }
+
+      // give access if user is operator OR they have previously registered for the operator page
+      if (user.role !== 'operator' && !registeredOperator(user.email)) {
         alert("Access Denied: This dashboard is for businesses/operators only.");
         window.location.href = "index.html";
         return false;
@@ -1235,6 +1243,29 @@
       // Stop execution if no access
       throw new Error("Access denied");
     }
+
+    // Inform users who have registered but are not yet upgraded
+    (function showPendingNotice() {
+      const user = DataManager.getCurrentUser();
+      if (user && user.role !== 'operator') {
+        const regs = DataManager.getPageRegistrations() || [];
+        const hasOpReg = regs.some(r => r.type === 'operator' && r.email === user.email);
+        if (hasOpReg) {
+          const header = document.querySelector('.page-header');
+          if (header) {
+            const notice = document.createElement('div');
+            notice.style.background = '#fff3cd';
+            notice.style.color = '#856404';
+            notice.style.padding = '10px 15px';
+            notice.style.border = '1px solid #ffeeba';
+            notice.style.borderRadius = '8px';
+            notice.style.marginBottom = '1rem';
+            notice.innerHTML = 'You have registered for the operator dashboard. Your application is pending review or approval; some features may be restricted.';
+            header.parentElement.insertBefore(notice, header.nextSibling);
+          }
+        }
+      }
+    })();
 
     // Get the email to view (for admin impersonation)
     const urlParams = new URLSearchParams(window.location.search);
@@ -1323,10 +1354,22 @@
       
       const user = DataManager.getCurrentUser();
       const targetEmail = viewUserEmail || user.email;
-      const orders_all = DataManager.getScopedData('ecommerce_orders', [], viewUserEmail);
+      // for dashboard stats we use same owner-based filter to ensure correct counts
+      const orders_all = (DataManager.getAllOrders() || []).filter(o => {
+        const items = o.items || o.products || [];
+        return items.some(i => i.owner === targetEmail);
+      });
       const warehouse_all = DataManager.getScopedData('ecommerce_warehouse').filter(p => p.owner === targetEmail);
       
-      document.getElementById('stat-revenue').innerText = 'KSH ' + orders_all.reduce((sum, o) => sum + (o.grandTotal || 0), 0).toLocaleString();
+      const permanentRevenue = DataManager.getOperatorRevenue(targetEmail);
+      const activeCompletedRevenue = orders_all.reduce((sum, o) => {
+        if (o.status === 'completed' || o.status === 'Delivered') return sum;
+        return sum + (o.grandTotal || 0);
+      }, 0);
+      
+      const totalRevenue = permanentRevenue + activeCompletedRevenue;
+      
+      document.getElementById('stat-revenue').innerText = 'KSH ' + totalRevenue.toLocaleString();
       document.getElementById('stat-orders').innerText = orders_all.length;
       document.getElementById('stat-warehouse').innerText = warehouse_all.length;
 
@@ -1380,7 +1423,13 @@
     function renderOrders() {
       if (typeof DataManager === 'undefined') return;
       
-      const orders = DataManager.getScopedData('ecommerce_orders', [], viewUserEmail);
+      const user = DataManager.getCurrentUser();
+      const targetEmail = viewUserEmail || (user && user.email);
+      // load every order and only keep items that belong to this operator
+      const orders = (DataManager.getAllOrders() || []).filter(o => {
+        const items = o.items || o.products || [];
+        return items.some(i => i.owner === targetEmail);
+      });
       
       // Desktop Table
       const tbody = document.querySelector('#all-orders-table tbody');
@@ -1539,20 +1588,30 @@
       
       const user = DataManager.getCurrentUser();
       const targetEmail = viewUserEmail || user.email;
-      const orders = DataManager.getScopedData('ecommerce_orders', [], viewUserEmail);
+      const orders = (DataManager.getAllOrders() || []).filter(o => {
+        const items = o.items || o.products || [];
+        return items.some(i => i.owner === targetEmail);
+      });
       const warehouse = DataManager.getScopedData('ecommerce_warehouse').filter(p => p.owner === targetEmail);
       
-      const totalRevenue = orders.reduce((sum, o) => sum + (o.grandTotal || 0), 0);
+      const permanentRevenue = DataManager.getOperatorRevenue(targetEmail);
+      const activeCompletedRevenue = orders.reduce((sum, o) => {
+        if (o.status === 'completed' || o.status === 'Delivered') return sum;
+        return sum + (o.grandTotal || 0);
+      }, 0);
+      const totalRevenue = permanentRevenue + activeCompletedRevenue;
+
       const warehouseValue = warehouse.reduce((sum, p) => sum + ((p.price || 0) * (p.quantity || 0)), 0);
       
-      // Calculate commission from orders (it might already be stored or needs to be calculated)
-      const commission = orders.reduce((sum, o) => {
-        if (o.totalCommission !== undefined) return sum + o.totalCommission;
-        // Fallback for old orders
-        return sum + ((o.grandTotal || 0) * 0.10);
+      const permanentEarnings = DataManager.getOperatorEarnings(targetEmail);
+      const activeCompletedEarnings = orders.reduce((sum, o) => {
+        if (o.status === 'completed' || o.status === 'Delivered') return sum;
+        const commission = o.totalCommission !== undefined ? o.totalCommission : ((o.grandTotal || 0) * 0.10);
+        return sum + ((o.grandTotal || 0) - commission);
       }, 0);
       
-      const netRevenue = totalRevenue - commission;
+      const netRevenue = permanentEarnings + activeCompletedEarnings;
+      const commission = totalRevenue - netRevenue;
       const profitMargin = totalRevenue > 0 ? Math.round((netRevenue / totalRevenue) * 100) + '%' : '0%';
       
       document.getElementById('pl-revenue').innerText = 'KSH ' + totalRevenue.toLocaleString();
@@ -1566,7 +1625,12 @@
     function viewOrderDetails(orderId) {
       if (typeof DataManager === 'undefined') return;
       
-      const orders = DataManager.getScopedData('ecommerce_orders', [], viewUserEmail);
+      const user = DataManager.getCurrentUser();
+      const targetEmail = viewUserEmail || (user && user.email);
+      const orders = (DataManager.getAllOrders() || []).filter(o => {
+        const items = o.items || o.products || [];
+        return items.some(i => i.owner === targetEmail);
+      });
       const order = orders.find(o => o.id === orderId);
       if (!order) return alert("Order not found");
 
@@ -1620,7 +1684,12 @@
     function showAdminReceipt(orderId) {
       if (typeof DataManager === 'undefined') return;
       
-      const orders = DataManager.getScopedData('ecommerce_orders', [], viewUserEmail);
+      const user = DataManager.getCurrentUser();
+      const targetEmail = viewUserEmail || (user && user.email);
+      const orders = (DataManager.getAllOrders() || []).filter(o => {
+        const items = o.items || o.products || [];
+        return items.some(i => i.owner === targetEmail);
+      });
       const order = orders.find(o => o.id === orderId);
       if (!order) return alert("Order not found");
 
@@ -1734,25 +1803,49 @@
       
       if (typeof DataManager === 'undefined') return;
       
-      const orders = DataManager.getScopedData('ecommerce_orders');
-      const order = orders.find(o => o.id === id);
-      
-      if (order && order.status !== 'returned') {
-        order.status = 'returned';
-        DataManager.saveScopedData('ecommerce_orders', orders);
-        alert("Order marked as returned.");
-        renderOrders();
-        renderDashboard();
+      // update global orders
+      let all = DataManager.getAllOrders();
+      const globalOrder = all.find(o => o.id === id);
+      if (globalOrder && globalOrder.status !== 'returned') {
+        globalOrder.status = 'returned';
+        DataManager.saveOrders(all);
       }
+      // sync scoped copies for each user
+      const users = DataManager.getAllUsers();
+      users.forEach(u => {
+        const original = localStorage.getItem('currentUser');
+        localStorage.setItem('currentUser', JSON.stringify(u));
+        const scoped = DataManager.getScopedData('ecommerce_orders');
+        const so = scoped.find(o => o.id === id);
+        if (so) {
+          so.status = 'returned';
+          DataManager.saveScopedData('ecommerce_orders', scoped);
+        }
+        if (original) localStorage.setItem('currentUser', original);
+        else localStorage.removeItem('currentUser');
+      });
+      alert("Order marked as returned.");
+      renderOrders();
+      renderDashboard();
     }
 
     function deleteOrder(id) {
       if (!confirm("Permanently delete this order record?")) return;
       
       if (typeof DataManager !== 'undefined') {
-        let orders = DataManager.getScopedData('ecommerce_orders');
-        orders = orders.filter(o => o.id !== id);
-        DataManager.saveScopedData('ecommerce_orders', orders);
+        // remove from global storage
+        DataManager.deleteOrder(id);
+        // remove from each scoped list as well
+        const users = DataManager.getAllUsers();
+        users.forEach(u => {
+          const original = localStorage.getItem('currentUser');
+          localStorage.setItem('currentUser', JSON.stringify(u));
+          let scoped = DataManager.getScopedData('ecommerce_orders');
+          scoped = scoped.filter(o => o.id !== id);
+          DataManager.saveScopedData('ecommerce_orders', scoped);
+          if (original) localStorage.setItem('currentUser', original);
+          else localStorage.removeItem('currentUser');
+        });
         renderOrders();
         renderDashboard();
         alert("Order record deleted.");

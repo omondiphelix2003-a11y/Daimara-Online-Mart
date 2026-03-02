@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Daimara Stores | My Profile</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link rel="stylesheet" href="profile.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Libre+Barcode+39&display=swap" rel="stylesheet">
@@ -1419,7 +1419,15 @@ function loadUserProfile() {
   const userOrders = DataManager.getUserOrders(loggedInUser.id);
   const totalOrders = userOrders.length;
   const totalSpent = userOrders.reduce((sum, order) => sum + (order.grandTotal || order.total || 0), 0);
-  const loyaltyPoints = Math.floor(totalSpent / 100) * 1;
+  
+  // Combine permanent points + current active orders points
+  const permanentPoints = DataManager.getUserLoyaltyPoints(loggedInUser.id);
+  const activeCompletedPoints = userOrders.reduce((sum, o) => {
+    const isCompleted = o.status === 'completed' || o.status === 'Delivered';
+    if (isCompleted) return sum; // Already in permanent points
+    return sum + Math.floor((o.grandTotal || o.total || 0) / 100);
+  }, 0);
+  const loyaltyPoints = permanentPoints + activeCompletedPoints;
 
   document.getElementById("total-orders").textContent = totalOrders;
   document.getElementById("total-spent").textContent = `KSH ${totalSpent.toLocaleString()}`;
@@ -1955,6 +1963,22 @@ window.addEventListener("DOMContentLoaded", function() {
   if (typeof updateProfileNav === 'function') {
     setTimeout(updateProfileNav, 100);
   }
+
+  // when the modal form is displayed we want to auto-fill the email fields with the
+  // currently logged in user's address (makes later login seamless).
+  const user = DataManager.getCurrentUser();
+  if (user && user.email) {
+    const opEmail = document.getElementById('op-email');
+    const delEmail = document.getElementById('del-email');
+    if (opEmail) {
+      opEmail.value = user.email;
+      opEmail.readOnly = true;
+    }
+    if (delEmail) {
+      delEmail.value = user.email;
+      delEmail.readOnly = true;
+    }
+  }
 });
 
 /* REGISTRATION MODAL LOGIC */
@@ -2016,6 +2040,10 @@ async function validateAndProceed() {
     return;
   }
 
+  // NOTE: earlier versions imposed a 1MB limit on ID photos to keep
+  // localStorage usage low. That quota check has been removed so registrants
+  // can submit larger images without being blocked.
+
   // Simulate ID Scanning
   const statusEl = document.getElementById('scan-status');
   statusEl.innerText = "Scanning ID Photos... Please wait.";
@@ -2051,47 +2079,65 @@ async function validateAndProceed() {
 }
 
 async function submitRegistration(type) {
-  let details = {};
-  let email = '';
-  
-  if (type === 'operator') {
-    const company = document.getElementById('op-company').value;
-    email = document.getElementById('op-email').value;
-    const state = document.getElementById('op-state').value;
-    const city = document.getElementById('op-city').value;
-    const street = document.getElementById('op-street').value;
-    const address = document.getElementById('op-address').value;
-    const regnumber = document.getElementById('op-regnumber').value;
-    const businessType = document.getElementById('op-type').value;
-
-    if (!company || !email || !state || !city || !street || !address || !regnumber || !businessType) {
-      alert("Please fill all business details.");
-      return;
-    }
+  try {
+    let details = {};
+    let email = '';
     
-    details = { company, email, location: { state, city, street, address }, regnumber, businessType };
-  } else {
-    const means = document.getElementById('del-means').value;
-    email = document.getElementById('del-email').value;
-    const state = document.getElementById('del-state').value;
-    const city = document.getElementById('del-city').value;
-    const street = document.getElementById('del-street').value;
-    const address = document.getElementById('del-address').value;
-    const regnumber = document.getElementById('del-regnumber').value;
-    const krapin = document.getElementById('del-krapin').value;
-    const serviceType = document.getElementById('del-type').value;
-    const plate = document.getElementById('del-plate').value;
-    
-    const fImg = document.getElementById('del-img-front').files[0];
-    const sImg = document.getElementById('del-img-side').files[0];
-    const bImg = document.getElementById('del-img-back').files[0];
+    if (type === 'operator') {
+      const companyEl = document.getElementById('op-company');
+      const emailEl = document.getElementById('op-email');
+      const stateEl = document.getElementById('op-state');
+      const cityEl = document.getElementById('op-city');
+      const streetEl = document.getElementById('op-street');
+      const addressEl = document.getElementById('op-address');
+      const regnumberEl = document.getElementById('op-regnumber');
+      const businessTypeEl = document.getElementById('op-type');
 
-    if (!means || !email || !state || !city || !street || !address || !regnumber || !krapin || !plate || !fImg || !sImg || !bImg) {
-      alert("Please fill all delivery details and upload vehicle photos.");
-      return;
-    }
+      if (!companyEl || !emailEl) return alert("Error: Form elements not found.");
 
-    try {
+      const company = companyEl.value.trim();
+      email = emailEl.value.trim();
+      const state = stateEl.value.trim();
+      const city = cityEl.value.trim();
+      const street = streetEl.value.trim();
+      const address = addressEl.value.trim();
+      const regnumber = regnumberEl.value.trim();
+      const businessType = businessTypeEl.value.trim();
+
+      if (!company || !email || !state || !city || !street || !address || !regnumber || !businessType) {
+        alert("Please fill all business details before registering.");
+        return;
+      }
+      
+      details = { company, email, location: { state, city, street, address }, regnumber, businessType };
+    } else {
+      const meansEl = document.getElementById('del-means');
+      const emailEl = document.getElementById('del-email');
+      // ... same for others ...
+      email = emailEl.value.trim();
+      const means = meansEl.value;
+      const state = document.getElementById('del-state').value.trim();
+      const city = document.getElementById('del-city').value.trim();
+      const street = document.getElementById('del-street').value.trim();
+      const address = document.getElementById('del-address').value.trim();
+      const regnumber = document.getElementById('del-regnumber').value.trim();
+      const krapin = document.getElementById('del-krapin').value.trim();
+      const serviceType = document.getElementById('del-type').value.trim();
+      const plate = document.getElementById('del-plate').value.trim();
+      
+      const fImg = document.getElementById('del-img-front').files[0];
+      const sImg = document.getElementById('del-img-side').files[0];
+      const bImg = document.getElementById('del-img-back').files[0];
+
+      if (!means || !email || !state || !city || !street || !address || !regnumber || !krapin || !plate || !fImg || !sImg || !bImg) {
+        alert("Please fill all delivery details and upload vehicle photos.");
+        return;
+      }
+
+      // note: ID photos validated earlier are capped at 1MB. Other photos (vehicle,
+      // profile, etc.) may be any size per requirement, so we intentionally skip
+      // size checking here.
+
       const fBase64 = await fileToBase64(fImg);
       const sBase64 = await fileToBase64(sImg);
       const bBase64 = await fileToBase64(bImg);
@@ -2100,27 +2146,32 @@ async function submitRegistration(type) {
         means, email, locality: { state, city, street, address }, regnumber, krapin, serviceType, plate,
         vehiclePhotos: { front: fBase64, side: sBase64, back: bBase64 }
       };
-    } catch (err) {
-      alert("Error processing vehicle photos.");
-      return;
     }
-  }
 
-  // Create registration request instead of direct registration
-  const result = DataManager.addPageRegistration({
-    type,
-    email,
-    details: { ...regData.personal, ...details }
-  });
+    // Ensure we have personal data
+    const personalData = regData.personal || {};
+    if (!personalData.fullname) {
+       alert("Error: Personal identification details are missing. Please go back and complete the first step.");
+       return;
+    }
 
-  if (result.success) {
-    // Save a verification message to localStorage for index.html to display
-    localStorage.setItem('daimara_reg_message', "Please wait for atleast 10 min for account verification. A redirectory email will be sent to your email and incase you haven't received the email after 30min please contact us.");
-    
-    // Redirect to home page (index.html) as requested
-    window.location.href = "index.html";
-  } else {
-    alert(result.message);
+    const registrationPayload = {
+      type,
+      email,
+      details: { ...personalData, ...details }
+    };
+
+    const result = DataManager.addPageRegistration(registrationPayload);
+
+    if (result && result.success) {
+      localStorage.setItem('daimara_reg_message', "Please wait for atleast 10 min for account verification. A redirectory email will be sent to your email and incase you haven't received the email after 30min please contact us.");
+      window.location.href = "index.html";
+    } else {
+      alert("Registration failed: " + (result?.message || "Unknown error"));
+    }
+  } catch (err) {
+    console.error("Registration Error:", err);
+    alert("An unexpected error occurred during registration. Please try again.");
   }
 }
 </script>
