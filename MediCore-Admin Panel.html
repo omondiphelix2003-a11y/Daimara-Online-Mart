@@ -180,6 +180,98 @@
             border-color: #3b82f6;
             border-style: solid;
         }
+
+        /* MOBILE NAV STYLES */
+        .nav-toggle {
+          display: none;
+          background: transparent;
+          color: white;
+          border: 1px solid var(--glass-border);
+          padding: 8px 12px;
+          border-radius: 8px;
+          cursor: pointer;
+          z-index: 2001;
+          transition: 0.3s;
+          align-items: center;
+          justify-content: center;
+          font-size: 20px;
+        }
+        .nav-toggle:hover {
+          background: var(--glass);
+          border-color: #3b82f6;
+        }
+
+        .nav-links {
+          display: none;
+          position: fixed;
+          top: 64px;
+          left: 0;
+          width: 250px;
+          height: auto;
+          max-height: calc(100vh - 64px);
+          overflow-y: auto;
+          background: white !important;
+          flex-direction: column;
+          padding: 20px;
+          z-index: 2000;
+          transition: 0.3s;
+          border-right: 1px solid #ddd;
+          border-bottom: 1px solid #ddd;
+          justify-content: flex-start;
+          gap: 10px;
+          box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .nav-links.active {
+          display: flex !important;
+        }
+        .nav-links a {
+          width: 100%;
+          padding: 12px;
+          border-bottom: 1px solid #eee;
+          text-align: left;
+          color: black !important;
+          font-weight: 600;
+          font-size: 14px;
+        }
+        .nav-links a:hover {
+          color: #3b82f6 !important;
+        }
+
+        @media (min-width: 1025px) {
+            .nav-links {
+                display: flex !important;
+                position: static;
+                background: transparent !important;
+                width: auto;
+                flex-direction: row;
+                padding: 0;
+                box-shadow: none;
+                border: none;
+            }
+            .nav-links a {
+                color: #3b82f6 !important;
+                border: none;
+                width: auto;
+                padding: 0 10px;
+            }
+            .nav-toggle {
+                display: none !important;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            aside {
+                position: fixed;
+                left: -256px;
+                transition: left 0.3s ease;
+            }
+            aside.open {
+                left: 0;
+            }
+            .nav-toggle {
+                display: flex !important;
+            }
+        }
     </style>
 <base target="_blank">
 </head>
@@ -254,7 +346,21 @@
     <main class="flex-1 overflow-hidden flex flex-col bg-slate-950">
         <!-- Top Bar -->
         <header class="h-16 bg-slate-900/50 border-b border-slate-800 flex items-center justify-between px-6 backdrop-blur-sm">
-            <h2 id="pageTitle" class="text-xl font-bold text-white">Dashboard</h2>
+            <div class="flex items-center gap-4">
+                <button class="nav-toggle" onclick="toggleNav()"><i class="fas fa-bars"></i></button>
+                <h2 id="pageTitle" class="text-xl font-bold text-white">Dashboard</h2>
+            </div>
+            
+            <div class="nav-links" id="adminSiteNav">
+                <a href="index.html">Home</a>
+                <a href="store.html">Store</a>
+                <!--<a href="supermarket.html">Supermarket</a>
+                <a href="second-hand items.html">Second-hand</a>-->
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+                <a href="MediCore Pharmacy.html">Pharmacy Page</a>
+            </div>
+
             <div class="flex items-center gap-4">
                 <button onclick="refreshData()" class="p-2 text-slate-400 hover:text-blue-400 transition-colors" title="Refresh Data">
                     <i class="fa-solid fa-rotate"></i>
@@ -812,6 +918,16 @@
     </div>
 
     <script>
+        function toggleNav() {
+            const nav = document.getElementById('adminSiteNav');
+            const toggle = document.querySelector('.nav-toggle');
+            const sidebar = document.querySelector('aside');
+            nav.classList.toggle('active');
+            toggle.classList.toggle('active');
+            if(window.innerWidth <= 1024) {
+                sidebar.classList.toggle('open');
+            }
+        }
         // Data Storage
         let data = {
             shelves: [

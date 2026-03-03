@@ -7,12 +7,14 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 :root {
-  --primary:rgb(233, 157, 17);
-  --bg:#f4f6f9;
-  --card:#ffffff;
+  --primary:#3b82f6;
+  --bg:#0f172a;
+  --card:#1e293b;
+  --glass: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
 }
-body{margin:0;font-family:Arial;background:var(--bg);} 
-.topbar{background:var(--primary);padding:16px 24px;display:flex;justify-content:space-between;align-items:center;}
+body{margin:0;font-family:'Inter';background:var(--bg);} 
+.topbar{background:var(--primary);padding:16px 24px;display:flex;justify-content:space-between;align-items:center;border-bottom: 1px solid var(--glass-border);backdrop-filter: blur(12px);-webkit-backdrop-filter: blur(12px);}
 .topbar h1{margin:0;color:black;}
 .btn{background:black;color:white;border:none;padding:10px 16px;border-radius:8px;cursor:pointer;}
 .container{padding:24px;}

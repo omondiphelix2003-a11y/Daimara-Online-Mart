@@ -8,156 +8,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 
 <style>
-/**{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif}
-body{background:#f5f5f5; font-size: 22px; padding-bottom: 100px;}
-
-/* FOOTER */
-/*.footer {
-  background: #0a0a0a;
-  color: white;
-  padding: 30px 20px;
-  text-align: center;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  z-index: 1000;
-}
-.footer p {
-  color: rgb(233, 157, 17);
-}
-
-/* NAVBAR */
-/*.navbar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:5px 5px 5px 10px;
-  margin: 5px 0px 10px 0px;
-  background:#000000;
-  color:#fff;
-  position:fixed;
-  bottom:1945px;
-  width:100%;
-  z-index:1000;
-}
-.logo{color:rgb(233,157,17);font-size:25px;font-weight:bold}
-.navbar a{color:#f5f5f5;text-decoration:none;margin-left:15px;font-size: 25px;}
-.navbar a:hover{color:rgb(233,157,17)}*/
-
-/*.container{
- max-width:1000px;
-  height: 1000px;
-  margin:120px auto 40px;
-  padding:30px;
-  background:#000000;
-  border-radius:10px;
-  box-shadow:0 10px 15px rgba(0, 0, 0, 0);
-  top: 150%;
-  margin-top: 250px;
-}
-
-h2{text-align:center;margin-bottom:20px;color: rgb(233,157,17);margin-bottom:80px;margin-top: 40px;}
-
-.m-pesa {
-   width:-250px;
-  height: -250px;
-  padding-bottom: 50px;
-  border-radius:50px;
-   box-shadow:0 10px 15px rgba(116, 115, 115, 0);
-}
-
-.mpesa-box{
-  background:#dfdddd;
-  padding:20px;
-  border-radius:8px;
-  margin-bottom:120px;
-}
-
-.mpesa-box p{
-  margin-bottom:20px;
-  margin-top: 20px;
-  font-size:20px;
-  color: #000000;
-}
-
-.phone {
-  color: rgb(233,157,17);margin-bottom: 50px;margin-top: 80px;font-size: 25px;
-}
-
-input{
-  width:100%;
-  padding:12px;
-  margin:10px 0;
-  border:1px solid #000000cc;
-  border-radius:6px;
-  box-shadow: #000000;
-  background:#ffffff;
-  cursor: pointer;
-  font-size: 20px;
-}
-
-button{
-  width:50%;
-  padding:14px;
-  background:#111;
-  color:rgb(233,157,17);
-  border:none;
-  border-radius:6px;
-  font-size:21px;
-  cursor:pointer;
-  margin-left: 25%;
-}
-
-button:hover{
-  background:#0b7021;
-  color: #000000;
-}
-
-.note{
-  font-size:20px;
-  color:#ffffff;
-  text-align:center;
-  margin-top:45px;
-}
-
-.shop-icon {
-            position: relative;
-            width: 40px;
-            height: 35px;
-            background-color: transparent;
-            border: 3px solid rgb(233, 157, 17);
-            border-radius: 4px;
-            margin: 20px;
-             top: 5px;
-            left: -15%;
-        }
-
-        .shop-icon::before {
-            content: '';
-            position: absolute;
-            top: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 18px;
-            height: 12px;
-            border: 3px solid rgb(233, 157, 17);
-            border-bottom: none;
-            border-radius: 10px 10px 0 0;
-        }
-
-        .shop-icon::after {
-            content: '';
-            position: absolute;
-            top: 10px;
-            left: 8px;
-            width: 24px;
-            height: 2px;
-            background-color: #ffffff;
-            box-shadow: 0 6px 0 #a7884f;
-        }*/
-
-
 
 
 :root{
@@ -550,39 +400,46 @@ input[type="tel"]::placeholder{
     /* RESPONSIVE BREAKPOINTS */
     @media (max-width: 768px) {
     .container{
-    margin-top:-52px;
+    margin-top:-32px;
     padding:1rem;
-    margin-left: -120px;
+    
+    margin-left: 28px;
   }
   
   .m-pesa{
     max-width:200px;
-    
+     margin-left: 2px;
   }
   
   .payment-card{
     border-radius:16px;
     padding:1.25rem;
+    margin-left: 28px;
   }
   
 .order-summary{
-  margin-left: 28px;
+  margin-left: 2px;
 }
 
 .input-group{
-  margin-left: 28px;
+  margin-left: 2px;
 }
 
   .pay-btn{
     font-size:1rem;
     padding:0.875rem 1.25rem;
+
   }
     }
 
 /* RESPONSIVE BREAKPOINTS */
  @media (max-width: 480px) {
   /* M-PESA LOGO */
-.m-pesa{
+.container {
+  margin-left: 2px;
+}
+
+  .m-pesa{
   width:100%;
   max-width:280px;
   margin: 2rem auto;

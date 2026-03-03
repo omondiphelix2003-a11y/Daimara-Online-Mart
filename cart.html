@@ -6,30 +6,37 @@
     <title>Daimara Stores | Cart</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        
         :root {
-            --primary: #e99d11;
-            --dark: #111;
-            --bg: #f5f5f5;
-            --card: #ffffff;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --primary: #3b82f6;
+            --dark: #0f172a;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, Helvetica, sans-serif; }
-        body { background: var(--bg); font-size: 16px; padding-bottom: 20px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); font-size: 16px; padding-bottom: 20px; color: #e2e8f0; }
 
         /* NAVBAR */
         .navbar {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 10px 20px; background: var(--dark); color: #fff;
+            padding: 10px 20px; background: var(--glass); color: #fff;
             position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
             flex-wrap: wrap;
+            border-bottom: 1px solid var(--glass-border);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
         .logo { color: white; font-size: 20px; font-weight: bold; text-decoration: none; }
         .nav-links { display: flex; align-items: center; gap: 15px; }
-        .nav-links a { color: #e99d11; text-decoration: none; font-size: 14px; transition: 0.3s; }
+        .nav-links a { color: #3b82f6; text-decoration: none; font-size: 14px; transition: 0.3s; }
         .nav-links a:hover { color: white; }
         .nav-icons { display: flex; align-items: center; gap: 15px; }
-        .nav-icons a { color: #fff; font-size: 18px; transition: 0.3s; }
+        .nav-icons a { color: #e2e8f0; font-size: 18px; transition: 0.3s; }
 
         .cart-icon-container {
             position: relative;
@@ -53,19 +60,7 @@
             body { padding-bottom: 80px; }
             .navbar { padding: 10px; flex-direction: row; justify-content: space-between; align-items: center; height: 60px; }
             .logo { font-size: 18px; }
-            .nav-links { 
-                display: none; 
-                position: fixed; 
-                top: 60px; 
-                left: 0; 
-                width: 100%; 
-                background: #000; 
-                flex-direction: column; 
-                padding: 10px; 
-                z-index: 1000;
-            }
-            .nav-links.active { display: flex; }
-            .nav-links a { font-size: 14px; padding: 10px; width: 100%; text-align: center; }
+            .nav-links { display: none !important; }
             .nav-icons { display: none !important; }
             
             .cart-item-card { grid-template-columns: 80px 1fr; }
@@ -79,6 +74,7 @@
             .product button { padding: 5px; font-size: 10px; }
             .slider { max-height: 200px; }
 
+        }
             /* BOTTOM NAV */
             .bottom-nav {
                 display: flex !important;
@@ -104,20 +100,7 @@
             .bottom-nav a.active { color: var(--primary); }
             .bottom-nav a span { font-size: 10px; margin-top: 4px; }
 
-            .nav-toggle {
-                display: block !important;
-                background: var(--primary);
-                color: #000;
-                border: none;
-                padding: 5px 10px;
-                border-radius: 5px;
-                font-weight: bold;
-                cursor: pointer;
-            }
-        }
-
-        .bottom-nav { display: none; }
-        .nav-toggle { display: none; }
+    @media (max-width: 768px) {
 
         @media (max-width: 400px) {
             .cart-container { margin-top: 80px; }
@@ -129,7 +112,7 @@
             background: #fff; border-radius: 12px; padding: 20px;
             box-shadow: var(--shadow); min-height: 400px;
         }
-        h4 { text-align: center; font-size: 24px; margin-bottom: 20px; color: #333; }
+        h4 { text-align: center; font-size: 24px; margin-bottom: 20px; color: #000000; }
 
         /* CART ITEMS */
         .cart-item-card {
@@ -138,16 +121,16 @@
             align-items: center;
         }
         .cart-item-image img { width: 100%; height: 80px; object-fit: cover; border-radius: 8px; }
-        .cart-item-details h3 { font-size: 18px; margin-bottom: 5px; color: #333; }
-        .cart-item-details .price { font-weight: bold; color: var(--primary); font-size: 16px; }
-        .cart-item-details .description { font-size: 14px; color: #777; margin: 5px 0; }
+        .cart-item-details h3 { font-size: 18px; margin-bottom: 5px; color: #000000; }
+        .cart-item-details .price { font-weight: bold; color: #5c5a5a; font-size: 16px; }
+        .cart-item-details .description { font-size: 14px; color: #161616; margin: 5px 0; }
         
         .quantity-control { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
         .qty-btn { 
             width: 25px; height: 25px; border: 1px solid #ddd; background: #fff;
             border-radius: 4px; cursor: pointer; font-weight: bold;
         }
-        .qty-display { font-weight: bold; width: 20px; text-align: center; }
+        .qty-display { font-weight: bold; width: 20px; text-align: center;color: #161616; }
 
         .cart-item-action { text-align: right; }
         .subtotal { font-weight: bold; color: #27ae60; font-size: 16px; margin-bottom: 10px; }
@@ -155,13 +138,14 @@
             padding: 5px 10px; background: #ff4757; color: #fff; 
             border: none; border-radius: 4px; cursor: pointer; font-size: 12px;
         }
-
+        
+    
 
 
         /* TOTAL & CHECKOUT */
         .cart-total {
             margin-top: 20px; text-align: right; padding: 15px;
-            background: #f9f9f9; border-radius: 8px; font-size: 20px; font-weight: bold;
+            background: #f9f9f9; border-radius: 8px; font-size: 20px; font-weight: bold;color: #000000;
         }
         .checkout { display: flex; gap: 10px; margin-top: 20px; }
         .checkout a {
@@ -193,24 +177,31 @@
         }
 
       .product:hover{
-      transform:translateY(-4px);
-      box-shadow:0 20px 25px -5px rgba(0, 0, 0, 0.39);
-      border-color:#e99d11;
+      transform:translateY(-4px) scale(1.02);
+      box-shadow:0 20px 40px -15px rgba(59, 130, 246, 0.3);
+      border-color: rgb(233, 157, 17);
     }
 
         .product {
             background: 0 5px 15px rgba(0, 0, 0, 0.329); padding: 10px; border-radius: 10px;
             box-shadow: var(--shadow); text-align: center;
+            border: 1px solid #334155;
         }
 
         .product img { width: 100%; height: 100px; object-fit: cover; border-radius: 6px; }
-        .product h4 { font-size: 14px; margin: 8px 0; }
+        .product h4 { font-size: 15px; margin: 8px 0;color: rgb(199, 197, 197); }
         .product p { font-size: 16px; font-weight: bold; color: var(--primary); }
         .product button {
             width: 100%; margin-top: 8px; padding: 8px; border: none;
-            border-radius: 4px; background: var(--dark); color: var(--primary);
+            border-radius: 4px;  background-color: #000000;
+            color: rgb(233, 157, 17);
             cursor: pointer; font-size: 12px; font-weight: bold;
         }
+    }
+
+    .product button:hover{
+      background-color:#ffffff;color:#000000;transform:translateY(-2px);box-shadow:0 8px 15px rgba(59, 130, 246, 0.3);
+    }
 
         @media (max-width: 480px) {
             .nav-icons { gap: 10px; }
@@ -224,13 +215,13 @@
         .footer { background: none; color: #fff; padding: 15px; text-align: center; margin-top:40px;
       margin-bottom: -100px; }
         .footer p { color: black; font-size: 14px;font-weight: bold; }
+    
     </style>
 </head>
 <body>
 
 <nav class="navbar">
     <a href="index.html" class="logo">Daimara Stores</a>
-    <button class="nav-toggle" onclick="toggleNav()">Menu <i class="fas fa-bars"></i></button>
     <div class="nav-links" id="cartNav">
         <a href="supermarket.html">Supermarket</a>
         <a href="second-hand items.html">Second-hand</a>
@@ -287,10 +278,6 @@
 <script src="data-manager.js"></script>
 <script src="auth-check.js"></script>
 <script>
-    function toggleNav() {
-        document.getElementById('cartNav').classList.toggle('active');
-    }
-
     function updateCartBadge() {
         const cartItems = DataManager.getCart();
         const totalQty = cartItems.reduce((acc, item) => acc + (item.qty || 1), 0);

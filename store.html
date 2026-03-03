@@ -6,30 +6,37 @@
   <title>Daimara Stores | Store</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+    
     :root {
-      --primary: #e99d11;
-      --dark: #111;
-      --bg: #f5f5f5;
-      --card: #ffffff;
-      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --primary: #3b82f6;
+      --dark: #0f172a;
+      --bg: #0f172a;
+      --card: #1e293b;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+      --glass: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(255, 255, 255, 0.1);
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, Helvetica, sans-serif; }
-    body { background: var(--bg); font-size: 16px; padding-bottom: 20px; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+    body { background: var(--bg); font-size: 16px; padding-bottom: 20px; color: #e2e8f0; }
 
     /* NAVBAR */
     .navbar {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 10px 20px; background: var(--dark); color: #fff;
+      padding: 20px 20px; background: var(--glass); color: #fff;
       position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
       flex-wrap: wrap;
+      border-bottom: 1px solid var(--glass-border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
     }
     .logo { color: white; font-size: 20px; text-decoration: none;font-weight: bold; }
     .nav-links { display: flex; align-items: center; gap: 15px; }
-    .nav-links a { color: #e99d11; text-decoration: none; font-size: 16px; transition: 0.3s; }
+    .nav-links a { color: #3b82f6; text-decoration: none; font-size: 16px; transition: 0.3s; }
     .nav-links a:hover, .nav-links a.active { color: #ffffff }
     .nav-icons { display: flex; align-items: center; gap: 15px; }
-    .nav-icons a { color: #ffffff; font-size: 18px; transition: 0.3s; }
+    .nav-icons a { color: #e2e8f0; font-size: 21px; transition: 0.3s; }
     .nav-icons a:hover { color: var(--primary); }
 
     .cart-icon-container {
@@ -59,29 +66,30 @@
 
     /* SEARCH */
     .search-container {
-      position: fixed; top: 5px; left: 50%; transform: translateX(-50%);
-      width: 90%; max-width: 400px; z-index: 1001;margin-left: -283px;
+      position: fixed; top: 10px; left: 50%; transform: translateX(-50%);
+      width: 90%; max-width: 300px; z-index: 1001;margin-left: -283px;
     }
     #search-input {
   width: 100%;
-  padding: 8px 20px;
-  border: none;
-  background-color: #f5f5f5;
+  padding: 8px 10px;
+  border: 1px solid #334155;
+  background-color: #1e293b;
   border-radius: 12px;
-  color:#000000;
+  color:#e2e8f0;
    font-size: 16px;
      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.726);
 }
     #search-results {
-      position: absolute; top: 50px; width: 100%; background: #fff;
-      border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      position: absolute; top: 50px; width: 100%; background: #1e293b;
+      border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
       display: none; max-height: 300px; overflow-y: auto; z-index: 1002;
+      border: 1px solid #334155;
     }
     #search-results div {
-      padding: 12px 20px; border-bottom: 1px solid #eee; cursor: pointer;
-      transition: 0.2s; color: #333;
+      padding: 12px 20px; border-bottom: 1px solid #334155; cursor: pointer;
+      transition: 0.2s; color: #e2e8f0;
     }
-    #search-results div:hover { background: #f0f0f0; }
+    #search-results div:hover { background: #0f172a; color: #3b82f6; }
 
     /* SLIDER */
         .slider {
@@ -92,7 +100,7 @@
         .slide img { width: 100%; height: 100%; object-fit: cover; }
 
     section{padding:20px 15px}
-    h2{color: rgb(0, 0, 0);text-align:center;margin-bottom:50px; font-size: 2.5rem;}
+    h2{color: #e2e8f0;text-align:center;margin-bottom:50px; font-size: 2.5rem;}
 
 
    /* PRODUCTS GRID */
@@ -104,16 +112,16 @@
     }
     
     .product{
-      background:0 5px 15px rgba(0, 0, 0, 0);border-radius:12px;overflow:hidden;box-shadow:0 5px 15px rgba(0, 0, 0, 0.329);
-      transition:all 0.3s ease;cursor:pointer;border:0.5px solid rgba(168, 163, 163, 0.363);
+      background:linear-gradient(145deg, #1e293b, #0f172a);border-radius:12px;overflow:hidden;box-shadow:0 5px 15px rgba(0, 0, 0, 0.329);
+      transition:all 0.3s ease;cursor:pointer;border:1px solid #334155;
       display:flex;flex-direction:column;
       width: 100%;
     }
 
     .product:hover{
-      transform:translateY(-4px);
-      box-shadow:0 20px 25px -5px rgba(0,0,0,0.1);
-      border-color:#e99d11;
+      transform:translateY(-4px) scale(1.02);
+      box-shadow:0 20px 40px -15px rgba(59, 130, 246, 0.3);
+      border-color: rgb(233, 157, 17);
     }
 
     .product img{
@@ -129,28 +137,30 @@
   position: relative;
   overflow: hidden;
   height: 120px;
-  background-color: 0 5px 15px rgba(0, 0, 0, 0.445);}
+  background-color: #1e293b;}
 
     .product-details{
       padding:12px;flex-grow:1;display:flex;flex-direction:column;
     }
 
     .product h4{
-      font-size:16px;margin:0 0 5px 0;color:#000000;font-weight:600;flex-grow:1;
+      font-size:16px;margin:0 0 5px 0;color:#e2e8f0;font-weight:600;flex-grow:1;
     }
 
     .product p{
-      color:#000000;font-size:18px;font-weight:bold;margin:5px 0;
+      color:#3b82f6;font-size:18px;font-weight:bold;margin:5px 0;
     }
 
     .product button{
-      width:100%;margin-top:10px;padding:10px;border:none;border-radius:0 0 6px 6px;background:#000000;
-      color:rgb(233, 157, 17);cursor:pointer;font-size:14px;font-weight:600;
-      transition:all 0.3s ease;box-shadow:0 2px 8px rgba(0, 0, 0, 0.3);
+      width:100%;margin-top:10px;padding:10px;border:none;border-radius:0 0 6px 6px;
+       background-color: #000000;
+      color: rgb(233, 157, 17);
+      cursor:pointer;font-size:14px;font-weight:600;
+      transition:all 0.3s ease;box-shadow:0 2px 8px rgba(0, 0, 0, 0.3);border-top:1px solid #334155;
     }
 
     .product button:hover{
-      background-color:#ffffff;color:#000;transform:translateY(-2px);box-shadow:0 8px 15px rgba(0, 0, 0, 0.4);
+      background-color:#ffffff;color:#000000;transform:translateY(-2px);box-shadow:0 8px 15px rgba(59, 130, 246, 0.3);
     }
 
 
@@ -166,45 +176,18 @@
 
     /* FOOTER */
     .footer {
-      background: none; color: #fff; padding: 20px;
+      background: #0f172a; color: #e2e8f0; padding: 20px;
       text-align: center; margin-top: 40px;margin-top:60px;
       margin-bottom: -80px;
+      border-top: 1px solid #334155;
     }
-    .footer p { color: black; font-size: 14px;font-weight: bold; }
-
-    
-    @media (max-width: 1024px) {
-      .nav-toggle {
-        display: block !important;
-        background: var(--primary);
-        color: #000;
-        border: none;
-        padding: 5px 10px;
-        border-radius: 5px;
-        font-weight: bold;
-        cursor: pointer;
-      }
-      .nav-links {
-        display: none;
-        position: fixed;
-        top: 60px;
-        left: 0;
-        width: 100%;
-        background: #000;
-        flex-direction: row;
-        padding: 10px;
-        z-index: 1000;
-        overflow-x: auto;
-        white-space: nowrap;
-      }
-      .nav-links.active { display: flex; }
-    }
+    .footer p { color: #e2e8f0; font-size: 14px;font-weight: bold; }
 
     @media (max-width: 768px) {
       body { font-size: 16px; padding-bottom: 80px; }
       .navbar { top: 0; flex-direction: row; height: 60px; padding: 10px; justify-content: space-between; align-items: center; }
       .nav-icons { display: none !important; }
-      .search-container { top: 10px; width: 95%;margin-left: -160px; }
+      .search-container { top: 10px; width: 95%;margin-left: -50px; }
       .slider { margin-top: 100px; }
 
       /* BOTTOM NAV */
@@ -214,7 +197,7 @@
         bottom: 0;
         left: 0;
         width: 100%;
-        background: #000;
+        background: #000000;
         height: 60px;
         justify-content: space-around;
         align-items: center;
@@ -222,7 +205,7 @@
         border-top: 2px solid var(--primary);
       }
       .bottom-nav a {
-        color: white;
+        color: #e2e8f0;
         text-decoration: none;
         font-size: 20px;
         display: flex;
@@ -231,24 +214,11 @@
       }
       .bottom-nav a.active { color: var(--primary); }
       .bottom-nav a span { font-size: 10px; margin-top: 4px; }
-
-      .nav-toggle {
-        display: block !important;
-        background: var(--primary);
-        color: #000;
-        border: none;
-        padding: 5px 10px;
-        border-radius: 5px;
-        font-weight: bold;
-        cursor: pointer;
-      }
     }
-
-    .nav-toggle { display: none; }
     
     @media (max-width: 480px) {
-      .navbar { top: 0; height: 50px; }
-      .search-container { top: 60px; }
+      .navbar { top: 1px; height: 80px;}
+      .search-container { top: 10px;margin-left: -94px;  }
       .slider { max-height: 200px; margin-top: 60px; }
       h2 { font-size: 1.5rem; margin-bottom: 20px; }
       .products {
@@ -265,9 +235,10 @@
  @media (max-width: 480px) {
       .ad-bar { font-size: 12px; padding: 0.5rem; }
       .navbar { top: 5px; height: 50px;padding-top: 13px;padding-bottom: 13px; }
+      .nav-links { top: 55px !important; }
       .logo {display: none;}
-      .search-container { top: 13px;max-width: 230px;margin-left: 48px; }
-      .slider { margin-top: 80px; }
+      .search-container { top: 63px;max-width: 230px;margin-left: -86px; }
+      .slider { margin-top: 60px; }
       .delivery-card img { height: 150px; }
     }
 
@@ -278,7 +249,6 @@
 <!-- NAVBAR -->
 <nav class="navbar">
   <a href="index.html" class="logo">Daimara Stores</a>
-  <button class="nav-toggle" onclick="toggleNav()"><i class="fas fa-bars"></i></button>
   <div class="nav-links" id="storeNav">
     <a href="supermarket.html">Supermarket</a>
     <a href="second-hand items.html">Second-hand</a>
@@ -330,10 +300,6 @@
 <script src="data-manager.js"></script>
 <script src="auth-check.js"></script>
 <script>
-  function toggleNav() {
-    document.getElementById('storeNav').classList.toggle('active');
-  }
-
   // SLIDER
   let slideIndex = 0;
   function initSlideshow() {

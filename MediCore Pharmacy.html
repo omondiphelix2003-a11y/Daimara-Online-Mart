@@ -137,6 +137,95 @@
             animation: ring-pulse 1.5s ease-out infinite;
         }
 
+        /* MOBILE NAV STYLES */
+        .nav-toggle {
+          display: none;
+          background: transparent;
+          color: white;
+          border: 1px solid var(--glass-border);
+          padding: 8px 12px;
+          border-radius: 8px;
+          cursor: pointer;
+          z-index: 2001;
+          transition: 0.3s;
+          align-items: center;
+          justify-content: center;
+          font-size: 20px;
+        }
+        .nav-toggle:hover {
+          background: var(--glass);
+          border-color: #3b82f6;
+        }
+        .nav-toggle i {
+          transition: transform 0.3s;
+        }
+        .nav-toggle.active i {
+          transform: rotate(90deg);
+        }
+
+        .nav-links {
+          display: flex;
+          align-items: center;
+          gap: 20px;
+        }
+        .nav-links a {
+          color: #3b82f6;
+          text-decoration: none;
+          font-size: 16px;
+          transition: 0.3s;
+          font-weight: 600;
+        }
+        .nav-links a:hover {
+          color: white;
+        }
+
+        @media (min-width: 1025px) {
+          .nav-links {
+            display: flex !important;
+          }
+          .nav-toggle {
+            display: none !important;
+          }
+        }
+
+        @media (max-width: 1024px) {
+          .nav-toggle {
+            display: flex !important;
+          }
+          .nav-links {
+            display: none;
+            position: fixed;
+            top: 72px; /* Adjusted for MediCore navbar height */
+            left: 0;
+            width: 250px;
+            height: auto;
+            max-height: calc(100vh - 72px);
+            overflow-y: auto;
+            background: white !important;
+            flex-direction: column;
+            padding: 20px;
+            z-index: 2000;
+            transition: 0.3s;
+            border-right: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+            justify-content: flex-start;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+          }
+          .nav-links.active {
+            display: flex !important;
+          }
+          .nav-links a {
+            width: 100%;
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+            color: black !important;
+            font-weight: 600;
+          }
+          .desktop-only { display: none; }
+        }
+
         .modal {
             transition: opacity 0.3s ease, visibility 0.3s ease;
         }
@@ -451,6 +540,7 @@
     <!-- Navigation -->
     <nav class="glass-panel sticky top-0 z-40 px-6 py-4 flex justify-between items-center border-b border-slate-700">
         <div class="flex items-center gap-3">
+            <button class="nav-toggle" onclick="toggleNav()"><i class="fas fa-bars"></i></button>
             <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-blue-500/30">
                 <i class="fa-solid fa-mortar-pestle"></i>
             </div>
@@ -458,6 +548,15 @@
                 <h1 class="text-xl font-bold tracking-tight text-white">MediCore <span class="text-blue-400">Pharmacy</span></h1>
                 <p class="text-xs text-slate-400">Smart Inventory & Support System</p>
             </div>
+        </div>
+        
+        <div class="nav-links" id="pharmacyNav">
+            <a href="index.html">Home</a>
+            <a href="store.html">Store</a>
+            <!--<a href="supermarket.html">Supermarket</a>
+            <a href="second-hand items.html">Second-hand</a>-->
+            <a href="about.html">About</a>
+            <a href="contact.html">Contact</a>
         </div>
         
         <div class="flex items-center gap-4">
@@ -691,6 +790,13 @@
     <div id="cartOverlay" onclick="toggleCart()" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[40] hidden transition-opacity"></div>
 
     <script>
+        function toggleNav() {
+            const nav = document.getElementById('pharmacyNav');
+            const toggle = document.querySelector('.nav-toggle');
+            nav.classList.toggle('active');
+            toggle.classList.toggle('active');
+        }
+
         // Extended Inventory with 20 Shelves and 100+ drugs
         const inventory = [
             // Original 12 shelves expanded

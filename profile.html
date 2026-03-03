@@ -11,11 +11,11 @@
 <style>* {
   box-sizing: border-box;
   margin: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 body {
-  background: #f5f5f5;
+  background: #0f172a;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -23,26 +23,28 @@ body {
   padding-bottom: 20px;
   overflow-x: hidden;
   width: 100%;
+  color: #e2e8f0;
 }
 
 * { max-width: 100%; }
 
 /* FOOTER */
 .footer {
-  background: #0a0a0a;
-  color: white;
+  background: #0f172a;
+  color: #e2e8f0;
   padding: 20px;
   text-align: center;
   margin-top: 40px;
+  border-top: 1px solid #334155;
 }
 .footer p {
-  color: rgb(233, 157, 17);
+  color: #3b82f6;
   font-size: 14px;
 }
 
 /* NAVBAR */
 .navbar {
-  background: #0a0a0a;
+  background: #0f172a;
   padding: 10px 20px;
   display: flex;
   justify-content: space-between;
@@ -51,10 +53,11 @@ body {
   top: 0;
   z-index: 1000;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid #334155;
 }
 
 .shop-name {
-  color: rgb(247, 247, 247);
+  color: #ffffff;
   font-size: 20px;
   font-weight: 700;
   text-decoration: none;
@@ -67,7 +70,7 @@ body {
 }
 
 .nav-right a {
-  color: rgb(233, 157, 17);
+  color: #3b82f6;
   text-decoration: none;
   font-size: 18px;
   transition: 0.3s;
@@ -86,15 +89,15 @@ body {
     bottom: 0;
     left: 0;
     width: 100%;
-    background: #000;
+    background: #0f172a;
     height: 60px;
     justify-content: space-around;
     align-items: center;
     z-index: 2000;
-    border-top: 2px solid rgb(233, 157, 17);
+    border-top: 2px solid #3b82f6;
   }
   .bottom-nav a {
-    color: white;
+    color: #e2e8f0;
     text-decoration: none;
     font-size: 20px;
     display: flex;
@@ -220,7 +223,7 @@ body {
 /* SIDEBAR */
 .profile-sidebar {
   width: 280px;
-  background: white;
+  background: rgba(2, 2, 2, 0.377);
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
@@ -335,7 +338,7 @@ body {
 }
 
 .tab-content {
-  background: white;
+  background: rgba(2, 2, 2, 0.377);
   border-radius: 12px;
   padding: 30px;
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
@@ -391,7 +394,7 @@ body {
   overflow: hidden;
   border: 4px solid rgb(233, 157, 17);
   flex-shrink: 0;
-  background: white;
+  background: rgba(2, 2, 2, 0.377);
 }
 
 .profile-image-large img {
@@ -467,7 +470,7 @@ body {
 }
 
 .detail-section {
-  background: #f9f9f9;
+  background: rgba(2, 2, 2, 0.377);
   padding: 20px;
   border-radius: 10px;
   border-left: 4px solid rgb(233, 157, 17);
@@ -577,7 +580,7 @@ body {
 }
 
 .order-card {
-  background: #f9f9f9;
+  background: rgba(2, 2, 2, 0.527);
   padding: 20px;
   border-radius: 10px;
   border-left: 4px solid rgb(233, 157, 17);
@@ -658,7 +661,7 @@ body {
 }
 
 .address-card {
-  background: #f9f9f9;
+  background: rgba(2, 2, 2, 0.377);
   padding: 20px;
   border-radius: 10px;
   border-left: 4px solid rgb(233, 157, 17);
@@ -758,7 +761,7 @@ body {
   border-radius: 50%;
   border: 2px solid #ecf0f1;
   overflow: hidden;
-  background: #f9f9f9;
+  background: rgba(2, 2, 2, 0.377);
 }
 
 .settings-profile-preview img {
@@ -801,7 +804,7 @@ body {
 }
 
 .favorite-card {
-  background: #f9f9f9;
+  background: rgba(2, 2, 2, 0.377);
   border-radius: 10px;
   overflow: hidden;
   transition: all 0.3s ease;
@@ -815,7 +818,7 @@ body {
 .favorite-image {
   width: 100%;
   height: 200px;
-  background: white;
+  background: rgba(2, 2, 2, 0.377);
   overflow: hidden;
 }
 
@@ -856,6 +859,7 @@ body {
 /* TRACKING STYLES */
 .tracking-container {
   padding: 20px 0;
+  background-color: rgba(2, 2, 2, 0.61);
 }
 .tracking-header {
   text-align: center;
@@ -879,7 +883,7 @@ body {
   top: 5px;
   bottom: 5px;
   width: 3px;
-  background: #eee;
+  background: rgba(2, 2, 2, 0.377);
 }
 .tracking-step {
   display: flex;
@@ -891,7 +895,7 @@ body {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #eee;
+  background: rgba(2, 2, 2, 0.377);
   border: 4px solid #fff;
   box-shadow: 0 0 0 2px #eee;
   z-index: 1;
@@ -947,7 +951,7 @@ body {
 }
 
 .modal-content {
-  background-color: white;
+  background-color: rgba(2, 2, 2, 0.377);
   padding: 30px;
   border-radius: 12px;
   width: 90%;
@@ -977,7 +981,7 @@ body {
 /* RECEIPT STYLES */
 .receipt {
   color: #333;
-  background: #fff;
+  background: rgba(2, 2, 2, 0.61);
 }
 .receipt-header {
   text-align: center;
@@ -1057,7 +1061,7 @@ body {
 @media print {
   body * { visibility: hidden; }
   .modal, .modal-content, .receipt, .receipt * { visibility: visible; }
-  .modal { position: absolute; left: 0; top: 0; background: white; display: flex !important; }
+  .modal { position: absolute; left: 0; top: 0; background: rgba(2, 2, 2, 0.377); display: flex !important; }
   .close, .print-btn, .navbar, .footer, .profile-sidebar { display: none !important; }
   .modal-content { box-shadow: none; border: none; width: 100%; max-width: 100%; padding: 0; }
 }
@@ -1120,7 +1124,7 @@ body {
       <a id="login-btn" href="login.html"><i class="fa fa-user"></i> Login</a>
     </div>
     <div class="nav-cart">
-      <a href="store.html" style="text-decoration: none; color: inherit;"><i class="fa fa-shopping-bag"></i> Shop</a>
+      <a href="store.html" style="text-decoration: none; color: inherit;"><i class="fa fa-shopping-bag"></i></a>
     </div>
   </div>
 </nav>

@@ -8,6 +8,17 @@
   <link rel="stylesheet" href="second-hand items.css">
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+:root {
+  --primary: #3b82f6;
+      --dark: #0f172a;
+      --bg: #0f172a;
+      --card: #1e293b;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  --glass: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+}
 
 * {
   margin: 0;
@@ -16,22 +27,21 @@
 }
 
 body {
-  font-family: Arial, sans-serif;
-  /* margin: 0; */
-  background: #f5f5f5;
+  font-family: 'Inter', sans-serif;
+  background: #0f172a;
   font-size: 25px;
   padding-bottom: 100px;
 }
 
 /* FOOTER */
 .footer {
-  background: none; color: #fff; padding: 20px;
+  background: #0f172a; color: #e2e8f0; padding: 20px;
       text-align: center; margin-top:60px;
       margin-bottom: -100px;
       
 }
 .footer p {
-  color: rgb(0, 0, 0);
+  color: #e2e8f0;
   font-size: 14px;
   font-weight: bold;
 }
@@ -49,7 +59,7 @@ body {
 
 .view-cart-link {
   text-decoration: none;
-  color: rgb(233, 157, 17);
+  color: #3b82f6;
 }
 
 
@@ -57,15 +67,17 @@ body {
  /* NAVBAR */
     .navbar{
       display:flex;align-items:center;justify-content:space-between;
-      padding:15px 30px;background:#111;color:#fff;
+      padding:15px 30px;background:var(--glass);color:#fff;
       position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    background-color: #000000; /* Add your desired background color */
-    z-index: 1000; /* Ensure it's on top of other elements */ 
+    z-index: 1000;
+    border-bottom: 1px solid var(--glass-border);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     }
-    .logo{color:rgb(233, 157, 17);font-size:25px;font-weight:bold}
+    .logo{color:#3b82f6;font-size:25px;font-weight:bold}
 
     .nav-left
     .view-cart-link
@@ -111,15 +123,15 @@ body {
 
 .nav-links li:hover,
 .nav-links li.active {
-  color: rgb(233, 157, 17);
+  color: #3b82f6;
 }
 
-    .nav-links a{color:#fff;text-decoration:none}
+    .nav-links a{color:#3b82f6;text-decoration:none}
     .nav-icons a{color:#fff;margin-left:15px;font-size:25px}
 
 .nav-links a:hover,
 .nav-links a.active {
-  color: rgb(233, 157, 17);
+  color: #ffffff;
   border-bottom: 0px solid rgb(233, 157, 17);
 }
 
@@ -152,41 +164,7 @@ body {
   .product-info .price { font-size: 16px; }
 }
 
-@media (max-width: 1024px) {
-  .category-toggle {
-    display: block !important;
-    background: rgb(233, 157, 17);
-    color: #000;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-weight: bold;
-    cursor: pointer;
-    margin: 0 10px;
-  }
-  
-  .nav-links {
-    display: none;
-    position: fixed;
-    top: 60px;
-    left: 0;
-    width: 100%;
-    background: #000;
-    flex-direction: row;
-    padding: 10px;
-    z-index: 1002;
-    overflow-x: auto;
-    white-space: nowrap;
-    border-bottom: 1px solid rgb(233, 157, 17);
-    max-width: 100%;
-  }
-  
-  .nav-links.active {
-    display: flex;
-  }
-}
-
-@media (max-width: 768px) {
+    @media (max-width: 768px) {
   body { font-size: 16px; padding-bottom: 80px; }
   .navbar { padding: 10px 15px; flex-wrap: nowrap; justify-content: space-between; align-items: center; height: 60px; }
   .logo { font-size: 20px; }
@@ -241,14 +219,14 @@ body {
 
 .search-container {
   position: fixed; top: 9px; left: 50%; transform: translateX(-50%);
-      width: 90%; max-width: 300px; z-index: 1001;margin-top: 2px;margin-left: -405px;
+      width: 90%; max-width: 250px; z-index: 1001;margin-top: 2px;margin-left: -435px;
  }
 
 #search-input {
   width: 100%;
   padding: 8px 20px;
   border: none;
-  background-color: #f5f5f5;
+  background-color: #1e293b;
   border-radius: 12px;
   color:#000000;
    font-size: 16px;
@@ -330,6 +308,7 @@ body {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   cursor: pointer;
+  border: 1px solid #334155;
 }
 
 .product-card:hover {
@@ -406,6 +385,7 @@ body {
 
 .product-card .add-to-cart:hover {
   background-color: #ffffff;
+   color: #000000;
   transform: translateY(-2px);
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
 }
@@ -708,13 +688,14 @@ body {
 @media (max-width: 480px) {
      .ad-bar { font-size: 12px; padding: 0.5rem; }
       .navbar { top: 1px; height: 50px;padding-top: 13px;padding-bottom: 13px; }
+      .nav-links { top: 51px !important; }
       .nav-links li {padding-top:5px;padding-bottom: 5px;margin-bottom: -5px;}
       .nav-links li:hover,
       .nav-links li.active {
        color: rgb(233, 157, 17);
 }
       .logo {display: none;}
-      .search-container { top: 10px;max-width: 250px;margin-left: -170px; }
+      .search-container { top: 55px;max-width: 250px;margin-left: -78px; }
       .product-container {margin-top: 20%;min-width: 600px;max-height: 1150%;
   padding-top: -50px;
   display: grid;
@@ -734,7 +715,7 @@ body {
   transition: all 0.3s ease;
   cursor: pointer;
   /*height: 240px;*/
-  
+  border: 1px solid #334155;
 }
 
 .product-card:hover {
@@ -830,6 +811,35 @@ body {
       .slider { margin-top: 150px; }
       .delivery-card img { height: 150px; }
     }
+
+ /* BOTTOM NAV */
+      .bottom-nav {
+        display: flex !important;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: #000000;
+        height: 60px;
+        justify-content: space-around;
+        align-items: center;
+        z-index: 2000;
+        border-top: 2px solid var(--primary);
+      }
+      .bottom-nav a {
+        color: #e2e8f0;
+        text-decoration: none;
+        font-size: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .bottom-nav a.active { color: var(--primary); }
+      .bottom-nav a span { font-size: 10px; margin-top: 4px; }
+    
+
+
+
 </style>
 
 </head>
@@ -842,8 +852,6 @@ body {
    <div class="nav-left">
       <a href="store.html" class="home-link"><span><div class="logo"><div class="fa fa-shopping-bag"></div></div></span></a>
     </div>
-
-  <button class="category-toggle" onclick="toggleCategories()">Categories <i class="fas fa-chevron-down"></i></button>
 
   <ul class="nav-links" id="categoryLinks">
     <li><a href="#" data-category="Household items">Household items</a></li>
@@ -864,9 +872,9 @@ body {
   <a href="index.html"><i class="fa fa-home"></i><span>Home</span></a>
   <a href="about.html"><i class="fas fa-info-circle"></i><span>About</span></a>
   <a href="contact.html"><i class="fas fa-phone"></i><span>Contact</span></a>
-  <a href="cart.html" style="position:relative;">
+  <a href="#" id="cart-bottom-link" style="position:relative;">
     <i class="fa fa-shopping-cart"></i>
-    <span class="cart-badge" style="position:absolute; top:-5px; right:15px; background:red; color:white; border-radius:50%; padding:2px 5px; font-size:10px; display:none;">0</span>
+    <span class="cart-badge" id="cartBadgeBottom" style="position:absolute; top:-5px; right:15px; background:red; color:white; border-radius:50%; padding:2px 5px; font-size:10px; display:none;">0</span>
     <span>Cart</span>
   </a>
   <a href="profile.html"><i class="fa fa-user"></i><span>Profile</span></a>
@@ -914,10 +922,6 @@ body {
 <script src="data-manager.js"></script>
 <script src="auth-check.js"></script>
 <script>
-function toggleCategories() {
-  document.getElementById('categoryLinks').classList.toggle('active');
-}
-
 // Load products dynamically from DataManager
 let product = DataManager.getAllProducts();
 let cart = DataManager.getCart();
@@ -1079,25 +1083,25 @@ function updateCartDisplay() {
 function updateCartBadge() {
   const cartItems = DataManager.getCart();
   const totalQty = cartItems.reduce((acc, item) => acc + (item.qty || 1), 0);
-  const badge = document.getElementById('cartBadge');
-  if (badge) {
+  const badges = document.querySelectorAll('.cart-badge');
+  badges.forEach(badge => {
     if (totalQty > 0) {
       badge.innerText = totalQty;
       badge.style.display = 'block';
     } else {
       badge.style.display = 'none';
     }
-  }
+  });
 }
 
 // Cart icon click
-const cartIcon = document.querySelector(".cart-icon");
-if (cartIcon) {
-  cartIcon.onclick = e => {
+const cartIcons = document.querySelectorAll(".cart-icon-container, #cart-bottom-link");
+cartIcons.forEach(icon => {
+  icon.onclick = e => {
     e.preventDefault();
     cartModal.classList.toggle("open");
   };
-}
+});
 
 document.getElementById("close-cart").onclick = () => {
   cartModal.classList.remove("open");
@@ -1133,7 +1137,7 @@ if (checkoutLink) {
 
 // Close modal when clicking outside
 document.addEventListener('click', (e) => {
-  if (!e.target.closest('.cart-icon') && !e.target.closest('.cart-modal') && cartModal.classList.contains('open')) {
+  if (!e.target.closest('.cart-icon-container') && !e.target.closest('#cart-bottom-link') && !e.target.closest('.cart-modal') && cartModal.classList.contains('open')) {
     cartModal.classList.remove('open');
   }
 });
@@ -1146,9 +1150,13 @@ document.querySelectorAll(".nav-links a").forEach(link => {
       currentCategory = link.dataset.category;
       renderProducts(link.dataset.category);
       
-      // Add active state
       document.querySelectorAll(".nav-links a").forEach(l => l.classList.remove('active'));
       link.classList.add('active');
+      
+      // Close mobile menu if active
+      if (document.getElementById('categoryLinks').classList.contains('active')) {
+        toggleNav();
+      }
     }
   };
 });

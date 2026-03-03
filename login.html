@@ -5,16 +5,20 @@
   <title>Daimara Stores | Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+    
     :root {
-      --primary: #e99d11;
-      --dark: #111;
-      --bg: #0a0a0a;
-      --text: #ecf0f1;
+      --primary: #3b82f6;
+      --dark: #0f172a;
+      --bg: #0f172a;
+      --text: #e2e8f0;
+      --glass: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(255, 255, 255, 0.1);
     }
 
-    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
     body {
-      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
       margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
       padding: 20px; color: var(--text);
     }
@@ -23,7 +27,7 @@
       background: rgba(255, 255, 255, 0.05);
       backdrop-filter: blur(10px);
       width: 100%; max-width: 450px; padding: 40px 30px;
-      border-radius: 16px; border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px; border: 1px solid rgba(59, 130, 246, 0.2);
       box-shadow: 0 10px 30px rgba(0,0,0,0.5);
       animation: fadeIn 0.5s ease;
     }
@@ -34,11 +38,11 @@
     form { display: flex; flex-direction: column; gap: 20px; }
     
     input, select {
-      width: 100%; padding: 12px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2);
-      background: rgba(255,255,255,0.1); color: #fff; font-size: 16px; outline: none; transition: 0.3s;
+      width: 100%; padding: 12px 15px; border-radius: 8px; border: 1px solid rgba(59, 130, 246, 0.2);
+      background: rgba(30, 41, 59, 0.8); color: #e2e8f0; font-size: 16px; outline: none; transition: 0.3s;
     }
-    input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(233,157,17,0.3); }
-    input::placeholder { color: #aaa; }
+    input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(59, 130, 246, 0.3); }
+    input::placeholder { color: #94a3b8; }
 
     .profile-image-group { text-align: center; margin: 10px 0; }
     .profile-image-group label { display: block; margin-bottom: 10px; font-size: 14px; color: var(--primary); font-weight: 600; }
@@ -54,9 +58,9 @@
       background: var(--primary); color: #fff; font-size: 18px; font-weight: bold;
       cursor: pointer; transition: 0.3s; margin-top: 10px;
     }
-    button:hover { background: #d48b0d; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(233,157,17,0.3); }
+    button:hover { background: #2563eb; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4); }
 
-    .switch { text-align: center; margin-top: 20px; font-size: 14px; color: #aaa; }
+    .switch { text-align: center; margin-top: 20px; font-size: 14px; color: #94a3b8; }
     .switch span { color: var(--primary); cursor: pointer; font-weight: bold; }
     .switch span:hover { text-decoration: underline; }
 

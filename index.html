@@ -6,29 +6,31 @@
   <title>Daimara Stores | Home</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+    
 :root{
-      --primary:#e99d11;
-      --dark:#111;
-      --bg:#f5f5f5;
-      --card:#ffffff;
-      --text:#1f2937;
-      --border:#e5e7eb;
-      --shadow:0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    }
+      --primary:#3b82f6;
+      --dark:#0f172a;
+      --bg:#0f172a;
+      --card:#1e293b;
+      --text:#e2e8f0;
+      --border:#334155;
+      --shadow:0 4px 6px -1px rgba(0, 0, 0, 0.3);      --glass: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(255, 255, 255, 0.1);    }
 
 
-    *{margin:0;padding:0;box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
-    body{background:#f5f5f5; font-size: 25px; padding-bottom: 80px;}
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter', sans-serif}
+    body{background:#0f172a; font-size: 25px; padding-bottom: 80px; color: #e2e8f0;}
 
 /* PARA */
 .para{
- color: #f5f5f5;
+ color: #e2e8f0;
 }
 
 /* ADVERTISEMENT BAR */
     .ad-bar{
-      background:var(--primary);
-      color:var(--dark);
+      background:#082b61;
+      color:#ffffff;
       text-align:center;
       padding:0.7rem 3rem;
       font-size:22px;
@@ -53,23 +55,26 @@
       46% { opacity: 1; }
     }
 
-div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px;
+div.h3{text-align: center; color: #082b61; font-size: 22px;
    margin-top: 20px; margin-bottom: 20px;padding-top: 12px;}
 
     /* NAVBAR */
     .navbar{
     display:flex;align-items:center;justify-content:space-between;
-    padding:10px 20px;background:#111;color:#fff;
+    padding:10px 20px;background:var(--glass);color:#fff;
     position: fixed;
     top: 30px;
     left: 0;
     width: 100%;
-    background-color: #000000;
+    background-color: var(--glass);
     z-index: 1000;
     flex-wrap: wrap;
      margin-top: 9px;
      padding-top: 24px;
      padding-bottom: 24px;
+     border-bottom: 1px solid var(--glass-border);
+     backdrop-filter: blur(12px);
+     -webkit-backdrop-filter: blur(12px);
     }
     .logo{color:white;font-size:20px;font-weight:bold;
     display: flex;
@@ -78,16 +83,16 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px;
     cursor: pointer;
     }
     .nav-center{display:flex;align-items:center;gap:15px; margin-left: auto; margin-right: auto;}
-    .nav-center a{color:rgb(233,157,17);text-decoration:none;font-size:20px;}
-    .nav-icons a{color:rgb(255, 255, 255);margin-left:10px;font-size:22px}
+    .nav-center a{color:#3b82f6;text-decoration:none;font-size:20px;}
+    .nav-icons a{color:#e2e8f0;margin-left:10px;font-size:22px}
 
 .nav-center a:hover,
 .nav-center a.active {
-  color: rgb(255, 255, 255);
+  color: #ffffff;
 }
 
 .nav-icons a:hover {
-  color:rgb(233,157,17);
+  color:#3b82f6;
 }
 
 .cart-icon-container {
@@ -118,24 +123,24 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px;
 
 
    .search-container {
- position: fixed; top: 75px; left: 50%; transform: translateX(-50%);
-      width: 90%; max-width: 400px; z-index: 1001;margin-top: -15px;margin-left: -300px;
+ position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+      width: 90%; max-width: 300px; z-index: 1001;margin-top: -15px;margin-left: -300px;
  }
 
 
 #search-input {
   width: 100%;
   padding: 8px 20px;
-  border: none;
-  background-color: #f5f5f5;
+  border: 1px solid #334155;
+  background-color: #1e293b;
   border-radius: 12px;
-  color:#000000;
+  color:#e2e8f0;
    font-size: 16px;
      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.726);
 }
 
 #search-input::placeholder {
-  color: #000000;
+  color: #94a3b8;
  justify-items: center;
  opacity: 1; /* Ensure color is fully opaque */
 }
@@ -154,8 +159,8 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px;
   position: absolute;
   top: 45px;
   width: 100%;
-  background: #0000009a;
-  border: 1px solid #ddd;
+  background: #1e293b;
+  border: 1px solid #334155;
   border-radius: 5px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.452);
   display: none;
@@ -168,31 +173,31 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px;
 
 #search-results div {
   padding: 10px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #334155;
   cursor: pointer;
-  color: #333;
+  color: #e2e8f0;
   font-size: 19px;
   transition: 0.2s;
-  background-color: #f9f9f9;
+  background-color: #1e293b;
 }
 
 #search-results div:hover {
-  background: #000000;
-  color: #ffffff;
+  background: #0f172a;
+  color: #3b82f6;
 }
 
 #search-results strong {
-  color: #1d1c1c;
+  color: #3b82f6;
 }
 
  .shop-icon {
             position: relative;width: 40px;height: 35px;background-color: transparent;
-            border: 3px solid rgb(233, 157, 17);border-radius: 4px;margin: 20px;
+            border: 3px solid #3b82f6;border-radius: 4px;margin: 20px;
         }
 
         .shop-icon::before {
             content: '';position: absolute;top: -15px;left: 50%;transform: translateX(-50%);
-            width: 18px;height: 12px;border: 3px solid rgb(233, 157, 17);border-bottom: none;
+            width: 18px;height: 12px;border: 3px solid #3b82f6;border-bottom: none;
             border-radius: 10px 10px 0 0;
         }
 
@@ -219,7 +224,7 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px;
 
     /* DELIVERY SECTIONS */
     section{padding:20px 15px}
-    h2{color: rgb(0, 0, 0);text-align:center;margin-bottom:50px; font-size: 2.5rem;}
+    h2{color: #e2e8f0;text-align:center;margin-bottom:50px; font-size: 2.5rem;}
     
 
     /* DELIVERY */
@@ -242,15 +247,15 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px;
     }
 
     .delivery-card{
-      background:#ffffff77;padding:15px;border-radius:10px;
+      background:#1e293b;padding:15px;border-radius:10px;border:1px solid #334155;
       box-shadow:0 5px 15px rgba(0, 0, 0, 0.397);text-align:center;}
       .delivery-card img{width:100%;height:auto;aspect-ratio:1/1;object-fit:cover;border-radius: 5px;}
       
     
-    .delivery-card i{font-size:25px;margin-bottom:15px;color:#111}
+    .delivery-card i{font-size:25px;margin-bottom:15px;color:#3b82f6}
     button{
       margin-top:10px;padding:8px 15px;border:none;border-radius:5px;
-      background:#111;color:rgb(233, 157, 17);cursor:pointer
+      background:#0f172a;color:#3b82f6;cursor:pointer;border:1px solid #3b82f6;
     }
 
     
@@ -280,16 +285,16 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px;
     }
     
     .product{
-      background:0 5px 15px rgba(0, 0, 0, 0.329);border-radius:12px;overflow:hidden;box-shadow:0 5px 15px rgba(0, 0, 0, 0.329);
-      transition:all 0.3s ease;cursor:pointer;border:0.5px solid rgba(168, 163, 163, 0.363);
+      background:linear-gradient(145deg, #1e293b, #0f172a);border-radius:12px;overflow:hidden;box-shadow:0 5px 15px rgba(0, 0, 0, 0.329);
+      transition:all 0.3s ease;cursor:pointer;border:1px solid #334155;
       display:flex;flex-direction:column;
       width: 100%;
     }
 
     .product:hover{
-      transform:translateY(-4px);
-      box-shadow:0 20px 25px -5px rgba(0,0,0,0.1);
-      border-color:#e99d11;
+      transform:translateY(-4px) scale(1.02);
+      box-shadow:0 20px 40px -15px rgba(59, 130, 246, 0.3);
+      border-color: rgb(233, 157, 17);
     }
 
     .product img{
@@ -306,35 +311,38 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px;
     }
 
     .product h4{
-      font-size:16px;margin:0 0 5px 0;color:#000000;font-weight:600;flex-grow:1;
+      font-size:16px;margin:0 0 5px 0;color:#e2e8f0;font-weight:600;flex-grow:1;
     }
 
     .product p{
-      color:#000000;font-size:18px;font-weight:bold;margin:5px 0;
+      color:#3b82f6;font-size:18px;font-weight:bold;margin:5px 0;
     }
 
     .product button{
-      width:100%;margin-top:10px;padding:10px;border:none;border-radius:0 0 6px 6px;background:#000000;
-      color:rgb(233, 157, 17);cursor:pointer;font-size:14px;font-weight:600;
-      transition:all 0.3s ease;box-shadow:0 2px 8px rgba(0, 0, 0, 0.3);
+      width:100%;margin-top:10px;padding:10px;border:none;border-radius:0 0 6px 6px;
+       background-color: #000000;
+      color: rgb(233, 157, 17);
+      cursor:pointer;font-size:14px;font-weight:600;
+      transition:all 0.3s ease;box-shadow:0 2px 8px rgba(0, 0, 0, 0.3);border-top:1px solid #334155;
     }
 
     .product button:hover{
-      background-color:#ffffff;color:#000;transform:translateY(-2px);box-shadow:0 8px 15px rgba(0, 0, 0, 0.4);
+      background-color:#ffffff;color:#000000;transform:translateY(-2px);box-shadow:0 8px 15px rgba(59, 130, 246, 0.3);
     }
 
     /* FOOTER */
     .footer {
-      background: none;
+      background: #0f172a;
       padding: 15px;
       text-align: center;
       position: static;
       width: 100%;
       margin-top:60px;
       margin-bottom: -80px;
+      border-top: 1px solid #334155;
     }
     .footer p {
-      color: #000000;
+      color: #e2e8f0;
       font-size: 14px;
       font-weight: bold;
     }
@@ -412,19 +420,6 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px;
       .bottom-nav a.active { color: var(--primary); }
       .bottom-nav a span { font-size: 10px; margin-top: 4px; }
 
-      .nav-toggle {
-        display: block !important;
-        background: var(--primary);
-        color: #000;
-        border: none;
-        padding: 5px 10px;
-        border-radius: 5px;
-        font-weight: bold;
-        cursor: pointer;
-      }
-    }
-
-    .nav-toggle { display: none; }
     /* HORIZONTAL SCROLL FOR LONG TEXT */
     .scrollable-text {
       overflow-x: auto;
@@ -478,11 +473,10 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px;
       </a>
 
 
-  <div class="nav-center">
-    <a href="store.html"><div class="fa fa-shopping-bag"></div></a>
-     <a href="about.html" title="About"><i class="fas fa-info-circle"></i></a>
-    <a href="contact.html" title="Contact"><i class="fas fa-phone"></i></a>
-    <a href="MediCore Pharmacy.html">medicore</div></a>
+  <div class="nav-center" id="homeNav">
+    <a href="store.html"> <i class="fa fa-shopping-bag desktop-only"></i></a>
+    <a href="about.html"><i class="fas fa-info-circle desktop-only"></i></a>
+    <a href="contact.html"><i class="fas fa-phone desktop-only"></i></a>
 
 
     <!--<input type="text" placeholder="Search products..." />-->
@@ -560,6 +554,16 @@ div.h3{text-align: center; color: rgb(233, 157, 17); font-size: 22px;
        <div class="product-card"><img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400&h=300&fit=crop" alt="Gas"></div>
        <p>Quick and reliable gas refilling service.</p>
        <a href="gas-refill.html"><button>Order Now</button></a>
+      </div>
+
+      
+      <div class="delivery-card i">
+       <i class="fa-solid fa-mortar-pestle"class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center
+        text-white font-bold text-xl shadow-lg shadow-blue-500/30"></i>
+       <h3>MediCore Pharmacy</h3>
+       <div class="product-card"><img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400&h=300&fit=crop" alt="Gas"></div>
+       <p>Quick and reliable gas refilling service.</p>
+       <a href="MediCore Pharmacy.html"><button>Order Now</button></a>
       </div>
     
   </div>
