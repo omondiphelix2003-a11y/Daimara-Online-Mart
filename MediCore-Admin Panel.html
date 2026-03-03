@@ -1,0 +1,1892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediCore Admin | Control Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #3b82f6;
+            --glass: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #020617;
+            color: #e2e8f0;
+        }
+        
+        .glass-panel {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+        }
+        
+        .sidebar-link {
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .sidebar-link:hover, .sidebar-link.active {
+            background: rgba(59, 130, 246, 0.1);
+            border-left-color: #3b82f6;
+            color: #3b82f6;
+        }
+        
+        .sidebar-link.active {
+            background: rgba(59, 130, 246, 0.15);
+        }
+        
+        .admin-card {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            border: 1px solid #334155;
+            transition: all 0.3s ease;
+        }
+        
+        .admin-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px -10px rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+        }
+        
+        .status-badge {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 3px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+        
+        .modal-enter {
+            animation: modalSlide 0.3s ease-out;
+        }
+        
+        @keyframes modalSlide {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .notification-toast {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .drag-ghost {
+            opacity: 0.5;
+            background: #3b82f6;
+        }
+        
+        .drag-over {
+            border: 2px dashed #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid #334155;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+        }
+        
+        .order-status-pending { background: #f59e0b; color: #000; }
+        .order-status-processing { background: #3b82f6; color: white; }
+        .order-status-completed { background: #10b981; color: white; }
+        .order-status-cancelled { background: #ef4444; color: white; }
+        
+        .chat-bubble {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .chat-bubble.admin {
+            background: #3b82f6;
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 2px;
+        }
+        
+        .chat-bubble.client {
+            background: #1e293b;
+            color: #e2e8f0;
+            border: 1px solid #334155;
+            margin-right: auto;
+            border-bottom-left-radius: 2px;
+        }
+        
+        .typing-indicator span {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: #94a3b8;
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out both;
+            margin: 0 2px;
+        }
+        
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+        
+        .image-preview {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border: 2px dashed #475569;
+        }
+        
+        .image-preview.has-image {
+            border-color: #3b82f6;
+            border-style: solid;
+        }
+    </style>
+<base target="_blank">
+</head>
+<body class="min-h-screen flex overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-slate-900 border-r border-slate-700 flex flex-col z-20">
+        <div class="p-6 border-b border-slate-800">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/30">
+                    <i class="fa-solid fa-mortar-pestle"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold text-white">MediCore</h1>
+                    <p class="text-xs text-slate-400">Admin Panel</p>
+                </div>
+            </div>
+        </div>
+        
+        <nav class="flex-1 overflow-y-auto py-4 custom-scrollbar">
+            <div class="px-4 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">Management</div>
+            <a href="#dashboard" class="sidebar-link active flex items-center gap-3 px-4 py-3 text-sm text-slate-300" onclick="showSection('dashboard')">
+                <i class="fa-solid fa-chart-line w-5"></i> Dashboard
+            </a>
+            <a href="#inventory" class="sidebar-link flex items-center gap-3 px-4 py-3 text-sm text-slate-300" onclick="showSection('inventory')">
+                <i class="fa-solid fa-boxes-stacked w-5"></i> Inventory & Shelves
+            </a>
+            <a href="#orders" class="sidebar-link flex items-center gap-3 px-4 py-3 text-sm text-slate-300" onclick="showSection('orders')">
+                <i class="fa-solid fa-cart-shopping w-5"></i> Orders
+                <span id="orderBadge" class="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full hidden">0</span>
+            </a>
+            <a href="#messages" class="sidebar-link flex items-center gap-3 px-4 py-3 text-sm text-slate-300" onclick="showSection('messages')">
+                <i class="fa-solid fa-comments w-5"></i> Client Messages
+                <span id="messageBadge" class="ml-auto bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full hidden">0</span>
+            </a>
+            
+            <div class="px-4 mt-6 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">Content</div>
+            <a href="#partners" class="sidebar-link flex items-center gap-3 px-4 py-3 text-sm text-slate-300" onclick="showSection('partners')">
+                <i class="fa-solid fa-handshake w-5"></i> Partners
+            </a>
+            <a href="#slideshow" class="sidebar-link flex items-center gap-3 px-4 py-3 text-sm text-slate-300" onclick="showSection('slideshow')">
+                <i class="fa-solid fa-images w-5"></i> Slideshow
+            </a>
+            <a href="#pharmacists" class="sidebar-link flex items-center gap-3 px-4 py-3 text-sm text-slate-300" onclick="showSection('pharmacists')">
+                <i class="fa-solid fa-user-doctor w-5"></i> Pharmacists
+            </a>
+            <a href="#branding" class="sidebar-link flex items-center gap-3 px-4 py-3 text-sm text-slate-300" onclick="showSection('branding')">
+                <i class="fa-solid fa-paint-brush w-5"></i> Branding
+            </a>
+            
+            <div class="px-4 mt-6 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">System</div>
+            <a href="#warehouse" class="sidebar-link flex items-center gap-3 px-4 py-3 text-sm text-slate-300" onclick="showSection('warehouse')">
+                <i class="fa-solid fa-warehouse w-5"></i> Warehouse View
+            </a>
+        </nav>
+        
+        <div class="p-4 border-t border-slate-800">
+            <div class="flex items-center gap-3 p-3 bg-slate-800 rounded-lg">
+                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop" class="w-10 h-10 rounded-full object-cover border-2 border-blue-500">
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-semibold text-white truncate">Admin User</p>
+                    <p class="text-xs text-slate-400">Super Admin</p>
+                </div>
+                <button onclick="logout()" class="text-slate-400 hover:text-red-400 transition-colors">
+                    <i class="fa-solid fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-hidden flex flex-col bg-slate-950">
+        <!-- Top Bar -->
+        <header class="h-16 bg-slate-900/50 border-b border-slate-800 flex items-center justify-between px-6 backdrop-blur-sm">
+            <h2 id="pageTitle" class="text-xl font-bold text-white">Dashboard</h2>
+            <div class="flex items-center gap-4">
+                <button onclick="refreshData()" class="p-2 text-slate-400 hover:text-blue-400 transition-colors" title="Refresh Data">
+                    <i class="fa-solid fa-rotate"></i>
+                </button>
+                <div class="relative">
+                    <button onclick="toggleNotifications()" class="p-2 text-slate-400 hover:text-white transition-colors relative">
+                        <i class="fa-solid fa-bell"></i>
+                        <span id="notifBadge" class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full hidden"></span>
+                    </button>
+                    <div id="notificationPanel" class="hidden absolute right-0 top-full mt-2 w-80 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl z-50 overflow-hidden">
+                        <div class="p-3 border-b border-slate-700 flex justify-between items-center">
+                            <span class="font-semibold text-sm">Notifications</span>
+                            <button onclick="clearAllNotifications()" class="text-xs text-blue-400 hover:text-blue-300">Clear All</button>
+                        </div>
+                        <div id="notificationList" class="max-h-64 overflow-y-auto custom-scrollbar">
+                            <p class="text-center text-slate-500 py-4 text-sm">No new notifications</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div id="contentArea" class="flex-1 overflow-y-auto custom-scrollbar p-6">
+            
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="stat-card relative rounded-xl p-6 overflow-hidden">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <p class="text-slate-400 text-sm">Total Products</p>
+                                <h3 id="statTotalProducts" class="text-3xl font-bold text-white mt-1">0</h3>
+                            </div>
+                            <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center text-blue-400">
+                                <i class="fa-solid fa-pills text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm">
+                            <span class="text-green-400"><i class="fa-solid fa-arrow-up"></i> 12%</span>
+                            <span class="text-slate-500">vs last month</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card relative rounded-xl p-6 overflow-hidden">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <p class="text-slate-400 text-sm">Pending Orders</p>
+                                <h3 id="statPendingOrders" class="text-3xl font-bold text-white mt-1">0</h3>
+                            </div>
+                            <div class="w-12 h-12 bg-amber-500/20 rounded-lg flex items-center justify-center text-amber-400">
+                                <i class="fa-solid fa-clock text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm">
+                            <span class="text-amber-400">Requires attention</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card relative rounded-xl p-6 overflow-hidden">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <p class="text-slate-400 text-sm">Active Chats</p>
+                                <h3 id="statActiveChats" class="text-3xl font-bold text-white mt-1">0</h3>
+                            </div>
+                            <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center text-green-400">
+                                <i class="fa-solid fa-comments text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm">
+                            <span class="text-green-400"><i class="fa-solid fa-circle text-xs"></i> Live</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card relative rounded-xl p-6 overflow-hidden">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <p class="text-slate-400 text-sm">Total Revenue</p>
+                                <h3 id="statRevenue" class="text-3xl font-bold text-white mt-1">KSh 0</h3>
+                            </div>
+                            <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center text-purple-400">
+                                <i class="fa-solid fa-wallet text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm">
+                            <span class="text-green-400"><i class="fa-solid fa-arrow-up"></i> 8%</span>
+                            <span class="text-slate-500">vs last month</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="admin-card rounded-xl p-6">
+                        <h3 class="text-lg font-bold text-white mb-4">Sales Overview</h3>
+                        <canvas id="salesChart" height="250"></canvas>
+                    </div>
+                    
+                    <div class="admin-card rounded-xl p-6">
+                        <h3 class="text-lg font-bold text-white mb-4">Inventory by Category</h3>
+                        <canvas id="inventoryChart" height="250"></canvas>
+                    </div>
+                </div>
+
+                <div class="admin-card rounded-xl p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-white">Recent Activity</h3>
+                        <button onclick="showSection('orders')" class="text-sm text-blue-400 hover:text-blue-300">View All</button>
+                    </div>
+                    <div id="recentActivity" class="space-y-3">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Inventory Section -->
+            <section id="inventory" class="hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <div class="flex gap-2">
+                        <button onclick="openDrugModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all">
+                            <i class="fa-solid fa-plus"></i> Add Drug
+                        </button>
+                        <button onclick="openShelfModal()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all">
+                            <i class="fa-solid fa-layer-group"></i> Manage Shelves
+                        </button>
+                    </div>
+                    <div class="relative">
+                        <input type="text" id="inventorySearch" placeholder="Search drugs..." 
+                            class="bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 pl-10 text-sm w-64 focus:outline-none focus:border-blue-500"
+                            onkeyup="searchInventory()">
+                        <i class="fa-solid fa-search absolute left-3 top-2.5 text-slate-500"></i>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    <div class="lg:col-span-1 space-y-3">
+                        <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Shelves</h3>
+                        <div id="shelfList" class="space-y-2">
+                            <!-- Shelves populated by JS -->
+                        </div>
+                    </div>
+                    
+                    <div class="lg:col-span-3">
+                        <div id="inventoryGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                            <!-- Drugs populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Orders Section -->
+            <section id="orders" class="hidden space-y-6">
+                <div class="flex flex-wrap gap-4 items-center justify-between">
+                    <div class="flex gap-2 bg-slate-800 p-1 rounded-lg">
+                        <button onclick="filterOrders('all')" class="order-filter active px-4 py-2 rounded-md text-sm transition-all bg-blue-600 text-white" data-filter="all">All</button>
+                        <button onclick="filterOrders('pending')" class="order-filter px-4 py-2 rounded-md text-sm transition-all text-slate-400 hover:text-white" data-filter="pending">Pending</button>
+                        <button onclick="filterOrders('processing')" class="order-filter px-4 py-2 rounded-md text-sm transition-all text-slate-400 hover:text-white" data-filter="processing">Processing</button>
+                        <button onclick="filterOrders('completed')" class="order-filter px-4 py-2 rounded-md text-sm transition-all text-slate-400 hover:text-white" data-filter="completed">Completed</button>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="exportOrders()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-download"></i> Export
+                        </button>
+                    </div>
+                </div>
+
+                <div class="admin-card rounded-xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-800 border-b border-slate-700">
+                                <tr>
+                                    <th class="px-6 py-4 text-sm font-semibold text-slate-400">Order ID</th>
+                                    <th class="px-6 py-4 text-sm font-semibold text-slate-400">Customer</th>
+                                    <th class="px-6 py-4 text-sm font-semibold text-slate-400">Items</th>
+                                    <th class="px-6 py-4 text-sm font-semibold text-slate-400">Total</th>
+                                    <th class="px-6 py-4 text-sm font-semibold text-slate-400">Status</th>
+                                    <th class="px-6 py-4 text-sm font-semibold text-slate-400">Date</th>
+                                    <th class="px-6 py-4 text-sm font-semibold text-slate-400">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ordersTable" class="divide-y divide-slate-700">
+                                <!-- Orders populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Messages Section -->
+            <section id="messages" class="hidden h-full">
+                <div class="flex h-[calc(100vh-140px)] gap-4">
+                    <div class="w-80 admin-card rounded-xl flex flex-col">
+                        <div class="p-4 border-b border-slate-700">
+                            <h3 class="font-bold text-white">Conversations</h3>
+                            <p class="text-xs text-slate-400 mt-1">Active client requests</p>
+                        </div>
+                        <div id="conversationList" class="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-2">
+                            <!-- Conversations populated by JS -->
+                        </div>
+                    </div>
+                    
+                    <div class="flex-1 admin-card rounded-xl flex flex-col">
+                        <div id="chatHeader" class="p-4 border-b border-slate-700 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center">
+                                    <i class="fa-solid fa-user text-slate-400"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-white">Select a conversation</h4>
+                                    <p class="text-xs text-slate-400">Choose from the list</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="chatMessages" class="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-3">
+                            <div class="text-center text-slate-500 mt-10">
+                                <i class="fa-solid fa-comments text-4xl mb-3 opacity-50"></i>
+                                <p>Select a conversation to start chatting</p>
+                            </div>
+                        </div>
+                        
+                        <div id="chatInputArea" class="p-4 border-t border-slate-700 hidden">
+                            <div class="flex gap-2">
+                                <input type="text" id="adminChatInput" placeholder="Type your message..." 
+                                    class="flex-1 bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500"
+                                    onkeypress="if(event.key==='Enter') sendAdminMessage()">
+                                <button onclick="sendAdminMessage()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg transition-all">
+                                    <i class="fa-solid fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Partners Section -->
+            <section id="partners" class="hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-bold text-white">Partner Organizations</h3>
+                    <button onclick="openPartnerModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i> Add Partner
+                    </button>
+                </div>
+                
+                <div id="partnersGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Partners populated by JS -->
+                </div>
+            </section>
+
+            <!-- Slideshow Section -->
+            <section id="slideshow" class="hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-bold text-white">Homepage Slideshow</h3>
+                    <button onclick="openSlideshowModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i> Add Slide
+                    </button>
+                </div>
+                
+                <div id="slideshowGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Slides populated by JS -->
+                </div>
+            </section>
+
+            <!-- Pharmacists Section -->
+            <section id="pharmacists" class="hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-bold text-white">Pharmacist Management</h3>
+                    <button onclick="openPharmacistModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i> Add Pharmacist
+                    </button>
+                </div>
+                
+                <div id="pharmacistsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Pharmacists populated by JS -->
+                </div>
+            </section>
+
+            <!-- Branding Section -->
+            <section id="branding" class="hidden space-y-6">
+                <div class="admin-card rounded-xl p-6 max-w-2xl">
+                    <h3 class="text-lg font-bold text-white mb-6">Brand Configuration</h3>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-400 mb-2">Logo Icon</label>
+                            <div class="flex items-center gap-4">
+                                <div id="logoPreview" class="w-16 h-16 bg-blue-600 rounded-lg flex items-center justify-center text-white text-2xl">
+                                    <i class="fa-solid fa-mortar-pestle"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <select id="logoIcon" onchange="updateLogoPreview()" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500">
+                                        <option value="fa-mortar-pestle">Mortar & Pestle</option>
+                                        <option value="fa-heart-pulse">Heart Pulse</option>
+                                        <option value="fa-user-doctor">Doctor</option>
+                                        <option value="fa-hospital">Hospital</option>
+                                        <option value="fa-capsules">Capsules</option>
+                                        <option value="fa-dna">DNA</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-slate-400 mb-2">Primary Color</label>
+                            <div class="flex gap-3">
+                                <button onclick="setBrandColor('blue')" class="w-10 h-10 rounded-full bg-blue-600 border-2 border-white ring-2 ring-blue-600"></button>
+                                <button onclick="setBrandColor('green')" class="w-10 h-10 rounded-full bg-green-600 border-2 border-transparent hover:border-white"></button>
+                                <button onclick="setBrandColor('purple')" class="w-10 h-10 rounded-full bg-purple-600 border-2 border-transparent hover:border-white"></button>
+                                <button onclick="setBrandColor('red')" class="w-10 h-10 rounded-full bg-red-600 border-2 border-transparent hover:border-white"></button>
+                                <button onclick="setBrandColor('orange')" class="w-10 h-10 rounded-full bg-orange-600 border-2 border-transparent hover:border-white"></button>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-slate-400 mb-2">Pharmacy Name</label>
+                            <input type="text" id="pharmacyName" value="MediCore Pharmacy" 
+                                class="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500">
+                        </div>
+                        
+                        <div class="pt-4 border-t border-slate-700">
+                            <button onclick="saveBranding()" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg transition-all">
+                                Save Changes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Warehouse Section -->
+            <section id="warehouse" class="hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-bold text-white">Warehouse Overview</h3>
+                    <div class="flex gap-2">
+                        <button onclick="printWarehouse()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-print"></i> Print
+                        </button>
+                        <button onclick="exportWarehouse()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-file-export"></i> Export CSV
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <div class="admin-card rounded-xl p-4 text-center">
+                        <p class="text-slate-400 text-sm">Total Items</p>
+                        <h4 id="warehouseTotal" class="text-2xl font-bold text-white mt-1">0</h4>
+                    </div>
+                    <div class="admin-card rounded-xl p-4 text-center">
+                        <p class="text-slate-400 text-sm">Low Stock Items</p>
+                        <h4 id="warehouseLowStock" class="text-2xl font-bold text-red-400 mt-1">0</h4>
+                    </div>
+                    <div class="admin-card rounded-xl p-4 text-center">
+                        <p class="text-slate-400 text-sm">Categories</p>
+                        <h4 id="warehouseCategories" class="text-2xl font-bold text-blue-400 mt-1">0</h4>
+                    </div>
+                    <div class="admin-card rounded-xl p-4 text-center">
+                        <p class="text-slate-400 text-sm">Inventory Value</p>
+                        <h4 id="warehouseValue" class="text-2xl font-bold text-green-400 mt-1">KSh 0</h4>
+                    </div>
+                </div>
+                
+                <div class="admin-card rounded-xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-800 border-b border-slate-700">
+                                <tr>
+                                    <th class="px-6 py-4 text-sm font-semibold text-slate-400">Shelf</th>
+                                    <th class="px-6 py-4 text-sm font-semibold text-slate-400">Product ID</th>
+                                    <th class="px-6 py-4 text-sm font-semibold text-slate-400">Name</th>
+                                    <th class="px-6 py-4 text-sm font-semibold text-slate-400">Type</th>
+                                    <th class="px-6 py-4 text-sm font-semibold text-slate-400">Stock</th>
+                                    <th class="px-6 py-4 text-sm font-semibold text-slate-400">Price</th>
+                                    <th class="px-6 py-4 text-sm font-semibold text-slate-400">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="warehouseTable" class="divide-y divide-slate-700">
+                                <!-- Warehouse items populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Modals -->
+    
+    <!-- Drug Modal -->
+    <div id="drugModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+        <div class="bg-slate-800 border border-slate-600 rounded-xl w-full max-w-lg mx-4 p-6 modal-enter max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-white" id="drugModalTitle">Add New Drug</h3>
+                <button onclick="closeDrugModal()" class="text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+            <form id="drugForm" class="space-y-4">
+                <input type="hidden" id="drugId">
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-1">Drug Name</label>
+                    <input type="text" id="drugName" required class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-1">Type</label>
+                        <select id="drugType" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500">
+                            <option value="Tablet">Tablet</option>
+                            <option value="Capsule">Capsule</option>
+                            <option value="Syrup">Syrup</option>
+                            <option value="Injection">Injection</option>
+                            <option value="Cream">Cream</option>
+                            <option value="Drops">Drops</option>
+                            <option value="Device">Device</option>
+                            <option value="Supply">Supply</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-1">Shelf</label>
+                        <select id="drugShelf" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500">
+                            <!-- Populated by JS -->
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-1">Price (KSh)</label>
+                        <input type="number" id="drugPrice" required min="0" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-1">Stock Quantity</label>
+                        <input type="number" id="drugStock" required min="0" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-1">Image URL</label>
+                    <input type="url" id="drugImage" placeholder="https://..." class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500">
+                    <p class="text-xs text-slate-500 mt-1">Leave empty for default image</p>
+                </div>
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="closeDrugModal()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-2 rounded-lg transition-all">Cancel</button>
+                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-2 rounded-lg transition-all">Save Drug</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Order Detail Modal -->
+    <div id="orderModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+        <div class="bg-slate-800 border border-slate-600 rounded-xl w-full max-w-2xl mx-4 p-6 modal-enter max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-white">Order Details</h3>
+                <button onclick="closeOrderModal()" class="text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+            <div id="orderDetailContent" class="space-y-4">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Partner Modal -->
+    <div id="partnerModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+        <div class="bg-slate-800 border border-slate-600 rounded-xl w-full max-w-md mx-4 p-6 modal-enter">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-white" id="partnerModalTitle">Add Partner</h3>
+                <button onclick="closePartnerModal()" class="text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+            <form id="partnerForm" class="space-y-4">
+                <input type="hidden" id="partnerId">
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-1">Organization Name</label>
+                    <input type="text" id="partnerName" required class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-1">Icon Class (FontAwesome)</label>
+                    <input type="text" id="partnerIcon" placeholder="fa-hospital" required class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="closePartnerModal()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-2 rounded-lg">Cancel</button>
+                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-2 rounded-lg">Save Partner</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Slideshow Modal -->
+    <div id="slideshowModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+        <div class="bg-slate-800 border border-slate-600 rounded-xl w-full max-w-lg mx-4 p-6 modal-enter">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-white" id="slideshowModalTitle">Add Slide</h3>
+                <button onclick="closeSlideshowModal()" class="text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+            <form id="slideshowForm" class="space-y-4">
+                <input type="hidden" id="slideId">
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-1">Image URL</label>
+                    <input type="url" id="slideImage" required class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-1">Title</label>
+                    <input type="text" id="slideTitle" required class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-1">Subtitle</label>
+                    <input type="text" id="slideSubtitle" required class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="closeSlideshowModal()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-2 rounded-lg">Cancel</button>
+                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-2 rounded-lg">Save Slide</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Pharmacist Modal -->
+    <div id="pharmacistModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+        <div class="bg-slate-800 border border-slate-600 rounded-xl w-full max-w-md mx-4 p-6 modal-enter">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-white" id="pharmacistModalTitle">Add Pharmacist</h3>
+                <button onclick="closePharmacistModal()" class="text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+            <form id="pharmacistForm" class="space-y-4">
+                <input type="hidden" id="pharmacistId">
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-1">Full Name</label>
+                    <input type="text" id="pharmacistName" required class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-1">Specialty</label>
+                    <input type="text" id="pharmacistSpecialty" required class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-1">Photo URL</label>
+                    <input type="url" id="pharmacistImage" required class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-1">Status</label>
+                    <select id="pharmacistStatus" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500">
+                        <option value="available">Available</option>
+                        <option value="busy">Busy</option>
+                    </select>
+                </div>
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="closePharmacistModal()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-2 rounded-lg">Cancel</button>
+                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-2 rounded-lg">Save Pharmacist</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Data Storage
+        let data = {
+            shelves: [
+                { id: 'S1', number: 1, name: 'Analgesics', description: 'Pain Relief & Fever Reducers', icon: 'fa-pills', color: 'blue' },
+                { id: 'S2', number: 2, name: 'Antibiotics', description: 'Bacterial Infection Treatments', icon: 'fa-capsules', color: 'red' },
+                { id: 'S3', number: 3, name: 'Pediatric', description: "Children's Medications", icon: 'fa-baby', color: 'green' },
+                { id: 'S4', number: 4, name: 'First Aid', description: 'Emergency Supplies', icon: 'fa-kit-medical', color: 'orange' },
+                { id: 'S5', number: 5, name: 'Vitamins', description: 'Supplements & Nutrition', icon: 'fa-apple-whole', color: 'purple' },
+                { id: 'S6', number: 6, name: 'Cardiac', description: 'Heart & Blood Pressure', icon: 'fa-heart-pulse', color: 'rose' },
+                { id: 'S7', number: 7, name: 'Diabetes Care', description: 'Blood Sugar Management', icon: 'fa-droplet', color: 'cyan' },
+                { id: 'S8', number: 8, name: 'Respiratory', description: 'Asthma & COPD', icon: 'fa-lungs', color: 'teal' }
+            ],
+            drugs: [
+                { id: 'S1-01', name: 'Paracetamol 500mg', type: 'Tablet', price: 550, stock: 120, shelfId: 'S1', image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=300&q=80' },
+                { id: 'S1-02', name: 'Ibuprofen 400mg', type: 'Tablet', price: 720, stock: 85, shelfId: 'S1', image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?w=300&q=80' },
+                { id: 'S2-01', name: 'Amoxicillin', type: 'Capsule', price: 1200, stock: 50, shelfId: 'S2', image: 'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=300&q=80' },
+                { id: 'S2-02', name: 'Ciprofloxacin', type: 'Tablet', price: 1550, stock: 40, shelfId: 'S2', image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=300&q=80' },
+                { id: 'S3-01', name: 'Cough Syrup', type: 'Syrup', price: 890, stock: 30, shelfId: 'S3', image: 'https://images.unsplash.com/photo-1583947581924-860bda6a26df?w=300&q=80' },
+                { id: 'S3-02', name: 'Vitamin C Drops', type: 'Liquid', price: 650, stock: 60, shelfId: 'S3', image: 'https://images.unsplash.com/photo-1550572017-edd951aa8f72?w=300&q=80' }
+            ],
+            partners: [
+                { id: 'P1', name: 'AAR HEALTHCARE', icon: 'fa-hospital' },
+                { id: 'P2', name: 'NAIROBI HOSPITAL', icon: 'fa-heart-pulse' },
+                { id: 'P3', name: 'MP SHAH HOSPITAL', icon: 'fa-user-doctor' },
+                { id: 'P4', name: 'AMREF HEALTH', icon: 'fa-truck-medical' }
+            ],
+            slideshow: [
+                { id: 'SL1', image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=1200&q=80', title: 'Regular Health Checkups', subtitle: 'Prevention is better than cure' },
+                { id: 'SL2', image: 'https://images.unsplash.com/photo-1585435557343-3b092031a831?w=1200&q=80', title: 'Take Medications on Time', subtitle: 'Consistency is key to recovery' },
+                { id: 'SL3', image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=1200&q=80', title: 'Stay Hydrated', subtitle: 'Drink at least 8 glasses daily' }
+            ],
+            pharmacists: [
+                { id: 'PH1', name: 'Dr. Sarah Chen', specialty: 'General Medicine', image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=300&q=80', isBusy: false },
+                { id: 'PH2', name: 'Dr. James Mwangi', specialty: 'Pediatrics', image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=300&q=80', isBusy: true },
+                { id: 'PH3', name: 'Dr. Emily Omondi', specialty: 'Pharmacy', image: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=300&q=80', isBusy: false }
+            ],
+            orders: [
+                { id: 'ORD-001', customer: 'John Doe', email: 'john@example.com', phone: '+254712345678', items: [{name: 'Paracetamol 500mg', qty: 2, price: 550}, {name: 'Ibuprofen 400mg', qty: 1, price: 720}], total: 1820, status: 'pending', date: '2024-01-15 14:30' },
+                { id: 'ORD-002', customer: 'Jane Smith', email: 'jane@example.com', phone: '+254723456789', items: [{name: 'Amoxicillin', qty: 1, price: 1200}], total: 1200, status: 'processing', date: '2024-01-15 16:45' },
+                { id: 'ORD-003', customer: 'Mike Johnson', email: 'mike@example.com', phone: '+254734567890', items: [{name: 'Cough Syrup', qty: 2, price: 890}, {name: 'Vitamin C Drops', qty: 1, price: 650}], total: 2430, status: 'completed', date: '2024-01-14 09:15' }
+            ],
+            conversations: [
+                { id: 'C1', client: 'Alice Brown', lastMessage: 'Do you have Amoxicillin in stock?', time: '2 min ago', unread: true, messages: [
+                    {sender: 'client', text: 'Hello, I need some medication', time: '10:00'},
+                    {sender: 'client', text: 'Do you have Amoxicillin in stock?', time: '10:05'}
+                ]},
+                { id: 'C2', client: 'Bob Wilson', lastMessage: 'Thank you for the help!', time: '1 hour ago', unread: false, messages: [
+                    {sender: 'client', text: 'I have a headache, what should I take?', time: '09:00'},
+                    {sender: 'admin', text: 'I recommend Paracetamol. Would you like me to add it to your cart?', time: '09:05'},
+                    {sender: 'client', text: 'Thank you for the help!', time: '09:10'}
+                ]}
+            ],
+            branding: {
+                logo: 'fa-mortar-pestle',
+                color: 'blue',
+                name: 'MediCore Pharmacy'
+            }
+        };
+
+        let currentSection = 'dashboard';
+        let selectedConversation = null;
+        let salesChartInstance = null;
+        let inventoryChartInstance = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            updateStats();
+            initCharts();
+            renderAll();
+            startRealtimeUpdates();
+        });
+
+        function loadData() {
+            const saved = localStorage.getItem('medicoreAdminData');
+            if (saved) {
+                data = JSON.parse(saved);
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('medicoreAdminData', JSON.stringify(data));
+        }
+
+        function showSection(section) {
+            // Hide all sections
+            document.querySelectorAll('main > div > section').forEach(s => s.classList.add('hidden'));
+            // Show selected
+            document.getElementById(section).classList.remove('hidden');
+            
+            // Update sidebar
+            document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+            event.target.closest('.sidebar-link').classList.add('active');
+            
+            // Update title
+            const titles = {
+                dashboard: 'Dashboard',
+                inventory: 'Inventory Management',
+                orders: 'Order Management',
+                messages: 'Client Messages',
+                partners: 'Partner Organizations',
+                slideshow: 'Slideshow Content',
+                pharmacists: 'Pharmacist Management',
+                branding: 'Brand Configuration',
+                warehouse: 'Warehouse Overview'
+            };
+            document.getElementById('pageTitle').textContent = titles[section];
+            currentSection = section;
+            
+            // Refresh data for section
+            if (section === 'inventory') renderInventory();
+            if (section === 'orders') renderOrders();
+            if (section === 'messages') renderConversations();
+            if (section === 'partners') renderPartners();
+            if (section === 'slideshow') renderSlideshow();
+            if (section === 'pharmacists') renderPharmacists();
+            if (section === 'warehouse') renderWarehouse();
+        }
+
+        function updateStats() {
+            const totalProducts = data.drugs.length;
+            const pendingOrders = data.orders.filter(o => o.status === 'pending').length;
+            const activeChats = data.conversations.filter(c => c.unread).length;
+            const revenue = data.orders.filter(o => o.status === 'completed').reduce((sum, o) => sum + o.total, 0);
+            
+            document.getElementById('statTotalProducts').textContent = totalProducts;
+            document.getElementById('statPendingOrders').textContent = pendingOrders;
+            document.getElementById('statActiveChats').textContent = activeChats;
+            document.getElementById('statRevenue').textContent = 'KSh ' + revenue.toLocaleString();
+            
+            // Badges
+            document.getElementById('orderBadge').classList.toggle('hidden', pendingOrders === 0);
+            document.getElementById('orderBadge').textContent = pendingOrders;
+            document.getElementById('messageBadge').classList.toggle('hidden', activeChats === 0);
+            document.getElementById('messageBadge').textContent = activeChats;
+        }
+
+        function initCharts() {
+            // Sales Chart
+            const salesCtx = document.getElementById('salesChart').getContext('2d');
+            salesChartInstance = new Chart(salesCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Sales (KSh)',
+                        data: [12500, 19000, 15000, 22000, 18000, 25000, 21000],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                    }
+                }
+            });
+
+            // Inventory Chart
+            const invCtx = document.getElementById('inventoryChart').getContext('2d');
+            const shelfCounts = data.shelves.map(s => data.drugs.filter(d => d.shelfId === s.id).length);
+            inventoryChartInstance = new Chart(invCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.shelves.map(s => s.name),
+                    datasets: [{
+                        data: shelfCounts,
+                        backgroundColor: ['#3b82f6', '#ef4444', '#22c55e', '#f97316', '#a855f7', '#f43f5e', '#06b6d4', '#14b8a6']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right', labels: { color: '#e2e8f0', font: { size: 11 } } }
+                    }
+                }
+            });
+        }
+
+        function renderAll() {
+            renderInventory();
+            renderOrders();
+            renderConversations();
+            renderPartners();
+            renderSlideshow();
+            renderPharmacists();
+            renderWarehouse();
+            renderRecentActivity();
+        }
+
+        // Inventory Functions
+        function renderInventory() {
+            const shelfList = document.getElementById('shelfList');
+            const inventoryGrid = document.getElementById('inventoryGrid');
+            
+            // Render shelves
+            shelfList.innerHTML = `
+                <div onclick="filterByShelf('all')" class="shelf-item cursor-pointer p-3 rounded-lg bg-blue-600/20 border border-blue-500/30 text-blue-400 hover:bg-blue-600/30 transition-all ${selectedShelf === 'all' ? 'bg-blue-600/40' : ''}" data-shelf="all">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-boxes"></i>
+                        <span class="font-medium">All Shelves</span>
+                        <span class="ml-auto text-xs bg-slate-800 px-2 py-1 rounded">${data.drugs.length}</span>
+                    </div>
+                </div>
+            `;
+            
+            data.shelves.forEach(shelf => {
+                const count = data.drugs.filter(d => d.shelfId === shelf.id).length;
+                shelfList.innerHTML += `
+                    <div onclick="filterByShelf('${shelf.id}')" class="shelf-item cursor-pointer p-3 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:border-blue-500 transition-all" data-shelf="${shelf.id}">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid ${shelf.icon} text-${shelf.color}-400"></i>
+                            <span class="font-medium">${shelf.name}</span>
+                            <span class="ml-auto text-xs bg-slate-900 px-2 py-1 rounded">${count}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // Render drugs
+            const filteredDrugs = selectedShelf === 'all' ? data.drugs : data.drugs.filter(d => d.shelfId === selectedShelf);
+            inventoryGrid.innerHTML = filteredDrugs.map(drug => {
+                const shelf = data.shelves.find(s => s.id === drug.shelfId);
+                return `
+                    <div class="admin-card rounded-lg p-4 group">
+                        <div class="flex gap-4">
+                            <img src="${drug.image}" class="w-20 h-20 rounded-lg object-cover bg-slate-800">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <span class="text-xs text-${shelf?.color || 'blue'}-400 font-medium">${shelf?.name || 'Unknown'}</span>
+                                        <h4 class="font-bold text-white truncate">${drug.name}</h4>
+                                        <p class="text-xs text-slate-400">${drug.type} • ID: ${drug.id}</p>
+                                    </div>
+                                    <div class="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                                        <button onclick="editDrug('${drug.id}')" class="p-1.5 text-blue-400 hover:bg-blue-400/20 rounded">
+                                            <i class="fa-solid fa-edit"></i>
+                                        </button>
+                                        <button onclick="deleteDrug('${drug.id}')" class="p-1.5 text-red-400 hover:bg-red-400/20 rounded">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between items-end mt-3">
+                                    <div>
+                                        <p class="text-lg font-bold text-blue-400">KSh ${drug.price.toLocaleString()}</p>
+                                        <p class="text-xs ${drug.stock < 20 ? 'text-red-400' : 'text-slate-400'}">
+                                            Stock: ${drug.stock} ${drug.stock < 20 ? '(Low!)' : ''}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Update shelf select in modal
+            const shelfSelect = document.getElementById('drugShelf');
+            if (shelfSelect) {
+                shelfSelect.innerHTML = data.shelves.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+            }
+        }
+
+        let selectedShelf = 'all';
+        function filterByShelf(shelfId) {
+            selectedShelf = shelfId;
+            document.querySelectorAll('.shelf-item').forEach(el => {
+                if (el.dataset.shelf === shelfId) {
+                    el.classList.add('bg-blue-600/40', 'border-blue-500/50');
+                    el.classList.remove('bg-slate-800', 'border-slate-700');
+                } else {
+                    el.classList.remove('bg-blue-600/40', 'border-blue-500/50');
+                    el.classList.add('bg-slate-800', 'border-slate-700');
+                }
+            });
+            renderInventory();
+        }
+
+        function searchInventory() {
+            const query = document.getElementById('inventorySearch').value.toLowerCase();
+            const filtered = data.drugs.filter(d => d.name.toLowerCase().includes(query) || d.id.toLowerCase().includes(query));
+            // Temporarily override render to show search results
+            const inventoryGrid = document.getElementById('inventoryGrid');
+            inventoryGrid.innerHTML = filtered.map(drug => {
+                const shelf = data.shelves.find(s => s.id === drug.shelfId);
+                return `
+                    <div class="admin-card rounded-lg p-4 group">
+                        <div class="flex gap-4">
+                            <img src="${drug.image}" class="w-20 h-20 rounded-lg object-cover bg-slate-800">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <span class="text-xs text-${shelf?.color || 'blue'}-400 font-medium">${shelf?.name || 'Unknown'}</span>
+                                        <h4 class="font-bold text-white truncate">${drug.name}</h4>
+                                        <p class="text-xs text-slate-400">${drug.type} • ID: ${drug.id}</p>
+                                    </div>
+                                    <div class="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                                        <button onclick="editDrug('${drug.id}')" class="p-1.5 text-blue-400 hover:bg-blue-400/20 rounded">
+                                            <i class="fa-solid fa-edit"></i>
+                                        </button>
+                                        <button onclick="deleteDrug('${drug.id}')" class="p-1.5 text-red-400 hover:bg-red-400/20 rounded">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between items-end mt-3">
+                                    <div>
+                                        <p class="text-lg font-bold text-blue-400">KSh ${drug.price.toLocaleString()}</p>
+                                        <p class="text-xs ${drug.stock < 20 ? 'text-red-400' : 'text-slate-400'}">
+                                            Stock: ${drug.stock} ${drug.stock < 20 ? '(Low!)' : ''}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openDrugModal(drugId = null) {
+            const modal = document.getElementById('drugModal');
+            const form = document.getElementById('drugForm');
+            const title = document.getElementById('drugModalTitle');
+            
+            if (drugId) {
+                const drug = data.drugs.find(d => d.id === drugId);
+                title.textContent = 'Edit Drug';
+                document.getElementById('drugId').value = drug.id;
+                document.getElementById('drugName').value = drug.name;
+                document.getElementById('drugType').value = drug.type;
+                document.getElementById('drugShelf').value = drug.shelfId;
+                document.getElementById('drugPrice').value = drug.price;
+                document.getElementById('drugStock').value = drug.stock;
+                document.getElementById('drugImage').value = drug.image;
+            } else {
+                title.textContent = 'Add New Drug';
+                form.reset();
+                document.getElementById('drugId').value = '';
+            }
+            
+            modal.classList.remove('hidden');
+        }
+
+        function closeDrugModal() {
+            document.getElementById('drugModal').classList.add('hidden');
+        }
+
+        document.getElementById('drugForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('drugId').value;
+            const drugData = {
+                id: id || generateId(),
+                name: document.getElementById('drugName').value,
+                type: document.getElementById('drugType').value,
+                shelfId: document.getElementById('drugShelf').value,
+                price: parseInt(document.getElementById('drugPrice').value),
+                stock: parseInt(document.getElementById('drugStock').value),
+                image: document.getElementById('drugImage').value || 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=300&q=80'
+            };
+            
+            if (id) {
+                const idx = data.drugs.findIndex(d => d.id === id);
+                data.drugs[idx] = drugData;
+            } else {
+                data.drugs.push(drugData);
+            }
+            
+            saveData();
+            renderInventory();
+            closeDrugModal();
+            showNotification(id ? 'Drug updated successfully' : 'Drug added successfully');
+        });
+
+        function editDrug(id) {
+            openDrugModal(id);
+        }
+
+        function deleteDrug(id) {
+            if (confirm('Are you sure you want to delete this drug?')) {
+                data.drugs = data.drugs.filter(d => d.id !== id);
+                saveData();
+                renderInventory();
+                showNotification('Drug deleted successfully');
+            }
+        }
+
+        function generateId() {
+            return 'D' + Date.now().toString(36).toUpperCase();
+        }
+
+        // Orders Functions
+        let currentOrderFilter = 'all';
+        
+        function renderOrders() {
+            const tbody = document.getElementById('ordersTable');
+            let filtered = data.orders;
+            if (currentOrderFilter !== 'all') {
+                filtered = data.orders.filter(o => o.status === currentOrderFilter);
+            }
+            
+            tbody.innerHTML = filtered.map(order => `
+                <tr class="hover:bg-slate-800/50 transition-colors">
+                    <td class="px-6 py-4 font-mono text-sm text-blue-400">${order.id}</td>
+                    <td class="px-6 py-4">
+                        <p class="font-medium text-white">${order.customer}</p>
+                        <p class="text-xs text-slate-400">${order.email}</p>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-slate-300">${order.items.length} items</td>
+                    <td class="px-6 py-4 font-bold text-white">KSh ${order.total.toLocaleString()}</td>
+                    <td class="px-6 py-4">
+                        <span class="px-3 py-1 rounded-full text-xs font-bold order-status-${order.status}">
+                            ${order.status.toUpperCase()}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-slate-400">${order.date}</td>
+                    <td class="px-6 py-4">
+                        <div class="flex gap-2">
+                            <button onclick="viewOrder('${order.id}')" class="p-2 text-blue-400 hover:bg-blue-400/20 rounded-lg transition-colors" title="View">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                            ${order.status === 'pending' ? `
+                                <button onclick="updateOrderStatus('${order.id}', 'processing')" class="p-2 text-amber-400 hover:bg-amber-400/20 rounded-lg transition-colors" title="Process">
+                                    <i class="fa-solid fa-play"></i>
+                                </button>
+                            ` : ''}
+                            ${order.status === 'processing' ? `
+                                <button onclick="updateOrderStatus('${order.id}', 'completed')" class="p-2 text-green-400 hover:bg-green-400/20 rounded-lg transition-colors" title="Complete">
+                                    <i class="fa-solid fa-check"></i>
+                                </button>
+                            ` : ''}
+                            ${order.status !== 'completed' && order.status !== 'cancelled' ? `
+                                <button onclick="updateOrderStatus('${order.id}', 'cancelled')" class="p-2 text-red-400 hover:bg-red-400/20 rounded-lg transition-colors" title="Cancel">
+                                    <i class="fa-solid fa-times"></i>
+                                </button>
+                            ` : ''}
+                            <button onclick="deleteOrder('${order.id}')" class="p-2 text-slate-400 hover:text-red-400 hover:bg-red-400/20 rounded-lg transition-colors" title="Delete">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function filterOrders(status) {
+            currentOrderFilter = status;
+            document.querySelectorAll('.order-filter').forEach(btn => {
+                if (btn.dataset.filter === status) {
+                    btn.classList.add('bg-blue-600', 'text-white');
+                    btn.classList.remove('text-slate-400');
+                } else {
+                    btn.classList.remove('bg-blue-600', 'text-white');
+                    btn.classList.add('text-slate-400');
+                }
+            });
+            renderOrders();
+        }
+
+        function viewOrder(id) {
+            const order = data.orders.find(o => o.id === id);
+            const content = document.getElementById('orderDetailContent');
+            content.innerHTML = `
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="bg-slate-900 p-4 rounded-lg">
+                        <p class="text-xs text-slate-400 mb-1">Order ID</p>
+                        <p class="font-mono text-blue-400">${order.id}</p>
+                    </div>
+                    <div class="bg-slate-900 p-4 rounded-lg">
+                        <p class="text-xs text-slate-400 mb-1">Date</p>
+                        <p class="text-white">${order.date}</p>
+                    </div>
+                </div>
+                <div class="bg-slate-900 p-4 rounded-lg mb-4">
+                    <p class="text-xs text-slate-400 mb-2">Customer Information</p>
+                    <p class="font-bold text-white">${order.customer}</p>
+                    <p class="text-sm text-slate-300">${order.email}</p>
+                    <p class="text-sm text-slate-300">${order.phone}</p>
+                </div>
+                <div class="bg-slate-900 p-4 rounded-lg mb-4">
+                    <p class="text-xs text-slate-400 mb-2">Order Items</p>
+                    <div class="space-y-2">
+                        ${order.items.map(item => `
+                            <div class="flex justify-between items-center py-2 border-b border-slate-800 last:border-0">
+                                <div>
+                                    <p class="text-white">${item.name}</p>
+                                    <p class="text-xs text-slate-400">Qty: ${item.qty}</p>
+                                </div>
+                                <p class="text-blue-400">KSh ${(item.price * item.qty).toLocaleString()}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-slate-700 flex justify-between items-center">
+                        <span class="font-bold text-white">Total</span>
+                        <span class="text-xl font-bold text-green-400">KSh ${order.total.toLocaleString()}</span>
+                    </div>
+                </div>
+                <div class="flex gap-3">
+                    ${order.status === 'pending' ? `
+                        <button onclick="updateOrderStatus('${order.id}', 'processing'); closeOrderModal()" class="flex-1 bg-amber-600 hover:bg-amber-500 text-white py-2 rounded-lg">Process Order</button>
+                    ` : ''}
+                    ${order.status === 'processing' ? `
+                        <button onclick="updateOrderStatus('${order.id}', 'completed'); closeOrderModal()" class="flex-1 bg-green-600 hover:bg-green-500 text-white py-2 rounded-lg">Complete Order</button>
+                    ` : ''}
+                    <button onclick="closeOrderModal()" class="px-6 bg-slate-700 hover:bg-slate-600 text-white py-2 rounded-lg">Close</button>
+                </div>
+            `;
+            document.getElementById('orderModal').classList.remove('hidden');
+        }
+
+        function closeOrderModal() {
+            document.getElementById('orderModal').classList.add('hidden');
+        }
+
+        function updateOrderStatus(id, status) {
+            const order = data.orders.find(o => o.id === id);
+            order.status = status;
+            saveData();
+            renderOrders();
+            updateStats();
+            showNotification(`Order ${id} marked as ${status}`);
+        }
+
+        function deleteOrder(id) {
+            if (confirm('Are you sure you want to delete this order?')) {
+                data.orders = data.orders.filter(o => o.id !== id);
+                saveData();
+                renderOrders();
+                updateStats();
+                showNotification('Order deleted');
+            }
+        }
+
+        function exportOrders() {
+            const csv = data.orders.map(o => `${o.id},${o.customer},${o.total},${o.status},${o.date}`).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'orders.csv';
+            a.click();
+        }
+
+        // Messages Functions
+        function renderConversations() {
+            const list = document.getElementById('conversationList');
+            list.innerHTML = data.conversations.map(conv => `
+                <div onclick="openConversation('${conv.id}')" class="cursor-pointer p-3 rounded-lg ${selectedConversation === conv.id ? 'bg-blue-600/20 border border-blue-500/30' : 'bg-slate-800 border border-slate-700 hover:border-slate-600'} transition-all">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center">
+                            <i class="fa-solid fa-user text-slate-400"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex justify-between items-center">
+                                <h4 class="font-medium text-white truncate">${conv.client}</h4>
+                                ${conv.unread ? '<span class="w-2 h-2 bg-blue-500 rounded-full"></span>' : ''}
+                            </div>
+                            <p class="text-xs text-slate-400 truncate">${conv.lastMessage}</p>
+                            <p class="text-xs text-slate-500 mt-1">${conv.time}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openConversation(id) {
+            selectedConversation = id;
+            const conv = data.conversations.find(c => c.id === id);
+            conv.unread = false;
+            saveData();
+            renderConversations();
+            updateStats();
+            
+            document.getElementById('chatHeader').innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center">
+                        <i class="fa-solid fa-user text-slate-400"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-white">${conv.client}</h4>
+                        <p class="text-xs text-green-400 flex items-center gap-1">
+                            <span class="w-2 h-2 bg-green-500 rounded-full"></span> Online
+                        </p>
+                    </div>
+                </div>
+                <button onclick="closeConversation()" class="text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-times"></i>
+                </button>
+            `;
+            
+            renderMessages(conv);
+            document.getElementById('chatInputArea').classList.remove('hidden');
+        }
+
+        function renderMessages(conv) {
+            const container = document.getElementById('chatMessages');
+            container.innerHTML = conv.messages.map(msg => `
+                <div class="chat-bubble ${msg.sender}">
+                    <p>${msg.text}</p>
+                    <p class="text-xs opacity-70 mt-1">${msg.time}</p>
+                </div>
+            `).join('');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function sendAdminMessage() {
+            const input = document.getElementById('adminChatInput');
+            const text = input.value.trim();
+            if (!text || !selectedConversation) return;
+            
+            const conv = data.conversations.find(c => c.id === selectedConversation);
+            const now = new Date();
+            const time = now.getHours() + ':' + String(now.getMinutes()).padStart(2, '0');
+            
+            conv.messages.push({ sender: 'admin', text, time });
+            conv.lastMessage = text;
+            conv.time = 'Just now';
+            
+            saveData();
+            renderMessages(conv);
+            renderConversations();
+            input.value = '';
+            
+            // Simulate reply
+            setTimeout(() => {
+                const replies = ['Thank you!', 'I understand.', 'Could you clarify that?', 'I appreciate your help.'];
+                const reply = replies[Math.floor(Math.random() * replies.length)];
+                conv.messages.push({ sender: 'client', text: reply, time: time });
+                conv.lastMessage = reply;
+                renderMessages(conv);
+                renderConversations();
+                saveData();
+            }, 3000);
+        }
+
+        function closeConversation() {
+            selectedConversation = null;
+            document.getElementById('chatHeader').innerHTML = `
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center">
+                        <i class="fa-solid fa-user text-slate-400"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-white">Select a conversation</h4>
+                        <p class="text-xs text-slate-400">Choose from the list</p>
+                    </div>
+                </div>
+            `;
+            document.getElementById('chatMessages').innerHTML = `
+                <div class="text-center text-slate-500 mt-10">
+                    <i class="fa-solid fa-comments text-4xl mb-3 opacity-50"></i>
+                    <p>Select a conversation to start chatting</p>
+                </div>
+            `;
+            document.getElementById('chatInputArea').classList.add('hidden');
+            renderConversations();
+        }
+
+        // Partners Functions
+        function renderPartners() {
+            const grid = document.getElementById('partnersGrid');
+            grid.innerHTML = data.partners.map(p => `
+                <div class="admin-card rounded-xl p-6 flex items-center justify-between group">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 bg-slate-800 rounded-lg flex items-center justify-center text-3xl text-slate-400">
+                            <i class="fa-solid ${p.icon}"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-white">${p.name}</h4>
+                            <p class="text-xs text-slate-400">Partner since 2023</p>
+                        </div>
+                    </div>
+                    <div class="opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                        <button onclick="editPartner('${p.id}')" class="p-2 text-blue-400 hover:bg-blue-400/20 rounded-lg">
+                            <i class="fa-solid fa-edit"></i>
+                        </button>
+                        <button onclick="deletePartner('${p.id}')" class="p-2 text-red-400 hover:bg-red-400/20 rounded-lg">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openPartnerModal(id = null) {
+            const modal = document.getElementById('partnerModal');
+            if (id) {
+                const p = data.partners.find(x => x.id === id);
+                document.getElementById('partnerId').value = p.id;
+                document.getElementById('partnerName').value = p.name;
+                document.getElementById('partnerIcon').value = p.icon;
+                document.getElementById('partnerModalTitle').textContent = 'Edit Partner';
+            } else {
+                document.getElementById('partnerForm').reset();
+                document.getElementById('partnerId').value = '';
+                document.getElementById('partnerModalTitle').textContent = 'Add Partner';
+            }
+            modal.classList.remove('hidden');
+        }
+
+        function closePartnerModal() {
+            document.getElementById('partnerModal').classList.add('hidden');
+        }
+
+        document.getElementById('partnerForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('partnerId').value;
+            const partner = {
+                id: id || 'P' + Date.now(),
+                name: document.getElementById('partnerName').value,
+                icon: document.getElementById('partnerIcon').value
+            };
+            
+            if (id) {
+                const idx = data.partners.findIndex(p => p.id === id);
+                data.partners[idx] = partner;
+            } else {
+                data.partners.push(partner);
+            }
+            
+            saveData();
+            renderPartners();
+            closePartnerModal();
+            showNotification(id ? 'Partner updated' : 'Partner added');
+        });
+
+        function editPartner(id) { openPartnerModal(id); }
+        function deletePartner(id) {
+            if (confirm('Delete this partner?')) {
+                data.partners = data.partners.filter(p => p.id !== id);
+                saveData();
+                renderPartners();
+            }
+        }
+
+        // Slideshow Functions
+        function renderSlideshow() {
+            const grid = document.getElementById('slideshowGrid');
+            grid.innerHTML = data.slideshow.map((slide, idx) => `
+                <div class="admin-card rounded-xl overflow-hidden group relative">
+                    <img src="${slide.image}" class="w-full h-48 object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-4">
+                        <h4 class="font-bold text-white">${slide.title}</h4>
+                        <p class="text-sm text-slate-300">${slide.subtitle}</p>
+                    </div>
+                    <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                        <button onclick="editSlideshow('${slide.id}')" class="p-2 bg-slate-800 text-blue-400 rounded-lg">
+                            <i class="fa-solid fa-edit"></i>
+                        </button>
+                        <button onclick="deleteSlideshow('${slide.id}')" class="p-2 bg-slate-800 text-red-400 rounded-lg">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
+                        Slide ${idx + 1}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openSlideshowModal(id = null) {
+            const modal = document.getElementById('slideshowModal');
+            if (id) {
+                const s = data.slideshow.find(x => x.id === id);
+                document.getElementById('slideId').value = s.id;
+                document.getElementById('slideImage').value = s.image;
+                document.getElementById('slideTitle').value = s.title;
+                document.getElementById('slideSubtitle').value = s.subtitle;
+                document.getElementById('slideshowModalTitle').textContent = 'Edit Slide';
+            } else {
+                document.getElementById('slideshowForm').reset();
+                document.getElementById('slideId').value = '';
+                document.getElementById('slideshowModalTitle').textContent = 'Add Slide';
+            }
+            modal.classList.remove('hidden');
+        }
+
+        function closeSlideshowModal() {
+            document.getElementById('slideshowModal').classList.add('hidden');
+        }
+
+        document.getElementById('slideshowForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('slideId').value;
+            const slide = {
+                id: id || 'SL' + Date.now(),
+                image: document.getElementById('slideImage').value,
+                title: document.getElementById('slideTitle').value,
+                subtitle: document.getElementById('slideSubtitle').value
+            };
+            
+            if (id) {
+                const idx = data.slideshow.findIndex(s => s.id === id);
+                data.slideshow[idx] = slide;
+            } else {
+                data.slideshow.push(slide);
+            }
+            
+            saveData();
+            renderSlideshow();
+            closeSlideshowModal();
+            showNotification(id ? 'Slide updated' : 'Slide added');
+        });
+
+        function editSlideshow(id) { openSlideshowModal(id); }
+        function deleteSlideshow(id) {
+            if (confirm('Delete this slide?')) {
+                data.slideshow = data.slideshow.filter(s => s.id !== id);
+                saveData();
+                renderSlideshow();
+            }
+        }
+
+        // Pharmacists Functions
+        function renderPharmacists() {
+            const grid = document.getElementById('pharmacistsGrid');
+            grid.innerHTML = data.pharmacists.map(p => `
+                <div class="admin-card rounded-xl p-6">
+                    <div class="flex items-start justify-between mb-4">
+                        <img src="${p.image}" class="w-16 h-16 rounded-full object-cover border-2 ${p.isBusy ? 'border-red-500' : 'border-green-500'}">
+                        <div class="flex gap-2">
+                            <button onclick="editPharmacist('${p.id}')" class="p-2 text-blue-400 hover:bg-blue-400/20 rounded-lg">
+                                <i class="fa-solid fa-edit"></i>
+                            </button>
+                            <button onclick="deletePharmacist('${p.id}')" class="p-2 text-red-400 hover:bg-red-400/20 rounded-lg">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <h4 class="font-bold text-white">${p.name}</h4>
+                    <p class="text-sm text-slate-400">${p.specialty}</p>
+                    <div class="mt-3 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full ${p.isBusy ? 'bg-red-500' : 'bg-green-500'}"></span>
+                        <span class="text-xs ${p.isBusy ? 'text-red-400' : 'text-green-400'}">
+                            ${p.isBusy ? 'Busy' : 'Available'}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openPharmacistModal(id = null) {
+            const modal = document.getElementById('pharmacistModal');
+            if (id) {
+                const p = data.pharmacists.find(x => x.id === id);
+                document.getElementById('pharmacistId').value = p.id;
+                document.getElementById('pharmacistName').value = p.name;
+                document.getElementById('pharmacistSpecialty').value = p.specialty;
+                document.getElementById('pharmacistImage').value = p.image;
+                document.getElementById('pharmacistStatus').value = p.isBusy ? 'busy' : 'available';
+                document.getElementById('pharmacistModalTitle').textContent = 'Edit Pharmacist';
+            } else {
+                document.getElementById('pharmacistForm').reset();
+                document.getElementById('pharmacistId').value = '';
+                document.getElementById('pharmacistModalTitle').textContent = 'Add Pharmacist';
+            }
+            modal.classList.remove('hidden');
+        }
+
+        function closePharmacistModal() {
+            document.getElementById('pharmacistModal').classList.add('hidden');
+        }
+
+        document.getElementById('pharmacistForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('pharmacistId').value;
+            const pharmacist = {
+                id: id || 'PH' + Date.now(),
+                name: document.getElementById('pharmacistName').value,
+                specialty: document.getElementById('pharmacistSpecialty').value,
+                image: document.getElementById('pharmacistImage').value,
+                isBusy: document.getElementById('pharmacistStatus').value === 'busy'
+            };
+            
+            if (id) {
+                const idx = data.pharmacists.findIndex(p => p.id === id);
+                data.pharmacists[idx] = pharmacist;
+            } else {
+                data.pharmacists.push(pharmacist);
+            }
+            
+            saveData();
+            renderPharmacists();
+            closePharmacistModal();
+            showNotification(id ? 'Pharmacist updated' : 'Pharmacist added');
+        });
+
+        function editPharmacist(id) { openPharmacistModal(id); }
+        function deletePharmacist(id) {
+            if (confirm('Delete this pharmacist?')) {
+                data.pharmacists = data.pharmacists.filter(p => p.id !== id);
+                saveData();
+                renderPharmacists();
+            }
+        }
+
+        // Branding Functions
+        function updateLogoPreview() {
+            const icon = document.getElementById('logoIcon').value;
+            document.getElementById('logoPreview').innerHTML = `<i class="fa-solid ${icon}"></i>`;
+        }
+
+        function setBrandColor(color) {
+            data.branding.color = color;
+            document.querySelectorAll('[onclick^="setBrandColor"]').forEach(btn => {
+                btn.classList.remove('ring-2', 'ring-offset-2', 'ring-offset-slate-800');
+                if (btn.getAttribute('onclick').includes(color)) {
+                    btn.classList.add('ring-2', 'ring-offset-2', 'ring-offset-slate-800');
+                }
+            });
+        }
+
+        function saveBranding() {
+            data.branding.logo = document.getElementById('logoIcon').value;
+            data.branding.name = document.getElementById('pharmacyName').value;
+            saveData();
+            showNotification('Branding saved successfully');
+        }
+
+        // Warehouse Functions
+        function renderWarehouse() {
+            const tbody = document.getElementById('warehouseTable');
+            let allItems = [];
+            data.shelves.forEach(shelf => {
+                const items = data.drugs.filter(d => d.shelfId === shelf.id);
+                items.forEach(item => {
+                    allItems.push({ ...item, shelfName: shelf.name, shelfNumber: shelf.number });
+                });
+            });
+            
+            // Sort by shelf number
+            allItems.sort((a, b) => a.shelfNumber - b.shelfNumber);
+            
+            // Update stats
+            document.getElementById('warehouseTotal').textContent = allItems.length;
+            document.getElementById('warehouseLowStock').textContent = allItems.filter(i => i.stock < 20).length;
+            document.getElementById('warehouseCategories').textContent = data.shelves.length;
+            document.getElementById('warehouseValue').textContent = 'KSh ' + allItems.reduce((sum, i) => sum + (i.price * i.stock), 0).toLocaleString();
+            
+            tbody.innerHTML = allItems.map(item => `
+                <tr class="hover:bg-slate-800/50">
+                    <td class="px-6 py-4 font-medium text-white">Shelf ${item.shelfNumber}</td>
+                    <td class="px-6 py-4 font-mono text-sm text-slate-400">${item.id}</td>
+                    <td class="px-6 py-4 text-white">${item.name}</td>
+                    <td class="px-6 py-4 text-slate-400">${item.type}</td>
+                    <td class="px-6 py-4">
+                        <span class="${item.stock < 20 ? 'text-red-400 font-bold' : 'text-slate-300'}">${item.stock}</span>
+                    </td>
+                    <td class="px-6 py-4 text-blue-400">KSh ${item.price.toLocaleString()}</td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 rounded text-xs ${item.stock < 20 ? 'bg-red-500/20 text-red-400' : item.stock < 50 ? 'bg-amber-500/20 text-amber-400' : 'bg-green-500/20 text-green-400'}">
+                            ${item.stock < 20 ? 'Critical' : item.stock < 50 ? 'Low' : 'Good'}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function printWarehouse() {
+            window.print();
+        }
+
+        function exportWarehouse() {
+            let csv = 'Shelf,ID,Name,Type,Stock,Price,Status\n';
+            data.shelves.forEach(shelf => {
+                data.drugs.filter(d => d.shelfId === shelf.id).forEach(drug => {
+                    const status = drug.stock < 20 ? 'Critical' : drug.stock < 50 ? 'Low' : 'Good';
+                    csv += `${shelf.name},${drug.id},${drug.name},${drug.type},${drug.stock},${drug.price},${status}\n`;
+                });
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'warehouse_inventory.csv';
+            a.click();
+        }
+
+        // Utility Functions
+        function showNotification(message) {
+            const notif = document.createElement('div');
+            notif.className = 'notification-toast fixed bottom-4 right-4 bg-slate-800 border border-blue-500/50 text-white px-6 py-3 rounded-lg shadow-2xl z-50 flex items-center gap-3';
+            notif.innerHTML = `<i class="fa-solid fa-check-circle text-blue-400"></i> ${message}`;
+            document.body.appendChild(notif);
+            setTimeout(() => notif.remove(), 3000);
+        }
+
+        function toggleNotifications() {
+            const panel = document.getElementById('notificationPanel');
+            panel.classList.toggle('hidden');
+        }
+
+        function clearAllNotifications() {
+            document.getElementById('notificationList').innerHTML = '<p class="text-center text-slate-500 py-4 text-sm">No new notifications</p>';
+            document.getElementById('notifBadge').classList.add('hidden');
+        }
+
+        function refreshData() {
+            renderAll();
+            updateStats();
+            showNotification('Data refreshed');
+        }
+
+        function renderRecentActivity() {
+            const container = document.getElementById('recentActivity');
+            const recent = data.orders.slice(0, 5);
+            container.innerHTML = recent.map(order => `
+                <div class="flex items-center gap-4 p-3 bg-slate-800/50 rounded-lg">
+                    <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center">
+                        <i class="fa-solid fa-shopping-bag text-slate-400"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm font-medium text-white">New order from ${order.customer}</p>
+                        <p class="text-xs text-slate-400">${order.date}</p>
+                    </div>
+                    <span class="text-sm font-bold text-blue-400">KSh ${order.total.toLocaleString()}</span>
+                </div>
+            `).join('');
+        }
+
+        function startRealtimeUpdates() {
+            // Simulate incoming orders
+            setInterval(() => {
+                if (Math.random() > 0.7) {
+                    const newOrder = {
+                        id: 'ORD-' + String(Date.now()).slice(-6),
+                        customer: 'New Customer ' + Math.floor(Math.random() * 100),
+                        email: 'customer@example.com',
+                        phone: '+2547' + Math.floor(Math.random() * 100000000),
+                        items: [{name: 'Random Drug', qty: 1, price: Math.floor(Math.random() * 1000)}],
+                        total: Math.floor(Math.random() * 2000),
+                        status: 'pending',
+                        date: new Date().toLocaleString()
+                    };
+                    data.orders.unshift(newOrder);
+                    saveData();
+                    updateStats();
+                    if (currentSection === 'orders') renderOrders();
+                    if (currentSection === 'dashboard') renderRecentActivity();
+                    
+                    // Show notification
+                    document.getElementById('notifBadge').classList.remove('hidden');
+                    const list = document.getElementById('notificationList');
+                    if (list.querySelector('p')) list.innerHTML = '';
+                    list.insertAdjacentHTML('afterbegin', `
+                        <div class="p-3 border-b border-slate-700 hover:bg-slate-700/50 cursor-pointer">
+                            <p class="text-sm text-white">New order received</p>
+                            <p class="text-xs text-slate-400">${newOrder.id} - KSh ${newOrder.total.toLocaleString()}</p>
+                        </div>
+                    `);
+                }
+            }, 30000); // Every 30 seconds
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                location.reload();
+            }
+        }
+
+        // Close modals on escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('[id$="Modal"]').forEach(m => m.classList.add('hidden'));
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediCore Pharmacy Network</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+
+        :root {
+            --primary: #0f172a;
+            --accent: #3b82f6;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+
+        .shelf-scroll::-webkit-scrollbar { height: 6px; }
+        .shelf-scroll::-webkit-scrollbar-track { background: #1e293b; border-radius: 3px; }
+        .shelf-scroll::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+        .shelf-scroll::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 15px rgba(59, 130, 246, 0.2); }
+            50% { box-shadow: 0 0 25px rgba(59, 130, 246, 0.6); }
+        }
+
+        @keyframes vibrate {
+            0%, 100% { transform: translate(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translate(-2px, 0); }
+            20%, 40%, 60%, 80% { transform: translate(2px, 0); }
+        }
+
+        @keyframes ring-pulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        @keyframes scroll-left {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .partners-track {
+            animation: scroll-left 30s linear infinite;
+            width: max-content;
+        }
+
+        .partners-container {
+            overflow: hidden;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .partners-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .glass-panel {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+        }
+
+        .shelf-container {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+        }
+        .shelf-container:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+            border-color: var(--accent);
+        }
+
+        .shelf-number {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            border: 3px solid #0f172a;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+            z-index: 10;
+        }
+
+        .pharmacist-card {
+            transition: all 0.3s ease;
+        }
+        .pharmacist-card:hover:not(.disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px -5px rgba(0,0,0,0.3);
+        }
+        .pharmacist-card.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .status-badge {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 3px solid #1e293b;
+        }
+        .status-badge.online { background: #22c55e; }
+        .status-badge.busy { background: #ef4444; }
+
+        .vibrating-icon {
+            animation: vibrate 0.3s linear infinite;
+        }
+
+        .ring-animation {
+            position: absolute;
+            border-radius: 50%;
+            border: 3px solid #3b82f6;
+            animation: ring-pulse 1.5s ease-out infinite;
+        }
+
+        .modal {
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .modal.visible {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .drug-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        @media (max-width: 640px) {
+            .drug-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+        }
+
+        .chat-bubble {
+            position: relative;
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            animation: fadeIn 0.3s ease-out;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+        .chat-bubble.user {
+            background: var(--accent);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 2px;
+        }
+        .chat-bubble.bot {
+            background: #1e293b;
+            color: #e2e8f0;
+            border: 1px solid #334155;
+            margin-right: auto;
+            border-bottom-left-radius: 2px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .typing-indicator span {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background-color: #94a3b8;
+            border-radius: 50%;
+            animation: typing-bounce 1.4s infinite ease-in-out both;
+            margin: 0 2px;
+        }
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes typing-bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        .slide {
+            display: none;
+            animation: fadeEffect 1s;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes fadeEffect {
+            from { opacity: 0.4; }
+            to { opacity: 1; }
+        }
+
+        .slide-dot {
+            height: 10px;
+            width: 10px;
+            margin: 0 5px;
+            background-color: #475569;
+            border-radius: 50%;
+            display: inline-block;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .slide-dot.active {
+            background-color: #3b82f6;
+        }
+
+        .random-drugs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .random-drugs-grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 1rem;
+            }
+        }
+
+        .drug-card {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            border: 1px solid #334155;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .drug-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px -15px rgba(59, 130, 246, 0.3);
+            border-color: #3b82f6;
+        }
+
+        /* Video Ad Section */
+        .video-ad-container {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 2px solid #3b82f6;
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .video-ad-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            z-index: 10;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .video-placeholder {
+            aspect-ratio: 16/9;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .video-placeholder::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="%233b82f6" stroke-width="0.5" opacity="0.3"/><circle cx="50" cy="50" r="30" fill="none" stroke="%233b82f6" stroke-width="0.5" opacity="0.2"/><circle cx="50" cy="50" r="20" fill="none" stroke="%233b82f6" stroke-width="0.5" opacity="0.1"/></svg>') center/200px repeat;
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .play-button {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.5);
+            position: relative;
+            z-index: 5;
+        }
+
+        .play-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(59, 130, 246, 0.7);
+        }
+
+        .play-button i {
+            font-size: 28px;
+            color: white;
+            margin-left: 4px;
+        }
+
+        .video-progress {
+            height: 4px;
+            background: #334155;
+            position: relative;
+        }
+
+        .video-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #60a5fa);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .shelf-category-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(15, 23, 42, 0.9);
+            color: #3b82f6;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            border: 1px solid #3b82f6;
+        }
+    </style>
+<base target="_blank">
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Partners Marquee -->
+    <div class="partners-container bg-slate-900/80 border-b border-slate-700 py-4">
+        <div class="partners-track flex items-center gap-16">
+            <div class="flex items-center gap-16">
+                <div class="flex items-center gap-3 text-slate-400 opacity-60">
+                    <i class="fa-solid fa-hospital text-3xl"></i>
+                    <span class="font-bold text-lg tracking-wider">AAR HEALTHCARE</span>
+                </div>
+                <div class="flex items-center gap-3 text-slate-400 opacity-60">
+                    <i class="fa-solid fa-heart-pulse text-3xl"></i>
+                    <span class="font-bold text-lg tracking-wider">NAIROBI HOSPITAL</span>
+                </div>
+                <div class="flex items-center gap-3 text-slate-400 opacity-60">
+                    <i class="fa-solid fa-user-doctor text-3xl"></i>
+                    <span class="font-bold text-lg tracking-wider">MP SHAH HOSPITAL</span>
+                </div>
+                <div class="flex items-center gap-3 text-slate-400 opacity-60">
+                    <i class="fa-solid fa-truck-medical text-3xl"></i>
+                    <span class="font-bold text-lg tracking-wider">AMREF HEALTH</span>
+                </div>
+                <div class="flex items-center gap-3 text-slate-400 opacity-60">
+                    <i class="fa-solid fa-pills text-3xl"></i>
+                    <span class="font-bold text-lg tracking-wider">GOODLIFE PHARMACY</span>
+                </div>
+                <div class="flex items-center gap-3 text-slate-400 opacity-60">
+                    <i class="fa-solid fa-dna text-3xl"></i>
+                    <span class="font-bold text-lg tracking-wider">PATHOLOGISTS LANCET</span>
+                </div>
+                <div class="flex items-center gap-3 text-slate-400 opacity-60">
+                    <i class="fa-solid fa-baby text-3xl"></i>
+                    <span class="font-bold text-lg tracking-wider">GERTRUDE'S HOSPITAL</span>
+                </div>
+                <div class="flex items-center gap-3 text-slate-400 opacity-60">
+                    <i class="fa-solid fa-stethoscope text-3xl"></i>
+                    <span class="font-bold text-lg tracking-wider">KENYATTA NATIONAL HOSPITAL</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-16">
+                <div class="flex items-center gap-3 text-slate-400 opacity-60">
+                    <i class="fa-solid fa-hospital text-3xl"></i>
+                    <span class="font-bold text-lg tracking-wider">AAR HEALTHCARE</span>
+                </div>
+                <div class="flex items-center gap-3 text-slate-400 opacity-60">
+                    <i class="fa-solid fa-heart-pulse text-3xl"></i>
+                    <span class="font-bold text-lg tracking-wider">NAIROBI HOSPITAL</span>
+                </div>
+                <div class="flex items-center gap-3 text-slate-400 opacity-60">
+                    <i class="fa-solid fa-user-doctor text-3xl"></i>
+                    <span class="font-bold text-lg tracking-wider">MP SHAH HOSPITAL</span>
+                </div>
+                <div class="flex items-center gap-3 text-slate-400 opacity-60">
+                    <i class="fa-solid fa-truck-medical text-3xl"></i>
+                    <span class="font-bold text-lg tracking-wider">AMREF HEALTH</span>
+                </div>
+                <div class="flex items-center gap-3 text-slate-400 opacity-60">
+                    <i class="fa-solid fa-pills text-3xl"></i>
+                    <span class="font-bold text-lg tracking-wider">GOODLIFE PHARMACY</span>
+                </div>
+                <div class="flex items-center gap-3 text-slate-400 opacity-60">
+                    <i class="fa-solid fa-dna text-3xl"></i>
+                    <span class="font-bold text-lg tracking-wider">PATHOLOGISTS LANCET</span>
+                </div>
+                <div class="flex items-center gap-3 text-slate-400 opacity-60">
+                    <i class="fa-solid fa-baby text-3xl"></i>
+                    <span class="font-bold text-lg tracking-wider">GERTRUDE'S HOSPITAL</span>
+                </div>
+                <div class="flex items-center gap-3 text-slate-400 opacity-60">
+                    <i class="fa-solid fa-stethoscope text-3xl"></i>
+                    <span class="font-bold text-lg tracking-wider">KENYATTA NATIONAL HOSPITAL</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="glass-panel sticky top-0 z-40 px-6 py-4 flex justify-between items-center border-b border-slate-700">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-blue-500/30">
+                <i class="fa-solid fa-mortar-pestle"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold tracking-tight text-white">MediCore <span class="text-blue-400">Pharmacy</span></h1>
+                <p class="text-xs text-slate-400">Smart Inventory & Support System</p>
+            </div>
+        </div>
+        
+        <div class="flex items-center gap-4">
+            <div class="relative hidden md:block">
+                <input type="text" id="globalSearch" placeholder="Search drugs, shelves..." 
+                    class="bg-slate-800 border border-slate-600 text-sm rounded-full px-4 py-2 w-64 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
+                <i class="fa-solid fa-search absolute right-3 top-2.5 text-slate-500"></i>
+            </div>
+            <button onclick="toggleCart()" class="relative p-2 text-slate-300 hover:text-white transition-colors">
+                <i class="fa-solid fa-cart-shopping text-xl"></i>
+                <span id="cartCount" class="absolute top-0 right-0 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center opacity-0 transition-opacity">0</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto bg-slate-900/50">
+        
+        <!-- Pharmacy Shelves Section -->
+        <section class="p-6">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white mb-1">Drug Shelves</h2>
+                        <p class="text-slate-400 text-sm">Click on any shelf to view available medications. Each shelf is numbered for easy reference.</p>
+                    </div>
+                    <span class="text-xs text-slate-500 bg-slate-800 px-3 py-1 rounded-full border border-slate-700">
+                        <i class="fa-solid fa-circle-info mr-1"></i> 20 Shelves Available
+                    </span>
+                </div>
+
+                <div class="shelf-scroll overflow-x-auto pb-6 pt-4">
+                    <div id="shelvesContainer" class="flex gap-5" style="min-width: max-content;">
+                        <!-- Shelves injected via JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Talk to Pharmacist Button Section -->
+        <section class="py-8 flex justify-center border-y border-slate-800 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900">
+            <button onclick="openPharmacyList()" class="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-bold py-4 px-8 rounded-full shadow-lg shadow-blue-600/30 transition-all transform hover:scale-105 flex items-center gap-3">
+                <i class="fa-solid fa-headset text-xl"></i>
+                <span>Talk to a Pharmacist</span>
+                <span class="bg-white/20 px-2 py-0.5 rounded-full text-xs animate-pulse">Live Support</span>
+            </button>
+        </section>
+
+        <!-- Slideshow Section -->
+        <section class="py-8 px-6">
+            <div class="max-w-5xl mx-auto">
+                <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-images text-blue-400"></i>
+                    Featured Health Tips
+                </h2>
+                <div class="slideshow-container bg-slate-800 rounded-2xl overflow-hidden shadow-2xl relative">
+                    <div id="slideshow" class="relative h-64 md:h-80"></div>
+                    <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2 z-10" id="slideDots"></div>
+                    <button onclick="changeSlide(-1)" class="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all z-10">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <button onclick="changeSlide(1)" class="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white w-10 h-10 rounded-full flex items-center justify-center transition-all z-10">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Featured Medications Section with Video Ad -->
+        <section class="py-8 px-6">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-shuffle text-green-400"></i>
+                        Featured Medications
+                    </h2>
+                    <button onclick="refreshRandomDrugs()" class="text-sm text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors">
+                        <i class="fa-solid fa-rotate"></i> Refresh
+                    </button>
+                </div>
+                <div id="randomDrugsContainer" class="random-drugs-grid">
+                    <!-- Drugs and Video Ad injected via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="bg-slate-900 border-t border-slate-800 py-8 px-6 mt-8">
+            <div class="max-w-7xl mx-auto text-center text-slate-500 text-sm">
+                <p>&copy; 2024 MediCore Pharmacy. All rights reserved.</p>
+                <p class="mt-2">Your trusted partner in healthcare.</p>
+            </div>
+        </footer>
+    </main>
+
+    <!-- Modals -->
+    <div id="pharmacyListModal" class="modal hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm">
+        <div class="bg-slate-800 border border-slate-600 rounded-xl w-full max-w-2xl mx-4 p-6 shadow-2xl max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h3 class="text-2xl font-bold text-white">Available Pharmacists</h3>
+                    <p class="text-sm text-slate-400 mt-1">Choose an available pharmacist to start a consultation</p>
+                </div>
+                <button onclick="closePharmacyList()" class="text-slate-400 hover:text-white p-2 hover:bg-slate-700 rounded-lg transition-colors">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+            <div id="pharmacistList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </div>
+    </div>
+
+    <div id="restrictionModal" class="modal hidden fixed inset-0 z-[70] flex items-center justify-center bg-black/90 backdrop-blur-sm">
+        <div class="bg-slate-800 border border-red-500/50 rounded-xl w-full max-w-md mx-4 p-6 shadow-2xl text-center">
+            <div class="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-circle-xmark text-red-500 text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">Pharmacist Unavailable</h3>
+            <p class="text-slate-400 mb-6">This pharmacist is currently handling another client. Please choose an available pharmacist with a green badge or try again later.</p>
+            <button onclick="closeRestrictionModal()" class="bg-slate-700 hover:bg-slate-600 text-white px-6 py-2 rounded-lg transition-colors">Go Back</button>
+        </div>
+    </div>
+
+    <div id="clientWaitingModal" class="modal hidden fixed inset-0 z-[70] flex items-center justify-center bg-black/90 backdrop-blur-sm">
+        <div class="bg-slate-800 border border-blue-500/50 rounded-xl w-full max-w-md mx-4 p-8 shadow-2xl text-center">
+            <div class="relative w-24 h-24 mx-auto mb-6">
+                <div class="ring-animation absolute inset-0"></div>
+                <div class="ring-animation absolute inset-0" style="animation-delay: 0.5s"></div>
+                <img id="waitingPharmacistImg" src="" alt="Pharmacist" class="w-24 h-24 rounded-full object-cover border-4 border-blue-500 relative z-10">
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">Connecting...</h3>
+            <p class="text-slate-400 mb-4">Waiting for <span id="waitingPharmacistName" class="text-blue-400 font-semibold"></span> to accept your request</p>
+            <div class="flex justify-center gap-2 mb-4">
+                <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
+                <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+            </div>
+            <button onclick="cancelConnectionRequest()" class="text-red-400 hover:text-red-300 text-sm underline">Cancel Request</button>
+        </div>
+    </div>
+
+    <div id="pharmacistCallModal" class="modal hidden fixed inset-0 z-[80] flex items-center justify-center bg-black/95 backdrop-blur-md">
+        <div class="bg-slate-800 border border-green-500/50 rounded-xl w-full max-w-md mx-4 p-8 shadow-2xl text-center relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-b from-green-500/10 to-transparent"></div>
+            <div class="relative z-10">
+                <div class="w-20 h-20 mx-auto mb-4 vibrating-icon">
+                    <i class="fa-solid fa-comment-medical text-6xl text-green-500"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-white mb-2">Incoming Request</h3>
+                <p class="text-slate-400 mb-6">A client wants to chat with you</p>
+                <div class="flex gap-4 justify-center">
+                    <button onclick="declineCall()" class="bg-red-600 hover:bg-red-500 text-white px-6 py-3 rounded-full transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-phone-slash"></i> Decline
+                    </button>
+                    <button onclick="acceptCall()" class="bg-green-600 hover:bg-green-500 text-white px-6 py-3 rounded-full transition-colors flex items-center gap-2 vibrating-icon">
+                        <i class="fa-solid fa-phone"></i> Accept
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="activeChatModal" class="modal hidden fixed inset-0 z-[70] flex items-center justify-center bg-black/80 backdrop-blur-sm">
+        <div class="bg-slate-800 border border-slate-600 rounded-xl w-full max-w-lg mx-4 shadow-2xl flex flex-col h-[600px]">
+            <div class="p-4 border-b border-slate-700 bg-slate-900/50 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <img id="activeChatImg" src="" alt="Pharmacist" class="w-10 h-10 rounded-full object-cover border-2 border-green-500">
+                    <div>
+                        <h3 id="activeChatName" class="font-bold text-white"></h3>
+                        <p class="text-xs text-green-400 flex items-center gap-1">
+                            <span class="w-2 h-2 bg-green-500 rounded-full"></span> Online
+                        </p>
+                    </div>
+                </div>
+                <button onclick="endChat()" class="text-slate-400 hover:text-red-400 transition-colors">
+                    <i class="fa-solid fa-phone-slash text-xl"></i>
+                </button>
+            </div>
+            <div id="activeChatMessages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-900/30"></div>
+            <div class="p-4 border-t border-slate-700 bg-slate-800">
+                <div class="flex gap-2">
+                    <input type="text" id="activeChatInput" placeholder="Type your message..." 
+                        class="flex-1 bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500"
+                        onkeypress="if(event.key==='Enter') sendActiveMessage()">
+                    <button onclick="sendActiveMessage()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg transition-colors">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="shelfModal" class="modal hidden fixed inset-0 z-[50] flex items-center justify-center bg-black/80 backdrop-blur-sm">
+        <div class="bg-slate-800 border border-slate-600 rounded-xl w-full max-w-4xl mx-4 p-6 shadow-2xl max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h3 id="shelfModalTitle" class="text-2xl font-bold text-white">Shelf Details</h3>
+                    <p id="shelfModalSubtitle" class="text-sm text-slate-400 mt-1">Browse medications in this shelf</p>
+                </div>
+                <button onclick="closeShelfModal()" class="text-slate-400 hover:text-white p-2 hover:bg-slate-700 rounded-lg transition-colors">
+                    <i class="fa-solid fa-times text-xl"></i>
+                </button>
+            </div>
+            <div id="shelfModalContent" class="drug-grid"></div>
+        </div>
+    </div>
+
+    <div id="cartDrawer" class="fixed inset-y-0 right-0 w-full md:w-96 bg-slate-800 shadow-2xl transform translate-x-full transition-transform duration-300 z-[45] border-l border-slate-700 flex flex-col">
+        <div class="p-6 border-b border-slate-700 flex justify-between items-center bg-slate-900">
+            <h2 class="text-xl font-bold text-white">Your Prescription</h2>
+            <button onclick="toggleCart()" class="text-slate-400 hover:text-white">
+                <i class="fa-solid fa-times text-xl"></i>
+            </button>
+        </div>
+        <div id="cartItems" class="flex-1 overflow-y-auto p-6 space-y-4">
+            <div class="text-center text-slate-500 mt-10">
+                <i class="fa-solid fa-basket-shopping text-4xl mb-3 opacity-50"></i>
+                <p>Your cart is empty.</p>
+            </div>
+        </div>
+        <div class="p-6 border-t border-slate-700 bg-slate-900">
+            <div class="flex justify-between mb-4 text-lg font-bold text-white">
+                <span>Total</span>
+                <span id="cartTotal">KSh 0.00</span>
+            </div>
+            <button onclick="checkout()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-lg shadow-lg shadow-green-600/20 transition-all">
+                Proceed to Payment
+            </button>
+        </div>
+    </div>
+
+    <div id="cartOverlay" onclick="toggleCart()" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[40] hidden transition-opacity"></div>
+
+    <script>
+        // Extended Inventory with 20 Shelves and 100+ drugs
+        const inventory = [
+            // Original 12 shelves expanded
+            {
+                id: 'S1', number: 1, name: 'Analgesics', description: 'Pain Relief & Fever Reducers', icon: 'fa-pills', color: 'blue',
+                items: [
+                    { id: 'S1-01', name: 'Paracetamol 500mg', type: 'Tablet', price: 550, stock: 120, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S1-02', name: 'Ibuprofen 400mg', type: 'Tablet', price: 720, stock: 85, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S1-03', name: 'Aspirin', type: 'Tablet', price: 400, stock: 200, image: 'https://images.unsplash.com/photo-1585435557343-3b092031a831?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S1-04', name: 'Naproxen Sodium', type: 'Tablet', price: 850, stock: 60, image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S1-05', name: 'Diclofenac', type: 'Tablet', price: 650, stock: 75, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S1-06', name: 'Tramadol', type: 'Capsule', price: 1200, stock: 40, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
+                ]
+            },
+            {
+                id: 'S2', number: 2, name: 'Antibiotics', description: 'Bacterial Infection Treatments', icon: 'fa-capsules', color: 'red',
+                items: [
+                    { id: 'S2-01', name: 'Amoxicillin', type: 'Capsule', price: 1200, stock: 50, image: 'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S2-02', name: 'Ciprofloxacin', type: 'Tablet', price: 1550, stock: 40, image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S2-03', name: 'Azithromycin', type: 'Tablet', price: 1800, stock: 35, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S2-04', name: 'Metronidazole', type: 'Tablet', price: 950, stock: 45, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S2-05', name: 'Doxycycline', type: 'Capsule', price: 1100, stock: 38, image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S2-06', name: 'Cefuroxime', type: 'Tablet', price: 1650, stock: 30, image: 'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
+                ]
+            },
+            {
+                id: 'S3', number: 3, name: 'Pediatric', description: "Children's Medications & Syrups", icon: 'fa-baby', color: 'green',
+                items: [
+                    { id: 'S3-01', name: 'Cough Syrup (Honey)', type: 'Syrup', price: 890, stock: 30, image: 'https://images.unsplash.com/photo-1583947581924-860bda6a26df?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S3-02', name: 'Vitamin C Drops', type: 'Liquid', price: 650, stock: 60, image: 'https://images.unsplash.com/photo-1550572017-edd951aa8f72?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S3-03', name: 'Pediatric Paracetamol', type: 'Syrup', price: 550, stock: 45, image: 'https://images.unsplash.com/photo-1585435557343-3b092031a831?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S3-04', name: 'ORS Sachets', type: 'Powder', price: 120, stock: 200, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S3-05', name: 'Zinc Tablets', type: 'Tablet', price: 380, stock: 80, image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S3-06', name: 'Multivitamin Syrup', type: 'Syrup', price: 750, stock: 35, image: 'https://images.unsplash.com/photo-1583947581924-860bda6a26df?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
+                ]
+            },
+            {
+                id: 'S4', number: 4, name: 'First Aid', description: 'Emergency Supplies & Care', icon: 'fa-kit-medical', color: 'orange',
+                items: [
+                    { id: 'S4-01', name: 'Bandages (Pack)', type: 'Supply', price: 320, stock: 150, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S4-02', name: 'Antiseptic Solution', type: 'Liquid', price: 900, stock: 45, image: 'https://images.unsplash.com/photo-1628595351029-c2bf17511435?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S4-03', name: 'Gauze Pads', type: 'Supply', price: 450, stock: 80, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S4-04', name: 'Medical Tape', type: 'Supply', price: 280, stock: 100, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S4-05', name: 'Cotton Wool', type: 'Supply', price: 180, stock: 120, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S4-06', name: 'Thermometer', type: 'Device', price: 850, stock: 25, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
+                ]
+            },
+            {
+                id: 'S5', number: 5, name: 'Vitamins', description: 'Supplements & Nutrition', icon: 'fa-apple-whole', color: 'purple',
+                items: [
+                    { id: 'S5-01', name: 'Vitamin D3', type: 'Capsule', price: 1100, stock: 100, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S5-02', name: 'Multivitamin', type: 'Tablet', price: 1450, stock: 75, image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S5-03', name: 'Omega-3 Fish Oil', type: 'Capsule', price: 1600, stock: 50, image: 'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S5-04', name: 'Vitamin B12', type: 'Tablet', price: 850, stock: 90, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S5-05', name: 'Vitamin C 1000mg', type: 'Tablet', price: 720, stock: 110, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S5-06', name: 'Iron Supplements', type: 'Tablet', price: 680, stock: 65, image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
+                ]
+            },
+            {
+                id: 'S6', number: 6, name: 'Cardiac', description: 'Heart & Blood Pressure', icon: 'fa-heart-pulse', color: 'rose',
+                items: [
+                    { id: 'S6-01', name: 'Amlodipine', type: 'Tablet', price: 950, stock: 60, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S6-02', name: 'Lisinopril', type: 'Tablet', price: 800, stock: 55, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S6-03', name: 'Atenolol', type: 'Tablet', price: 720, stock: 40, image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S6-04', name: 'Losartan', type: 'Tablet', price: 1100, stock: 45, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S6-05', name: 'Simvastatin', type: 'Tablet', price: 950, stock: 50, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S6-06', name: 'Clopidogrel', type: 'Tablet', price: 1450, stock: 35, image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
+                ]
+            },
+            {
+                id: 'S7', number: 7, name: 'Diabetes Care', description: 'Blood Sugar Management', icon: 'fa-droplet', color: 'cyan',
+                items: [
+                    { id: 'S7-01', name: 'Metformin 500mg', type: 'Tablet', price: 680, stock: 85, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S7-02', name: 'Glibenclamide', type: 'Tablet', price: 550, stock: 70, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S7-03', name: 'Insulin Syringes', type: 'Supply', price: 450, stock: 120, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S7-04', name: 'Glucose Test Strips', type: 'Supply', price: 1200, stock: 45, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S7-05', name: 'Glimepiride', type: 'Tablet', price: 850, stock: 55, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S7-06', name: 'Blood Glucose Meter', type: 'Device', price: 1850, stock: 20, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
+                ]
+            },
+            {
+                id: 'S8', number: 8, name: 'Respiratory', description: 'Asthma & COPD Treatments', icon: 'fa-lungs', color: 'teal',
+                items: [
+                    { id: 'S8-01', name: 'Salbutamol Inhaler', type: 'Inhaler', price: 850, stock: 40, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S8-02', name: 'Budesonide', type: 'Inhaler', price: 1450, stock: 30, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S8-03', name: 'Montelukast', type: 'Tablet', price: 1200, stock: 50, image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S8-04', name: 'Prednisolone', type: 'Tablet', price: 650, stock: 60, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S8-05', name: 'Aminophylline', type: 'Tablet', price: 780, stock: 40, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S8-06', name: 'Nebulizer Solution', type: 'Liquid', price: 950, stock: 35, image: 'https://images.unsplash.com/photo-1583947581924-860bda6a26df?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
+                ]
+            },
+            {
+                id: 'S9', number: 9, name: 'Mental Health', description: 'Anxiety & Depression Meds', icon: 'fa-brain', color: 'indigo',
+                items: [
+                    { id: 'S9-01', name: 'Sertraline', type: 'Tablet', price: 1800, stock: 35, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S9-02', name: 'Alprazolam', type: 'Tablet', price: 950, stock: 40, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S9-03', name: 'Fluoxetine', type: 'Capsule', price: 1650, stock: 30, image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S9-04', name: 'Amitriptyline', type: 'Tablet', price: 720, stock: 45, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S9-05', name: 'Risperidone', type: 'Tablet', price: 1450, stock: 25, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S9-06', name: 'Diazepam', type: 'Tablet', price: 850, stock: 35, image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
+                ]
+            },
+            {
+                id: 'S10', number: 10, name: 'Dermatology', description: 'Skin Care & Treatments', icon: 'fa-hand-dots', color: 'pink',
+                items: [
+                    { id: 'S10-01', name: 'Hydrocortisone Cream', type: 'Cream', price: 480, stock: 60, image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S10-02', name: 'Clotrimazole', type: 'Cream', price: 520, stock: 55, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S10-03', name: 'Sunscreen SPF 50', type: 'Lotion', price: 850, stock: 40, image: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S10-04', name: 'Acne Gel', type: 'Gel', price: 720, stock: 45, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S10-05', name: 'Betnovate Cream', type: 'Cream', price: 650, stock: 50, image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S10-06', name: 'Calamine Lotion', type: 'Lotion', price: 380, stock: 70, image: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
+                ]
+            },
+            {
+                id: 'S11', number: 11, name: 'Gastrointestinal', description: 'Digestive Health', icon: 'fa-stomach', color: 'amber',
+                items: [
+                    { id: 'S11-01', name: 'Omeprazole', type: 'Capsule', price: 680, stock: 80, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S11-02', name: 'Loperamide', type: 'Capsule', price: 450, stock: 70, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S11-03', name: 'Antacid Tablets', type: 'Chewable', price: 380, stock: 100, image: 'https://images.unsplash.com/photo-1585435557343-3b092031a831?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S11-04', name: 'Lactulose Syrup', type: 'Syrup', price: 750, stock: 35, image: 'https://images.unsplash.com/photo-1583947581924-860bda6a26df?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S11-05', name: 'Ranitidine', type: 'Tablet', price: 520, stock: 60, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S11-06', name: 'Esomeprazole', type: 'Capsule', price: 1200, stock: 40, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
+                ]
+            },
+            {
+                id: 'S12', number: 12, name: 'Eye & Ear Care', description: 'Ophthalmic & Otic Meds', icon: 'fa-eye', color: 'violet',
+                items: [
+                    { id: 'S12-01', name: 'Chloramphenicol Eye Drops', type: 'Drops', price: 420, stock: 50, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S12-02', name: 'Artificial Tears', type: 'Drops', price: 650, stock: 60, image: 'https://images.unsplash.com/photo-1550572017-edd951aa8f72?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S12-03', name: 'Ear Drops', type: 'Drops', price: 580, stock: 40, image: 'https://images.unsplash.com/photo-1583947581924-860bda6a26df?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S12-04', name: 'Eye Ointment', type: 'Ointment', price: 720, stock: 35, image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S12-05', name: 'Ciprofloxacin Eye Drops', type: 'Drops', price: 850, stock: 30, image: 'https://images.unsplash.com/photo-1550572017-edd951aa8f72?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S12-06', name: 'Wax Softener', type: 'Drops', price: 480, stock: 45, image: 'https://images.unsplash.com/photo-1583947581924-860bda6a26df?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
+                ]
+            },
+            // Additional 8 shelves
+            {
+                id: 'S13', number: 13, name: 'Antifungals', description: 'Fungal Infection Treatments', icon: 'fa-virus-slash', color: 'emerald',
+                items: [
+                    { id: 'S13-01', name: 'Fluconazole', type: 'Capsule', price: 950, stock: 45, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S13-02', name: 'Ketoconazole Shampoo', type: 'Shampoo', price: 780, stock: 35, image: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S13-03', name: 'Nystatin', type: 'Suspension', price: 650, stock: 40, image: 'https://images.unsplash.com/photo-1583947581924-860bda6a26df?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S13-04', name: 'Terbinafine Cream', type: 'Cream', price: 720, stock: 50, image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S13-05', name: 'Miconazole', type: 'Cream', price: 580, stock: 55, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S13-06', name: 'Griseofulvin', type: 'Tablet', price: 850, stock: 30, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
+                ]
+            },
+            {
+                id: 'S14', number: 14, name: 'Antivirals', description: 'Viral Infection Treatments', icon: 'fa-shield-virus', color: 'red',
+                items: [
+                    { id: 'S14-01', name: 'Acyclovir', type: 'Tablet', price: 1100, stock: 40, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S14-02', name: 'Valacyclovir', type: 'Tablet', price: 1650, stock: 30, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S14-03', name: 'Oseltamivir', type: 'Capsule', price: 2200, stock: 25, image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S14-04', name: 'Acyclovir Cream', type: 'Cream', price: 680, stock: 45, image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S14-05', name: 'Famciclovir', type: 'Tablet', price: 1850, stock: 20, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S14-06', name: 'Ribavirin', type: 'Capsule', price: 2400, stock: 15, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
+                ]
+            },
+            {
+                id: 'S15', number: 15, name: 'Hormonal', description: 'Hormone & Thyroid Meds', icon: 'fa-venus-mars', color: 'fuchsia',
+                items: [
+                    { id: 'S15-01', name: 'Levothyroxine', type: 'Tablet', price: 850, stock: 60, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S15-02', name: 'Metformin XR', type: 'Tablet', price: 950, stock: 50, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S15-03', name: 'Progesterone', type: 'Capsule', price: 1200, stock: 35, image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S15-04', name: 'Estrogen Patch', type: 'Patch', price: 1450, stock: 25, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S15-05', name: 'Testosterone Gel', type: 'Gel', price: 1650, stock: 20, image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S15-06', name: 'Cabergoline', type: 'Tablet', price: 2200, stock: 15, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
+                ]
+            },
+            {
+                id: 'S16', number: 16, name: 'Oncology Support', description: 'Cancer Support Meds', icon: 'fa-ribbon', color: 'pink',
+                items: [
+                    { id: 'S16-01', name: 'Ondansetron', type: 'Tablet', price: 950, stock: 40, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S16-02', name: 'Filgrastim', type: 'Injection', price: 4500, stock: 15, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S16-03', name: 'Epoetin Alfa', type: 'Injection', price: 3800, stock: 12, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S16-04', name: 'Dexamethasone', type: 'Tablet', price: 650, stock: 55, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S16-05', name: 'Prochlorperazine', type: 'Tablet', price: 580, stock: 45, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S16-06', name: 'Mouthwash (Benzydamine)', type: 'Liquid', price: 720, stock: 35, image: 'https://images.unsplash.com/photo-1628595351029-c2bf17511435?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
+                ]
+            },
+            {
+                id: 'S17', number: 17, name: 'Orthopedics', description: 'Bone & Joint Health', icon: 'fa-bone', color: 'slate',
+                items: [
+                    { id: 'S17-01', name: 'Calcium Carbonate', type: 'Tablet', price: 580, stock: 80, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S17-02', name: 'Alendronate', type: 'Tablet', price: 1200, stock: 35, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S17-03', name: 'Vitamin D3 + K2', type: 'Capsule', price: 950, stock: 50, image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S17-04', name: 'Glucosamine', type: 'Tablet', price: 1450, stock: 40, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S17-05', name: 'Chondroitin', type: 'Capsule', price: 1350, stock: 35, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S17-06', name: 'Collagen Peptides', type: 'Powder', price: 1850, stock: 25, image: 'https://images.unsplash.com/photo-1550572017-edd951aa8f72?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
+                ]
+            },
+            {
+                id: 'S18', number: 18, name: 'Women\'s Health', description: 'Gynecological & Maternal', icon: 'fa-person-dress', color: 'rose',
+                items: [
+                    { id: 'S18-01', name: 'Prenatal Vitamins', type: 'Tablet', price: 1200, stock: 45, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S18-02', name: 'Folic Acid', type: 'Tablet', price: 380, stock: 100, image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S18-03', name: 'Iron + Folic', type: 'Tablet', price: 520, stock: 75, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S18-04', name: 'Evening Primrose Oil', type: 'Capsule', price: 950, stock: 40, image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S18-05', name: 'Cranberry Extract', type: 'Capsule', price: 850, stock: 50, image: 'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S18-06', name: 'Menstrual Pain Relief', type: 'Tablet', price: 650, stock: 60, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
+                ]
+            },
+            {
+                id: 'S19', number: 19, name: 'Men\'s Health', description: 'Prostate & Vitality', icon: 'fa-person', color: 'sky',
+                items: [
+                    { id: 'S19-01', name: 'Saw Palmetto', type: 'Capsule', price: 1100, stock: 40, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S19-02', name: 'L-Arginine', type: 'Tablet', price: 950, stock: 45, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S19-03', name: 'Zinc + Selenium', type: 'Tablet', price: 780, stock: 55, image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S19-04', name: 'Tribulus Terrestris', type: 'Capsule', price: 850, stock: 40, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S19-05', name: 'Maca Root', type: 'Capsule', price: 920, stock: 35, image: 'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S19-06', name: 'Prostate Complex', type: 'Tablet', price: 1350, stock: 30, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
+                ]
+            },
+            {
+                id: 'S20', number: 20, name: 'Medical Devices', description: 'Health Monitoring Tools', icon: 'fa-heart-circle-check', color: 'lime',
+                items: [
+                    { id: 'S20-01', name: 'Digital BP Monitor', type: 'Device', price: 3500, stock: 20, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S20-02', name: 'Pulse Oximeter', type: 'Device', price: 1800, stock: 35, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S20-03', name: 'Nebulizer Machine', type: 'Device', price: 4500, stock: 15, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S20-04', name: 'Glucometer Kit', type: 'Device', price: 2200, stock: 25, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S20-05', name: 'Infrared Thermometer', type: 'Device', price: 1650, stock: 30, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
+                    { id: 'S20-06', name: 'ECG Monitor', type: 'Device', price: 8500, stock: 8, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
+                ]
+            }
+        ];
+
+        const pharmacists = [
+            { id: 'P1', name: 'Dr. Sarah Chen', specialty: 'General Medicine', image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', isBusy: false },
+            { id: 'P2', name: 'Dr. James Mwangi', specialty: 'Pediatrics', image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', isBusy: true },
+            { id: 'P3', name: 'Dr. Emily Omondi', specialty: 'Pharmacy', image: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', isBusy: false },
+            { id: 'P4', name: 'Dr. Michael Kimani', specialty: 'Clinical Pharmacy', image: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', isBusy: true },
+            { id: 'P5', name: 'Dr. Amina Hassan', specialty: 'Cardiology', image: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', isBusy: false }
+        ];
+
+        const slideshowData = [
+            { image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80', title: 'Regular Health Checkups', subtitle: 'Prevention is better than cure' },
+            { image: 'https://images.unsplash.com/photo-1585435557343-3b092031a831?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80', title: 'Take Medications on Time', subtitle: 'Consistency is key to recovery' },
+            { image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80', title: 'Stay Hydrated', subtitle: 'Drink at least 8 glasses of water daily' },
+            { image: 'https://images.unsplash.com/photo-1505576399279-565b52d4ac71?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80', title: 'Healthy Diet', subtitle: 'Eat balanced meals for better immunity' },
+            { image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80', title: 'Exercise Regularly', subtitle: '30 minutes of activity daily keeps you fit' }
+        ];
+
+        let cart = [];
+        let selectedPharmacist = null;
+        let currentChatPharmacist = null;
+        let currentSlide = 0;
+        let slideInterval;
+        let videoPlaying = false;
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderShelves();
+            initSlideshow();
+            renderRandomDrugs();
+        });
+
+        // --- Shelf Functions ---
+        function renderShelves() {
+            const container = document.getElementById('shelvesContainer');
+            container.innerHTML = '';
+            
+            inventory.forEach(shelf => {
+                const card = document.createElement('div');
+                card.className = 'shelf-container bg-slate-800 border border-slate-700 rounded-xl p-4 w-48 flex-shrink-0 flex flex-col items-center text-center gap-3 relative mt-4';
+                card.onclick = () => openShelfModal(shelf);
+                
+                const colorClasses = {
+                    blue: 'bg-blue-900/50 text-blue-400 border-blue-500/30',
+                    red: 'bg-red-900/50 text-red-400 border-red-500/30',
+                    green: 'bg-green-900/50 text-green-400 border-green-500/30',
+                    orange: 'bg-orange-900/50 text-orange-400 border-orange-500/30',
+                    purple: 'bg-purple-900/50 text-purple-400 border-purple-500/30',
+                    rose: 'bg-rose-900/50 text-rose-400 border-rose-500/30',
+                    cyan: 'bg-cyan-900/50 text-cyan-400 border-cyan-500/30',
+                    teal: 'bg-teal-900/50 text-teal-400 border-teal-500/30',
+                    indigo: 'bg-indigo-900/50 text-indigo-400 border-indigo-500/30',
+                    pink: 'bg-pink-900/50 text-pink-400 border-pink-500/30',
+                    amber: 'bg-amber-900/50 text-amber-400 border-amber-500/30',
+                    violet: 'bg-violet-900/50 text-violet-400 border-violet-500/30',
+                    emerald: 'bg-emerald-900/50 text-emerald-400 border-emerald-500/30',
+                    fuchsia: 'bg-fuchsia-900/50 text-fuchsia-400 border-fuchsia-500/30',
+                    slate: 'bg-slate-700/50 text-slate-400 border-slate-500/30',
+                    sky: 'bg-sky-900/50 text-sky-400 border-sky-500/30',
+                    lime: 'bg-lime-900/50 text-lime-400 border-lime-500/30'
+                };
+                const colorClass = colorClasses[shelf.color] || colorClasses.blue;
+
+                card.innerHTML = `
+                    <div class="shelf-number">${shelf.number}</div>
+                    <div class="w-16 h-16 rounded-full ${colorClass} border-2 flex items-center justify-center text-2xl mt-2">
+                        <i class="fa-solid ${shelf.icon}"></i>
+                    </div>
+                    <h3 class="font-bold text-white text-sm">${shelf.name}</h3>
+                    <p class="text-xs text-slate-400 line-clamp-2">${shelf.description}</p>
+                    <p class="text-xs text-slate-500 mt-1">${shelf.items.length} items</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function openShelfModal(shelf) {
+            document.getElementById('shelfModalTitle').innerText = `Shelf ${shelf.number}: ${shelf.name}`;
+            document.getElementById('shelfModalSubtitle').innerText = shelf.description;
+            const content = document.getElementById('shelfModalContent');
+            content.innerHTML = '';
+            
+            shelf.items.forEach(item => {
+                content.innerHTML += `
+                    <div class="bg-slate-700/50 border border-slate-600 rounded-lg p-4 hover:border-blue-500 transition-all">
+                        <div class="relative mb-3">
+                            <img src="${item.image}" class="w-full h-32 object-cover rounded-lg">
+                            <span class="absolute top-2 right-2 bg-slate-900/80 px-2 py-1 rounded text-xs font-mono text-slate-300 border border-slate-700">
+                                ${item.id}
+                            </span>
+                        </div>
+                        <h4 class="font-bold text-white text-sm mb-1">${item.name}</h4>
+                        <p class="text-xs text-slate-400 mb-2">${item.type} • Stock: ${item.stock}</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-blue-400 font-bold">KSh ${item.price.toLocaleString()}</span>
+                            <button onclick="addToCart('${item.id}')" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs transition-all">
+                                <i class="fa-solid fa-plus"></i> Add
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('shelfModal').classList.remove('hidden');
+            document.getElementById('shelfModal').classList.add('visible');
+        }
+
+        function closeShelfModal() {
+            document.getElementById('shelfModal').classList.add('hidden');
+        }
+
+        // --- Slideshow Functions ---
+        function initSlideshow() {
+            const container = document.getElementById('slideshow');
+            const dotsContainer = document.getElementById('slideDots');
+            
+            slideshowData.forEach((slide, index) => {
+                const slideDiv = document.createElement('div');
+                slideDiv.className = `slide absolute inset-0 ${index === 0 ? 'active' : ''}`;
+                slideDiv.innerHTML = `
+                    <img src="${slide.image}" class="w-full h-full object-cover" alt="${slide.title}">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent"></div>
+                    <div class="absolute bottom-8 left-8 right-8 text-white">
+                        <h3 class="text-2xl md:text-3xl font-bold mb-2">${slide.title}</h3>
+                        <p class="text-slate-300 text-sm md:text-base">${slide.subtitle}</p>
+                    </div>
+                `;
+                container.appendChild(slideDiv);
+                
+                const dot = document.createElement('span');
+                dot.className = `slide-dot ${index === 0 ? 'active' : ''}`;
+                dot.onclick = () => goToSlide(index);
+                dotsContainer.appendChild(dot);
+            });
+            
+            startSlideShow();
+        }
+
+        function startSlideShow() {
+            slideInterval = setInterval(() => {
+                changeSlide(1);
+            }, 5000);
+        }
+
+        function changeSlide(direction) {
+            const slides = document.querySelectorAll('.slide');
+            const dots = document.querySelectorAll('.slide-dot');
+            
+            slides[currentSlide].classList.remove('active');
+            dots[currentSlide].classList.remove('active');
+            
+            currentSlide = (currentSlide + direction + slides.length) % slides.length;
+            
+            slides[currentSlide].classList.add('active');
+            dots[currentSlide].classList.add('active');
+        }
+
+        function goToSlide(index) {
+            clearInterval(slideInterval);
+            const slides = document.querySelectorAll('.slide');
+            const dots = document.querySelectorAll('.slide-dot');
+            
+            slides[currentSlide].classList.remove('active');
+            dots[currentSlide].classList.remove('active');
+            
+            currentSlide = index;
+            
+            slides[currentSlide].classList.add('active');
+            dots[currentSlide].classList.add('active');
+            
+            startSlideShow();
+        }
+
+        // --- Random Drugs with Video Ad ---
+        function renderRandomDrugs() {
+            const container = document.getElementById('randomDrugsContainer');
+            container.innerHTML = '';
+            
+            const allItems = [];
+            inventory.forEach(shelf => {
+                shelf.items.forEach(item => {
+                    allItems.push({ ...item, shelfName: shelf.name, shelfNumber: shelf.number });
+                });
+            });
+            
+            // Shuffle and pick 16 random items (to show more with video in middle)
+            const shuffled = allItems.sort(() => 0.5 - Math.random());
+            const selected = shuffled.slice(0, 16);
+            
+            // Insert video ad after first 8 items (index 8)
+            selected.forEach((item, index) => {
+                // Insert video ad at position 8
+                if (index === 8) {
+                    container.appendChild(createVideoAdCard());
+                }
+                
+                const card = document.createElement('div');
+                card.className = 'drug-card';
+                card.innerHTML = `
+                    <div class="relative">
+                        <img src="${item.image}" alt="${item.name}" class="w-full h-40 object-cover">
+                        <div class="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded font-bold">
+                            ${item.shelfName}
+                        </div>
+                        <div class="absolute top-2 right-2 bg-slate-900/80 text-white text-xs px-2 py-1 rounded font-mono">
+                            ${item.id}
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="font-bold text-white text-sm mb-1">${item.name}</h4>
+                        <p class="text-xs text-slate-400 mb-2">${item.type} • Shelf ${item.shelfNumber}</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-blue-400 font-bold">KSh ${item.price.toLocaleString()}</span>
+                            <button onclick="addToCart('${item.id}')" class="bg-blue-600 hover:bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110">
+                                <i class="fa-solid fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function createVideoAdCard() {
+            const videoCard = document.createElement('div');
+            videoCard.className = 'video-ad-container col-span-1 md:col-span-2 lg:col-span-2';
+            videoCard.innerHTML = `
+                <div class="video-ad-badge">Sponsored</div>
+                <div class="video-placeholder" id="videoPlaceholder">
+                    <div class="play-button" onclick="playVideoAd()">
+                        <i class="fa-solid fa-play"></i>
+                    </div>
+                    <div class="absolute bottom-4 left-4 right-4 text-white z-10">
+                        <h4 class="font-bold text-lg">MediCore Health Tips</h4>
+                        <p class="text-sm text-slate-300">Learn how to manage your medications effectively</p>
+                    </div>
+                </div>
+                <div class="video-progress">
+                    <div class="video-progress-bar" id="videoProgressBar"></div>
+                </div>
+                <div class="p-4 flex justify-between items-center bg-slate-800/50">
+                    <div class="flex items-center gap-3">
+                        <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" class="w-10 h-10 rounded-full object-cover">
+                        <div>
+                            <p class="text-sm font-bold text-white">Dr. Sarah Chen</p>
+                            <p class="text-xs text-slate-400">Head Pharmacist</p>
+                        </div>
+                    </div>
+                    <button class="text-blue-400 hover:text-blue-300 text-sm font-semibold">
+                        Learn More <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            `;
+            return videoCard;
+        }
+
+        function playVideoAd() {
+            const placeholder = document.getElementById('videoPlaceholder');
+            const progressBar = document.getElementById('videoProgressBar');
+            
+            if (videoPlaying) return;
+            videoPlaying = true;
+            
+            // Simulate video playing
+            placeholder.innerHTML = `
+                <div class="absolute inset-0 bg-blue-900 flex items-center justify-center">
+                    <div class="text-center text-white">
+                        <i class="fa-solid fa-circle-play text-6xl mb-4 animate-pulse"></i>
+                        <p class="text-lg font-semibold">Playing Video...</p>
+                        <p class="text-sm text-slate-300 mt-2">0:15 / 0:30</p>
+                    </div>
+                </div>
+            `;
+            
+            // Animate progress bar
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 2;
+                progressBar.style.width = progress + '%';
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    videoPlaying = false;
+                    // Reset after "video" ends
+                    setTimeout(() => {
+                        placeholder.innerHTML = `
+                            <div class="play-button" onclick="playVideoAd()">
+                                <i class="fa-solid fa-rotate-right"></i>
+                            </div>
+                            <div class="absolute bottom-4 left-4 right-4 text-white z-10">
+                                <h4 class="font-bold text-lg">MediCore Health Tips</h4>
+                                <p class="text-sm text-slate-300">Learn how to manage your medications effectively</p>
+                            </div>
+                        `;
+                        progressBar.style.width = '0%';
+                    }, 500);
+                }
+            }, 100);
+        }
+
+        function refreshRandomDrugs() {
+            const btn = event.currentTarget;
+            btn.querySelector('i').classList.add('fa-spin');
+            setTimeout(() => {
+                btn.querySelector('i').classList.remove('fa-spin');
+                renderRandomDrugs();
+            }, 500);
+        }
+
+        // --- Pharmacist Selection System ---
+        function openPharmacyList() {
+            const list = document.getElementById('pharmacistList');
+            list.innerHTML = '';
+            
+            pharmacists.forEach(pharm => {
+                const card = document.createElement('div');
+                card.className = `pharmacist-card bg-slate-700/50 border border-slate-600 rounded-lg p-4 flex items-center gap-4 ${pharm.isBusy ? 'disabled' : 'cursor-pointer hover:border-blue-500'}`;
+                
+                if (!pharm.isBusy) {
+                    card.onclick = () => selectPharmacist(pharm);
+                } else {
+                    card.onclick = () => showRestrictionModal();
+                }
+
+                card.innerHTML = `
+                    <div class="relative">
+                        <img src="${pharm.image}" alt="${pharm.name}" class="w-14 h-14 rounded-full object-cover border-2 ${pharm.isBusy ? 'border-red-500' : 'border-green-500'}">
+                        <span class="status-badge ${pharm.isBusy ? 'busy' : 'online'}"></span>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-bold text-white">${pharm.name}</h4>
+                        <p class="text-xs text-slate-400">${pharm.specialty}</p>
+                        <span class="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold ${pharm.isBusy ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}">
+                            ${pharm.isBusy ? 'BUSY WITH CLIENT' : 'AVAILABLE'}
+                        </span>
+                    </div>
+                    <i class="fa-solid ${pharm.isBusy ? 'fa-lock' : 'fa-chevron-right'} text-slate-500"></i>
+                `;
+                list.appendChild(card);
+            });
+
+            document.getElementById('pharmacyListModal').classList.remove('hidden');
+        }
+
+        function closePharmacyList() {
+            document.getElementById('pharmacyListModal').classList.add('hidden');
+        }
+
+        function showRestrictionModal() {
+            document.getElementById('restrictionModal').classList.remove('hidden');
+        }
+
+        function closeRestrictionModal() {
+            document.getElementById('restrictionModal').classList.add('hidden');
+        }
+
+        function selectPharmacist(pharmacist) {
+            selectedPharmacist = pharmacist;
+            closePharmacyList();
+            
+            document.getElementById('waitingPharmacistImg').src = pharmacist.image;
+            document.getElementById('waitingPharmacistName').innerText = pharmacist.name;
+            document.getElementById('clientWaitingModal').classList.remove('hidden');
+            
+            setTimeout(() => {
+                showPharmacistIncomingCall(pharmacist);
+            }, 2000);
+        }
+
+        function cancelConnectionRequest() {
+            document.getElementById('clientWaitingModal').classList.add('hidden');
+            selectedPharmacist = null;
+        }
+
+        function showPharmacistIncomingCall(pharmacist) {
+            document.getElementById('pharmacistCallModal').classList.remove('hidden');
+        }
+
+        function declineCall() {
+            document.getElementById('pharmacistCallModal').classList.add('hidden');
+            document.getElementById('clientWaitingModal').classList.add('hidden');
+            setTimeout(() => {
+                alert('The pharmacist is currently unavailable. Please try again later or select another pharmacist.');
+            }, 500);
+        }
+
+        function acceptCall() {
+            document.getElementById('pharmacistCallModal').classList.add('hidden');
+            document.getElementById('clientWaitingModal').classList.add('hidden');
+            openActiveChat(selectedPharmacist);
+        }
+
+        // --- Active Chat System ---
+        function openActiveChat(pharmacist) {
+            currentChatPharmacist = pharmacist;
+            document.getElementById('activeChatImg').src = pharmacist.image;
+            document.getElementById('activeChatName').innerText = pharmacist.name;
+            
+            const messages = document.getElementById('activeChatMessages');
+            messages.innerHTML = `
+                <div class="chat-bubble bot">
+                    <p class="font-semibold text-blue-400 mb-1">${pharmacist.name}:</p>
+                    Hello! I've accepted your request. How can I help you today?
+                </div>
+            `;
+            
+            document.getElementById('activeChatModal').classList.remove('hidden');
+        }
+
+        function sendActiveMessage() {
+            const input = document.getElementById('activeChatInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const messages = document.getElementById('activeChatMessages');
+            messages.innerHTML += `<div class="chat-bubble user">${text}</div>`;
+            input.value = '';
+            messages.scrollTop = messages.scrollHeight;
+
+            setTimeout(() => {
+                const responses = [
+                    "I understand. Let me check our inventory for that.",
+                    "Could you tell me more about your symptoms?",
+                    "Based on what you've described, I recommend checking our shelves for appropriate medication.",
+                    "Would you like me to guide you to a specific medication?",
+                    "Please make sure to read the dosage instructions carefully."
+                ];
+                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                
+                messages.innerHTML += `
+                    <div class="chat-bubble bot">
+                        <p class="font-semibold text-blue-400 mb-1">${currentChatPharmacist.name}:</p>
+                        ${randomResponse}
+                    </div>
+                `;
+                messages.scrollTop = messages.scrollHeight;
+            }, 1500);
+        }
+
+        function endChat() {
+            document.getElementById('activeChatModal').classList.add('hidden');
+            currentChatPharmacist = null;
+            selectedPharmacist = null;
+        }
+
+        // --- Cart Functions ---
+        function addToCart(itemId) {
+            let item = null;
+            let shelfInfo = null;
+            
+            inventory.forEach(shelf => {
+                const found = shelf.items.find(i => i.id === itemId);
+                if (found) {
+                    item = found;
+                    shelfInfo = shelf;
+                }
+            });
+            
+            if (item) {
+                cart.push({ ...item, shelfName: shelfInfo.name });
+                updateCartUI();
+                
+                if (event && event.target) {
+                    const btn = event.target.closest('button');
+                    const originalHTML = btn.innerHTML;
+                    btn.innerHTML = '<i class="fa-solid fa-check"></i>';
+                    btn.classList.add('bg-green-600');
+                    setTimeout(() => {
+                        btn.innerHTML = originalHTML;
+                        btn.classList.remove('bg-green-600');
+                    }, 1000);
+                }
+            }
+        }
+
+        function updateCartUI() {
+            const count = document.getElementById('cartCount');
+            count.innerText = cart.length;
+            count.classList.remove('opacity-0');
+            
+            const container = document.getElementById('cartItems');
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-slate-500 mt-10">
+                        <i class="fa-solid fa-basket-shopping text-4xl mb-3 opacity-50"></i>
+                        <p>Your cart is empty.</p>
+                    </div>`;
+                document.getElementById('cartTotal').innerText = 'KSh 0.00';
+                return;
+            }
+
+            let html = '';
+            let total = 0;
+            cart.forEach((item, idx) => {
+                total += item.price;
+                html += `
+                    <div class="flex items-center gap-3 bg-slate-800 p-3 rounded-lg border border-slate-700">
+                        <img src="${item.image}" class="w-12 h-12 rounded object-cover">
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-sm font-bold text-white truncate">${item.name}</h4>
+                            <p class="text-xs text-slate-400">${item.shelfName}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm font-bold text-blue-400">KSh ${item.price.toLocaleString()}</p>
+                            <button onclick="removeFromCart(${idx})" class="text-xs text-red-400 hover:text-red-300">Remove</button>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+            document.getElementById('cartTotal').innerText = 'KSh ' + total.toLocaleString();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        function toggleCart() {
+            const drawer = document.getElementById('cartDrawer');
+            const overlay = document.getElementById('cartOverlay');
+            
+            if (drawer.classList.contains('translate-x-full')) {
+                drawer.classList.remove('translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                drawer.classList.add('translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        function checkout() {
+            if (cart.length === 0) return;
+            const total = document.getElementById('cartTotal').innerText;
+            alert(`Proceeding to payment...\n\nTotal: ${total}\n\nThis would connect to M-Pesa or other payment gateway.`);
+        }
+
+        // Close modals on escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeShelfModal();
+                closePharmacyList();
+                closeRestrictionModal();
+            }
+        });
+    </script>
+</body>
+</html>
