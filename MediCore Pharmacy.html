@@ -459,7 +459,7 @@
             border: 1px solid #3b82f6;
         }
     </style>
-<base target="_blank">
+<base target="_self">
 </head>
 <body class="min-h-screen flex flex-col">
 
@@ -789,6 +789,7 @@
 
     <div id="cartOverlay" onclick="toggleCart()" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[40] hidden transition-opacity"></div>
 
+    <script src="data-manager.js"></script>
     <script>
         function toggleNav() {
             const nav = document.getElementById('pharmacyNav');
@@ -798,231 +799,37 @@
         }
 
         // Extended Inventory with 20 Shelves and 100+ drugs
-        const inventory = [
-            // Original 12 shelves expanded
-            {
-                id: 'S1', number: 1, name: 'Analgesics', description: 'Pain Relief & Fever Reducers', icon: 'fa-pills', color: 'blue',
-                items: [
-                    { id: 'S1-01', name: 'Paracetamol 500mg', type: 'Tablet', price: 550, stock: 120, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S1-02', name: 'Ibuprofen 400mg', type: 'Tablet', price: 720, stock: 85, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S1-03', name: 'Aspirin', type: 'Tablet', price: 400, stock: 200, image: 'https://images.unsplash.com/photo-1585435557343-3b092031a831?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S1-04', name: 'Naproxen Sodium', type: 'Tablet', price: 850, stock: 60, image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S1-05', name: 'Diclofenac', type: 'Tablet', price: 650, stock: 75, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S1-06', name: 'Tramadol', type: 'Capsule', price: 1200, stock: 40, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
-                ]
-            },
-            {
-                id: 'S2', number: 2, name: 'Antibiotics', description: 'Bacterial Infection Treatments', icon: 'fa-capsules', color: 'red',
-                items: [
-                    { id: 'S2-01', name: 'Amoxicillin', type: 'Capsule', price: 1200, stock: 50, image: 'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S2-02', name: 'Ciprofloxacin', type: 'Tablet', price: 1550, stock: 40, image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S2-03', name: 'Azithromycin', type: 'Tablet', price: 1800, stock: 35, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S2-04', name: 'Metronidazole', type: 'Tablet', price: 950, stock: 45, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S2-05', name: 'Doxycycline', type: 'Capsule', price: 1100, stock: 38, image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S2-06', name: 'Cefuroxime', type: 'Tablet', price: 1650, stock: 30, image: 'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
-                ]
-            },
-            {
-                id: 'S3', number: 3, name: 'Pediatric', description: "Children's Medications & Syrups", icon: 'fa-baby', color: 'green',
-                items: [
-                    { id: 'S3-01', name: 'Cough Syrup (Honey)', type: 'Syrup', price: 890, stock: 30, image: 'https://images.unsplash.com/photo-1583947581924-860bda6a26df?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S3-02', name: 'Vitamin C Drops', type: 'Liquid', price: 650, stock: 60, image: 'https://images.unsplash.com/photo-1550572017-edd951aa8f72?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S3-03', name: 'Pediatric Paracetamol', type: 'Syrup', price: 550, stock: 45, image: 'https://images.unsplash.com/photo-1585435557343-3b092031a831?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S3-04', name: 'ORS Sachets', type: 'Powder', price: 120, stock: 200, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S3-05', name: 'Zinc Tablets', type: 'Tablet', price: 380, stock: 80, image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S3-06', name: 'Multivitamin Syrup', type: 'Syrup', price: 750, stock: 35, image: 'https://images.unsplash.com/photo-1583947581924-860bda6a26df?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
-                ]
-            },
-            {
-                id: 'S4', number: 4, name: 'First Aid', description: 'Emergency Supplies & Care', icon: 'fa-kit-medical', color: 'orange',
-                items: [
-                    { id: 'S4-01', name: 'Bandages (Pack)', type: 'Supply', price: 320, stock: 150, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S4-02', name: 'Antiseptic Solution', type: 'Liquid', price: 900, stock: 45, image: 'https://images.unsplash.com/photo-1628595351029-c2bf17511435?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S4-03', name: 'Gauze Pads', type: 'Supply', price: 450, stock: 80, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S4-04', name: 'Medical Tape', type: 'Supply', price: 280, stock: 100, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S4-05', name: 'Cotton Wool', type: 'Supply', price: 180, stock: 120, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S4-06', name: 'Thermometer', type: 'Device', price: 850, stock: 25, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
-                ]
-            },
-            {
-                id: 'S5', number: 5, name: 'Vitamins', description: 'Supplements & Nutrition', icon: 'fa-apple-whole', color: 'purple',
-                items: [
-                    { id: 'S5-01', name: 'Vitamin D3', type: 'Capsule', price: 1100, stock: 100, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S5-02', name: 'Multivitamin', type: 'Tablet', price: 1450, stock: 75, image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S5-03', name: 'Omega-3 Fish Oil', type: 'Capsule', price: 1600, stock: 50, image: 'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S5-04', name: 'Vitamin B12', type: 'Tablet', price: 850, stock: 90, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S5-05', name: 'Vitamin C 1000mg', type: 'Tablet', price: 720, stock: 110, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S5-06', name: 'Iron Supplements', type: 'Tablet', price: 680, stock: 65, image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
-                ]
-            },
-            {
-                id: 'S6', number: 6, name: 'Cardiac', description: 'Heart & Blood Pressure', icon: 'fa-heart-pulse', color: 'rose',
-                items: [
-                    { id: 'S6-01', name: 'Amlodipine', type: 'Tablet', price: 950, stock: 60, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S6-02', name: 'Lisinopril', type: 'Tablet', price: 800, stock: 55, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S6-03', name: 'Atenolol', type: 'Tablet', price: 720, stock: 40, image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S6-04', name: 'Losartan', type: 'Tablet', price: 1100, stock: 45, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S6-05', name: 'Simvastatin', type: 'Tablet', price: 950, stock: 50, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S6-06', name: 'Clopidogrel', type: 'Tablet', price: 1450, stock: 35, image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
-                ]
-            },
-            {
-                id: 'S7', number: 7, name: 'Diabetes Care', description: 'Blood Sugar Management', icon: 'fa-droplet', color: 'cyan',
-                items: [
-                    { id: 'S7-01', name: 'Metformin 500mg', type: 'Tablet', price: 680, stock: 85, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S7-02', name: 'Glibenclamide', type: 'Tablet', price: 550, stock: 70, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S7-03', name: 'Insulin Syringes', type: 'Supply', price: 450, stock: 120, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S7-04', name: 'Glucose Test Strips', type: 'Supply', price: 1200, stock: 45, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S7-05', name: 'Glimepiride', type: 'Tablet', price: 850, stock: 55, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S7-06', name: 'Blood Glucose Meter', type: 'Device', price: 1850, stock: 20, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
-                ]
-            },
-            {
-                id: 'S8', number: 8, name: 'Respiratory', description: 'Asthma & COPD Treatments', icon: 'fa-lungs', color: 'teal',
-                items: [
-                    { id: 'S8-01', name: 'Salbutamol Inhaler', type: 'Inhaler', price: 850, stock: 40, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S8-02', name: 'Budesonide', type: 'Inhaler', price: 1450, stock: 30, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S8-03', name: 'Montelukast', type: 'Tablet', price: 1200, stock: 50, image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S8-04', name: 'Prednisolone', type: 'Tablet', price: 650, stock: 60, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S8-05', name: 'Aminophylline', type: 'Tablet', price: 780, stock: 40, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S8-06', name: 'Nebulizer Solution', type: 'Liquid', price: 950, stock: 35, image: 'https://images.unsplash.com/photo-1583947581924-860bda6a26df?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
-                ]
-            },
-            {
-                id: 'S9', number: 9, name: 'Mental Health', description: 'Anxiety & Depression Meds', icon: 'fa-brain', color: 'indigo',
-                items: [
-                    { id: 'S9-01', name: 'Sertraline', type: 'Tablet', price: 1800, stock: 35, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S9-02', name: 'Alprazolam', type: 'Tablet', price: 950, stock: 40, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S9-03', name: 'Fluoxetine', type: 'Capsule', price: 1650, stock: 30, image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S9-04', name: 'Amitriptyline', type: 'Tablet', price: 720, stock: 45, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S9-05', name: 'Risperidone', type: 'Tablet', price: 1450, stock: 25, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S9-06', name: 'Diazepam', type: 'Tablet', price: 850, stock: 35, image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
-                ]
-            },
-            {
-                id: 'S10', number: 10, name: 'Dermatology', description: 'Skin Care & Treatments', icon: 'fa-hand-dots', color: 'pink',
-                items: [
-                    { id: 'S10-01', name: 'Hydrocortisone Cream', type: 'Cream', price: 480, stock: 60, image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S10-02', name: 'Clotrimazole', type: 'Cream', price: 520, stock: 55, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S10-03', name: 'Sunscreen SPF 50', type: 'Lotion', price: 850, stock: 40, image: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S10-04', name: 'Acne Gel', type: 'Gel', price: 720, stock: 45, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S10-05', name: 'Betnovate Cream', type: 'Cream', price: 650, stock: 50, image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S10-06', name: 'Calamine Lotion', type: 'Lotion', price: 380, stock: 70, image: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
-                ]
-            },
-            {
-                id: 'S11', number: 11, name: 'Gastrointestinal', description: 'Digestive Health', icon: 'fa-stomach', color: 'amber',
-                items: [
-                    { id: 'S11-01', name: 'Omeprazole', type: 'Capsule', price: 680, stock: 80, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S11-02', name: 'Loperamide', type: 'Capsule', price: 450, stock: 70, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S11-03', name: 'Antacid Tablets', type: 'Chewable', price: 380, stock: 100, image: 'https://images.unsplash.com/photo-1585435557343-3b092031a831?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S11-04', name: 'Lactulose Syrup', type: 'Syrup', price: 750, stock: 35, image: 'https://images.unsplash.com/photo-1583947581924-860bda6a26df?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S11-05', name: 'Ranitidine', type: 'Tablet', price: 520, stock: 60, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S11-06', name: 'Esomeprazole', type: 'Capsule', price: 1200, stock: 40, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
-                ]
-            },
-            {
-                id: 'S12', number: 12, name: 'Eye & Ear Care', description: 'Ophthalmic & Otic Meds', icon: 'fa-eye', color: 'violet',
-                items: [
-                    { id: 'S12-01', name: 'Chloramphenicol Eye Drops', type: 'Drops', price: 420, stock: 50, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S12-02', name: 'Artificial Tears', type: 'Drops', price: 650, stock: 60, image: 'https://images.unsplash.com/photo-1550572017-edd951aa8f72?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S12-03', name: 'Ear Drops', type: 'Drops', price: 580, stock: 40, image: 'https://images.unsplash.com/photo-1583947581924-860bda6a26df?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S12-04', name: 'Eye Ointment', type: 'Ointment', price: 720, stock: 35, image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S12-05', name: 'Ciprofloxacin Eye Drops', type: 'Drops', price: 850, stock: 30, image: 'https://images.unsplash.com/photo-1550572017-edd951aa8f72?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S12-06', name: 'Wax Softener', type: 'Drops', price: 480, stock: 45, image: 'https://images.unsplash.com/photo-1583947581924-860bda6a26df?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
-                ]
-            },
-            // Additional 8 shelves
-            {
-                id: 'S13', number: 13, name: 'Antifungals', description: 'Fungal Infection Treatments', icon: 'fa-virus-slash', color: 'emerald',
-                items: [
-                    { id: 'S13-01', name: 'Fluconazole', type: 'Capsule', price: 950, stock: 45, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S13-02', name: 'Ketoconazole Shampoo', type: 'Shampoo', price: 780, stock: 35, image: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S13-03', name: 'Nystatin', type: 'Suspension', price: 650, stock: 40, image: 'https://images.unsplash.com/photo-1583947581924-860bda6a26df?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S13-04', name: 'Terbinafine Cream', type: 'Cream', price: 720, stock: 50, image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S13-05', name: 'Miconazole', type: 'Cream', price: 580, stock: 55, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S13-06', name: 'Griseofulvin', type: 'Tablet', price: 850, stock: 30, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
-                ]
-            },
-            {
-                id: 'S14', number: 14, name: 'Antivirals', description: 'Viral Infection Treatments', icon: 'fa-shield-virus', color: 'red',
-                items: [
-                    { id: 'S14-01', name: 'Acyclovir', type: 'Tablet', price: 1100, stock: 40, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S14-02', name: 'Valacyclovir', type: 'Tablet', price: 1650, stock: 30, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S14-03', name: 'Oseltamivir', type: 'Capsule', price: 2200, stock: 25, image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S14-04', name: 'Acyclovir Cream', type: 'Cream', price: 680, stock: 45, image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S14-05', name: 'Famciclovir', type: 'Tablet', price: 1850, stock: 20, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S14-06', name: 'Ribavirin', type: 'Capsule', price: 2400, stock: 15, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
-                ]
-            },
-            {
-                id: 'S15', number: 15, name: 'Hormonal', description: 'Hormone & Thyroid Meds', icon: 'fa-venus-mars', color: 'fuchsia',
-                items: [
-                    { id: 'S15-01', name: 'Levothyroxine', type: 'Tablet', price: 850, stock: 60, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S15-02', name: 'Metformin XR', type: 'Tablet', price: 950, stock: 50, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S15-03', name: 'Progesterone', type: 'Capsule', price: 1200, stock: 35, image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S15-04', name: 'Estrogen Patch', type: 'Patch', price: 1450, stock: 25, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S15-05', name: 'Testosterone Gel', type: 'Gel', price: 1650, stock: 20, image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S15-06', name: 'Cabergoline', type: 'Tablet', price: 2200, stock: 15, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
-                ]
-            },
-            {
-                id: 'S16', number: 16, name: 'Oncology Support', description: 'Cancer Support Meds', icon: 'fa-ribbon', color: 'pink',
-                items: [
-                    { id: 'S16-01', name: 'Ondansetron', type: 'Tablet', price: 950, stock: 40, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S16-02', name: 'Filgrastim', type: 'Injection', price: 4500, stock: 15, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S16-03', name: 'Epoetin Alfa', type: 'Injection', price: 3800, stock: 12, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S16-04', name: 'Dexamethasone', type: 'Tablet', price: 650, stock: 55, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S16-05', name: 'Prochlorperazine', type: 'Tablet', price: 580, stock: 45, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S16-06', name: 'Mouthwash (Benzydamine)', type: 'Liquid', price: 720, stock: 35, image: 'https://images.unsplash.com/photo-1628595351029-c2bf17511435?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
-                ]
-            },
-            {
-                id: 'S17', number: 17, name: 'Orthopedics', description: 'Bone & Joint Health', icon: 'fa-bone', color: 'slate',
-                items: [
-                    { id: 'S17-01', name: 'Calcium Carbonate', type: 'Tablet', price: 580, stock: 80, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S17-02', name: 'Alendronate', type: 'Tablet', price: 1200, stock: 35, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S17-03', name: 'Vitamin D3 + K2', type: 'Capsule', price: 950, stock: 50, image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S17-04', name: 'Glucosamine', type: 'Tablet', price: 1450, stock: 40, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S17-05', name: 'Chondroitin', type: 'Capsule', price: 1350, stock: 35, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S17-06', name: 'Collagen Peptides', type: 'Powder', price: 1850, stock: 25, image: 'https://images.unsplash.com/photo-1550572017-edd951aa8f72?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
-                ]
-            },
-            {
-                id: 'S18', number: 18, name: 'Women\'s Health', description: 'Gynecological & Maternal', icon: 'fa-person-dress', color: 'rose',
-                items: [
-                    { id: 'S18-01', name: 'Prenatal Vitamins', type: 'Tablet', price: 1200, stock: 45, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S18-02', name: 'Folic Acid', type: 'Tablet', price: 380, stock: 100, image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S18-03', name: 'Iron + Folic', type: 'Tablet', price: 520, stock: 75, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S18-04', name: 'Evening Primrose Oil', type: 'Capsule', price: 950, stock: 40, image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S18-05', name: 'Cranberry Extract', type: 'Capsule', price: 850, stock: 50, image: 'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S18-06', name: 'Menstrual Pain Relief', type: 'Tablet', price: 650, stock: 60, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
-                ]
-            },
-            {
-                id: 'S19', number: 19, name: 'Men\'s Health', description: 'Prostate & Vitality', icon: 'fa-person', color: 'sky',
-                items: [
-                    { id: 'S19-01', name: 'Saw Palmetto', type: 'Capsule', price: 1100, stock: 40, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S19-02', name: 'L-Arginine', type: 'Tablet', price: 950, stock: 45, image: 'https://images.unsplash.com/photo-1626285861696-9f0bf5a49c6d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S19-03', name: 'Zinc + Selenium', type: 'Tablet', price: 780, stock: 55, image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbde88?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S19-04', name: 'Tribulus Terrestris', type: 'Capsule', price: 850, stock: 40, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S19-05', name: 'Maca Root', type: 'Capsule', price: 920, stock: 35, image: 'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S19-06', name: 'Prostate Complex', type: 'Tablet', price: 1350, stock: 30, image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
-                ]
-            },
-            {
-                id: 'S20', number: 20, name: 'Medical Devices', description: 'Health Monitoring Tools', icon: 'fa-heart-circle-check', color: 'lime',
-                items: [
-                    { id: 'S20-01', name: 'Digital BP Monitor', type: 'Device', price: 3500, stock: 20, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S20-02', name: 'Pulse Oximeter', type: 'Device', price: 1800, stock: 35, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S20-03', name: 'Nebulizer Machine', type: 'Device', price: 4500, stock: 15, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S20-04', name: 'Glucometer Kit', type: 'Device', price: 2200, stock: 25, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S20-05', name: 'Infrared Thermometer', type: 'Device', price: 1650, stock: 30, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' },
-                    { id: 'S20-06', name: 'ECG Monitor', type: 'Device', price: 8500, stock: 8, image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }
-                ]
-            }
-        ];
+        let inventory = [];
 
+        function loadPharmacyData() {
+            const savedData = localStorage.getItem('medicoreAdminData');
+            if (savedData) {
+                const adminData = JSON.parse(savedData);
+                // Transform admin data to pharmacy inventory format
+                inventory = adminData.shelves.map((shelf, index) => ({
+                    id: shelf.id,
+                    number: index + 1,
+                    name: shelf.name,
+                    description: shelf.description || `${shelf.name} Medications`,
+                    icon: shelf.icon || 'fa-pills',
+                    color: shelf.color || 'blue',
+                    items: adminData.drugs.filter(d => d.shelfId === shelf.id).map(d => ({
+                        id: d.id,
+                        name: d.name,
+                        type: d.type,
+                        price: d.price,
+                        stock: d.stock,
+                        image: d.image
+                    }))
+                }));
+                
+                // Add unassigned items to a virtual warehouse shelf if needed? 
+                // For now just focus on assigned items
+            }
+        }
+        // Initialize pharmacy data
+        loadPharmacyData();
+        
         const pharmacists = [
             { id: 'P1', name: 'Dr. Sarah Chen', specialty: 'General Medicine', image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', isBusy: false },
             { id: 'P2', name: 'Dr. James Mwangi', specialty: 'Pediatrics', image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', isBusy: true },
@@ -1039,7 +846,11 @@
             { image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80', title: 'Exercise Regularly', subtitle: '30 minutes of activity daily keeps you fit' }
         ];
 
-        let cart = [];
+        let cart = DataManager.getCart();
+
+        function syncCartWithStorage() {
+            DataManager.saveCart(cart);
+        }
         let selectedPharmacist = null;
         let currentChatPharmacist = null;
         let currentSlide = 0;
@@ -1048,9 +859,11 @@
 
         // --- Initialization ---
         document.addEventListener('DOMContentLoaded', () => {
+            loadPharmacyData();
             renderShelves();
             initSlideshow();
             renderRandomDrugs();
+            updateCartUI();
         });
 
         // --- Shelf Functions ---
@@ -1480,7 +1293,13 @@
             });
             
             if (item) {
-                cart.push({ ...item, shelfName: shelfInfo.name });
+                const existing = cart.find(i => i.id === itemId);
+                if (existing) {
+                    existing.qty = (existing.qty || 1) + 1;
+                } else {
+                    cart.push({ ...item, shelfName: shelfInfo.name, qty: 1 });
+                }
+                syncCartWithStorage();
                 updateCartUI();
                 
                 if (event && event.target) {
@@ -1498,8 +1317,9 @@
 
         function updateCartUI() {
             const count = document.getElementById('cartCount');
-            count.innerText = cart.length;
-            count.classList.remove('opacity-0');
+            const totalItems = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
+            count.innerText = totalItems;
+            count.classList.toggle('opacity-0', totalItems === 0);
             
             const container = document.getElementById('cartItems');
             if (cart.length === 0) {
@@ -1515,16 +1335,17 @@
             let html = '';
             let total = 0;
             cart.forEach((item, idx) => {
-                total += item.price;
+                const itemTotal = item.price * (item.qty || 1);
+                total += itemTotal;
                 html += `
                     <div class="flex items-center gap-3 bg-slate-800 p-3 rounded-lg border border-slate-700">
                         <img src="${item.image}" class="w-12 h-12 rounded object-cover">
                         <div class="flex-1 min-w-0">
                             <h4 class="text-sm font-bold text-white truncate">${item.name}</h4>
-                            <p class="text-xs text-slate-400">${item.shelfName}</p>
+                            <p class="text-xs text-slate-400">${item.shelfName} • Qty: ${item.qty || 1}</p>
                         </div>
                         <div class="text-right">
-                            <p class="text-sm font-bold text-blue-400">KSh ${item.price.toLocaleString()}</p>
+                            <p class="text-sm font-bold text-blue-400">KSh ${itemTotal.toLocaleString()}</p>
                             <button onclick="removeFromCart(${idx})" class="text-xs text-red-400 hover:text-red-300">Remove</button>
                         </div>
                     </div>
@@ -1536,6 +1357,7 @@
 
         function removeFromCart(index) {
             cart.splice(index, 1);
+            syncCartWithStorage();
             updateCartUI();
         }
 
@@ -1553,9 +1375,11 @@
         }
 
         function checkout() {
-            if (cart.length === 0) return;
-            const total = document.getElementById('cartTotal').innerText;
-            alert(`Proceeding to payment...\n\nTotal: ${total}\n\nThis would connect to M-Pesa or other payment gateway.`);
+            if (cart.length === 0) {
+                alert("Your cart is empty!");
+                return;
+            }
+            window.location.href = 'checkout.html';
         }
 
         // Close modals on escape

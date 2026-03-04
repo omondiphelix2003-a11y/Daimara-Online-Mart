@@ -318,7 +318,7 @@ function renderDeliveryData() {
     <tr>
       <td>${o.id}</td>
       <td>${o.client}</td>
-      <td><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(o.destination)}" target="_blank" style="color:var(--accent); text-decoration:none;"><i class="fas fa-map-marker-alt"></i> ${o.destination}</a></td>
+      <td><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(o.destination)}" target="_self" style="color:var(--accent); text-decoration:none;"><i class="fas fa-map-marker-alt"></i> ${o.destination}</a></td>
       <td>${o.status}</td>
       <td>
         ${(o.status === 'assigned' || o.status === 'Packed') ? `<button class="action-btn dispatch" onclick="viewReceipt('${o.id}')">Send to Delivery</button>` : ''}
@@ -361,7 +361,7 @@ function viewReceipt(orderId) {
         <p><strong>Order ID:</strong> ${order.id}</p>
         <p><strong>Customer:</strong> ${order.customerName || order.customer?.name}</p>
         <p><strong>Phone:</strong> ${order.customerPhone || order.customer?.phone || 'N/A'}</p>
-        <p><strong>Destination:</strong> <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(order.deliveryLocation || dOrder.destination)}" target="_blank" style="color:var(--accent); text-decoration:none;"><i class="fas fa-map-marker-alt"></i> ${order.deliveryLocation || 'N/A'}</a></p>
+        <p><strong>Destination:</strong> <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(order.deliveryLocation || dOrder.destination)}" target="_self" style="color:var(--accent); text-decoration:none;"><i class="fas fa-map-marker-alt"></i> ${order.deliveryLocation || 'N/A'}</a></p>
         <p><strong>Date:</strong> ${new Date(order.date).toLocaleString()}</p>
       </div>
       <table class="receipt-table">

@@ -8,6 +8,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="data-manager.js"></script>
     <style>
         :root {
             --primary: #0f172a;
@@ -370,24 +371,24 @@
             <a href="#profits" class="sidebar-link flex items-center gap-3 px-4 py-3 text-sm text-slate-300" onclick="showSection('profits')">
                 <i class="fa-solid fa-chart-line w-5"></i> Platform Earnings
             </a>
-            <a href="#messages" class="sidebar-link flex items-center gap-3 px-4 py-3 text-sm text-slate-300" onclick="showSection('messages')">
+            <!--<a href="#messages" class="sidebar-link flex items-center gap-3 px-4 py-3 text-sm text-slate-300" onclick="showSection('messages')">
                 <i class="fa-solid fa-comments w-5"></i> Client Messages
                 <span id="messageBadge" class="ml-auto bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full hidden">0</span>
-            </a>
+            </a>-->
             
             <div class="px-4 mt-6 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">Content</div>
-            <a href="#partners" class="sidebar-link flex items-center gap-3 px-4 py-3 text-sm text-slate-300" onclick="showSection('partners')">
+           <!-- <a href="#partners" class="sidebar-link flex items-center gap-3 px-4 py-3 text-sm text-slate-300" onclick="showSection('partners')">
                 <i class="fa-solid fa-handshake w-5"></i> Partners
             </a>
             <a href="#slideshow" class="sidebar-link flex items-center gap-3 px-4 py-3 text-sm text-slate-300" onclick="showSection('slideshow')">
                 <i class="fa-solid fa-images w-5"></i> Slideshow
-            </a>
+            </a>-->
             <a href="#pharmacists" class="sidebar-link flex items-center gap-3 px-4 py-3 text-sm text-slate-300" onclick="showSection('pharmacists')">
                 <i class="fa-solid fa-user-doctor w-5"></i> Pharmacists
             </a>
-            <a href="#branding" class="sidebar-link flex items-center gap-3 px-4 py-3 text-sm text-slate-300" onclick="showSection('branding')">
+           <!-- <a href="#branding" class="sidebar-link flex items-center gap-3 px-4 py-3 text-sm text-slate-300" onclick="showSection('branding')">
                 <i class="fa-solid fa-paint-brush w-5"></i> Branding
-            </a>
+            </a>-->
             
             <div class="px-4 mt-6 mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">System</div>
             <a href="#warehouse" class="sidebar-link flex items-center gap-3 px-4 py-3 text-sm text-slate-300" onclick="showSection('warehouse')">
@@ -512,14 +513,14 @@
                                 <i class="fa-solid fa-wallet text-xl"></i>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2 text-sm">
+                       <!-- <div class="flex items-center gap-2 text-sm">
                             <span class="text-green-400"><i class="fa-solid fa-arrow-up"></i> 8%</span>
                             <span class="text-slate-500">vs last month</span>
-                        </div>
+                        </div>-->
                     </div>
                 </div>
 
-               <!-- <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="admin-card rounded-xl p-6">
                         <h3 class="text-lg font-bold text-white mb-4">Sales Overview</h3>
                         <canvas id="salesChart" height="250"></canvas>
@@ -529,7 +530,7 @@
                         <h3 class="text-lg font-bold text-white mb-4">Inventory by Category</h3>
                         <canvas id="inventoryChart" height="250"></canvas>
                     </div>
-                </div>-->
+                </div>
 
                 <div class="admin-card rounded-xl p-6">
                     <div class="flex justify-between items-center mb-4">
@@ -549,9 +550,6 @@
                         <button onclick="openDrugModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all">
                             <i class="fa-solid fa-plus"></i> Add Drug
                         </button>
-                        <button onclick="openShelfModal()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all">
-                            <i class="fa-solid fa-layer-group"></i> Manage Shelves
-                        </button>
                     </div>
                     <div class="relative">
                         <input type="text" id="inventorySearch" placeholder="Search drugs..." 
@@ -565,13 +563,13 @@
                     <div class="lg:col-span-1 space-y-3">
                         <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Shelves</h3>
                         <div id="shelfList" class="space-y-2">
-                            <!-- Shelves populated by JS -->
+                            -- Shelves populated by JS --
                         </div>
                     </div>
                     
-                    <div class="lg:col-span-3">
-                        <div id="inventoryGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                            <!-- Drugs populated by JS -->
+                    --<div class="lg:col-span-3">
+                       <div id="inventoryGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                            -- Drugs populated by JS --
                         </div>
                     </div>
                 </div>
@@ -663,7 +661,7 @@
             </section>
 
             <!-- Partners Section -->
-            <section id="partners" class="hidden space-y-6">
+           <!-- <section id="partners" class="hidden space-y-6">
                 <div class="flex justify-between items-center">
                     <h3 class="text-lg font-bold text-white">Partner Organizations</h3>
                     <button onclick="openPartnerModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center gap-2">
@@ -672,12 +670,12 @@
                 </div>
                 
                 <div id="partnersGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <!-- Partners populated by JS -->
+                    -- Partners populated by JS --
                 </div>
-            </section>
+            </section>-->
 
             <!-- Slideshow Section -->
-            <section id="slideshow" class="hidden space-y-6">
+           <!-- <section id="slideshow" class="hidden space-y-6">
                 <div class="flex justify-between items-center">
                     <h3 class="text-lg font-bold text-white">Homepage Slideshow</h3>
                     <button onclick="openSlideshowModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center gap-2">
@@ -685,7 +683,7 @@
                     </button>
                 </div>
                 
-                <div id="slideshowGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div id="slideshowGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">--->
                     <!-- Slides populated by JS -->
                 </div>
             </section>
@@ -694,7 +692,7 @@
             <section id="pharmacists" class="hidden space-y-6">
                 <div class="flex justify-between items-center">
                     <h3 class="text-lg font-bold text-white">Pharmacist Management</h3>
-                    <button onclick="openPharmacistModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+                   <button onclick="openPharmacistModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center gap-2">
                         <i class="fa-solid fa-plus"></i> Add Pharmacist
                     </button>
                 </div>
@@ -1560,14 +1558,27 @@
             const modal = document.getElementById('drugModal');
             const form = document.getElementById('drugForm');
             const title = document.getElementById('drugModalTitle');
+            const shelfSelect = document.getElementById('drugShelf');
             
+            // Populate shelves
+            shelfSelect.innerHTML = '<option value="warehouse">Warehouse (Unassigned)</option>';
+            data.shelves.forEach(s => {
+                shelfSelect.innerHTML += `<option value="${s.id}">Shelf ${s.number}: ${s.name}</option>`;
+            });
+
             if (drugId) {
-                const drug = data.drugs.find(d => d.id === drugId);
+                let drug = data.drugs.find(d => d.id === drugId);
+                let isFromWarehouse = false;
+                if (!drug && data.warehouseDrugs) {
+                    drug = data.warehouseDrugs.find(d => d.id === drugId);
+                    isFromWarehouse = true;
+                }
+                
                 title.textContent = 'Edit Drug';
                 document.getElementById('drugId').value = drug.id;
                 document.getElementById('drugName').value = drug.name;
                 document.getElementById('drugType').value = drug.type;
-                document.getElementById('drugShelf').value = drug.shelfId;
+                document.getElementById('drugShelf').value = isFromWarehouse ? 'warehouse' : drug.shelfId;
                 document.getElementById('drugPrice').value = drug.price;
                 document.getElementById('drugStock').value = drug.stock;
                 document.getElementById('drugImage').value = drug.image;
@@ -1587,27 +1598,46 @@
         document.getElementById('drugForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const id = document.getElementById('drugId').value;
+            const shelfId = document.getElementById('drugShelf').value;
             const drugData = {
                 id: id || generateId(),
                 name: document.getElementById('drugName').value,
                 type: document.getElementById('drugType').value,
-                shelfId: document.getElementById('drugShelf').value,
+                shelfId: shelfId === 'warehouse' ? 'unassigned' : shelfId,
                 price: parseInt(document.getElementById('drugPrice').value),
                 stock: parseInt(document.getElementById('drugStock').value),
                 image: document.getElementById('drugImage').value || 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=300&q=80'
             };
             
-            if (id) {
-                const idx = data.drugs.findIndex(d => d.id === id);
-                data.drugs[idx] = drugData;
+            // Remove existing version from both arrays
+            data.drugs = data.drugs.filter(d => d.id !== drugData.id);
+            if (!data.warehouseDrugs) data.warehouseDrugs = [];
+            data.warehouseDrugs = data.warehouseDrugs.filter(d => d.id !== drugData.id);
+            
+            // Add to the appropriate array
+            if (shelfId === 'warehouse') {
+                data.warehouseDrugs.push(drugData);
             } else {
                 data.drugs.push(drugData);
             }
             
+            // Sync with main website products
+            const websiteProduct = {
+                id: drugData.id,
+                name: drugData.name,
+                price: drugData.price,
+                image: drugData.image,
+                subcategory: 'Pharmacy',
+                description: `${drugData.type} - MediCore Pharmacy Stock`,
+                stock: drugData.stock
+            };
+            DataManager.addProduct(websiteProduct);
+            
             saveData();
             renderInventory();
+            renderWarehouse();
             closeDrugModal();
-            showNotification(id ? 'Drug updated successfully' : 'Drug added successfully');
+            showNotification(id ? 'Drug updated successfully' : 'Drug added successfully and posted to website');
         });
 
         function editDrug(id) {
