@@ -145,6 +145,16 @@ body{
 .receipt-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
 .receipt-table th { text-align: left; border-bottom: 1px solid #eee; padding: 10px 0; }
 .receipt-table td { padding: 10px 0; border-bottom: 1px solid #f9f9f9; }
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-left: 10px;
+}
+.badge-red { background: #fee2e2; color: #ef4444; border: 1px solid #fecaca; }
+.badge-green { background: #dcfce7; color: #22c55e; border: 1px solid #bbf7d0; }
 .receipt-total { text-align: right; font-size: 20px; font-weight: bold; border-top: 2px solid #333; padding-top: 10px; }
 .dispatch-confirm-btn {
   display: block;
@@ -293,10 +303,25 @@ if (checkAccess()) {
 function renderDeliveryData() {
   const orders = DataManager.getScopedData('delivery_orders', [], viewUserEmail);
   const earnings = DataManager.getScopedData('delivery_earnings', { total: 0 }, viewUserEmail);
+  const allGlobalOrders = DataManager.getAllOrders();
   
   const today = new Date().toLocaleDateString();
+  
+  // An order is only "Ready" if it's assigned to this person AND all its products are confirmed by operators
+  const readyOrders = orders.filter(o => {
+    if (o.status !== 'assigned' && o.status !== 'Packed') return false;
+    
+    // Check global order for full assignment status
+    const globalOrder = allGlobalOrders.find(go => go.id === o.id);
+    if (!globalOrder) return true; // Fallback
+    
+    const items = globalOrder.items || globalOrder.products || [];
+    const assignedBy = globalOrder.assignedBy || [];
+    return items.every(item => item.owner ? assignedBy.includes(item.owner) : true);
+  });
+
   const summary = {
-    ready: orders.filter(o => o.status === 'assigned' || o.status === 'Packed').length,
+    ready: readyOrders.length,
     out: orders.filter(o => o.status === 'Out for Delivery').length,
     delivered: orders.filter(o => {
       const isCompleted = o.status === 'completed' || o.status === 'Delivered';
@@ -314,19 +339,31 @@ function renderDeliveryData() {
 
   // Update Table
   const tbody = document.querySelector('.table tbody');
-  tbody.innerHTML = orders.map(o => `
+  tbody.innerHTML = orders.map(o => {
+    const globalOrder = allGlobalOrders.find(go => go.id === o.id);
+    let isFullyAssigned = true;
+    if (globalOrder) {
+      const items = globalOrder.items || globalOrder.products || [];
+      const assignedBy = globalOrder.assignedBy || [];
+      isFullyAssigned = items.every(item => item.owner ? assignedBy.includes(item.owner) : true);
+    }
+
+    const displayStatus = (o.status === 'assigned' && !isFullyAssigned) ? 'Partially Assigned (Waiting)' : o.status;
+
+    return `
     <tr>
       <td>${o.id}</td>
       <td>${o.client}</td>
       <td><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(o.destination)}" target="_self" style="color:var(--accent); text-decoration:none;"><i class="fas fa-map-marker-alt"></i> ${o.destination}</a></td>
-      <td>${o.status}</td>
+      <td>${displayStatus}</td>
       <td>
-        ${(o.status === 'assigned' || o.status === 'Packed') ? `<button class="action-btn dispatch" onclick="viewReceipt('${o.id}')">Send to Delivery</button>` : ''}
+        ${(o.status === 'assigned' || o.status === 'Packed') ? `<button class="action-btn dispatch" onclick="viewReceipt('${o.id}')">View Details & Dispatch</button>` : ''}
         ${o.status === 'Out for Delivery' ? `<button class="action-btn delivered" onclick="updateStatus('${o.id}', 'completed')">Mark Delivered</button>` : ''}
         ${(o.status === 'completed' || o.status === 'Delivered') ? '<span style="color:green">Completed</span>' : ''}
       </td>
     </tr>
-  `).join('') || '<tr><td colspan="5" style="text-align:center">No active delivery assignments</td></tr>';
+  `;
+  }).join('') || '<tr><td colspan="5" style="text-align:center">No active delivery assignments</td></tr>';
 }
 
 function updateStatus(id, newStatus) {
@@ -349,7 +386,31 @@ function viewReceipt(orderId) {
 
   const body = document.getElementById('modal-body');
   const items = order.items || order.products || [];
+  const assignedBy = order.assignedBy || [];
   const config = DataManager.getSystemConfig();
+
+  let allAssigned = true;
+  const itemsHtml = items.map(item => {
+    // If an item has an owner, check if that owner has assigned it
+    // If it has NO owner, assume it's an admin/general product and it's implicitly assigned by the lead
+    const isAssigned = item.owner ? assignedBy.includes(item.owner) : true;
+    if (!isAssigned) allAssigned = false;
+    
+    const badgeClass = isAssigned ? 'badge-green' : 'badge-red';
+    const badgeText = isAssigned ? 'Ready' : 'Waiting for Operator';
+    
+    return `
+      <tr>
+        <td>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span>${item.name}</span>
+            <span class="status-badge ${badgeClass}">${badgeText}</span>
+          </div>
+        </td>
+        <td style="text-align:center;">${item.qty || item.quantity || 1}</td>
+      </tr>
+    `;
+  }).join('');
 
   body.innerHTML = `
     <div class="receipt">
@@ -372,14 +433,16 @@ function viewReceipt(orderId) {
           </tr>
         </thead>
         <tbody>
-          ${items.map(item => `
-            <tr>
-              <td>${item.name}</td>
-              <td style="text-align:center;">${item.qty || item.quantity || 1}</td>
-            </tr>
-          `).join('')}
+          ${itemsHtml}
         </tbody>
       </table>
+      
+      ${!allAssigned ? `
+        <div style="background:#fff3cd; color:#856404; padding:10px; border-radius:8px; margin-bottom:15px; font-size:14px; text-align:center;">
+          <i class="fas fa-exclamation-triangle"></i> Some products in this order haven't been assigned by their operators yet.
+        </div>
+      ` : ''}
+
       <div class="receipt-total">
         ${order.paymentMethod === 'Pay After Delivery' ? 
           `<div style="font-size:0.8em; color:#16a34a;">Delivery Fee (KES ${config.deliveryFee}): PAID UPFRONT</div>
@@ -387,7 +450,9 @@ function viewReceipt(orderId) {
           `Total: KES ${(order.grandTotal || order.totalPrice || 0).toLocaleString()}`
         }
       </div>
-      <button class="dispatch-confirm-btn" onclick="updateStatus('${order.id}', 'Out for Delivery')">
+      <button class="dispatch-confirm-btn" 
+              onclick="updateStatus('${order.id}', 'Out for Delivery')"
+              ${!allAssigned ? 'disabled style="background:#bdc3c7; cursor:not-allowed;"' : ''}>
         <i class="fas fa-truck"></i> Confirm Dispatch & Start Delivery
       </button>
     </div>

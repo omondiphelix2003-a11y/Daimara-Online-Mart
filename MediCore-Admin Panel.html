@@ -8,6 +8,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="data-manager.js"></script>
     <style>
         :root {
             --primary: #0f172a;
@@ -1743,16 +1744,30 @@
 
         function updateOrderStatus(id, status) {
             const order = data.orders.find(o => o.id === id);
-            order.status = status;
-            saveData();
-            renderOrders();
-            updateStats();
-            showNotification(`Order ${id} marked as ${status}`);
+            if (order) {
+                order.status = status;
+                
+                // Sync with global order system
+                if (typeof DataManager !== 'undefined') {
+                    DataManager.updateOrderStatus(id, status);
+                }
+                
+                saveData();
+                renderOrders();
+                updateStats();
+                showNotification(`Order ${id} marked as ${status}`);
+            }
         }
 
         function deleteOrder(id) {
             if (confirm('Are you sure you want to delete this order?')) {
                 data.orders = data.orders.filter(o => o.id !== id);
+                
+                // Sync with global order system
+                if (typeof DataManager !== 'undefined') {
+                    DataManager.deleteOrder(id);
+                }
+                
                 saveData();
                 renderOrders();
                 updateStats();
@@ -2411,10 +2426,17 @@
 
         // Action Functions
         function assignDelivery(orderId) {
-            const deliveryPersonnel = [
-                { name: 'John Delivery', email: 'john@delivery.com' },
-                { name: 'Sarah Courier', email: 'sarah@delivery.com' }
-            ];
+            const allUsers = DataManager.getAllUsers();
+            const onlineIds = DataManager.getOnlineUsers();
+            
+            const deliveryPersonnel = allUsers.filter(u => 
+                u.role === 'delivery' && onlineIds.includes(u.id)
+            );
+            
+            if (deliveryPersonnel.length === 0) {
+                alert("No available delivery personnel at the moment.");
+                return;
+            }
             
             let msg = "Select a delivery person to assign this order:\n";
             deliveryPersonnel.forEach((p, idx) => {
@@ -2429,6 +2451,10 @@
                     const order = data.orders.find(o => o.id === orderId);
                     order.deliveryPersonEmail = selectedPerson.email;
                     order.status = 'processing';
+                    
+                    // Sync with global order system
+                    DataManager.assignOrder(orderId, selectedPerson.email);
+                    
                     saveData();
                     renderOrders();
                     updateStats();

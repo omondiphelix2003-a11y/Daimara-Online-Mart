@@ -8,7 +8,19 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Libre+Barcode+39&display=swap" rel="stylesheet">
 
-<style>* {
+<style>
+:root{
+      --primary:#3b82f6;
+      --dark:#0f172a;
+      --bg:#0f172a;
+      --card:#1e293b;
+      --text:#e2e8f0;
+      --border:#334155;
+      --shadow:0 4px 6px -1px rgba(0, 0, 0, 0.3);      --glass: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(255, 255, 255, 0.1);    }
+
+
+* {
   box-sizing: border-box;
   margin: 0;
   font-family: 'Inter', sans-serif;
@@ -580,7 +592,7 @@ body {
 }
 
 .order-card {
-  background: rgba(2, 2, 2, 0.527);
+  background:  rgba(14, 13, 13, 0.05);
   padding: 20px;
   border-radius: 10px;
   border-left: 4px solid rgb(233, 157, 17);
@@ -859,7 +871,9 @@ body {
 /* TRACKING STYLES */
 .tracking-container {
   padding: 20px 0;
-  background-color: rgba(2, 2, 2, 0.61);
+  padding-left: 12px;
+  padding-right: -12px;
+  background-color: rgba(0, 0, 0, 0.925);
 }
 .tracking-header {
   text-align: center;
@@ -883,7 +897,7 @@ body {
   top: 5px;
   bottom: 5px;
   width: 3px;
-  background: rgba(2, 2, 2, 0.377);
+  background: rgba(0, 0, 0, 0.925);
 }
 .tracking-step {
   display: flex;
@@ -895,7 +909,7 @@ body {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: rgba(2, 2, 2, 0.377);
+  background: rgba(0, 0, 0, 0.925);
   border: 4px solid #fff;
   box-shadow: 0 0 0 2px #eee;
   z-index: 1;
@@ -923,7 +937,7 @@ body {
 .no-data {
   text-align: center;
   padding: 40px 20px;
-  color: #7f8c8d;
+  color: #4d5858;
 }
 
 .no-data p {
@@ -940,7 +954,7 @@ body {
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.925);
   animation: fadeIn 0.3s ease;
   align-items: center;
   justify-content: center;
@@ -951,12 +965,12 @@ body {
 }
 
 .modal-content {
-  background-color: rgba(2, 2, 2, 0.377);
+  background-color: rgba(0, 0, 0, 0.925);
   padding: 30px;
   border-radius: 12px;
   width: 90%;
   max-width: 500px;
-  box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 5px 30px rgba(0, 0, 0, 0.925);
   position: relative;
   max-height: 90vh;
   overflow-y: auto;
@@ -980,8 +994,8 @@ body {
 
 /* RECEIPT STYLES */
 .receipt {
-  color: #333;
-  background: rgba(2, 2, 2, 0.61);
+  color: #1f1e1e;
+  background: rgba(0, 0, 0, 0.925);
 }
 .receipt-header {
   text-align: center;
@@ -991,19 +1005,19 @@ body {
 }
 .receipt-header h1 {
   color: rgb(233, 157, 17);
-  font-size: 24px;
+  font-size: 27px;
   margin-bottom: 5px;
 }
 .receipt-info {
   margin-bottom: 20px;
   line-height: 1.6;
-  font-size: 14px;
+  font-size: 12px;
 }
 .receipt-table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 20px;
-  font-size: 14px;
+  font-size: 12px;
 }
 .receipt-table th {
   text-align: left;
@@ -1024,8 +1038,7 @@ body {
 }
 .receipt-total {
   text-align: right;
-  font-size: 18px;
-  font-weight: bold;
+  font-size: 14px;
   border-top: 2px solid #333;
   padding-top: 10px;
 }
@@ -1061,7 +1074,7 @@ body {
 @media print {
   body * { visibility: hidden; }
   .modal, .modal-content, .receipt, .receipt * { visibility: visible; }
-  .modal { position: absolute; left: 0; top: 0; background: rgba(2, 2, 2, 0.377); display: flex !important; }
+  .modal { position: absolute; left: 0; top: 0; background: rgba(0, 0, 0, 0.925); display: flex !important; }
   .close, .print-btn, .navbar, .footer, .profile-sidebar { display: none !important; }
   .modal-content { box-shadow: none; border: none; width: 100%; max-width: 100%; padding: 0; }
 }
@@ -2191,78 +2204,78 @@ async function submitRegistration(type) {
     <span class="close" onclick="closeRegistrationModal()">&times;</span>
     <div id="reg-step-1" class="reg-step active">
       <h2 style="border:none; margin-bottom: 20px; font-size: 18px;">Daimara business Panel</h2>
-      <p style="font-size: 16px; margin-bottom: 20px;">Choose the type of page you want to register for:</p>
+      <p style="font-size: 14px; margin-bottom: 20px;">Choose the type of page you want to register for:</p>
       <div style="display: flex; flex-direction: column; gap: 15px;">
-        <button class="btn btn-primary" style="padding: 20px; font-size: 16px;" onclick="startRegistration('operator')">Register for a Business Operator Panel 🏢</button>
-        <button class="btn btn-primary" style="padding: 20px; font-size: 16px;" onclick="startRegistration('delivery')">Register for a Delivery Personnel panel 🚚</button>
+        <button class="btn btn-primary" style="padding: 20px; font-size: 14px;color: #0a0a0a;" onclick="startRegistration('operator')">Register for a Business Operator Panel <span style="font-size: 30px;">🏢</span></button>
+        <button class="btn btn-primary" style="padding: 20px; font-size: 14px;color: #0a0a0a;" onclick="startRegistration('delivery')">Register for a Delivery Personnel panel <span style="font-size: 30px;">🚚</span></button>
       </div>
     </div>
 
     <!-- Personal Details Step (Shared) -->
     <div id="reg-step-personal" class="reg-step">
-      <h2 style="border:none;">Personal Identification</h2>
-      <div class="form-group">
+      <h2 style="border:none;color: #ffffff;font-weight: lighter;">Personal Identification</h2>
+      <div class="form-group" style="font-size: 16px;font-weight: lighter;">
         <label>User Full Name (as in ID)</label>
         <input type="text" id="reg-fullname" placeholder="Full Name">
       </div>
-      <div class="form-group">
+      <div class="form-group"style="font-size: 16px;font-weight: lighter;">
         <label>Date of Birth (as in ID)</label>
         <input type="date" id="reg-dob">
       </div>
-      <div class="form-group">
+      <div class="form-group"style="font-size: 16px;font-weight: lighter;">
         <label>District of Birth (as in ID)</label>
         <input type="text" id="reg-district" placeholder="District">
       </div>
-      <div class="form-group">
+      <div class="form-group"style="font-size: 16px;font-weight: lighter;">
         <label>ID Number</label>
         <input type="text" id="reg-idnumber" placeholder="ID Number">
       </div>
-      <div class="id-upload-grid">
+      <div class="id-upload-grid"style="font-size: 16px;font-weight: lighter;">
         <div>
-          <label style="display:block; margin-bottom:10px; font-size:14px; font-weight:600;">Front of ID</label>
+          <label style="display:block; margin-bottom:10px; font-size:14px; font-weight:lighter;">Front of ID</label>
           <div style="border: 2px dashed #ccc; padding: 15px; text-align: center; border-radius: 8px;">
-            <input type="file" id="reg-id-front" accept="image/*" style="display:none;" onchange="previewID(this, 'preview-front')">
-            <button class="btn btn-secondary" style="font-size:12px; margin-bottom:10px;" onclick="document.getElementById('reg-id-front').click()">Upload ID Photo(Front)</button>
+            <input type="file" id="reg-id-front" accept="image/*" style="display:none;font-weight: lighter;" onchange="previewID(this, 'preview-front')">
+            <button class="btn btn-secondary" style="font-size:14px; margin-bottom:10px;font-weight: lighter;color: #0a0a0a;" onclick="document.getElementById('reg-id-front').click()">Upload ID Photo(Front)</button>
             <div id="preview-front" style="height:80px; display:flex; align-items:center; justify-content:center; font-size: 12px;">No image</div>
           </div>
         </div>
         <div>
-          <label style="display:block; margin-bottom:10px; font-size:14px; font-weight:600;">Back of ID</label>
+          <label style="display:block; margin-bottom:10px; font-size:14px; font-weight:lighter;">Back of ID</label>
           <div style="border: 2px dashed #ccc; padding: 15px; text-align: center; border-radius: 8px;">
-            <input type="file" id="reg-id-back" accept="image/*" style="display:none;" onchange="previewID(this, 'preview-back')">
-            <button class="btn btn-secondary" style="font-size:12px; margin-bottom:10px;" onclick="document.getElementById('reg-id-back').click()">Upload ID Photo(Back)</button>
+            <input type="file" id="reg-id-back" accept="image/*" style="display:none;font-weight: lighter;" onchange="previewID(this, 'preview-back')">
+            <button class="btn btn-secondary" style="font-size:14px; margin-bottom:10px;font-weight: lighter;color: #0a0a0a;" onclick="document.getElementById('reg-id-back').click()">Upload ID Photo(Back)</button>
             <div id="preview-back" style="height:80px; display:flex; align-items:center; justify-content:center; font-size: 12px;">No image</div>
           </div>
         </div>
       </div>
-      <div id="scan-status" style="margin-bottom: 20px; font-size: 16px; font-weight: bold; color: rgb(233, 157, 17);"></div>
-      <button class="btn btn-primary btn-full" onclick="validateAndProceed()">Confirm Details & Continue</button>
+      <div id="scan-status" style="margin-bottom: 20px; font-size: 16px; font-weight: lighter; color: rgb(233, 157, 17);"></div>
+      <button class="btn btn-primary btn-full" onclick="validateAndProceed()" style="color: black;font-weight: lighter;">Confirm Details & Continue</button>
     </div>
 
     <!-- Operator Details Step -->
     <div id="reg-step-operator" class="reg-step">
-      <h2 style="border:none;">Business Details</h2>
-      <div class="form-group">
+      <h2 style="border:none;color: #ffffff;font-weight: lighter;">Business Details</h2>
+      <div class="form-group"style="font-size: 16px;font-weight: lighter;">
         <label>Business/Company's Name</label>
         <input type="text" id="op-company" placeholder="Company Name">
       </div>
-      <div class="form-group">
+      <div class="form-group"style="font-size: 16px;font-weight: lighter;">
         <label>Business Email</label>
         <input type="email" id="op-email" placeholder="example@gmail.com or example@example.com/.co.ke">
       </div>
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-        <div class="form-group"><label>State</label><input type="text" id="op-state"></div>
-        <div class="form-group"><label>City</label><input type="text" id="op-city"></div>
+        <div class="form-group"style="font-size: 16px;font-weight: lighter;"><label>State</label><input type="text" id="op-state"></div>
+        <div class="form-group"style="font-size: 16px;font-weight: lighter;"><label>City</label><input type="text" id="op-city"></div>
       </div>
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-        <div class="form-group"><label>Street</label><input type="text" id="op-street"></div>
-        <div class="form-group"><label>Address</label><input type="text" id="op-address"></div>
+        <div class="form-group"style="font-size: 16px;font-weight: lighter;"><label>Street</label><input type="text" id="op-street"></div>
+        <div class="form-group"style="font-size: 16px;font-weight: lighter;"><label>Address</label><input type="text" id="op-address"></div>
       </div>
-      <div class="form-group">
+      <div class="form-group"style="font-size: 16px;font-weight: lighter;">
         <label>Business Registration Number</label>
         <input type="text" id="op-regnumber">
       </div>
-      <div class="form-group">
+      <div class="form-group"style="font-size: 16px;font-weight: lighter;">
         <label>Type of Business</label>
         <input type="text" id="op-type" placeholder="e.g. Retail, Wholesale">
       </div>
@@ -2271,8 +2284,8 @@ async function submitRegistration(type) {
 
     <!-- Delivery Details Step -->
     <div id="reg-step-delivery" class="reg-step">
-      <h2 style="border:none;">Delivery Services Details</h2>
-      <div class="form-group">
+      <h2 style="border:none;color: #ffffff;font-weight: lighter;">Delivery Services Details</h2>
+      <div class="form-group"style="font-size: 16px;font-weight: lighter;">
         <label>Means of Delivery</label>
         <select id="del-means" style="width:100%; padding:12px; border-radius:6px; border:1px solid #bdc3c7;">
           <option value="cycled-bike">Bicycle</option>
@@ -2280,38 +2293,38 @@ async function submitRegistration(type) {
           <option value="vehicle">Vehicle</option>
         </select>
       </div>
-      <div class="form-group">
+      <div class="form-group"style="font-size: 16px;font-weight: lighter;">
         <label>Email Address</label>
         <input type="email" id="del-email" placeholder="example@gmail.com">
       </div>
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-        <div class="form-group"><label>State of Operation</label><input type="text" id="del-state"></div>
-        <div class="form-group"><label>City</label><input type="text" id="del-city"></div>
+        <div class="form-group"style="font-size: 16px;font-weight: lighter;"><label>State of Operation</label><input type="text" id="del-state"></div>
+        <div class="form-group"style="font-size: 16px;font-weight: lighter;"><label>City</label><input type="text" id="del-city"></div>
       </div>
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-        <div class="form-group"><label>Street</label><input type="text" id="del-street"></div>
-        <div class="form-group"><label>Address</label><input type="text" id="del-address"></div>
+        <div class="form-group"style="font-size: 16px;font-weight: lighter;"><label>Street</label><input type="text" id="del-street"></div>
+        <div class="form-group"style="font-size: 16px;font-weight: lighter;"><label>Address</label><input type="text" id="del-address"></div>
       </div>
-      <div class="form-group">
+      <div class="form-group"style="font-size: 16px;font-weight: lighter;">
         <label>Business Registration Number</label>
         <input type="text" id="del-regnumber">
       </div>
-      <div class="form-group">
+      <div class="form-group"style="font-size: 16px;font-weight: lighter;">
         <label>KRA PIN</label>
         <input type="text" id="del-krapin">
       </div>
-      <div class="form-group">
+      <div class="form-group"style="font-size: 16px;font-weight: lighter;">
         <label>Type of Services</label>
         <input type="text" id="del-type" value="delivery services" readonly>
       </div>
-      <div class="form-group">
+      <div class="form-group"style="font-size: 16px;font-weight: lighter;">
         <label>Plate Number (CAPITAL LETTERS)</label>
         <input type="text" id="del-plate" placeholder="E.G. KAA 001A" style="text-transform: uppercase;">
       </div>
-      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px;">
-        <div><label style="font-size:12px;">Front View</label><input type="file" accept="image/*" id="del-img-front"></div>
-        <div><label style="font-size:12px;">Side View</label><input type="file" accept="image/*" id="del-img-side"></div>
-        <div><label style="font-size:12px;">Back View</label><input type="file" accept="image/*" id="del-img-back"></div>
+      <div style="display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 20px;">
+        <div><label style="font-size:15px;color: rgb(233, 157, 17);">Front View</label><input type="file" accept="image/*" id="del-img-front"></div>
+        <div><label style="font-size:15px;color: rgb(233, 157, 17);">Side View</label><input type="file" accept="image/*" id="del-img-side"></div>
+        <div><label style="font-size:15px;color: rgb(233, 157, 17);">Back View</label><input type="file" accept="image/*" id="del-img-back"></div>
       </div>
       <button class="btn btn-primary btn-full" onclick="submitRegistration('delivery')">Register Now</button>
     </div>
@@ -2326,7 +2339,7 @@ async function submitRegistration(type) {
 <script src="profile-nav.js"></script>
 <script src="profile.js"></script>
 <footer class="footer">
-  <p>Copyright © 2026 Daimara Stores. All rights reserved.</p>
+  <p>© 2026 Daimara Stores. All rights reserved.</p>
 </footer>
 </body>
 </html>

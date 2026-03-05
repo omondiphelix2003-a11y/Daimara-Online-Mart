@@ -465,75 +465,8 @@
 
     <!-- Partners Marquee -->
     <div class="partners-container bg-slate-900/80 border-b border-slate-700 py-4">
-        <div class="partners-track flex items-center gap-16">
-            <div class="flex items-center gap-16">
-                <div class="flex items-center gap-3 text-slate-400 opacity-60">
-                    <i class="fa-solid fa-hospital text-3xl"></i>
-                    <span class="font-bold text-lg tracking-wider">AAR HEALTHCARE</span>
-                </div>
-                <div class="flex items-center gap-3 text-slate-400 opacity-60">
-                    <i class="fa-solid fa-heart-pulse text-3xl"></i>
-                    <span class="font-bold text-lg tracking-wider">NAIROBI HOSPITAL</span>
-                </div>
-                <div class="flex items-center gap-3 text-slate-400 opacity-60">
-                    <i class="fa-solid fa-user-doctor text-3xl"></i>
-                    <span class="font-bold text-lg tracking-wider">MP SHAH HOSPITAL</span>
-                </div>
-                <div class="flex items-center gap-3 text-slate-400 opacity-60">
-                    <i class="fa-solid fa-truck-medical text-3xl"></i>
-                    <span class="font-bold text-lg tracking-wider">AMREF HEALTH</span>
-                </div>
-                <div class="flex items-center gap-3 text-slate-400 opacity-60">
-                    <i class="fa-solid fa-pills text-3xl"></i>
-                    <span class="font-bold text-lg tracking-wider">GOODLIFE PHARMACY</span>
-                </div>
-                <div class="flex items-center gap-3 text-slate-400 opacity-60">
-                    <i class="fa-solid fa-dna text-3xl"></i>
-                    <span class="font-bold text-lg tracking-wider">PATHOLOGISTS LANCET</span>
-                </div>
-                <div class="flex items-center gap-3 text-slate-400 opacity-60">
-                    <i class="fa-solid fa-baby text-3xl"></i>
-                    <span class="font-bold text-lg tracking-wider">GERTRUDE'S HOSPITAL</span>
-                </div>
-                <div class="flex items-center gap-3 text-slate-400 opacity-60">
-                    <i class="fa-solid fa-stethoscope text-3xl"></i>
-                    <span class="font-bold text-lg tracking-wider">KENYATTA NATIONAL HOSPITAL</span>
-                </div>
-            </div>
-            <div class="flex items-center gap-16">
-                <div class="flex items-center gap-3 text-slate-400 opacity-60">
-                    <i class="fa-solid fa-hospital text-3xl"></i>
-                    <span class="font-bold text-lg tracking-wider">AAR HEALTHCARE</span>
-                </div>
-                <div class="flex items-center gap-3 text-slate-400 opacity-60">
-                    <i class="fa-solid fa-heart-pulse text-3xl"></i>
-                    <span class="font-bold text-lg tracking-wider">NAIROBI HOSPITAL</span>
-                </div>
-                <div class="flex items-center gap-3 text-slate-400 opacity-60">
-                    <i class="fa-solid fa-user-doctor text-3xl"></i>
-                    <span class="font-bold text-lg tracking-wider">MP SHAH HOSPITAL</span>
-                </div>
-                <div class="flex items-center gap-3 text-slate-400 opacity-60">
-                    <i class="fa-solid fa-truck-medical text-3xl"></i>
-                    <span class="font-bold text-lg tracking-wider">AMREF HEALTH</span>
-                </div>
-                <div class="flex items-center gap-3 text-slate-400 opacity-60">
-                    <i class="fa-solid fa-pills text-3xl"></i>
-                    <span class="font-bold text-lg tracking-wider">GOODLIFE PHARMACY</span>
-                </div>
-                <div class="flex items-center gap-3 text-slate-400 opacity-60">
-                    <i class="fa-solid fa-dna text-3xl"></i>
-                    <span class="font-bold text-lg tracking-wider">PATHOLOGISTS LANCET</span>
-                </div>
-                <div class="flex items-center gap-3 text-slate-400 opacity-60">
-                    <i class="fa-solid fa-baby text-3xl"></i>
-                    <span class="font-bold text-lg tracking-wider">GERTRUDE'S HOSPITAL</span>
-                </div>
-                <div class="flex items-center gap-3 text-slate-400 opacity-60">
-                    <i class="fa-solid fa-stethoscope text-3xl"></i>
-                    <span class="font-bold text-lg tracking-wider">KENYATTA NATIONAL HOSPITAL</span>
-                </div>
-            </div>
+        <div id="partnersTrack" class="partners-track flex items-center gap-16">
+            <!-- Partners injected via JS -->
         </div>
     </div>
 
@@ -800,37 +733,7 @@
 
         // Extended Inventory with 20 Shelves and 100+ drugs
         let inventory = [];
-
-        function loadPharmacyData() {
-            const savedData = localStorage.getItem('medicoreAdminData');
-            if (savedData) {
-                const adminData = JSON.parse(savedData);
-                // Transform admin data to pharmacy inventory format
-                inventory = adminData.shelves.map((shelf, index) => ({
-                    id: shelf.id,
-                    number: index + 1,
-                    name: shelf.name,
-                    description: shelf.description || `${shelf.name} Medications`,
-                    icon: shelf.icon || 'fa-pills',
-                    color: shelf.color || 'blue',
-                    items: adminData.drugs.filter(d => d.shelfId === shelf.id).map(d => ({
-                        id: d.id,
-                        name: d.name,
-                        type: d.type,
-                        price: d.price,
-                        stock: d.stock,
-                        image: d.image
-                    }))
-                }));
-                
-                // Add unassigned items to a virtual warehouse shelf if needed? 
-                // For now just focus on assigned items
-            }
-        }
-        // Initialize pharmacy data
-        loadPharmacyData();
-        
-        const pharmacists = [
+        let pharmacists = [
             { id: 'P1', name: 'Dr. Sarah Chen', specialty: 'General Medicine', image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', isBusy: false },
             { id: 'P2', name: 'Dr. James Mwangi', specialty: 'Pediatrics', image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', isBusy: true },
             { id: 'P3', name: 'Dr. Emily Omondi', specialty: 'Pharmacy', image: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', isBusy: false },
@@ -838,13 +741,68 @@
             { id: 'P5', name: 'Dr. Amina Hassan', specialty: 'Cardiology', image: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80', isBusy: false }
         ];
 
-        const slideshowData = [
+        let slideshowData = [
             { image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80', title: 'Regular Health Checkups', subtitle: 'Prevention is better than cure' },
             { image: 'https://images.unsplash.com/photo-1585435557343-3b092031a831?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80', title: 'Take Medications on Time', subtitle: 'Consistency is key to recovery' },
             { image: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80', title: 'Stay Hydrated', subtitle: 'Drink at least 8 glasses of water daily' },
             { image: 'https://images.unsplash.com/photo-1505576399279-565b52d4ac71?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80', title: 'Healthy Diet', subtitle: 'Eat balanced meals for better immunity' },
             { image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80', title: 'Exercise Regularly', subtitle: '30 minutes of activity daily keeps you fit' }
         ];
+
+        let partnersData = [
+            { id: 'P1', name: 'AAR HEALTHCARE', icon: 'fa-hospital' },
+            { id: 'P2', name: 'NAIROBI HOSPITAL', icon: 'fa-heart-pulse' },
+            { id: 'P3', name: 'MP SHAH HOSPITAL', icon: 'fa-user-doctor' },
+            { id: 'P4', name: 'AMREF HEALTH', icon: 'fa-truck-medical' },
+            { id: 'P5', name: 'GOODLIFE PHARMACY', icon: 'fa-pills' },
+            { id: 'P6', name: 'PATHOLOGISTS LANCET', icon: 'fa-dna' },
+            { id: 'P7', name: 'GERTRUDE\'S HOSPITAL', icon: 'fa-baby' },
+            { id: 'P8', name: 'KENYATTA NATIONAL HOSPITAL', icon: 'fa-stethoscope' }
+        ];
+
+        function loadPharmacyData() {
+            const savedData = localStorage.getItem('medicoreAdminData');
+            if (savedData) {
+                const adminData = JSON.parse(savedData);
+                // Transform admin data to pharmacy inventory format
+                if (adminData.shelves) {
+                    inventory = adminData.shelves.map((shelf, index) => ({
+                        id: shelf.id,
+                        number: index + 1,
+                        name: shelf.name,
+                        description: shelf.description || `${shelf.name} Medications`,
+                        icon: shelf.icon || 'fa-pills',
+                        color: shelf.color || 'blue',
+                        items: (adminData.drugs || []).filter(d => d.shelfId === shelf.id).map(d => ({
+                            id: d.id,
+                            name: d.name,
+                            type: d.type,
+                            price: d.price,
+                            stock: d.stock,
+                            image: d.image
+                        }))
+                    }));
+                }
+
+                // Sync Slideshow
+                if (adminData.slideshow && adminData.slideshow.length > 0) {
+                    slideshowData = adminData.slideshow;
+                }
+
+                // Sync Pharmacists
+                if (adminData.pharmacists && adminData.pharmacists.length > 0) {
+                    // Only show available (not busy) pharmacists
+                    pharmacists = adminData.pharmacists.filter(p => !p.isBusy);
+                }
+
+                // Sync Partners
+                if (adminData.partners && adminData.partners.length > 0) {
+                    partnersData = adminData.partners;
+                }
+            }
+        }
+        // Initialize pharmacy data
+        loadPharmacyData();
 
         let cart = DataManager.getCart();
 
@@ -859,12 +817,49 @@
 
         // --- Initialization ---
         document.addEventListener('DOMContentLoaded', () => {
+            initApp();
+        });
+
+        function initApp() {
             loadPharmacyData();
+            renderPartners();
             renderShelves();
+            
+            // Clear previous slideshow
+            if (slideInterval) clearInterval(slideInterval);
+            const slideshowContainer = document.getElementById('slideshow');
+            const dotsContainer = document.getElementById('slideDots');
+            if (slideshowContainer) slideshowContainer.innerHTML = '';
+            if (dotsContainer) dotsContainer.innerHTML = '';
+            currentSlide = 0;
+            
             initSlideshow();
             renderRandomDrugs();
             updateCartUI();
+        }
+
+        // Handle real-time updates from other tabs (Admin panel)
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'medicoreAdminData') {
+                initApp();
+            }
         });
+
+        // --- Partners Functions ---
+        function renderPartners() {
+            const track = document.getElementById('partnersTrack');
+            if (!track) return;
+            
+            const partnersHTML = partnersData.map(partner => `
+                <div class="flex items-center gap-3 text-slate-400 opacity-60">
+                    <i class="fa-solid ${partner.icon} text-3xl"></i>
+                    <span class="font-bold text-lg tracking-wider">${partner.name}</span>
+                </div>
+            `).join('');
+            
+            // Duplicate for smooth infinite scroll
+            track.innerHTML = partnersHTML + partnersHTML;
+        }
 
         // --- Shelf Functions ---
         function renderShelves() {
@@ -929,7 +924,7 @@
                         <p class="text-xs text-slate-400 mb-2">${item.type} • Stock: ${item.stock}</p>
                         <div class="flex justify-between items-center">
                             <span class="text-blue-400 font-bold">KSh ${item.price.toLocaleString()}</span>
-                            <button onclick="addToCart('${item.id}')" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs transition-all">
+                            <button onclick="addToCart('${item.id}', event)" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs transition-all">
                                 <i class="fa-solid fa-plus"></i> Add
                             </button>
                         </div>
@@ -1047,7 +1042,7 @@
                         <p class="text-xs text-slate-400 mb-2">${item.type} • Shelf ${item.shelfNumber}</p>
                         <div class="flex justify-between items-center">
                             <span class="text-blue-400 font-bold">KSh ${item.price.toLocaleString()}</span>
-                            <button onclick="addToCart('${item.id}')" class="bg-blue-600 hover:bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110">
+                            <button onclick="addToCart('${item.id}', event)" class="bg-blue-600 hover:bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110">
                                 <i class="fa-solid fa-plus"></i>
                             </button>
                         </div>
@@ -1280,7 +1275,8 @@
         }
 
         // --- Cart Functions ---
-        function addToCart(itemId) {
+        function addToCart(itemId, e = null) {
+            const event = e || window.event;
             let item = null;
             let shelfInfo = null;
             
@@ -1302,15 +1298,18 @@
                 syncCartWithStorage();
                 updateCartUI();
                 
-                if (event && event.target) {
-                    const btn = event.target.closest('button');
-                    const originalHTML = btn.innerHTML;
-                    btn.innerHTML = '<i class="fa-solid fa-check"></i>';
-                    btn.classList.add('bg-green-600');
-                    setTimeout(() => {
-                        btn.innerHTML = originalHTML;
-                        btn.classList.remove('bg-green-600');
-                    }, 1000);
+                if (event && event.currentTarget) {
+                    const btn = event.currentTarget.closest('button') || event.target.closest('button');
+                    if (btn) {
+                        const originalHTML = btn.innerHTML;
+                        btn.innerHTML = '<i class="fa-solid fa-check"></i>';
+                        const originalClass = btn.className;
+                        btn.classList.add('bg-green-600');
+                        setTimeout(() => {
+                            btn.innerHTML = originalHTML;
+                            btn.className = originalClass;
+                        }, 1000);
+                    }
                 }
             }
         }

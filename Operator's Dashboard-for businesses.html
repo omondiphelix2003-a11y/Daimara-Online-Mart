@@ -72,8 +72,8 @@
     /* SIDEBAR */
     .sidebar {  
       width: 280px; 
-      background: var(--sidebar-bg); 
-      color: #000; 
+      background: #041344; 
+      color: #e7e5e5; 
       display: flex; 
       flex-direction: column; 
       position: fixed; 
@@ -91,8 +91,8 @@
     }
 
     .sidebar-header h2 { 
-      color: #000; 
-      font-size: clamp(1.25rem, 3vw, 1.5rem); 
+      color: #ffffff; 
+      font-size: 22px; 
       font-weight: 700;
       display: flex;
       align-items: center;
@@ -111,7 +111,7 @@
     }
 
     .nav-links a { 
-      color: rgba(0,0,0,0.8); 
+      color: rgba(0, 0, 0, 0.979); 
       text-decoration: none; 
       display: flex; 
       align-items: center; 
@@ -119,14 +119,14 @@
       border-radius: 12px; 
       transition: all 0.3s; 
       gap: 1rem; 
-      font-size: 1rem;
+      font-size: 18px;
       font-weight: 500;
     }
 
     .nav-links a:hover, 
     .nav-links a.active { 
-      background: rgba(0,0,0,0.1); 
-      color: #000;
+      background: rgb(0, 0, 0); 
+      color: #ffffff;
       transform: translateX(4px);
     }
 
@@ -143,7 +143,7 @@
 
     .logout-btn { 
       background: rgba(0,0,0,0.8); 
-      color: var(--primary); 
+      color: rgba(255, 0, 0, 0.753); 
       border: none;
       width: 100%; 
       padding: 0.875rem; 
@@ -998,6 +998,19 @@
       .stat-card { padding: 1rem; }
     }
 
+    .opened-warning {
+      color: #e74c3c;
+      font-size: 1.2rem;
+      margin-left: 10px;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.4; }
+      100% { opacity: 1; }
+    }
+
     /* Global wrapping helper */
     .wrap-content { display: flex; flex-wrap: wrap; gap: 10px; }
   </style>
@@ -1357,12 +1370,10 @@
       
       const user = DataManager.getCurrentUser();
       const targetEmail = viewUserEmail || user.email;
-      // for dashboard stats we use same owner-based filter to ensure correct counts
-      const orders_all = (DataManager.getAllOrders() || []).filter(o => {
-        const items = o.items || o.products || [];
-        return items.some(i => i.owner === targetEmail);
-      });
-      const warehouse_all = DataManager.getScopedData('ecommerce_warehouse').filter(p => p.owner === targetEmail);
+      
+      // Use scoped orders for operators
+      const orders_all = DataManager.getScopedData('ecommerce_orders', [], targetEmail);
+      const warehouse_all = DataManager.getScopedData('ecommerce_warehouse', [], targetEmail);
       
       const permanentRevenue = DataManager.getOperatorRevenue(targetEmail);
       const activeCompletedRevenue = orders_all.reduce((sum, o) => {
@@ -1381,10 +1392,18 @@
       // Desktop Table
       const tbody = document.querySelector('#recent-orders-table tbody');
       if (tbody) {
-        tbody.innerHTML = orders.map(o => `
+        tbody.innerHTML = orders.map(o => {
+          const isOpenedByOther = o.openedBy && o.openedBy !== targetEmail;
+          const isAssignedByMe = o.assignedBy && o.assignedBy.includes(targetEmail);
+          const showRedIcon = isOpenedByOther && !isAssignedByMe;
+          
+          return `
           <tr>
             <td><strong>#${(o.id || '').slice(-6)}</strong></td>
-            <td><span class="clickable-name" onclick="viewOrderDetails('${o.id}')">${o.customerName || o.customer?.name || 'Guest'}</span></td>
+            <td>
+              <span class="clickable-name" onclick="viewOrderDetails('${o.id}')">${o.customerName || o.customer?.name || 'Guest'}</span>
+              ${showRedIcon ? '<i class="fas fa-exclamation-circle opened-warning" title="Order opened by another operator"></i>' : ''}
+            </td>
             <td>KSH ${(o.grandTotal || o.totalPrice || 0).toLocaleString()}</td>
             <td>
               <span class="status-pill status-${o.status || 'pending'}">${o.status || 'pending'}</span>
@@ -1392,13 +1411,18 @@
             </td>
             <td>${o.date ? new Date(o.date).toLocaleDateString() : 'N/A'}</td>
           </tr>
-        `).join('') || '<tr><td colspan="5" style="text-align:center">No recent orders</td></tr>';
+        `}).join('') || '<tr><td colspan="5" style="text-align:center">No recent orders</td></tr>';
       }
 
       // Mobile Cards
       const mobileContainer = document.getElementById('recent-orders-mobile');
       if (mobileContainer) {
-        mobileContainer.innerHTML = orders.map(o => `
+        mobileContainer.innerHTML = orders.map(o => {
+          const isOpenedByOther = o.openedBy && o.openedBy !== targetEmail;
+          const isAssignedByMe = o.assignedBy && o.assignedBy.includes(targetEmail);
+          const showRedIcon = isOpenedByOther && !isAssignedByMe;
+
+          return `
           <div class="data-card-mobile">
             <div class="card-header">
               <span class="card-title">#${(o.id || '').slice(-6)}</span>
@@ -1407,7 +1431,10 @@
             <div class="card-body">
               <div class="data-row">
                 <span class="label">Customer</span>
-                <span class="value clickable-name" onclick="viewOrderDetails('${o.id}')">${o.customerName || o.customer?.name || 'Guest'}</span>
+                <span class="value clickable-name" onclick="viewOrderDetails('${o.id}')">
+                  ${o.customerName || o.customer?.name || 'Guest'}
+                  ${showRedIcon ? '<i class="fas fa-exclamation-circle opened-warning"></i>' : ''}
+                </span>
               </div>
               <div class="data-row">
                 <span class="label">Amount</span>
@@ -1419,7 +1446,7 @@
               </div>
             </div>
           </div>
-        `).join('') || '<p style="text-align:center; color: var(--text-muted);">No recent orders</p>';
+        `}).join('') || '<p style="text-align:center; color: var(--text-muted);">No recent orders</p>';
       }
     }
 
@@ -1428,21 +1455,32 @@
       
       const user = DataManager.getCurrentUser();
       const targetEmail = viewUserEmail || (user && user.email);
-      // load every order and only keep items that belong to this operator
-      const orders = (DataManager.getAllOrders() || []).filter(o => {
-        const items = o.items || o.products || [];
-        return items.some(i => i.owner === targetEmail);
-      });
+      
+      // Use scoped orders for operators
+      const orders = DataManager.getScopedData('ecommerce_orders', [], targetEmail);
       
       // Desktop Table
       const tbody = document.querySelector('#all-orders-table tbody');
       if (tbody) {
         tbody.innerHTML = orders.map(o => {
+          const isOpenedByOther = o.openedBy && o.openedBy !== targetEmail;
+          const isAssignedByMe = o.assignedBy && o.assignedBy.includes(targetEmail);
+          const showRedIcon = isOpenedByOther && !isAssignedByMe;
+          
+          // Disable assign if:
+          // 1. Already assigned by me
+          // 2. Opened by other AND not yet assigned by first operator
+          const leadAssigned = !!o.deliveryPersonEmail;
+          const assignDisabled = isAssignedByMe || (isOpenedByOther && !leadAssigned);
+          
           const isAssigned = !!o.deliveryPersonEmail;
           return `
             <tr>
               <td><strong>#${(o.id || '').slice(-8)}</strong></td>
-              <td><span class="clickable-name" onclick="viewOrderDetails('${o.id}')">${o.customerName || o.customer?.name || 'N/A'}</span></td>
+              <td>
+                <span class="clickable-name" onclick="viewOrderDetails('${o.id}')">${o.customerName || o.customer?.name || 'N/A'}</span>
+                ${showRedIcon ? '<i class="fas fa-exclamation-circle opened-warning" title="Order opened by another operator"></i>' : ''}
+              </td>
               <td>${(o.items || o.products || []).length} items</td>
               <td>KSH ${(o.grandTotal || o.totalPrice || 0).toLocaleString()}</td>
               <td>
@@ -1452,7 +1490,7 @@
               <td>${o.date ? new Date(o.date).toLocaleDateString() : 'N/A'}</td>
               <td>
                 <div style="display:flex; gap:0.5rem; flex-wrap: wrap;">
-                  <button class="btn btn-success btn-sm" onclick="assignDelivery('${o.id}')" ${isAssigned ? 'disabled style="background:#bdc3c7; cursor:not-allowed;" title="Already assigned"' : ''}>
+                  <button class="btn btn-success btn-sm" onclick="assignDelivery('${o.id}')" ${assignDisabled ? 'disabled style="background:#bdc3c7; cursor:not-allowed;" title="Assignment locked or already completed"' : ''}>
                     <i class="fas fa-truck"></i>
                   </button>
                   <button class="btn btn-primary btn-sm" onclick="showAdminReceipt('${o.id}')">
@@ -1475,7 +1513,13 @@
       const mobileContainer = document.getElementById('all-orders-mobile');
       if (mobileContainer) {
         mobileContainer.innerHTML = orders.map(o => {
-          const isAssigned = !!o.deliveryPersonEmail;
+          const isOpenedByOther = o.openedBy && o.openedBy !== targetEmail;
+          const isAssignedByMe = o.assignedBy && o.assignedBy.includes(targetEmail);
+          const showRedIcon = isOpenedByOther && !isAssignedByMe;
+          
+          const leadAssigned = !!o.deliveryPersonEmail;
+          const assignDisabled = isAssignedByMe || (isOpenedByOther && !leadAssigned);
+
           return `
           <div class="data-card-mobile">
             <div class="card-header">
@@ -1485,7 +1529,10 @@
             <div class="card-body">
               <div class="data-row">
                 <span class="label">Customer</span>
-                <span class="value clickable-name" onclick="viewOrderDetails('${o.id}')">${o.customerName || o.customer?.name || 'N/A'}</span>
+                <span class="value clickable-name" onclick="viewOrderDetails('${o.id}')">
+                  ${o.customerName || o.customer?.name || 'N/A'}
+                  ${showRedIcon ? '<i class="fas fa-exclamation-circle opened-warning"></i>' : ''}
+                </span>
               </div>
               <div class="data-row">
                 <span class="label">Items</span>
@@ -1501,7 +1548,7 @@
               </div>
             </div>
             <div class="card-actions">
-              <button class="btn btn-success btn-sm" onclick="assignDelivery('${o.id}')" ${isAssigned ? 'disabled style="background:#bdc3c7; cursor:not-allowed;" title="Already assigned"' : ''}>
+              <button class="btn btn-success btn-sm" onclick="assignDelivery('${o.id}')" ${assignDisabled ? 'disabled style="background:#bdc3c7; cursor:not-allowed;"' : ''}>
                 <i class="fas fa-truck"></i> Assign
               </button>
               <button class="btn btn-primary btn-sm" onclick="showAdminReceipt('${o.id}')">
@@ -1525,7 +1572,7 @@
       
       const user = DataManager.getCurrentUser();
       const targetEmail = viewUserEmail || user.email;
-      const warehouse = DataManager.getScopedData('ecommerce_warehouse').filter(p => p.owner === targetEmail);
+      const warehouse = DataManager.getScopedData('ecommerce_warehouse', [], targetEmail);
       
       // Desktop Table
       const tbody = document.querySelector('#warehouse-table tbody');
@@ -1591,11 +1638,8 @@
       
       const user = DataManager.getCurrentUser();
       const targetEmail = viewUserEmail || user.email;
-      const orders = (DataManager.getAllOrders() || []).filter(o => {
-        const items = o.items || o.products || [];
-        return items.some(i => i.owner === targetEmail);
-      });
-      const warehouse = DataManager.getScopedData('ecommerce_warehouse').filter(p => p.owner === targetEmail);
+      const orders = DataManager.getScopedData('ecommerce_orders', [], targetEmail);
+      const warehouse = DataManager.getScopedData('ecommerce_warehouse', [], targetEmail);
       
       const permanentRevenue = DataManager.getOperatorRevenue(targetEmail);
       const activeCompletedRevenue = orders.reduce((sum, o) => {
@@ -1630,10 +1674,11 @@
       
       const user = DataManager.getCurrentUser();
       const targetEmail = viewUserEmail || (user && user.email);
-      const orders = (DataManager.getAllOrders() || []).filter(o => {
-        const items = o.items || o.products || [];
-        return items.some(i => i.owner === targetEmail);
-      });
+      
+      // Mark as opened by this operator
+      DataManager.markOrderAsOpened(orderId, targetEmail);
+      
+      const orders = DataManager.getScopedData('ecommerce_orders', [], targetEmail);
       const order = orders.find(o => o.id === orderId);
       if (!order) return alert("Order not found");
 
@@ -1689,6 +1734,10 @@
       
       const user = DataManager.getCurrentUser();
       const targetEmail = viewUserEmail || (user && user.email);
+
+      // Mark as opened by this operator
+      DataManager.markOrderAsOpened(orderId, targetEmail);
+      
       const orders = (DataManager.getAllOrders() || []).filter(o => {
         const items = o.items || o.products || [];
         return items.some(i => i.owner === targetEmail);
@@ -1806,52 +1855,39 @@
       
       if (typeof DataManager === 'undefined') return;
       
-      // update global orders
-      let all = DataManager.getAllOrders();
-      const globalOrder = all.find(o => o.id === id);
-      if (globalOrder && globalOrder.status !== 'returned') {
-        globalOrder.status = 'returned';
-        DataManager.saveOrders(all);
+      const result = DataManager.updateOrderStatus(id, 'returned');
+      if (result.success) {
+        alert("Order marked as returned.");
+        renderOrders();
+        renderDashboard();
+      } else {
+        alert("Error: " + result.message);
       }
-      // sync scoped copies for each user
-      const users = DataManager.getAllUsers();
-      users.forEach(u => {
-        const original = localStorage.getItem('currentUser');
-        localStorage.setItem('currentUser', JSON.stringify(u));
-        const scoped = DataManager.getScopedData('ecommerce_orders');
-        const so = scoped.find(o => o.id === id);
-        if (so) {
-          so.status = 'returned';
-          DataManager.saveScopedData('ecommerce_orders', scoped);
-        }
-        if (original) localStorage.setItem('currentUser', original);
-        else localStorage.removeItem('currentUser');
-      });
-      alert("Order marked as returned.");
-      renderOrders();
-      renderDashboard();
     }
 
     function deleteOrder(id) {
       if (!confirm("Permanently delete this order record?")) return;
       
       if (typeof DataManager !== 'undefined') {
-        // remove from global storage
-        DataManager.deleteOrder(id);
-        // remove from each scoped list as well
-        const users = DataManager.getAllUsers();
-        users.forEach(u => {
-          const original = localStorage.getItem('currentUser');
-          localStorage.setItem('currentUser', JSON.stringify(u));
-          let scoped = DataManager.getScopedData('ecommerce_orders');
-          scoped = scoped.filter(o => o.id !== id);
-          DataManager.saveScopedData('ecommerce_orders', scoped);
-          if (original) localStorage.setItem('currentUser', original);
-          else localStorage.removeItem('currentUser');
-        });
-        renderOrders();
-        renderDashboard();
-        alert("Order record deleted.");
+        const result = DataManager.deleteOrder(id);
+        if (result.success) {
+          // Sync with all scoped orders (DataManager.deleteOrder only removes from global)
+          // Actually DataManager.deleteOrder should probably be updated too, but let's fix it here for now
+          const users = DataManager.getAllUsers();
+          users.forEach(u => {
+            const originalUser = localStorage.getItem('ecommerce_user');
+            localStorage.setItem('ecommerce_user', JSON.stringify(u));
+            let scoped = DataManager.getScopedData('ecommerce_orders');
+            scoped = scoped.filter(o => o.id !== id);
+            DataManager.saveScopedData('ecommerce_orders', scoped);
+            if (originalUser) localStorage.setItem('ecommerce_user', originalUser);
+            else localStorage.removeItem('ecommerce_user');
+          });
+          
+          renderOrders();
+          renderDashboard();
+          alert("Order record deleted.");
+        }
       }
     }
 

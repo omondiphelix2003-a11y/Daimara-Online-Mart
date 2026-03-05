@@ -92,19 +92,19 @@
         .map-btn { display: inline-block; background: #0f172a; color: #ffffff;font-size: 18px; padding: 8px 15px; border-radius: 4px; text-decoration: none; font-size: 12px; font-weight: bold; margin-bottom: 10px; border: 1px solid var(--primary); }
         
         .btn-group { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
-        .btn-primary { background: #0f172a; color: chocolate; padding: 15px; border: 1px solid var(--primary);
-             border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
-        .btn-primary:hover { background-color: #000000; color: rgb(247, 247, 247); border-color: chocolate; }
-        .btn-secondary { background: #000000; color: chocolate; padding: 15px; border: 1px solid #334155; 
-            border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
-        .btn-secondary:hover { background-color: #000000; color: rgb(255, 255, 255); border-color: var(--primary); } 
+        .btn-primary { background: #0f172a; color: rgb(233, 157, 17); padding: 15px; border: 1px solid var(--primary);
+             border-radius: 6px; cursor: pointer; font-size: 14px; transition: 0.3s; }
+        .btn-primary:hover { background-color: #000000; color: rgb(247, 247, 247); border-color: rgb(233, 157, 17); }
+        .btn-secondary { background: #000000; color: rgb(233, 157, 17); padding: 15px; border: 1px solid var(--primary); 
+            border-radius: 6px; cursor: pointer; font-size: 14px; transition: 0.3s; }
+        .btn-secondary:hover { background-color: #000000; color: rgb(255, 255, 255); border-color: rgb(233, 157, 17); } 
         .btn-primary:active, .btn-secondary:active { transform: scale(0.98); }
 
 
 
         #random-products {
             display: grid; grid-template-columns: repeat(4, 1fr) !important; background-color: transparent;
-            gap: 15px;height: 205px;
+            gap: 15px;
         }
            
         .product:hover{
@@ -670,6 +670,15 @@
             renderCart(); // Refresh the table
         }
     }
+
+    // Listen for changes from other tabs (e.g. cart cleared)
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'ecommerce_cart') {
+            cart = DataManager.getCart();
+            renderCart();
+            updateCartBadge();
+        }
+    });
 </script>
 </body>
 </html>

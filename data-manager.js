@@ -737,10 +737,14 @@ const DataManager = (() => {
         // Create a scoped version of the order for this operator
         // They only see the items THEY own
         const scopedItems = items.filter(i => i.owner === opEmail);
+        const scopedTotal = scopedItems.reduce((sum, i) => sum + (i.price * (i.qty || i.quantity || 1)), 0);
+        
+        const { deliveryFee, ...orderWithoutDelivery } = order;
         const scopedOrder = {
-          ...order,
+          ...orderWithoutDelivery,
           items: scopedItems,
-          grandTotal: scopedItems.reduce((sum, i) => sum + (i.price * (i.qty || i.quantity || 1)), 0),
+          totalPrice: scopedTotal,
+          grandTotal: scopedTotal,
           totalCommission: scopedItems.reduce((sum, i) => sum + (i.commission || 0), 0)
         };
 
@@ -771,6 +775,41 @@ const DataManager = (() => {
       items: items
     });
 
+    // SYNC WITH MEDICORE ADMIN DATA
+    let medicoreData = JSON.parse(localStorage.getItem('medicoreAdminData'));
+    const medicoreItems = items.filter(item => item.subcategory === 'Pharmacy' || item.shelfName);
+    
+    if (medicoreItems.length > 0) {
+      if (!medicoreData) {
+        // Initialize basic structure if it doesn't exist
+        medicoreData = {
+          shelves: [],
+          drugs: [],
+          partners: [],
+          slideshow: [],
+          pharmacists: [],
+          orders: [],
+          conversations: [],
+          branding: { logo: 'fa-mortar-pestle', color: 'blue', name: 'MediCore Pharmacy' }
+        };
+      }
+      
+      if (!medicoreData.orders) medicoreData.orders = [];
+      const medicoreTotal = medicoreItems.reduce((sum, i) => sum + (i.price * (i.qty || i.quantity || 1)), 0);
+      const medicoreOrder = {
+        id: order.id,
+        customer: order.customerName || (order.customer && order.customer.name) || 'Customer',
+        email: order.customerEmail || (order.customer && order.customer.email) || '',
+        phone: order.customerPhone || (order.customer && order.customer.phone) || '',
+        items: medicoreItems.map(i => ({ name: i.name, qty: i.qty || i.quantity || 1, price: i.price })),
+        total: medicoreTotal,
+        status: order.status || 'pending',
+        date: order.date || new Date().toLocaleString()
+      };
+      medicoreData.orders.unshift(medicoreOrder);
+      localStorage.setItem('medicoreAdminData', JSON.stringify(medicoreData));
+    }
+
     return { success: true };
   }
 
@@ -782,9 +821,59 @@ const DataManager = (() => {
   }
 
   /**
+   * Mark an order as opened by an operator
+   */
+  function markOrderAsOpened(orderId, operatorEmail) {
+    const allOrders = getAllOrders();
+    const order = allOrders.find(o => o.id === orderId);
+    if (!order) return { success: false, message: 'Order not found' };
+
+    // Only mark if not already opened by someone else
+    if (!order.openedBy) {
+      order.openedBy = operatorEmail;
+      saveOrders(allOrders);
+      
+      // Propagate to all scoped copies
+      const items = order.items || order.products || [];
+      const owners = [...new Set(items.map(item => item.owner).filter(Boolean))];
+      const users = getAllUsers();
+      
+      owners.forEach(opEmail => {
+        const opUser = users.find(u => u.email === opEmail);
+        if (opUser) {
+          const originalUser = localStorage.getItem(STORAGE_KEYS.USER);
+          localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(opUser));
+          
+          const scopedOrders = getScopedData('ecommerce_orders');
+          const scopedOrder = scopedOrders.find(o => o.id === orderId);
+          if (scopedOrder) {
+            scopedOrder.openedBy = operatorEmail;
+            saveScopedData('ecommerce_orders', scopedOrders);
+          }
+
+          if (originalUser) localStorage.setItem(STORAGE_KEYS.USER, originalUser);
+          else localStorage.removeItem(STORAGE_KEYS.USER);
+        }
+      });
+
+      return { success: true, openedBy: operatorEmail };
+    }
+    
+    return { success: true, openedBy: order.openedBy };
+  }
+
+  /**
+   * Get a specific global order
+   */
+  function getGlobalOrder(orderId) {
+    const allOrders = getAllOrders();
+    return allOrders.find(o => o.id === orderId);
+  }
+
+  /**
    * Assign an order to a delivery person
    */
-  function assignOrder(orderId, deliveryPersonEmail) {
+  function assignOrder(orderId, deliveryPersonEmail, operatorEmail = null) {
     const users = getAllUsers();
     const deliveryPerson = users.find(u => u.email === deliveryPersonEmail);
     if (!deliveryPerson) return { success: false, message: 'Delivery person not found' };
@@ -794,8 +883,27 @@ const DataManager = (() => {
     const globalOrder = allOrders.find(o => o.id === orderId);
     if (!globalOrder) return { success: false, message: 'Order not found' };
 
+    // Check if someone else already assigned to a DIFFERENT delivery person
+    if (globalOrder.deliveryPersonEmail && globalOrder.deliveryPersonEmail !== deliveryPersonEmail) {
+      return { success: false, message: `This order must be assigned to ${globalOrder.deliveryPersonEmail} as per the lead operator's choice.` };
+    }
+
     globalOrder.status = 'assigned';
     globalOrder.deliveryPersonEmail = deliveryPersonEmail;
+    
+    // Track who has assigned this order
+    if (operatorEmail) {
+      if (!globalOrder.assignedBy) globalOrder.assignedBy = [];
+      if (!globalOrder.assignedBy.includes(operatorEmail)) {
+        globalOrder.assignedBy.push(operatorEmail);
+      }
+    } else {
+      // Admin assignment - auto-assign for all involved owners
+      const items = globalOrder.items || globalOrder.products || [];
+      const owners = [...new Set(items.map(item => item.owner).filter(Boolean))];
+      globalOrder.assignedBy = owners;
+    }
+
     saveOrders(allOrders);
 
     // 2. Update Scoped Orders for Operators
@@ -813,6 +921,9 @@ const DataManager = (() => {
         if (scopedOrder) {
           scopedOrder.status = 'assigned';
           scopedOrder.deliveryPersonEmail = deliveryPersonEmail;
+          // Sync extra fields
+          scopedOrder.openedBy = globalOrder.openedBy;
+          scopedOrder.assignedBy = globalOrder.assignedBy;
           saveScopedData('ecommerce_orders', scopedOrders);
         }
 
@@ -975,6 +1086,19 @@ const DataManager = (() => {
       }
     }
 
+    // 4. Sync with MediCore Admin Data if pharmacy order
+    const isPharmacyOrder = items.some(item => item.subcategory === 'Pharmacy' || item.shelfName);
+    if (isPharmacyOrder) {
+      let medicoreData = JSON.parse(localStorage.getItem('medicoreAdminData'));
+      if (medicoreData && medicoreData.orders) {
+        const mOrder = medicoreData.orders.find(o => o.id === orderId);
+        if (mOrder) {
+          mOrder.status = newStatus;
+          localStorage.setItem('medicoreAdminData', JSON.stringify(medicoreData));
+        }
+      }
+    }
+
     return { success: true };
   }
 
@@ -1013,6 +1137,19 @@ const DataManager = (() => {
         else localStorage.removeItem(STORAGE_KEYS.USER);
       }
     });
+
+    // 3. Sync with MediCore Admin Data if pharmacy order
+    const isPharmacyOrder = items.some(item => item.subcategory === 'Pharmacy' || item.shelfName);
+    if (isPharmacyOrder) {
+      let medicoreData = JSON.parse(localStorage.getItem('medicoreAdminData'));
+      if (medicoreData && medicoreData.orders) {
+        const mOrder = medicoreData.orders.find(o => o.id === orderId);
+        if (mOrder) {
+          mOrder.paymentStatus = newPaymentStatus;
+          localStorage.setItem('medicoreAdminData', JSON.stringify(medicoreData));
+        }
+      }
+    }
 
     return { success: true };
   }
@@ -1325,6 +1462,19 @@ const DataManager = (() => {
     localStorage.setItem(STORAGE_KEYS.ONLINE_USERS, JSON.stringify(onlineUsers));
   }
 
+  function getOnlineUsers() {
+    const onlineUsers = JSON.parse(localStorage.getItem(STORAGE_KEYS.ONLINE_USERS)) || {};
+    const now = Date.now();
+    const fiveMinutes = 5 * 60 * 1000;
+    const onlineIds = [];
+    for (const id in onlineUsers) {
+      if (now - onlineUsers[id] < fiveMinutes) {
+        onlineIds.push(id);
+      }
+    }
+    return onlineIds;
+  }
+
   /**
    * Get number of online users (active in last 5 minutes)
    */
@@ -1423,6 +1573,12 @@ const DataManager = (() => {
     }
   });
 
+  function saveCart(cart) {
+    localStorage.setItem(STORAGE_KEYS.CART, JSON.stringify(cart));
+    window.dispatchEvent(new Event('cartUpdated'));
+    return { success: true };
+  }
+
   // Public API
   return {
     getAllProducts,
@@ -1431,6 +1587,7 @@ const DataManager = (() => {
     updateProduct,
     deleteProduct,
     getCart,
+    saveCart,
     addToCart,
     removeFromCart,
     updateCartQuantity,
@@ -1475,6 +1632,7 @@ const DataManager = (() => {
     getSystemConfig,
     updateSystemConfig,
     getAdminDashboardStats,
+    getOnlineUsers,
     getOnlineUserCount,
     getClientEmails,
     markEmailAsRead,

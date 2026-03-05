@@ -62,7 +62,7 @@
         .products-preview h2 { text-align: center; margin-bottom: 20px; font-size: 22px; }
         #random-products {
             display: grid; grid-template-columns: repeat(4, 1fr) !important; background-color: transparent;
-            gap: 15px;height: 430px;
+            gap: 15px;
         }
 
       .product:hover{
@@ -244,8 +244,8 @@
             flex: 1; text-align: center; padding: 12px; border-radius: 6px;
             font-weight: bold; text-decoration: none; transition: 0.3s;
         }
-        #checkout { background: #000000; color: chocolate; border: 1px solid var(--primary); }
-        .checkout a[href="store.html"] { background: #000000; color: chocolate; border: 1px solid var(--primary); }
+        #checkout { background: #000000;font-size: 14px;font-weight: lighter; color: rgb(233, 157, 17); border: 1px solid var(--primary); }
+        .checkout a[href="store.html"] { background: #000000;font-size: 14px;font-weight: lighter; color: rgb(233, 157, 17); border: 1px solid var(--primary); }
         #checkout:hover, .checkout a[href="store.html"]:hover { background: #0f172a; color: #ffffff; }
         .checkout a:hover{background: #0f172a; color: #ffffff;}
         @media (max-width: 480px) {
@@ -511,6 +511,15 @@
     initSlideshow();
     renderRandom();
     renderCart();
+
+    // Listen for changes from other tabs (e.g. order completed in checkout)
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'ecommerce_cart') {
+            cart = DataManager.getCart();
+            renderCart();
+            updateCartBadge();
+        }
+    });
 </script>
 </body>
 </html>

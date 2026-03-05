@@ -225,6 +225,19 @@
             border-style: solid;
         }
 
+        .opened-warning {
+            color: #ef4444;
+            font-size: 1.1rem;
+            margin-left: 8px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
         /* MOBILE NAV STYLES */
         .nav-toggle {
           display: none;
@@ -520,7 +533,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!--<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="admin-card rounded-xl p-6">
                         <h3 class="text-lg font-bold text-white mb-4">Sales Overview</h3>
                         <canvas id="salesChart" height="250"></canvas>
@@ -530,7 +543,7 @@
                         <h3 class="text-lg font-bold text-white mb-4">Inventory by Category</h3>
                         <canvas id="inventoryChart" height="250"></canvas>
                     </div>
-                </div>
+                </div>-->
 
                 <div class="admin-card rounded-xl p-6">
                     <div class="flex justify-between items-center mb-4">
@@ -567,9 +580,9 @@
                         </div>
                     </div>
                     
-                    --<div class="lg:col-span-3">
-                       <div id="inventoryGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                            -- Drugs populated by JS --
+                    <div class="lg:col-span-3">
+                        <div id="inventoryGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                            <!-- Drugs populated by JS -->
                         </div>
                     </div>
                 </div>
@@ -1134,6 +1147,81 @@
         </div>
     </div>
 
+    <!-- Chat Request Modal (Pharmacist Side) -->
+    <div id="chatRequestModal" class="hidden fixed inset-0 z-[60] flex items-center justify-center bg-black/90 backdrop-blur-md">
+        <div class="bg-slate-800 border-2 border-blue-500 rounded-2xl w-full max-w-sm mx-4 p-8 text-center modal-enter relative overflow-hidden">
+            <!-- Animated Background Pulse -->
+            <div class="absolute inset-0 bg-blue-500/5 animate-pulse pointer-events-none"></div>
+            
+            <div class="relative z-10">
+                <div class="w-24 h-24 bg-blue-600/20 rounded-full flex items-center justify-center mx-auto mb-6 relative">
+                    <i class="fa-solid fa-comment-dots text-4xl text-blue-400 animate-bounce"></i>
+                    <div class="absolute inset-0 border-4 border-blue-500 rounded-full animate-ping opacity-25"></div>
+                </div>
+                
+                <h3 class="text-2xl font-bold text-white mb-2">Incoming Chat Request</h3>
+                <p class="text-slate-400 mb-6">A client is requesting a live consultation.</p>
+                
+                <!-- Countdown Timer -->
+                <div class="mb-8">
+                    <div class="text-4xl font-mono font-bold text-blue-500 mb-1" id="chatRequestTimer">15</div>
+                    <p class="text-[10px] uppercase tracking-widest text-slate-500">Seconds remaining</p>
+                    <div class="w-full bg-slate-700 h-1.5 rounded-full mt-4 overflow-hidden">
+                        <div id="chatRequestProgressBar" class="bg-blue-500 h-full transition-all duration-1000 linear" style="width: 100%"></div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="declineChatRequest()" class="bg-slate-700 hover:bg-red-600 text-white py-3 rounded-xl font-bold transition-all transform hover:scale-105 active:scale-95">
+                        Decline
+                    </button>
+                    <button onclick="acceptChatRequest()" class="bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-xl font-bold shadow-lg shadow-blue-500/20 transition-all transform hover:scale-105 active:scale-95">
+                        Accept
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live One-on-One Chat Modal (Pharmacist Side) -->
+    <div id="liveChatModal" class="hidden fixed inset-0 z-[70] flex items-center justify-center bg-black/80 backdrop-blur-sm">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-2xl mx-4 h-[80vh] flex flex-col shadow-2xl overflow-hidden">
+            <!-- Header -->
+            <div class="p-4 bg-slate-800 border-b border-slate-700 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
+                        <i class="fa-solid fa-user text-green-400"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-white">Client Consultation</h4>
+                        <p class="text-[10px] text-green-400 flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span> LIVE SESSION
+                        </p>
+                    </div>
+                </div>
+                <button onclick="endLiveChat()" class="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-4 py-1.5 rounded-lg text-xs font-bold transition-all border border-red-500/20">
+                    END SESSION
+                </button>
+            </div>
+            
+            <!-- Messages -->
+            <div id="liveChatMessages" class="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar bg-slate-950/50">
+                <!-- Live messages here -->
+            </div>
+            
+            <!-- Input -->
+            <div class="p-4 bg-slate-800 border-t border-slate-700">
+                <form onsubmit="sendLiveMessage(event)" class="flex gap-2">
+                    <input type="text" id="liveChatInput" placeholder="Type professional advice here..." 
+                        class="flex-1 bg-slate-900 border border-slate-600 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-all">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white w-12 h-12 rounded-xl flex items-center justify-center transition-all shadow-lg shadow-blue-500/20">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script>
         function toggleNav() {
             const nav = document.getElementById('adminSiteNav');
@@ -1213,20 +1301,262 @@
         let selectedConversation = null;
         let salesChartInstance = null;
         let inventoryChartInstance = null;
+        let targetEmail = null; // Defined here for global access
+        let activeChatRequest = null;
+        let chatTimerInterval = null;
+        let chatCountdown = 15;
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
+            if (typeof DataManager !== 'undefined') {
+                const user = DataManager.getCurrentUser();
+                targetEmail = (user && user.role === 'operator') ? user.email : null;
+            }
             loadData();
             updateStats();
             initCharts();
             renderAll();
             startRealtimeUpdates();
+            listenForChatRequests();
         });
+
+        function listenForChatRequests() {
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'medicore_chat_requests') {
+                    const requests = JSON.parse(e.newValue || '[]');
+                    const myRequest = requests.find(r => r.pharmacistEmail === targetEmail && r.status === 'pending');
+                    
+                    if (myRequest && !activeChatRequest) {
+                        showChatRequest(myRequest);
+                    }
+                }
+            });
+            
+            // Check once on load
+            const requests = JSON.parse(localStorage.getItem('medicore_chat_requests') || '[]');
+            const myRequest = requests.find(r => r.pharmacistEmail === targetEmail && r.status === 'pending');
+            if (myRequest) showChatRequest(myRequest);
+        }
+
+        function showChatRequest(request) {
+            activeChatRequest = request;
+            chatCountdown = 15;
+            
+            const modal = document.getElementById('chatRequestModal');
+            const timerText = document.getElementById('chatRequestTimer');
+            const progressBar = document.getElementById('chatRequestProgressBar');
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            timerText.innerText = chatCountdown;
+            progressBar.style.width = '100%';
+            
+            if (chatTimerInterval) clearInterval(chatTimerInterval);
+            
+            chatTimerInterval = setInterval(() => {
+                chatCountdown--;
+                timerText.innerText = chatCountdown;
+                progressBar.style.width = (chatCountdown / 15 * 100) + '%';
+                
+                if (chatCountdown <= 0) {
+                    clearInterval(chatTimerInterval);
+                    autoCancelChatRequest();
+                }
+            }, 1000);
+        }
+
+        function autoCancelChatRequest() {
+            if (!activeChatRequest) return;
+            
+            const requests = JSON.parse(localStorage.getItem('medicore_chat_requests') || '[]');
+            const idx = requests.findIndex(r => r.id === activeChatRequest.id);
+            if (idx !== -1) {
+                requests[idx].status = 'timeout';
+                localStorage.setItem('medicore_chat_requests', JSON.stringify(requests));
+            }
+            
+            closeChatRequestModal();
+            showNotification('Chat request timed out', 'info');
+        }
+
+        function declineChatRequest() {
+            if (!activeChatRequest) return;
+            
+            const requests = JSON.parse(localStorage.getItem('medicore_chat_requests') || '[]');
+            const idx = requests.findIndex(r => r.id === activeChatRequest.id);
+            if (idx !== -1) {
+                requests[idx].status = 'declined';
+                localStorage.setItem('medicore_chat_requests', JSON.stringify(requests));
+            }
+            
+            closeChatRequestModal();
+            showNotification('Chat request declined', 'info');
+        }
+
+        function acceptChatRequest() {
+            if (!activeChatRequest) return;
+            
+            const requests = JSON.parse(localStorage.getItem('medicore_chat_requests') || '[]');
+            const idx = requests.findIndex(r => r.id === activeChatRequest.id);
+            if (idx !== -1) {
+                requests[idx].status = 'accepted';
+                localStorage.setItem('medicore_chat_requests', JSON.stringify(requests));
+            }
+            
+            // Update pharmacist status to busy
+            const pharmacist = data.pharmacists.find(p => p.email === targetEmail);
+            if (pharmacist) {
+                pharmacist.isBusy = true;
+                saveData();
+                renderPharmacists();
+            }
+            
+            closeChatRequestModal();
+            openLiveChat(activeChatRequest);
+        }
+
+        function closeChatRequestModal() {
+            const modal = document.getElementById('chatRequestModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            if (chatTimerInterval) clearInterval(chatTimerInterval);
+            activeChatRequest = null;
+        }
+
+        function openLiveChat(request) {
+            const modal = document.getElementById('liveChatModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            const messages = document.getElementById('liveChatMessages');
+            messages.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-10 text-slate-500 opacity-50">
+                    <i class="fa-solid fa-shield-halved text-4xl mb-4"></i>
+                    <p class="text-sm">Secure Live Consultation Started</p>
+                    <p class="text-[10px] mt-1">${new Date().toLocaleString()}</p>
+                </div>
+                <div class="chat-bubble client">
+                    Hello, I'm waiting for your professional advice.
+                </div>
+            `;
+            
+            // Start listening for client messages
+            startLiveChatSync(request.id);
+        }
+
+        let liveChatInterval = null;
+        function startLiveChatSync(requestId) {
+            if (liveChatInterval) clearInterval(liveChatInterval);
+            
+            liveChatInterval = setInterval(() => {
+                const chats = JSON.parse(localStorage.getItem('medicore_live_chats') || '{}');
+                const myChat = chats[requestId] || [];
+                
+                const messages = document.getElementById('liveChatMessages');
+                const currentCount = messages.querySelectorAll('.chat-bubble').length;
+                
+                if (myChat.length > currentCount - 1) { // -1 for initial dummy message
+                    // Only render new messages
+                    for (let i = currentCount - 1; i < myChat.length; i++) {
+                        const msg = myChat[i];
+                        const bubble = document.createElement('div');
+                        bubble.className = `chat-bubble ${msg.sender === 'pharmacist' ? 'admin' : 'client'}`;
+                        bubble.innerText = msg.text;
+                        messages.appendChild(bubble);
+                    }
+                    messages.scrollTop = messages.scrollHeight;
+                }
+                
+                // Check if client ended chat
+                const requests = JSON.parse(localStorage.getItem('medicore_chat_requests') || '[]');
+                const req = requests.find(r => r.id === requestId);
+                if (req && req.status === 'ended') {
+                    endLiveChat(false);
+                }
+            }, 1000);
+        }
+
+        function sendLiveMessage(e) {
+            if (e) e.preventDefault();
+            const input = document.getElementById('liveChatInput');
+            const text = input.value.trim();
+            if (!text || !activeChatRequest) return;
+            
+            const requestId = activeChatRequest.id;
+            const chats = JSON.parse(localStorage.getItem('medicore_live_chats') || '{}');
+            if (!chats[requestId]) chats[requestId] = [];
+            
+            chats[requestId].push({
+                sender: 'pharmacist',
+                text: text,
+                time: new Date().toISOString()
+            });
+            
+            localStorage.setItem('medicore_live_chats', JSON.stringify(chats));
+            input.value = '';
+            
+            // Trigger local sync immediately
+            startLiveChatSync(requestId);
+        }
+
+        function endLiveChat(notifyClient = true) {
+            if (liveChatInterval) clearInterval(liveChatInterval);
+            
+            if (notifyClient && activeChatRequest) {
+                const requests = JSON.parse(localStorage.getItem('medicore_chat_requests') || '[]');
+                const idx = requests.findIndex(r => r.id === activeChatRequest.id);
+                if (idx !== -1) {
+                    requests[idx].status = 'ended';
+                    localStorage.setItem('medicore_chat_requests', JSON.stringify(requests));
+                }
+            }
+            
+            // Set pharmacist back to available
+            const pharmacist = data.pharmacists.find(p => p.email === targetEmail);
+            if (pharmacist) {
+                pharmacist.isBusy = false;
+                saveData();
+                renderPharmacists();
+            }
+            
+            document.getElementById('liveChatModal').classList.add('hidden');
+            document.getElementById('liveChatModal').classList.remove('flex');
+            showNotification('Session ended', 'info');
+        }
 
         function loadData() {
             const saved = localStorage.getItem('medicoreAdminData');
             if (saved) {
                 data = JSON.parse(saved);
+            }
+            
+            // Sync with global scoped orders if targetEmail is set
+            if (targetEmail && typeof DataManager !== 'undefined') {
+                const scopedOrders = DataManager.getScopedData('ecommerce_orders', [], targetEmail);
+                if (scopedOrders && scopedOrders.length > 0) {
+                    // Merge or replace - for MediCore we might want to replace orders with scoped ones
+                    // to ensure price/qty filtering is respected
+                    data.orders = scopedOrders.map(o => ({
+                        id: o.id,
+                        customer: o.customerName || o.customer?.name || 'Customer',
+                        email: o.customerEmail || o.customer?.email || '',
+                        phone: o.customerPhone || o.customer?.phone || '',
+                        items: (o.items || o.products || []).map(i => ({
+                            name: i.name,
+                            qty: i.qty || i.quantity || 1,
+                            price: i.price,
+                            image: i.image
+                        })),
+                        total: o.grandTotal || o.totalPrice || 0,
+                        status: o.status,
+                        date: o.date,
+                        deliveryLocation: o.deliveryLocation,
+                        openedBy: o.openedBy,
+                        assignedBy: o.assignedBy,
+                        deliveryPersonEmail: o.deliveryPersonEmail
+                    }));
+                }
             }
         }
 
@@ -1400,12 +1730,9 @@
                                 <span class="ml-auto text-xs bg-slate-900 px-2 py-1 rounded">${count}</span>
                             </div>
                         </div>
-                        <div class="absolute right-10 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-                            <button onclick="event.stopPropagation(); openShelfModal('${shelf.id}')" class="p-1 text-blue-400 hover:bg-blue-400/20 rounded" title="Edit Shelf">
-                                <i class="fa-solid fa-pen text-xs"></i>
-                            </button>
-                            <button onclick="event.stopPropagation(); deleteShelf('${shelf.id}')" class="p-1 text-red-400 hover:bg-red-400/20 rounded" title="Delete Shelf">
-                                <i class="fa-solid fa-trash text-xs"></i>
+                        <div class="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                            <button onclick="event.stopPropagation(); openDrugModalForShelf('${shelf.id}')" class="p-1 text-green-400 hover:bg-green-400/20 rounded" title="Add Drug to this Shelf">
+                                <i class="fa-solid fa-plus text-xs"></i>
                             </button>
                         </div>
                     </div>
@@ -1554,6 +1881,11 @@
             }).join('');
         }
 
+        function openDrugModalForShelf(shelfId) {
+            openDrugModal();
+            document.getElementById('drugShelf').value = shelfId;
+        }
+
         function openDrugModal(drugId = null) {
             const modal = document.getElementById('drugModal');
             const form = document.getElementById('drugForm');
@@ -1667,11 +1999,22 @@
                 filtered = data.orders.filter(o => o.status === currentOrderFilter);
             }
             
-            tbody.innerHTML = filtered.map(order => `
+            tbody.innerHTML = filtered.map(order => {
+                const isOpenedByOther = order.openedBy && order.openedBy !== targetEmail;
+                const isAssignedByMe = order.assignedBy && order.assignedBy.includes(targetEmail);
+                const showRedIcon = isOpenedByOther && !isAssignedByMe;
+                
+                const leadAssigned = !!order.deliveryPersonEmail;
+                const assignDisabled = isAssignedByMe || (isOpenedByOther && !leadAssigned);
+
+                return `
                 <tr class="hover:bg-slate-800/50 transition-colors">
                     <td class="px-6 py-4 font-mono text-sm text-blue-400">${order.id}</td>
                     <td class="px-6 py-4">
-                        <p class="font-medium text-white">${order.customer}</p>
+                        <p class="font-medium text-white">
+                            ${order.customer}
+                            ${showRedIcon ? '<i class="fa-solid fa-circle-exclamation opened-warning" title="Order opened by another operator"></i>' : ''}
+                        </p>
                         <p class="text-xs text-slate-400">${order.email}</p>
                     </td>
                     <td class="px-6 py-4 text-sm text-slate-300">${order.items.length} items</td>
@@ -1684,7 +2027,7 @@
                     <td class="px-6 py-4 text-sm text-slate-400">${order.date}</td>
                     <td class="px-6 py-4">
                         <div class="flex gap-2 flex-wrap">
-                            <button onclick="assignDelivery('${order.id}')" class="p-2 text-green-400 hover:bg-green-400/20 rounded-lg transition-colors" title="Assign Delivery" ${order.deliveryPersonEmail ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}>
+                            <button onclick="assignDelivery('${order.id}')" class="p-2 text-green-400 hover:bg-green-400/20 rounded-lg transition-colors" title="Assign Delivery" ${assignDisabled ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}>
                                 <i class="fa-solid fa-truck"></i>
                             </button>
                             <button onclick="showAdminReceipt('${order.id}')" class="p-2 text-blue-400 hover:bg-blue-400/20 rounded-lg transition-colors" title="View Receipt">
@@ -1699,7 +2042,8 @@
                         </div>
                     </td>
                 </tr>
-            `).join('');
+            `;
+            }).join('');
         }
 
         function filterOrders(status) {
@@ -1717,6 +2061,9 @@
         }
 
         function viewOrder(id) {
+            if (typeof DataManager !== 'undefined' && targetEmail) {
+                DataManager.markOrderAsOpened(id, targetEmail);
+            }
             const order = data.orders.find(o => o.id === id);
             const content = document.getElementById('orderDetailContent');
             content.innerHTML = `
@@ -1773,16 +2120,30 @@
 
         function updateOrderStatus(id, status) {
             const order = data.orders.find(o => o.id === id);
-            order.status = status;
-            saveData();
-            renderOrders();
-            updateStats();
-            showNotification(`Order ${id} marked as ${status}`);
+            if (order) {
+                order.status = status;
+                
+                // Sync with global order system
+                if (typeof DataManager !== 'undefined') {
+                    DataManager.updateOrderStatus(id, status);
+                }
+                
+                saveData();
+                renderOrders();
+                updateStats();
+                showNotification(`Order ${id} marked as ${status}`);
+            }
         }
 
         function deleteOrder(id) {
             if (confirm('Are you sure you want to delete this order?')) {
                 data.orders = data.orders.filter(o => o.id !== id);
+                
+                // Sync with global order system
+                if (typeof DataManager !== 'undefined') {
+                    DataManager.deleteOrder(id);
+                }
+                
                 saveData();
                 renderOrders();
                 updateStats();
@@ -2333,6 +2694,15 @@
         }
 
         function startRealtimeUpdates() {
+            // Listen for data changes from other tabs (e.g. checkout success)
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'medicoreAdminData') {
+                    loadData();
+                    updateStats();
+                    renderAll();
+                }
+            });
+
             // Simulate incoming orders
             setInterval(() => {
                 if (Math.random() > 0.7) {
@@ -2441,10 +2811,35 @@
 
         // Action Functions
         function assignDelivery(orderId) {
-            const deliveryPersonnel = [
-                { name: 'John Delivery', email: 'john@delivery.com' },
-                { name: 'Sarah Courier', email: 'sarah@delivery.com' }
-            ];
+            if (typeof DataManager === 'undefined') return;
+            
+            const order = data.orders.find(o => o.id === orderId);
+            if (!order) return;
+
+            const isOpenedByOther = order.openedBy && order.openedBy !== targetEmail;
+            const leadAssigned = !!order.deliveryPersonEmail;
+
+            // If opened by other but lead hasn't assigned yet, button should be disabled (already handled in render)
+            // If lead HAS assigned, this operator must follow the same assignment
+            if (isOpenedByOther && leadAssigned) {
+                if (confirm(`This order was already assigned to ${order.deliveryPersonEmail} by the first operator. Do you want to confirm assignment for your products too?`)) {
+                    DataManager.assignOrder(orderId, order.deliveryPersonEmail, targetEmail);
+                    order.assignedBy = order.assignedBy || [];
+                    if (!order.assignedBy.includes(targetEmail)) order.assignedBy.push(targetEmail);
+                    saveData();
+                    renderOrders();
+                    showNotification("Assignment confirmed");
+                }
+                return;
+            }
+
+            const allUsers = DataManager.getAllUsers();
+            const deliveryPersonnel = allUsers.filter(u => u.role === 'delivery');
+            
+            if (deliveryPersonnel.length === 0) {
+                alert("No delivery personnel currently available.");
+                return;
+            }
             
             let msg = "Select a delivery person to assign this order:\n";
             deliveryPersonnel.forEach((p, idx) => {
@@ -2456,9 +2851,15 @@
                 const idx = parseInt(choice) - 1;
                 if (deliveryPersonnel[idx]) {
                     const selectedPerson = deliveryPersonnel[idx];
-                    const order = data.orders.find(o => o.id === orderId);
+                    
+                    // Sync with global order system
+                    DataManager.assignOrder(orderId, selectedPerson.email, targetEmail);
+                    
                     order.deliveryPersonEmail = selectedPerson.email;
                     order.status = 'processing';
+                    order.assignedBy = order.assignedBy || [];
+                    if (!order.assignedBy.includes(targetEmail)) order.assignedBy.push(targetEmail);
+                    
                     saveData();
                     renderOrders();
                     updateStats();
@@ -2470,6 +2871,9 @@
         }
 
         function showAdminReceipt(orderId) {
+            if (typeof DataManager !== 'undefined' && targetEmail) {
+                DataManager.markOrderAsOpened(orderId, targetEmail);
+            }
             const order = data.orders.find(o => o.id === orderId);
             if (!order) return;
 
