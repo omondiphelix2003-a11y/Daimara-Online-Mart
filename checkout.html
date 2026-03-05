@@ -57,7 +57,7 @@
         /* TOTAL SECTION */
         .total-section { text-align: right; padding: 15px; background: #1e293b; border-radius: 8px; box-shadow: var(--shadow); margin-bottom: 30px; border: 1px solid #334155; }
         .total-section div { margin: 5px 0; font-size: 16px; color: #09752a; }
-        .grand-total { font-size: 22px !important; font-weight: bold; color: #ffffff !important; margin-top: 10px !important; }
+        .grand-total { font-size: 22px !important; font-weight: bold; color: #000000 !important; margin-top: 10px !important; }
 
         .cart-icon-container {
             position: relative;
@@ -92,13 +92,45 @@
         .map-btn { display: inline-block; background: #0f172a; color: #ffffff;font-size: 18px; padding: 8px 15px; border-radius: 4px; text-decoration: none; font-size: 12px; font-weight: bold; margin-bottom: 10px; border: 1px solid var(--primary); }
         
         .btn-group { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
-        .btn-primary { background: #0f172a; color: #ffffff; padding: 15px; border: 1px solid var(--primary);
+        .btn-primary { background: #0f172a; color: chocolate; padding: 15px; border: 1px solid var(--primary);
              border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
-        .btn-primary:hover { background-color: #000000; color: chocolate; border-color: chocolate; }
-        .btn-secondary { background: #000000; color: #fff; padding: 15px; border: 1px solid #334155; 
+        .btn-primary:hover { background-color: #000000; color: rgb(247, 247, 247); border-color: chocolate; }
+        .btn-secondary { background: #000000; color: chocolate; padding: 15px; border: 1px solid #334155; 
             border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
-        .btn-secondary:hover { background-color: #000000; color: chocolate; border-color: var(--primary); } 
+        .btn-secondary:hover { background-color: #000000; color: rgb(255, 255, 255); border-color: var(--primary); } 
         .btn-primary:active, .btn-secondary:active { transform: scale(0.98); }
+
+
+
+        #random-products {
+            display: grid; grid-template-columns: repeat(4, 1fr) !important; background-color: transparent;
+            gap: 15px;height: 205px;
+        }
+           
+        .product:hover{
+      transform:translateY(-4px) scale(1.02);
+      box-shadow:0 20px 40px -15px rgba(59, 130, 246, 0.3);
+      border-color: rgb(233, 157, 17);
+    }
+        
+
+        .product {
+            background: linear-gradient(145deg, #1e293b, #0f172a); border-radius: 10px;
+            box-shadow: var(--shadow); text-align: center;
+            border: 1px solid #334155;
+        }
+
+        .product img {width: 100%; height: 100px; object-fit: cover; border-radius:6px 6px 0 0; }
+            .product h4 { font-size: 13px; margin: 8px 0;color: rgb(199, 197, 197); }
+            .product p { font-size: 16px; font-weight: bold; color: var(--primary); }
+            .product button { 
+             width: 100%; margin-top: 8px; padding: 8px; border: none;
+            border-radius: 4px;  background-color: #000000;
+            color: rgb(233, 157, 17);
+            cursor: pointer; font-size: 12px; font-weight: bold;
+             }
+
+
 
         @media (max-width: 768px) {
             body { padding-bottom: 80px; }
@@ -123,7 +155,7 @@
            
          #random-products {
             display: grid; grid-template-columns: repeat(3, 1fr) !important; background-color: transparent;
-            gap: 15px;
+            gap: 15px;margin-bottom: 189px;height: 260px;
         }
            
         .product:hover{
@@ -155,7 +187,7 @@
                 bottom: 0;
                 left: 0;
                 width: 100%;
-                background: #0f172a;
+                background: #000000;
                 height: 60px;
                 justify-content: space-around;
                 align-items: center;
@@ -179,6 +211,85 @@
     }
         }
 
+     @media (max-width: 480px) {
+         body { padding-bottom: 80px; }
+            .navbar { padding: 10px; height: 60px; justify-content: space-between; align-items: center; }
+            .nav-links { display: none !important; }
+            .nav-icons { display: none !important; }
+            .container { padding: 10px; margin-top: 80px; }
+            .checkout-form { padding: 15px; }
+            th, td { padding: 8px 5px; font-size: 11px; }
+            .logo { font-size: 18px; }
+            .btn-group { flex-direction: column; }
+            .btn-primary, .btn-secondary { width: 100%; padding: 12px; font-size: 14px; }
+           
+            /* SLIDER */
+        .slider {
+            width: 95%; max-width: 1000px; aspect-ratio: 16/9; max-height: 300px;
+            margin: 30px auto; overflow: hidden; border-radius: 2px;
+        }
+        .slide { display: none; height: 100%; }
+        .slide img { width: 100%; height: 100%; object-fit: cover; }
+
+           
+         #random-products {
+            display: grid; grid-template-columns: repeat(3, 1fr) !important; background-color: transparent;
+            gap: 15px;margin-bottom: 183px;
+        }
+           
+        .product:hover{
+      transform:translateY(-4px) scale(1.02);
+      box-shadow:0 20px 40px -15px rgba(59, 130, 246, 0.3);
+      border-color: rgb(233, 157, 17);
+    }
+        
+
+        .product {
+            background: linear-gradient(145deg, #1e293b, #0f172a); border-radius: 10px;
+            box-shadow: var(--shadow); text-align: center;
+            border: 1px solid #334155;
+        }
+
+        .product img {width: 100%; height: 100px; object-fit: cover; border-radius:6px 6px 0 0; }
+            .product h4 { font-size: 13px; margin: 8px 0;color: rgb(199, 197, 197); }
+            .product p { font-size: 16px; font-weight: bold; color: var(--primary); }
+            .product button { 
+             width: 100%; margin-top: 8px; padding: 8px; border: none;
+            border-radius: 4px;  background-color: #000000;
+            color: rgb(233, 157, 17);
+            cursor: pointer; font-size: 12px; font-weight: bold;
+             }
+
+            .bottom-nav {
+                display: flex !important;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                background: #000000;
+                height: 60px;
+                justify-content: space-around;
+                align-items: center;
+                z-index: 2000;
+                border-top: 2px solid var(--primary);
+            }
+            .bottom-nav a {
+                color: #e2e8f0;
+                text-decoration: none;
+                font-size: 20px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            .bottom-nav a.active { color: var(--primary); }
+            .bottom-nav a span { font-size: 10px; margin-top: 4px; }
+       
+       
+    .product button:hover{
+      background-color:#ffffff;color:#000000;transform:translateY(-2px);box-shadow:0 8px 15px rgba(59, 130, 246, 0.3);
+    }
+     }
+
         /* FOOTER */
         .footer { background: none; color: #fff; padding: 15px; text-align: center; margin-top:40px; }
         .footer p { color: #ffffff; font-size: 14px; font-weight: bold; }
@@ -187,7 +298,12 @@
 <body>
 
 <nav class="navbar">
-    <a href="index.html" class="logo">Daimara Stores</a>
+<a class="logo"href="index.html">
+        <span style="font-size:21px;color:white;margin-left:10px;
+        margin-left: -3px;cursor: pointer;">Daimara <span style="color: #3b82f6;cursor: pointer;">Stores</span></span>
+      </a>
+
+    <!--<a href="index.html" class="logo">Daimara Stores</a>-->
     <div class="nav-links" id="checkoutNav">
         <a href="supermarket.html">Supermarket</a>
         <a href="second-hand items.html">Second-hand</a>
@@ -239,30 +355,31 @@
 
     <h3>Checkout Details</h3>
     <div class="checkout-form">
+        
         <div class="form-group">
-            <label>Full Name</label>
+            <label style="color: black;font-size:16px">Full Name</label>
             <input type="text" id="name" placeholder="Enter your full name">
         </div>
         <div class="form-group">
-            <label>Email Address</label>
+            <label style="color: black;font-size:16px" >Email Address</label>
             <input type="email" id="email" placeholder="Enter your email">
         </div>
         <div class="form-group">
-            <label>Payment Method</label>
+            <label style="color: black;font-size:16px">Payment Method</label>
             <select id="paymentMethod">
                 <option value="mpesa">M-Pesa</option>
             </select>
         </div>
 
         <div class="delivery-box">
-            <label class="checkbox-label">
+            <label class="checkbox-label"style="color: black;font-size:16px">
                 <input type="checkbox" id="delivery-option" onchange="toggleMap()">
-                <span id="deliveryLabelText">Add Delivery Fee (KES 0)</span>
+                <span id="deliveryLabelText">Need Door Delivery Fee (KES 0)</span>
             </label>
 
             <div id="map-container">
-                <a href="https://www.google.com/maps" target="_self" class="map-btn">
-                    <i class="fas fa-map-marker-alt"></i> Open Google Maps
+                <a href="https://www.google.com/maps" target="_self" class="map-btn"style="color: #462d07;font-weight:bold;font-size:14px">
+                    <i class="fas fa-map-marker-alt"style="color:chocolate"></i> Open Google Maps
                 </a>
                 <p style="font-size: 12px; color: #666; margin-bottom: 5px;">Paste coordinates or link below:</p>
                 <input type="text" id="location-coords" placeholder="e.g. -1.28, 36.82 or Maps link">
@@ -270,8 +387,8 @@
         </div>
 
         <div class="btn-group">
-            <button onclick="checkout()" class="btn-primary">Pay For Order(Now)</button>
-            <button onclick="initiatePayAfterDelivery()" class="btn-secondary">Pay For Order(After Delivery)</button>
+            <button onclick="checkout()" class="btn-primary">Pay (Now)</button>
+            <button onclick="initiatePayAfterDelivery()" class="btn-secondary">Pay (After Delivery)</button>
         </div>
     </div>
 

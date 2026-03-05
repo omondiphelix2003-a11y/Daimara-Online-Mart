@@ -311,11 +311,12 @@ div.h3{text-align: center; color: #082b61; font-size: 22px;
     }
 
     .product h4{
-      font-size:16px;margin:0 0 5px 0;color:#e2e8f0;font-weight:600;flex-grow:1;
+      font-size:16px;margin:0 0 5px 0;color:#e2e8f0;font-weight:600;flex-grow:1;margin-top: 12px;
+      margin-left: 5px;
     }
 
     .product p{
-      color:#3b82f6;font-size:18px;font-weight:bold;margin:5px 0;
+      color:#3b82f6;font-size:18px;font-weight:bold;margin:5px 0;margin-left: 5px;
     }
 
     .product button{
@@ -420,6 +421,8 @@ div.h3{text-align: center; color: #082b61; font-size: 22px;
       .bottom-nav a.active { color: var(--primary); }
       .bottom-nav a span { font-size: 10px; margin-top: 4px; }
 
+
+    }
     /* HORIZONTAL SCROLL FOR LONG TEXT */
     .scrollable-text {
       overflow-x: auto;
@@ -430,9 +433,31 @@ div.h3{text-align: center; color: #082b61; font-size: 22px;
     @media (max-width: 480px) {
       .ad-bar { font-size: 12px; padding: 0.5rem; }
       .navbar { top: 23px; height: 50px;padding-top: 13px;padding-bottom: 13px; }
-      .search-container { top: 54px;max-width: 235px;margin-left: 78px; }
+      .search-container { top: 54px;max-width: 200px;margin-left: 88px; }
       .slider { margin-top: 80px; }
       .delivery-card img { height: 150px; }
+     
+      /* DELIVERY SECTIONS */
+    section{padding:20px 15px}
+    h2{color: #e2e8f0;text-align:center;margin-bottom:50px; font-size: 1.7rem;}
+     
+      /* VIDEO SECTION */
+    .video-box{
+      display:flex;
+      justify-content:center;
+      padding:1rem;
+      width: 110%;
+      overflow: hidden;
+      margin-left: -14px;
+    }
+
+    video{
+      width:100%;
+      max-width:1200px;
+      height: auto;
+      border-radius:16px;
+      box-shadow:var(--shadow);
+    }
     }
 
     /* DARK MODE */
@@ -467,11 +492,12 @@ div.h3{text-align: center; color: #082b61; font-size: 22px;
     <i class="fas fa-bullhorn"></i> Advertise with us! Contact sales@daimara.com
   </div>
 
-   <nav class="navbar">
+      <nav class="navbar">
       <a class="logo">
-        <span style="font-size:20px;color:white;margin-left:10px;margin-left: -3px;">Daimara Stores</span>
+        <span style="font-size:21px;color:white;margin-left:10px;margin-left: -3px;">Daimara <span style="color: #3b82f6;">Stores</span></span>
       </a>
 
+      
 
   <div class="nav-center" id="homeNav">
     <a href="store.html"> <i class="fa fa-shopping-bag desktop-only"></i></a>

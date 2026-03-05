@@ -147,11 +147,12 @@ body {
 .about-hero h1 {
   font-size: 42px;
   margin-bottom: 15px;
-  font-weight: 700;
+  font-weight: bold;
 }
 
 .about-hero p {
-  font-size: 20px;
+  font-size: 18px;
+  font-weight: none;
   opacity: 0.9;
   color: rgb(255, 255, 255);
 }
@@ -162,7 +163,7 @@ body {
   margin: 50px auto;
   padding: 40px 20px;
   background: white;
-  border-radius: 12px;
+  border-radius: 2px;
    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
      margin-top: 15%;
@@ -178,14 +179,14 @@ body {
   margin-bottom: 15px;
   color: #2c3e50;
   font-size: 25px;
-  font-weight: 700;
+  font-weight: bold;
 }
 
 .about-text p {
   margin-bottom: 20px;
   color: #555;
   line-height: 1.8;
-  font-size: 19px;
+  font-size: 16px;
 }
 
 /* STATS */
@@ -223,7 +224,7 @@ body {
 
 .stat p {
   color: white;
-  font-size: 20px;
+  font-size: 18px;
 }
 
 /* WHY US */
@@ -245,9 +246,9 @@ body {
   content: '';
   position: absolute;
   bottom: -10px;
-  left: 50%;
+  left: 36%;
   transform: translateY(-50%);
-  width: 80px;
+  width: 100px;
   height: 4px;
   background: rgb(233, 157, 17);
   border-radius: 2px;
@@ -279,13 +280,14 @@ body {
 .why-card h3 {
   color: rgb(233, 157, 17);
   margin-bottom: 15px;
-  font-size: 25px;
+  font-size: 20px;
 }
 
 .why-card p {
   color: #666;
-  font-size: 21px;
+  font-size: 18px;
   line-height: 1.6;
+  font-weight: none;
 }
 
 /* FOOTER */
@@ -316,7 +318,7 @@ footer {
   color: #bdc3c7;
   line-height: 1.8;
   margin-bottom: 10px;
-  font-size: 21px;
+  font-size: 17px;
 }
 
 .copyright {
@@ -325,7 +327,7 @@ footer {
   padding-top: 20px;
   border-top: 1px solid #333;
   color: rgb(233, 157, 17);
-  font-size: 20px;
+  font-size: 18px;
 }
 
 
@@ -337,12 +339,13 @@ footer {
 
 <!-- NAVBAR -->
 <!--<nav class="navbar">
- <div class="logo">
-            <a href="index.html" style="text-decoration: none; color:  #fff;font-size:22px;font-weight:bold;"><span>Daimara Stores</span></a>
- </div>
+<a class="logo"href="index.html">
+        <span style="font-size:21px;color:white;margin-left:10px;
+        margin-left: -3px;cursor: pointer;">Daimara <span style="color: #3b82f6;cursor: pointer;">Stores</span></span>
+      </a>-->
 
 
-  <div class="nav-center">
+  <!--<div class="nav-center">
     <a href="index.html"style="color:#e99d11;">Back</a>
     <a href="contact.html"><i class="fas fa-phone"></i> Contact</a>
     <a href="store.html"><i class="fa fa-shopping-bag"></i> Store</a>
@@ -454,7 +457,7 @@ footer {
       <p>Facebook | Instagram | Twitter</p>
     </div>
   </div>
-  <p class="copyright">Copyright © 2026 Daimara Stores.All rights reserved.</p>
+  <p class="copyright">© 2026 Daimara Stores.All rights reserved.</p>
 </footer>
 
 

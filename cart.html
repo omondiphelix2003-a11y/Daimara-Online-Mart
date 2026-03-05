@@ -56,6 +56,44 @@
             display: none;
         }
 
+
+        /* RECOMMENDATIONS */
+        .products-preview { width: 95%; max-width: 1000px; margin: 0 auto; padding: 20px 0; }
+        .products-preview h2 { text-align: center; margin-bottom: 20px; font-size: 22px; }
+        #random-products {
+            display: grid; grid-template-columns: repeat(4, 1fr) !important; background-color: transparent;
+            gap: 15px;height: 430px;
+        }
+
+      .product:hover{
+      transform:translateY(-4px) scale(1.02);
+      box-shadow:0 20px 40px -15px rgba(59, 130, 246, 0.3);
+      border-color: rgb(233, 157, 17);
+    }
+
+        .product {
+            background: linear-gradient(145deg, #1e293b, #0f172a);  border-radius: 10px;
+            box-shadow: var(--shadow); text-align: center;
+            border: 1px solid #334155;
+        }
+
+        .product img { width: 100%; height: 100px; object-fit: cover; border-radius:6px 6px 0 0; }
+        .product h4 { font-size: 15px; margin: 8px 0;color: rgb(199, 197, 197); }
+        .product p { font-size: 16px; font-weight: bold; color: var(--primary); }
+        .product button {
+            width: 100%; margin-top: 8px; padding: 8px; border: none;
+            border-radius: 4px;  background-color: #000000;
+            color: rgb(233, 157, 17);
+            cursor: pointer; font-size: 12px; font-weight: bold;
+        }
+    
+
+    .product button:hover{
+      background-color:#ffffff;color:#000000;transform:translateY(-2px);box-shadow:0 8px 15px rgba(59, 130, 246, 0.3);
+    }
+
+
+
         @media (max-width: 768px) {
             body { padding-bottom: 80px; }
             .navbar { padding: 10px; flex-direction: row; justify-content: space-between; align-items: center; height: 60px; }
@@ -157,7 +195,7 @@
 
 
 
-        @media (max-width: 400px) {
+         @media (max-width: 480px) {
             .cart-container { margin-top: 80px; }
         }
 
@@ -183,9 +221,9 @@
         .quantity-control { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
         .qty-btn { 
             width: 25px; height: 25px; border: 1px solid #334155; background: #0f172a;
-            border-radius: 4px; cursor: pointer; font-weight: bold; color: #ffffff;
+            border-radius: 4px; cursor: pointer; font-weight: bold; color: #ffffff;margin-left: -2px;
         }
-        .qty-display { font-weight: bold; width: 20px; text-align: center;color: #e2e8f0; }
+        .qty-display { font-weight: bold; width: 20px; text-align: center;color: #e2e8f0;}
 
         .cart-item-action { text-align: right; }
         .subtotal { font-weight: bold; color: #27ae60; font-size: 16px; margin-bottom: 10px; }
@@ -198,7 +236,7 @@
         /* TOTAL & CHECKOUT */
         .cart-total {
             margin-top: 20px; text-align: right; padding: 15px;
-            background: #0f172a; border-radius: 8px; font-size: 20px; font-weight: bold;color: #ffffff;
+            background: #0f172a; border-radius: 8px; font-size: 20px; font-weight: bold;color: #000000;
             border: 1px solid #334155;
         }
         .checkout { display: flex; gap: 10px; margin-top: 20px; }
@@ -206,10 +244,10 @@
             flex: 1; text-align: center; padding: 12px; border-radius: 6px;
             font-weight: bold; text-decoration: none; transition: 0.3s;
         }
-        #checkout { background: #0f172a; color: #ffffff; border: 1px solid var(--primary); }
-        .checkout a[href="store.html"] { background: #0f172a; color: #ffffff; border: 1px solid var(--primary); }
-        #checkout:hover, .checkout a[href="store.html"]:hover { background: #000000; color: chocolate; }
-
+        #checkout { background: #000000; color: chocolate; border: 1px solid var(--primary); }
+        .checkout a[href="store.html"] { background: #000000; color: chocolate; border: 1px solid var(--primary); }
+        #checkout:hover, .checkout a[href="store.html"]:hover { background: #0f172a; color: #ffffff; }
+        .checkout a:hover{background: #0f172a; color: #ffffff;}
         @media (max-width: 480px) {
             .checkout { flex-direction: column; }
         }
@@ -266,7 +304,12 @@
 <body>
 
 <nav class="navbar">
-    <a href="index.html" class="logo">Daimara Stores</a>
+<a class="logo"href="index.html">
+        <span style="font-size:21px;color:white;margin-left:10px;
+        margin-left: -3px;cursor: pointer;">Daimara <span style="color: #3b82f6;cursor: pointer;">Stores</span></span>
+      </a>
+
+    <!--<a href="index.html" class="logo">Daimara Stores</a>-->
     <div class="nav-links" id="cartNav">
         <a href="supermarket.html">Supermarket</a>
         <a href="second-hand items.html">Second-hand</a>

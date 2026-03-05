@@ -58,23 +58,22 @@ body {
 }
 
 /* NAVBAR */
-    .navbar{
-      display:flex;align-items:center;justify-content:space-between;
-      padding:15px 30px;background:var(--glass);color:#fff; position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
-    border-bottom: 1px solid var(--glass-border);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    .navbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 20px; background: var(--glass); color: #fff;
+      position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+      flex-wrap: wrap;
+      border-bottom: 1px solid var(--glass-border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
     }
-    .logo{color:#3b82f6;font-size:25px;font-weight:bold}
-    .nav-center{display:flex;align-items:center;gap:10px}
-    .nav-center a{color: #3b82f6; font-size: 17px; transition: 0.3s; text-decoration: none;
-      padding-left: 5px;margin-right: 20px;}
-    .nav-center input{padding:7px 10px;border-radius:5px;border:none}
-    .nav-icons a{color:#fff;margin-left:15px;font-size:14px}
+    .logo { color: white; font-size: 20px; text-decoration: none;font-weight: bold; }
+    .nav-links { display: flex; align-items: center; gap: 15px; }
+    .nav-links a { color: #3b82f6; text-decoration: none; font-size: 16px; transition: 0.3s; }
+    .nav-links a:hover, .nav-links a.active { color: #ffffff }
+    .nav-icons { display: flex; align-items: center; gap: 15px; }
+    .nav-icons a { color: #e2e8f0; font-size: 21px; transition: 0.3s; }
+    .nav-icons a:hover { color: var(--primary); }
 
 .nav-center a:hover,
 .nav-center a.active {
@@ -155,7 +154,7 @@ body {
 
 .contact-container h1 {
   font-size: 25px;
-  color: #2c3e50;
+  color: #2d5c8b;
   margin-bottom: 15px;
   font-weight: 700;
 }
@@ -290,27 +289,31 @@ body {
 
 /* CONTACT SECTION */
 .contact-container {
-  max-width: 1000px;
+  max-width: 500px;
   margin: 100px auto 40px auto;
-  padding: 20px 20px;
+  padding: 10px 10px ;
+  margin-left: -5px;
+  
 }
 
 .contact-container h1 {
-  font-size: 32px;
-  color: #2c3e50;
-  margin-bottom: 15px;
+  font-size: 30px;
+  color: #2d5c8b;
+  margin-bottom: 25px;
   font-weight: 700;
+  margin-left: 12px;
 }
 
 .contact-container > p {
   font-size: 18px;
   color: #7f8c8d;
   margin-bottom: 40px;
+  margin-left: 12px;
 }
 
 .contact-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns:  1fr;
   gap: 40px;
 }
 
@@ -375,13 +378,13 @@ body {
 .contact-info h3 {
   color: #2c3e50;
   margin-bottom: 20px;
-  font-size: 22px;
+  font-size: 25px;
 }
 
 .contact-info p {
   color: #555;
   margin-bottom: 12px;
-  font-size: 16px;
+  font-size: 18px;
   line-height: 1.8;
 }
 
@@ -421,15 +424,20 @@ body {
 <!-- NAVBAR -->
 <nav class="navbar">
   
-   <!-- <div class="logo">
-            <a href="index.html" style="text-decoration: none; color:  #fff;font-size:22px;font-weight:bold;"><span>Daimara Stores</span></a>
-   </div> -->
+    <div class="logo">
+      <a class="logo" href="index.html">
+        <span style="font-size:21px;color:white;margin-left:10px;
+        margin-left: -3px;cursor: pointer;">Daimara <span style="color: #3b82f6;cursor: pointer;">Stores</span></span>
+      </a>
+            <!--<a href="index.html" style="text-decoration: none; 
+            color:  #fff;font-size:20px;"><span>Daimara Stores</span></a>-->
+   </div> 
 
-  <div class="nav-center">
-    <!--<a href="index.html"style="color:#e99d11;">Back</a>-->
+  <!--<div class="nav-center">
+    --<a href="index.html"style="color:#e99d11;">Back</a>-
     <a href="about.html"><i class="fas fa-info-circle"></i> </a>
     <a href="store.html"><i class="fa fa-shopping-bag"></i> </a>
-  </div>
+  </div>-->
 
   <!--<div class="nav-icons">
     <a href="login.html"><i class="fa fa-user"></i></a>
