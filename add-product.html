@@ -383,6 +383,27 @@
 
 
 
+        .rating-stars {
+            display: flex;
+            gap: 5px;
+            margin: 10px 0;
+            cursor: pointer;
+        }
+
+        .rating-stars i {
+            color: #ccc;
+            font-size: 1.2em;
+            transition: color 0.2s;
+        }
+
+        .rating-stars i.active {
+            color: #f1c40f;
+        }
+
+        .rating-stars.readonly {
+            cursor: default;
+        }
+
         @media (max-width: 768px) {
             header h1 { font-size: 2em; }
             .content { padding: 15px; }
@@ -408,6 +429,33 @@
         </header>
 
         <div class="content">
+            <!-- Admin Only: Category Management -->
+            <div id="adminCategorySection" class="form-section" style="display:none;">
+                <h2>⚙️ Store Category Management</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="catName">Category Name</label>
+                        <input type="text" id="catName" placeholder="e.g. Supermarket">
+                    </div>
+                    <div class="form-group">
+                        <label for="catIcon">Icon Class (FontAwesome)</label>
+                        <input type="text" id="catIcon" placeholder="e.g. fa-shopping-basket">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="catSubcategories">Sub-Categories (Comma separated)</label>
+                    <input type="text" id="catSubcategories" placeholder="Fresh food, Grocery, Beverage...">
+                </div>
+                <div class="button-group">
+                    <button type="button" onclick="saveCategory()" class="btn-add">Save Category</button>
+                    <button type="button" onclick="resetCatForm()" class="btn-reset">Reset</button>
+                </div>
+                
+                <div id="categoryList" style="margin-top: 20px;" class="products-grid">
+                    <!-- Categories will be listed here -->
+                </div>
+            </div>
+
             <!-- Add Product Form -->
             <div class="form-section">
                 <h2>➕ Add New Product</h2>
@@ -439,6 +487,17 @@
                         <div class="form-group">
                             <label for="productImage">Product Image *</label>
                             <input type="file" id="productImage" accept="image/*" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="productOtherPhotos">Other Photos (Max 4)</label>
+                            <input type="file" id="productOtherPhotos" accept="image/*" multiple>
+                        </div>
+                        <div class="form-group">
+                            <label for="productSizes">Available Sizes (Comma separated, e.g. 38, 39, 40 or S, M, L)</label>
+                            <input type="text" id="productSizes" placeholder="Enter sizes separated by commas">
                         </div>
                     </div>
 
@@ -563,6 +622,17 @@
                     <input type="text" id="editProductSupplier">
                 </div>
 
+                <div class="form-group">
+                    <label for="editProductOtherPhotos">Update Other Photos (Max 4)</label>
+                    <input type="file" id="editProductOtherPhotos" accept="image/*" multiple>
+                    <small style="color: #666; display: block; margin-top: 5px;">Leave empty to keep current extra photos</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="editProductSizes">Available Sizes (Comma separated)</label>
+                    <input type="text" id="editProductSizes" placeholder="e.g. S, M, L or 38, 39, 40">
+                </div>
+
                 <div class="button-group">
                     <button type="submit" class="btn-add">Save Changes</button>
                     <button type="button" class="btn-reset" onclick="closeEditModal()">Cancel</button>
@@ -599,51 +669,149 @@
         let products = [];
         let currentFilter = 'all';
         let editingProductId = null;
+        let storeCategories = [];
+        let editingCatId = null;
 
-        // Update subcategories based on category selection
-        function updateSubcategories() {
-            const category = document.getElementById('productCategory').value;
-            const subcategorySelect = document.getElementById('productSubcategory');
-            subcategorySelect.innerHTML = '<option value="">Select Sub-Category</option>';
-            document.getElementById('subcategoryInfo').textContent = '';
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = DataManager.getCurrentUser();
+            if (user && user.role === 'admin') {
+                document.getElementById('adminCategorySection').style.display = 'block';
+            }
+            
+            refreshCategories();
+            loadProducts();
+            
+            // Set up category filters
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.onclick = () => {
+                    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentFilter = btn.dataset.category;
+                    renderProducts();
+                };
+            });
+        });
 
-            if (category && subcategories[category]) {
-                subcategories[category].forEach(sub => {
-                    const option = document.createElement('option');
-                    option.value = sub.name;
-                    option.textContent = sub.name;
-                    option.dataset.link = sub.link;
-                    option.dataset.page = sub.page;
-                    subcategorySelect.appendChild(option);
+        function refreshCategories() {
+            storeCategories = DataManager.getStoreCategories();
+            
+            // Update Category dropdowns
+            const catSelects = [document.getElementById('productCategory'), document.getElementById('editProductCategory')];
+            catSelects.forEach(select => {
+                if(!select) return;
+                const currentVal = select.value;
+                select.innerHTML = '<option value="">Select Category</option>';
+                storeCategories.forEach(cat => {
+                    const opt = document.createElement('option');
+                    opt.value = cat.name;
+                    opt.textContent = cat.name;
+                    select.appendChild(opt);
+                });
+                select.value = currentVal;
+            });
+
+            // Render admin category list
+            const list = document.getElementById('categoryList');
+            if(list) {
+                list.innerHTML = storeCategories.map(cat => `
+                    <div class="product-card" style="padding: 15px;">
+                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+                            <i class="fa-solid ${cat.icon}" style="font-size: 1.5rem; color:#3b82f6;"></i>
+                            <h3 style="margin:0;">${cat.name}</h3>
+                        </div>
+                        <p style="font-size:0.8rem; color:#888;">Subs: ${cat.subcategories.join(', ')}</p>
+                        <div class="product-actions">
+                            <button onclick="editCategory('${cat.id}')" class="btn-edit">Edit</button>
+                            <button onclick="deleteCategory('${cat.id}')" class="btn-delete">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function saveCategory() {
+            const name = document.getElementById('catName').value.trim();
+            const icon = document.getElementById('catIcon').value.trim();
+            const subs = document.getElementById('catSubcategories').value.split(',').map(s => s.trim()).filter(Boolean);
+
+            if(!name || !icon || subs.length === 0) {
+                alert('Please fill all fields and at least one sub-category');
+                return;
+            }
+
+            if(editingCatId) {
+                const idx = storeCategories.findIndex(c => c.id === editingCatId);
+                storeCategories[idx] = { ...storeCategories[idx], name, icon, subcategories: subs };
+                editingCatId = null;
+            } else {
+                storeCategories.push({
+                    id: 'cat_' + Date.now(),
+                    name,
+                    icon,
+                    subcategories: subs
                 });
             }
 
-            // Listen for subcategory change
-            subcategorySelect.addEventListener('change', function() {
-                const selectedOption = this.options[this.selectedIndex];
-                const infoElement = document.getElementById('subcategoryInfo');
-                if (selectedOption.value) {
-                    const pageName = selectedOption.dataset.page;
-                    infoElement.textContent = `📍 This product will be added to: ${pageName} (${selectedOption.dataset.link})`;
-                } else {
-                    infoElement.textContent = '';
-                }
-            });
+            DataManager.saveStoreCategories(storeCategories);
+            refreshCategories();
+            resetCatForm();
+            showAlert('Category saved successfully!', 'success');
+        }
+
+        function editCategory(id) {
+            const cat = storeCategories.find(c => c.id === id);
+            if(!cat) return;
+            document.getElementById('catName').value = cat.name;
+            document.getElementById('catIcon').value = cat.icon;
+            document.getElementById('catSubcategories').value = cat.subcategories.join(', ');
+            editingCatId = id;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function deleteCategory(id) {
+            if(confirm('Delete this category?')) {
+                storeCategories = storeCategories.filter(c => c.id !== id);
+                DataManager.saveStoreCategories(storeCategories);
+                refreshCategories();
+            }
+        }
+
+        function resetCatForm() {
+            document.getElementById('catName').value = '';
+            document.getElementById('catIcon').value = '';
+            document.getElementById('catSubcategories').value = '';
+            editingCatId = null;
+        }
+
+        // Update subcategories based on category selection
+        function updateSubcategories() {
+            const categoryName = document.getElementById('productCategory').value;
+            const subcategorySelect = document.getElementById('productSubcategory');
+            subcategorySelect.innerHTML = '<option value="">Select Sub-Category</option>';
+            
+            const category = storeCategories.find(c => c.name === categoryName);
+            if (category) {
+                category.subcategories.forEach(sub => {
+                    const option = document.createElement('option');
+                    option.value = sub;
+                    option.textContent = sub;
+                    subcategorySelect.appendChild(option);
+                });
+            }
         }
 
         // Update subcategories in edit modal
         function updateEditSubcategories() {
-            const category = document.getElementById('editProductCategory').value;
+            const categoryName = document.getElementById('editProductCategory').value;
             const subcategorySelect = document.getElementById('editProductSubcategory');
             subcategorySelect.innerHTML = '<option value="">Select Sub-Category</option>';
 
-            if (category && subcategories[category]) {
-                subcategories[category].forEach(sub => {
+            const category = storeCategories.find(c => c.name === categoryName);
+            if (category) {
+                category.subcategories.forEach(sub => {
                     const option = document.createElement('option');
-                    option.value = sub.name;
-                    option.textContent = sub.name;
-                    option.dataset.link = sub.link;
-                    option.dataset.page = sub.page;
+                    option.value = sub;
+                    option.textContent = sub;
                     subcategorySelect.appendChild(option);
                 });
             }
@@ -664,19 +832,14 @@
             const all = DataManager.getAllProducts(); // returns object keyed by sub-category
             products = [];
 
-            const supermarketSubs = (subcategories['Supermarket'] || []).map(s => s.name);
-            const secondSubs = (subcategories['Second-hand'] || []).map(s => s.name);
-            const refillSubs = (subcategories['Refilling'] || []).map(s => s.name);
-
             for (const cat in all) {
                 if (Array.isArray(all[cat])) {
                     all[cat].forEach(p => {
-                        // Derive main category (Supermarket / Second-hand / Refilling) from subcategory when missing
+                        // Derive main category if missing
                         if (!p.category) {
-                            if (supermarketSubs.includes(cat)) p.category = 'Supermarket';
-                            else if (secondSubs.includes(cat)) p.category = 'Second-hand';
-                            else if (refillSubs.includes(cat)) p.category = 'Refilling';
-                            else p.category = 'Supermarket';
+                            const foundCat = storeCategories.find(c => c.subcategories.includes(cat));
+                            if (foundCat) p.category = foundCat.name;
+                            else p.category = 'Other';
                         }
                         products.push(p);
                     });
@@ -701,6 +864,18 @@
             }
 
             const imageData = await convertImageToBase64(imageFile);
+            
+            // Handle additional photos
+            const otherPhotosFiles = document.getElementById('productOtherPhotos').files;
+            const otherPhotos = [];
+            for (let i = 0; i < Math.min(otherPhotosFiles.length, 4); i++) {
+                const base64 = await convertImageToBase64(otherPhotosFiles[i]);
+                otherPhotos.push(base64);
+            }
+
+            // Handle sizes
+            const sizesInput = document.getElementById('productSizes').value;
+            const sizes = sizesInput ? sizesInput.split(',').map(s => s.trim()).filter(s => s !== '') : [];
 
             const user = DataManager.getCurrentUser();
             const product = {
@@ -714,6 +889,8 @@
                 sku: document.getElementById('productSKU').value,
                 supplier: document.getElementById('productSupplier').value,
                 image: imageData,
+                otherPhotos: otherPhotos,
+                sizes: sizes,
                 createdAt: new Date().toLocaleDateString(),
                 owner: user ? user.email : 'admin' // Track who added it
             };
@@ -743,6 +920,9 @@
         // Render Products
         function renderProducts() {
             const container = document.getElementById('productsContainer');
+            const currentUser = DataManager.getCurrentUser();
+            // Only the primary admin (identified by specific email) can edit ratings
+            const isPrimaryAdmin = currentUser && currentUser.role === 'admin' && currentUser.email === "omondiphelix2003@gmail.com";
 
             let filtered = products;
             if (currentFilter !== 'all') {
@@ -754,12 +934,21 @@
                 return;
             }
 
-            container.innerHTML = filtered.map(product => `
+            container.innerHTML = filtered.map(product => {
+                const rating = product.rating || 0;
+                let starsHtml = `<div class="rating-stars ${!isPrimaryAdmin ? 'readonly' : ''}" data-product-id="${product.id}">`;
+                for (let i = 1; i <= 5; i++) {
+                    starsHtml += `<i class="fas fa-star ${i <= rating ? 'active' : ''}" onclick="${isPrimaryAdmin ? `updateProductRating('${product.id}', ${i})` : ''}"></i>`;
+                }
+                starsHtml += `</div>`;
+
+                return `
                 <div class="product-card">
                     ${product.image ? `<img src="${product.image}" alt="${product.name}" class="product-image">` : '<div class="product-image" style="display: flex; align-items: center; justify-content: center; color: #999;">No Image</div>'}
                     <span class="category-badge">${product.category}</span>
                     <div style="font-size: 0.85em; color: #888; margin-top: 5px; margin-bottom: 10px;"><strong>Sub:</strong> ${product.subcategory}</div>
                     <h3>${product.name}</h3>
+                    ${starsHtml}
                     <div class="product-details">
                         <p><strong>SKU:</strong> ${product.sku || 'N/A'}</p>
                         <p><strong>Supplier:</strong> ${product.supplier || 'N/A'}</p>
@@ -767,14 +956,31 @@
                         <p><strong>Date Added:</strong> ${product.createdAt}</p>
                         ${product.description ? `<p><strong>Description:</strong> ${product.description}</p>` : ''}
                     </div>
-                    <div class="price">$${product.price.toFixed(2)}</div>
+                    <div class="price">Ksh ${product.price.toLocaleString()}</div>
                     <div class="product-actions">
                         <button class="btn-edit" onclick="openEditModal('${product.id}')">Edit</button>
                         <button class="btn-delete" onclick="deleteProduct('${product.id}')">Delete</button>
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
         }
+
+        window.updateProductRating = function(productId, rating) {
+            const currentUser = DataManager.getCurrentUser();
+            // Restrict rating modification to primary admin email
+            if (!currentUser || currentUser.role !== 'admin' || currentUser.email !== "omondiphelix2003@gmail.com") {
+                showAlert('Permission denied: Only the main administrator can rate products.', 'info');
+                return;
+            }
+
+            const res = DataManager.updateProduct(productId, { rating: rating });
+            if (res && res.success) {
+                loadProducts();
+                showAlert(`Rating updated to ${rating} stars!`, 'success');
+            } else {
+                showAlert('Error updating rating: ' + (res.message||'Unknown'), 'info');
+            }
+        };
 
         // Delete Product
         function deleteProduct(id) {
@@ -803,8 +1009,9 @@
             document.getElementById('editProductPrice').value = product.price;
             document.getElementById('editProductQuantity').value = product.quantity;
             document.getElementById('editProductDescription').value = product.description;
-            document.getElementById('editProductSKU').value = product.sku;
-            document.getElementById('editProductSupplier').value = product.supplier;
+            document.getElementById('editProductSKU').value = product.sku || '';
+            document.getElementById('editProductSupplier').value = product.supplier || '';
+            document.getElementById('editProductSizes').value = (product.sizes || []).join(', ');
             
             if (product.image) {
                 document.getElementById('editImagePreview').src = product.image;
@@ -826,23 +1033,36 @@
             const product = products.find(p => p.id === editingProductId);
             if (!product) return;
 
-            product.name = document.getElementById('editProductName').value;
-            product.category = document.getElementById('editProductCategory').value;
-            product.subcategory = document.getElementById('editProductSubcategory').value;
-            product.price = parseFloat(document.getElementById('editProductPrice').value);
-            product.quantity = parseInt(document.getElementById('editProductQuantity').value);
-            product.description = document.getElementById('editProductDescription').value;
-            product.sku = document.getElementById('editProductSKU').value;
-            product.supplier = document.getElementById('editProductSupplier').value;
+            const updatedData = {
+                name: document.getElementById('editProductName').value,
+                category: document.getElementById('editProductCategory').value,
+                subcategory: document.getElementById('editProductSubcategory').value,
+                price: parseFloat(document.getElementById('editProductPrice').value),
+                quantity: parseInt(document.getElementById('editProductQuantity').value),
+                description: document.getElementById('editProductDescription').value,
+                sku: document.getElementById('editProductSKU').value,
+                supplier: document.getElementById('editProductSupplier').value,
+                sizes: document.getElementById('editProductSizes').value.split(',').map(s => s.trim()).filter(s => s !== '')
+            };
 
             const imageFile = document.getElementById('editProductImage').files[0];
             if (imageFile) {
                 const imageData = await convertImageToBase64(imageFile);
-                product.image = imageData;
+                updatedData.image = imageData;
+            }
+
+            const otherPhotosFiles = document.getElementById('editProductOtherPhotos').files;
+            if (otherPhotosFiles.length > 0) {
+                const otherPhotos = [];
+                for (let i = 0; i < Math.min(otherPhotosFiles.length, 4); i++) {
+                    const base64 = await convertImageToBase64(otherPhotosFiles[i]);
+                    otherPhotos.push(base64);
+                }
+                updatedData.otherPhotos = otherPhotos;
             }
 
             // Update in DataManager
-            const res = DataManager.updateProduct(editingProductId, product);
+            const res = DataManager.updateProduct(editingProductId, updatedData);
             if (res && res.success) {
                 loadProducts();
                 closeEditModal();

@@ -482,6 +482,82 @@ div.h3{text-align: center; color: #082b61; font-size: 22px;
         transition-duration:0.01ms !important;
       }
     }
+    /* PRODUCT DETAILS MODAL */
+    .product-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.95);
+      z-index: 2000;
+      overflow-y: auto;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 20px;
+    }
+    .product-modal.show { display: block; }
+    .modal-container {
+      max-width: 1000px;
+      margin: 40px auto;
+      background: #1e293b;
+      border-radius: 20px;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      border: 1px solid #334155;
+      position: relative;
+    }
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      background: rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+      transition: 0.3s;
+    }
+    .modal-close:hover { background: #3b82f6; }
+    .modal-gallery { padding: 30px; }
+    .main-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 12px; margin-bottom: 15px; border: 1px solid #334155; }
+    .thumb-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .thumb-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 8px; cursor: pointer; border: 2px solid transparent; transition: 0.3s; }
+    .thumb-img:hover, .thumb-img.active { border-color: #3b82f6; }
+    .modal-info { padding: 40px; display: flex; flex-direction: column; gap: 20px; background: #1e293b; }
+    .modal-info h2 { text-align: left; margin-bottom: 5px; font-size: 2rem; color: #ffffff; }
+    .modal-price { font-size: 1.8rem; color: #3b82f6; font-weight: bold; }
+    .modal-desc { color: #94a3b8; line-height: 1.6; font-size: 1rem; }
+    .modal-meta { display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; color: #cbd5e1; border-top: 1px solid #334155; padding-top: 15px; }
+    .size-selector { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+    .size-option {
+      padding: 8px 16px;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: 0.3s;
+      background: #0f172a;
+    }
+    .size-option:hover { border-color: #3b82f6; color: #3b82f6; }
+    .size-option.selected { background: #3b82f6; border-color: #3b82f6; color: white; }
+    .related-products { padding: 30px; border-top: 1px solid #334155; grid-column: span 2; }
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; }
+    
+    @media (max-width: 768px) {
+      .modal-container { grid-template-columns: 1fr; margin: 0; border-radius: 0; }
+      .modal-info { padding: 25px; }
+      .related-products { grid-column: span 1; }
+    }
   </style>
 </head>
 <body>
@@ -627,6 +703,63 @@ div.h3{text-align: center; color: #082b61; font-size: 22px;
   </section>
 
 
+  <div id="productDetailsModal" class="product-modal">
+    <div class="modal-container">
+      <div class="modal-close" onclick="closeProductDetails()"><i class="fas fa-times"></i></div>
+      
+      <div class="modal-gallery">
+        <img id="modalMainImg" src="" class="main-img" alt="Product">
+        <div id="modalThumbGrid" class="thumb-grid"></div>
+      </div>
+      
+      <div class="modal-info">
+        <div>
+          <h2 id="modalTitle">Product Name</h2>
+          <p id="modalCategory" style="font-size: 0.9rem; color: #3b82f6;"></p>
+        </div>
+        
+        <div class="modal-price" id="modalPrice">Ksh 0.00</div>
+        
+        <div id="modalStars" class="stars" style="margin-bottom: 10px;"></div>
+        
+        <div class="modal-desc" id="modalDesc">
+          Detailed description goes here...
+        </div>
+        
+        <div id="sizeSection" style="display:none;">
+          <h4 style="font-size: 0.9rem; margin-bottom: 5px;">Select Size:</h4>
+          <div id="modalSizes" class="size-selector"></div>
+        </div>
+        
+        <div class="modal-meta">
+          <p><strong>Supplier:</strong> <span id="modalSupplier">N/A</span></p>
+          <p><strong>SKU:</strong> <span id="modalSKU">N/A</span></p>
+          <p><strong>Availability:</strong> <span id="modalStock" style="color: #10b981;">In Stock</span></p>
+        </div>
+        
+        <div style="display: flex; gap: 15px; margin-top: 10px;">
+          <button id="modalAddToCartBtn" style="flex: 1; padding: 15px; background: #3b82f6; color: white; border: none; font-weight: bold; font-size: 1rem; cursor: pointer; border-radius: 10px;">
+            <i class="fas fa-cart-plus"></i> ADD TO CART
+          </button>
+          <a href="cart.html" style="padding: 15px; background: #1e293b; color: white; border: 1px solid #334155; border-radius: 10px; display: flex; align-items: center; justify-content: center; width: 60px;">
+            <i class="fas fa-shopping-cart"></i>
+          </a>
+        </div>
+      </div>
+      
+      <div class="related-products">
+        <h3 style="border-bottom: 1px solid #334155; padding-bottom: 10px; margin-bottom: 20px;">Related Products</h3>
+        <div id="relatedGrid" class="related-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast" class="toast">
+    <i class="fas fa-check-circle" style="color:#3b82f6;font-size:1.2rem"></i>
+    <span id="toast-msg">Item added to cart!</span>
+  </div>
+
 <!--<footer class="footer">
   <p>Copyright © 2026 Daimara Stores.All rights reserved.</p>
 </footer>-->
@@ -683,19 +816,151 @@ div.h3{text-align: center; color: #082b61; font-size: 22px;
     initHomePromotion();
   });
 
+  // PRODUCT DETAILS MODAL LOGIC
+  let currentProduct = null;
+  let selectedSize = null;
+
+  window.openProductDetails = function(id) {
+    const all = getAllFlattened();
+    const product = all.find(p => p.id === id);
+    if (!product) return;
+    
+    currentProduct = product;
+    selectedSize = null;
+    
+    const modal = document.getElementById('productDetailsModal');
+    document.getElementById('modalTitle').innerText = product.name;
+    document.getElementById('modalCategory').innerText = `${product.category} > ${product.subcategory}`;
+    document.getElementById('modalPrice').innerText = `Ksh ${product.price.toLocaleString()}`;
+    document.getElementById('modalDesc').innerText = product.description || 'No description available.';
+    document.getElementById('modalSupplier').innerText = product.supplier || 'Daimara Official';
+    document.getElementById('modalSKU').innerText = product.sku || 'N/A';
+    document.getElementById('modalMainImg').src = product.image || 'https://picsum.photos/400/400';
+    
+    // Stars
+    const starsEl = document.getElementById('modalStars');
+    if (starsEl) {
+      starsEl.innerHTML = '';
+      const rating = product.rating || 0;
+      for (let i = 1; i <= 5; i++) {
+        starsEl.innerHTML += `<i class="${i <= rating ? 'fas' : 'far'} fa-star" style="color:#fbbf24; font-size:1.2rem; margin-right:5px;"></i>`;
+      }
+    }
+
+    // Thumbs
+    const thumbGrid = document.getElementById('modalThumbGrid');
+    thumbGrid.innerHTML = '';
+    const allPhotos = [product.image, ...(product.otherImages || product.otherPhotos || [])].filter(Boolean);
+    allPhotos.forEach((photo, idx) => {
+      const img = document.createElement('img');
+      img.src = photo;
+      img.className = `thumb-img ${idx === 0 ? 'active' : ''}`;
+      img.onclick = () => {
+        document.getElementById('modalMainImg').src = photo;
+        document.querySelectorAll('.thumb-img').forEach(t => t.classList.remove('active'));
+        img.classList.add('active');
+      };
+      thumbGrid.appendChild(img);
+    });
+
+    // Sizes
+    const sizeSection = document.getElementById('sizeSection');
+    const sizesContainer = document.getElementById('modalSizes');
+    if (product.sizes && product.sizes.length > 0) {
+      sizeSection.style.display = 'block';
+      sizesContainer.innerHTML = '';
+      product.sizes.forEach(size => {
+        const span = document.createElement('span');
+        span.className = 'size-option';
+        span.innerText = size;
+        span.onclick = () => {
+          selectedSize = size;
+          document.querySelectorAll('.size-option').forEach(s => s.classList.remove('selected'));
+          span.classList.add('selected');
+        };
+        sizesContainer.appendChild(span);
+      });
+    } else {
+      sizeSection.style.display = 'none';
+    }
+
+    // Related Products
+    const relatedGrid = document.getElementById('relatedGrid');
+    const related = all.filter(p => p.subcategory === product.subcategory && p.id !== product.id).slice(0, 4);
+    relatedGrid.innerHTML = '';
+    related.forEach(p => {
+      relatedGrid.innerHTML += `
+        <div class="product" onclick="openProductDetails('${p.id}')" style="font-size: 14px;">
+          <img src="${p.image || 'https://picsum.photos/200/200'}" style="height: 120px;">
+          <h4 style="font-size: 12px; margin: 5px;">${p.name}</h4>
+          <p style="font-size: 14px; margin: 5px;">Ksh ${p.price}</p>
+        </div>
+      `;
+    });
+
+    // Add to Cart
+    document.getElementById('modalAddToCartBtn').onclick = () => {
+      if (product.sizes && product.sizes.length > 0 && !selectedSize) {
+        alert('Please select a size first');
+        return;
+      }
+      const itemToCart = { ...product, selectedSize: selectedSize };
+      DataManager.addToCart(itemToCart);
+      showToast(`${product.name} added to cart!`);
+      updateCartBadge();
+      
+      // Redirect or show cart
+      setTimeout(() => {
+        closeProductDetails();
+      }, 1000);
+    };
+
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  };
+
+  window.closeProductDetails = function() {
+    document.getElementById('productDetailsModal').classList.remove('show');
+    document.body.style.overflow = 'auto';
+  };
+
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    if (toast) {
+      document.getElementById('toast-msg').innerText = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    } else {
+      alert(msg);
+    }
+  }
+
+  function updateCartBadge() {
+    const cart = DataManager.getCart();
+    const badge = document.getElementById('cartBadge');
+    if (badge) {
+      const count = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
+      badge.innerText = count;
+      badge.style.display = count > 0 ? 'block' : 'none';
+    }
+  }
+
+  function getAllFlattened(){
+    const all = DataManager.getAllProducts();
+    return Object.keys(all).reduce((acc,k)=> acc.concat(all[k]||[]), []);
+  }
+
   // RANDOM PRODUCTS (from DataManager)
   (function(){
     const rndContainer = document.getElementById('random-products');
-    function getAllFlattened(){
-      const all = DataManager.getAllProducts();
-      return Object.keys(all).reduce((acc,k)=> acc.concat(all[k]||[]), []);
-    }
 
-    window.addToCartById = function(id){
+    window.addToCartById = function(id, e){
+      if(e) e.stopPropagation();
       const prod = getAllFlattened().find(p=>p.id===id);
       if (!prod) { alert('Product not found'); return; }
       DataManager.addToCart(prod);
-      alert('Added to cart');
+      showToast(`${prod.name} added to cart!`);
+      updateCartBadge();
     };
 
     function renderRandom(n=4){
@@ -707,16 +972,17 @@ div.h3{text-align: center; color: #082b61; font-size: 22px;
       shuffled.forEach(p => {
         const img = p.image || 'https://picsum.photos/300/200';
         rndContainer.innerHTML += `
-          <div class="product">
+          <div class="product" onclick="openProductDetails('${p.id}')">
             <img src="${img}">
             <h4>${p.name}</h4>
             <p>Ksh ${p.price}</p>
-            <button onclick="addToCartById('${p.id}')">Add to Cart</button>
+            <button onclick="addToCartById('${p.id}', event)">Add to Cart</button>
           </div>`;
       });
     }
 
     renderRandom(50);
+    updateCartBadge();
   })();
 
 // DELIVERY AUTO-SCROLL

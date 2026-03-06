@@ -232,10 +232,16 @@
             animation: pulse 1.5s infinite;
         }
 
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.4; }
-            100% { opacity: 1; }
+        @keyframes green-pulse-ring {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+            100% { transform: scale(0.8); opacity: 0.5; }
+        }
+        .animated-green-chat-icon {
+            animation: green-pulse-ring 1.5s infinite ease-in-out;
+            color: #22c55e;
+            cursor: pointer;
+            font-size: 1.5rem;
         }
 
         /* MOBILE NAV STYLES */
@@ -1164,7 +1170,7 @@
                 
                 <!-- Countdown Timer -->
                 <div class="mb-8">
-                    <div class="text-4xl font-mono font-bold text-blue-500 mb-1" id="chatRequestTimer">15</div>
+                    <div class="text-4xl font-mono font-bold text-blue-500 mb-1" id="chatRequestTimer">60</div>
                     <p class="text-[10px] uppercase tracking-widest text-slate-500">Seconds remaining</p>
                     <div class="w-full bg-slate-700 h-1.5 rounded-full mt-4 overflow-hidden">
                         <div id="chatRequestProgressBar" class="bg-blue-500 h-full transition-all duration-1000 linear" style="width: 100%"></div>
@@ -1304,7 +1310,7 @@
         let targetEmail = null; // Defined here for global access
         let activeChatRequest = null;
         let chatTimerInterval = null;
-        let chatCountdown = 15;
+        let chatCountdown = 60;
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
@@ -1322,25 +1328,30 @@
 
         function listenForChatRequests() {
             window.addEventListener('storage', (e) => {
-                if (e.key === 'medicore_chat_requests') {
-                    const requests = JSON.parse(e.newValue || '[]');
-                    const myRequest = requests.find(r => r.pharmacistEmail === targetEmail && r.status === 'pending');
-                    
-                    if (myRequest && !activeChatRequest) {
-                        showChatRequest(myRequest);
+                if (e.key === 'medicore_pharmacist_chat_request' && e.newValue) {
+                    const request = JSON.parse(e.newValue);
+                    if (request.status === 'pending') {
+                        // Re-render pharmacists grid to show the green icon
+                        renderPharmacists();
+                        // Also show modal if this is the target pharmacist or if we are admin
+                        // For simplicity, we'll let the operator click the icon as requested by user
                     }
+                } else if (e.key === 'medicore_pharmacist_chat_request' && !e.newValue) {
+                    // Request removed (e.g. timeout on client side)
+                    closeChatRequestModal();
+                    renderPharmacists();
                 }
             });
-            
-            // Check once on load
-            const requests = JSON.parse(localStorage.getItem('medicore_chat_requests') || '[]');
-            const myRequest = requests.find(r => r.pharmacistEmail === targetEmail && r.status === 'pending');
-            if (myRequest) showChatRequest(myRequest);
+
+            // Poll for requests periodically too (fallback)
+            setInterval(() => {
+                renderPharmacists();
+            }, 2000);
         }
 
         function showChatRequest(request) {
             activeChatRequest = request;
-            chatCountdown = 15;
+            chatCountdown = 60;
             
             const modal = document.getElementById('chatRequestModal');
             const timerText = document.getElementById('chatRequestTimer');
@@ -1357,7 +1368,7 @@
             chatTimerInterval = setInterval(() => {
                 chatCountdown--;
                 timerText.innerText = chatCountdown;
-                progressBar.style.width = (chatCountdown / 15 * 100) + '%';
+                progressBar.style.width = (chatCountdown / 60 * 100) + '%';
                 
                 if (chatCountdown <= 0) {
                     clearInterval(chatTimerInterval);
@@ -1369,49 +1380,51 @@
         function autoCancelChatRequest() {
             if (!activeChatRequest) return;
             
-            const requests = JSON.parse(localStorage.getItem('medicore_chat_requests') || '[]');
-            const idx = requests.findIndex(r => r.id === activeChatRequest.id);
-            if (idx !== -1) {
-                requests[idx].status = 'timeout';
-                localStorage.setItem('medicore_chat_requests', JSON.stringify(requests));
-            }
+            // Notify client of cancellation
+            localStorage.setItem('medicore_pharmacist_chat_response', JSON.stringify({
+                requestId: activeChatRequest.id,
+                status: 'cancelled'
+            }));
             
+            localStorage.removeItem('medicore_pharmacist_chat_request');
             closeChatRequestModal();
             showNotification('Chat request timed out', 'info');
+            renderPharmacists();
         }
 
         function declineChatRequest() {
             if (!activeChatRequest) return;
             
-            const requests = JSON.parse(localStorage.getItem('medicore_chat_requests') || '[]');
-            const idx = requests.findIndex(r => r.id === activeChatRequest.id);
-            if (idx !== -1) {
-                requests[idx].status = 'declined';
-                localStorage.setItem('medicore_chat_requests', JSON.stringify(requests));
-            }
+            // Notify client of decline
+            localStorage.setItem('medicore_pharmacist_chat_response', JSON.stringify({
+                requestId: activeChatRequest.id,
+                status: 'declined'
+            }));
             
+            localStorage.removeItem('medicore_pharmacist_chat_request');
             closeChatRequestModal();
             showNotification('Chat request declined', 'info');
+            renderPharmacists();
         }
 
         function acceptChatRequest() {
             if (!activeChatRequest) return;
             
-            const requests = JSON.parse(localStorage.getItem('medicore_chat_requests') || '[]');
-            const idx = requests.findIndex(r => r.id === activeChatRequest.id);
-            if (idx !== -1) {
-                requests[idx].status = 'accepted';
-                localStorage.setItem('medicore_chat_requests', JSON.stringify(requests));
-            }
+            // Notify client of acceptance
+            localStorage.setItem('medicore_pharmacist_chat_response', JSON.stringify({
+                requestId: activeChatRequest.id,
+                status: 'accepted'
+            }));
             
-            // Update pharmacist status to busy
-            const pharmacist = data.pharmacists.find(p => p.email === targetEmail);
+            // Update pharmacist status to busy so they disappear from client page
+            const pharmacist = data.pharmacists.find(p => p.id === activeChatRequest.pharmacistId);
             if (pharmacist) {
                 pharmacist.isBusy = true;
                 saveData();
                 renderPharmacists();
             }
             
+            localStorage.removeItem('medicore_pharmacist_chat_request');
             closeChatRequestModal();
             openLiveChat(activeChatRequest);
         }
@@ -2435,8 +2448,18 @@
         // Pharmacists Functions
         function renderPharmacists() {
             const grid = document.getElementById('pharmacistsGrid');
-            grid.innerHTML = data.pharmacists.map(p => `
-                <div class="admin-card rounded-xl p-6">
+            const chatRequest = JSON.parse(localStorage.getItem('medicore_pharmacist_chat_request') || 'null');
+            
+            grid.innerHTML = data.pharmacists.map(p => {
+                const hasPendingRequest = chatRequest && chatRequest.pharmacistId === p.id && chatRequest.status === 'pending';
+                
+                return `
+                <div class="admin-card rounded-xl p-6 relative">
+                    ${hasPendingRequest ? `
+                        <div class="absolute top-4 left-1/2 -translate-x-1/2 z-10">
+                            <i class="fa-solid fa-comment-dots animated-green-chat-icon" onclick="openChatRequestFromIcon('${p.id}')" title="Chat Request!"></i>
+                        </div>
+                    ` : ''}
                     <div class="flex items-start justify-between mb-4">
                         <img src="${p.image}" class="w-16 h-16 rounded-full object-cover border-2 ${p.isBusy ? 'border-red-500' : 'border-green-500'}">
                         <div class="flex gap-2">
@@ -2457,7 +2480,14 @@
                         </span>
                     </div>
                 </div>
-            `).join('');
+            `;}).join('');
+        }
+
+        function openChatRequestFromIcon(pharmacistId) {
+            const request = JSON.parse(localStorage.getItem('medicore_pharmacist_chat_request'));
+            if (request && request.pharmacistId === pharmacistId && request.status === 'pending') {
+                showChatRequest(request);
+            }
         }
 
         function openPharmacistModal(id = null) {

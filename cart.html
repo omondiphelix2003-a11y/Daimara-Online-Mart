@@ -296,6 +296,75 @@
       background-color:#ffffff;color:#000000;transform:translateY(-2px);box-shadow:0 8px 15px rgba(59, 130, 246, 0.3);
     }
 
+        /* PRODUCT DETAILS MODAL */
+        .product-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            z-index: 3000;
+            overflow-y: auto;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 20px;
+        }
+        .product-modal.show { display: block; }
+        .modal-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: #1e293b;
+            border-radius: 20px;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid #334155;
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .modal-gallery { padding: 30px; }
+        .main-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 12px; margin-bottom: 15px; border: 1px solid #334155; }
+        .thumb-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .thumb-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 8px; cursor: pointer; border: 2px solid transparent; }
+        .thumb-img.active { border-color: #3b82f6; }
+        .modal-info { padding: 40px; display: flex; flex-direction: column; gap: 20px; }
+        .modal-info h2 { font-size: 2rem; color: #fff; }
+        .modal-price { font-size: 1.8rem; color: #3b82f6; font-weight: bold; }
+        .modal-desc { color: #94a3b8; line-height: 1.6; }
+        .modal-meta { border-top: 1px solid #334155; padding-top: 15px; color: #cbd5e1; font-size: 0.9rem; }
+        .size-selector { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+        .size-option { padding: 8px 16px; border: 1px solid #475569; border-radius: 8px; cursor: pointer; background: #0f172a; }
+        .size-option.selected { background: #3b82f6; border-color: #3b82f6; color: white; }
+        .related-products { padding: 30px; border-top: 1px solid #334155; grid-column: span 2; }
+        .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
+
+        .toast {
+            position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: #1e293b; color: white; padding: 12px 24px; border-radius: 50px;
+            display: flex; align-items: center; gap: 10px; z-index: 4000;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4); border: 1px solid #3b82f6;
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); opacity: 0;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
         /* FOOTER */
         .footer { background: none; color: #fff; padding: 15px; text-align: center; margin-top:40px; }
         .footer p { color: #ffffff; font-size: 14px; font-weight: bold; }
@@ -363,6 +432,46 @@
     <p>Copyright © 2026 Daimara Online Mart. All rights reserved.</p>
 </footer>-->
 
+<div id="productDetailsModal" class="product-modal">
+    <div class="modal-container">
+        <div class="modal-close" onclick="closeProductDetails()"><i class="fas fa-times"></i></div>
+        <div class="modal-gallery">
+            <img id="modalMainImg" src="" class="main-img" alt="Product">
+            <div id="modalThumbGrid" class="thumb-grid"></div>
+        </div>
+        <div class="modal-info">
+            <div>
+                <h2 id="modalTitle">Product Name</h2>
+                <p id="modalCategory" style="font-size: 0.9rem; color: #3b82f6;"></p>
+            </div>
+            <div class="modal-price" id="modalPrice">Ksh 0.00</div>
+            <div class="modal-desc" id="modalDesc">Detailed description goes here...</div>
+            <div id="sizeSection" style="display:none;">
+                <h4 style="font-size: 0.9rem; margin-bottom: 5px; text-align: left; color: #fff;">Select Size:</h4>
+                <div id="modalSizes" class="size-selector"></div>
+            </div>
+            <div class="modal-meta">
+                <p><strong>Supplier:</strong> <span id="modalSupplier">N/A</span></p>
+                <p><strong>SKU:</strong> <span id="modalSKU">N/A</span></p>
+            </div>
+            <div style="display: flex; gap: 15px; margin-top: 10px;">
+                <button id="modalAddToCartBtn" style="flex: 1; padding: 15px; background: #3b82f6; color: white; border: none; font-weight: bold; font-size: 1rem; cursor: pointer; border-radius: 10px;">
+                    <i class="fas fa-cart-plus"></i> ADD TO CART
+                </button>
+            </div>
+        </div>
+        <div class="related-products">
+            <h3 style="border-bottom: 1px solid #334155; padding-bottom: 10px; margin-bottom: 20px; text-align: left; color: #fff;">Related Products</h3>
+            <div id="relatedGrid" class="related-grid"></div>
+        </div>
+    </div>
+</div>
+
+<div id="toast" class="toast">
+    <i class="fas fa-check-circle" style="color:#3b82f6;font-size:1.2rem"></i>
+    <span id="toast-msg">Item added to cart!</span>
+</div>
+
 <script src="data-manager.js"></script>
 <script src="auth-check.js"></script>
 <script>
@@ -402,9 +511,11 @@
             div.className = 'cart-item-card';
             div.setAttribute('data-product-id', item.id);
             div.innerHTML = `
-                <div class="cart-item-image"><img src="${item.image || 'https://picsum.photos/100/100'}" alt="${item.name}"></div>
+                <div class="cart-item-image">
+                    <img src="${item.image || 'https://picsum.photos/100/100'}" alt="${item.name}" onclick="openProductDetails('${item.id}')" style="cursor:pointer;">
+                </div>
                 <div class="cart-item-details">
-                    <h3>${item.name}</h3>
+                    <h3 onclick="openProductDetails('${item.id}')" style="cursor:pointer;">${item.name}</h3>
                     <p class="price">Ksh ${item.price.toLocaleString()}</p>
                     <div class="quantity-control">
                         <button class="qty-btn decrease-btn">-</button>
@@ -480,6 +591,100 @@
     }
 
     // Recommendations
+    // Modal logic
+    let selectedSize = null;
+    window.openProductDetails = function(id) {
+        const all = DataManager.getAllProducts();
+        const flat = Object.keys(all).reduce((acc,k) => acc.concat(all[k]||[]), []);
+        const product = flat.find(p => p.id === id);
+        if (!product) return;
+
+        selectedSize = null;
+        const modal = document.getElementById('productDetailsModal');
+        document.getElementById('modalTitle').innerText = product.name;
+        document.getElementById('modalCategory').innerText = `${product.category} > ${product.subcategory || ''}`;
+        document.getElementById('modalPrice').innerText = `Ksh ${product.price.toLocaleString()}`;
+        document.getElementById('modalDesc').innerText = product.description || 'No description available.';
+        document.getElementById('modalSupplier').innerText = product.supplier || 'Daimara Official';
+        document.getElementById('modalSKU').innerText = product.sku || 'N/A';
+        document.getElementById('modalMainImg').src = product.image || 'https://picsum.photos/400/400';
+
+        const thumbGrid = document.getElementById('modalThumbGrid');
+        thumbGrid.innerHTML = '';
+        const allPhotos = [product.image, ...(product.otherPhotos || [])].filter(Boolean);
+        allPhotos.forEach((photo, idx) => {
+            const img = document.createElement('img');
+            img.src = photo;
+            img.className = `thumb-img ${idx === 0 ? 'active' : ''}`;
+            img.onclick = () => {
+                document.getElementById('modalMainImg').src = photo;
+                document.querySelectorAll('.thumb-img').forEach(t => t.classList.remove('active'));
+                img.classList.add('active');
+            };
+            thumbGrid.appendChild(img);
+        });
+
+        const sizeSection = document.getElementById('sizeSection');
+        const sizesContainer = document.getElementById('modalSizes');
+        if (product.sizes && product.sizes.length > 0) {
+            sizeSection.style.display = 'block';
+            sizesContainer.innerHTML = '';
+            product.sizes.forEach(size => {
+                const span = document.createElement('span');
+                span.className = 'size-option';
+                span.innerText = size;
+                span.onclick = () => {
+                    selectedSize = size;
+                    document.querySelectorAll('.size-option').forEach(s => s.classList.remove('selected'));
+                    span.classList.add('selected');
+                };
+                sizesContainer.appendChild(span);
+            });
+        } else {
+            sizeSection.style.display = 'none';
+        }
+
+        const relatedGrid = document.getElementById('relatedGrid');
+        const related = flat.filter(p => p.subcategory === product.subcategory && p.id !== product.id).slice(0, 4);
+        relatedGrid.innerHTML = related.map(p => `
+            <div class="product" onclick="openProductDetails('${p.id}')" style="font-size: 14px; cursor:pointer;">
+                <img src="${p.image || 'https://picsum.photos/200/200'}" style="height: 120px;">
+                <h4 style="font-size: 12px; margin: 5px;">${p.name}</h4>
+                <p style="font-size: 14px; margin: 5px;">Ksh ${p.price}</p>
+            </div>
+        `).join('');
+
+        document.getElementById('modalAddToCartBtn').onclick = () => {
+            if (product.sizes && product.sizes.length > 0 && !selectedSize) {
+                alert('Please select a size first');
+                return;
+            }
+            const itemToCart = { ...product, selectedSize: selectedSize };
+            DataManager.addToCart(itemToCart);
+            showToast(`${product.name} added to cart!`);
+            cart = DataManager.getCart();
+            renderCart();
+            updateCartBadge();
+        };
+
+        modal.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    };
+
+    window.closeProductDetails = function() {
+        document.getElementById('productDetailsModal').classList.remove('show');
+        document.body.style.overflow = 'auto';
+    };
+
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        if (toast) {
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+    }
+
     function renderRandom() {
         const container = document.getElementById('random-products');
         const all = DataManager.getAllProducts();
@@ -487,8 +692,8 @@
         const shuffled = flat.sort(() => 0.5 - Math.random()).slice(0, 8);
         container.innerHTML = shuffled.map(p => `
             <div class="product">
-                <img src="${p.image || 'https://picsum.photos/200/200'}">
-                <h4>${p.name}</h4>
+                <img src="${p.image || 'https://picsum.photos/200/200'}" onclick="openProductDetails('${p.id}')" style="cursor:pointer;">
+                <h4 onclick="openProductDetails('${p.id}')" style="cursor:pointer;">${p.name}</h4>
                 <p>Ksh ${p.price}</p>
                 <button onclick="addRec('${p.id}')">Add to Cart</button>
             </div>

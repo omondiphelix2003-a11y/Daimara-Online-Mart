@@ -26,8 +26,18 @@ const DataManager = (() => {
     PERMANENT_EARNINGS: 'ecommerce_permanent_earnings',
     OPERATOR_EARNINGS: 'ecommerce_operator_earnings',
     OPERATOR_REVENUE: 'ecommerce_operator_revenue',
-    USER_LOYALTY: 'ecommerce_user_loyalty'
+    USER_LOYALTY: 'ecommerce_user_loyalty',
+    PHARMACIST_CHAT_REQUEST: 'medicore_pharmacist_chat_request',
+    PHARMACIST_CHAT_RESPONSE: 'medicore_pharmacist_chat_response',
+    STORE_CATEGORIES: 'ecommerce_store_categories'
   };
+
+  // Default Store Categories
+  const DEFAULT_CATEGORIES = [
+    { id: 'cat1', name: 'Supermarket', icon: 'fa-shopping-basket', subcategories: ['Fresh food', 'Grocery', 'Beverage', 'Cereal', 'Liquor', 'Household items'] },
+    { id: 'cat2', name: 'Second-hand Items', icon: 'fa-exchange-alt', subcategories: ['Clothings', 'Furniture', 'Electronics'] },
+    { id: 'cat3', name: 'Refilling Services', icon: 'fa-gas-pump', subcategories: ['Gas', 'Water'] }
+  ];
 
   // Initialize default products from both supermarket and second-hand categories
   const DEFAULT_PRODUCTS = {
@@ -106,6 +116,56 @@ const DataManager = (() => {
     if (!localStorage.getItem(STORAGE_KEYS.USER_LOYALTY)) {
       localStorage.setItem(STORAGE_KEYS.USER_LOYALTY, JSON.stringify({}));
     }
+    if (!localStorage.getItem(STORAGE_KEYS.STORE_CATEGORIES)) {
+      localStorage.setItem(STORAGE_KEYS.STORE_CATEGORIES, JSON.stringify(DEFAULT_CATEGORIES));
+    }
+  }
+
+  function getStoreCategories() {
+    initializeStorage();
+    return JSON.parse(localStorage.getItem(STORAGE_KEYS.STORE_CATEGORIES)) || DEFAULT_CATEGORIES;
+  }
+
+  function saveStoreCategories(categories) {
+    localStorage.setItem(STORAGE_KEYS.STORE_CATEGORIES, JSON.stringify(categories));
+    window.dispatchEvent(new Event('categoriesUpdated'));
+  }
+
+  function updateProductRating(productId, rating) {
+    const products = getAllProducts();
+    let found = false;
+    
+    for (const cat in products) {
+      const idx = products[cat].findIndex(p => p.id === productId);
+      if (idx !== -1) {
+        products[cat][idx].rating = rating;
+        found = true;
+        break;
+      }
+    }
+    
+    if (found) {
+      localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
+      
+      // Sync Warehouse
+      const warehouse = JSON.parse(localStorage.getItem(STORAGE_KEYS.WAREHOUSE)) || { products: [] };
+      const wIdx = warehouse.products.findIndex(p => p.id === productId);
+      if (wIdx !== -1) {
+        warehouse.products[wIdx].rating = rating;
+        localStorage.setItem(STORAGE_KEYS.WAREHOUSE, JSON.stringify(warehouse));
+      }
+
+      // Sync Added Products
+      const added = JSON.parse(localStorage.getItem(STORAGE_KEYS.ADDED_PRODUCTS)) || [];
+      const aIdx = added.findIndex(p => p.id === productId);
+      if (aIdx !== -1) {
+        added[aIdx].rating = rating;
+        localStorage.setItem(STORAGE_KEYS.ADDED_PRODUCTS, JSON.stringify(added));
+      }
+      
+      return { success: true };
+    }
+    return { success: false, message: 'Product not found' };
   }
 
   function getUserLoyaltyPoints(userId) {
@@ -559,6 +619,13 @@ const DataManager = (() => {
       return { success: true };
     }
     return { success: false };
+  }
+
+  function deletePageRegistration(regId) {
+    const regs = getPageRegistrations();
+    const filtered = regs.filter(r => r.id !== regId);
+    localStorage.setItem(STORAGE_KEYS.PAGE_REGISTRATIONS, JSON.stringify(filtered));
+    return { success: true };
   }
 
   function deleteUser(userId) {
@@ -1644,6 +1711,7 @@ const DataManager = (() => {
     addPageRegistration,
     getPageRegistrations,
     updatePageRegistrationStatus,
+    deletePageRegistration,
     updateUserRoleByEmail,
     getScopedData,
     saveScopedData,
@@ -1654,7 +1722,10 @@ const DataManager = (() => {
     getOperatorRevenue,
     addOperatorRevenue,
     getUserLoyaltyPoints,
-    addUserLoyaltyPoints
+    addUserLoyaltyPoints,
+    getStoreCategories,
+    saveStoreCategories,
+    updateProductRating
   };
 })();
 

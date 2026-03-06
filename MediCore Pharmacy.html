@@ -601,17 +601,6 @@
         </div>
     </div>
 
-    <div id="restrictionModal" class="modal hidden fixed inset-0 z-[70] flex items-center justify-center bg-black/90 backdrop-blur-sm">
-        <div class="bg-slate-800 border border-red-500/50 rounded-xl w-full max-w-md mx-4 p-6 shadow-2xl text-center">
-            <div class="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fa-solid fa-circle-xmark text-red-500 text-3xl"></i>
-            </div>
-            <h3 class="text-xl font-bold text-white mb-2">Pharmacist Unavailable</h3>
-            <p class="text-slate-400 mb-6">This pharmacist is currently handling another client. Please choose an available pharmacist with a green badge or try again later.</p>
-            <button onclick="closeRestrictionModal()" class="bg-slate-700 hover:bg-slate-600 text-white px-6 py-2 rounded-lg transition-colors">Go Back</button>
-        </div>
-    </div>
-
     <div id="clientWaitingModal" class="modal hidden fixed inset-0 z-[70] flex items-center justify-center bg-black/90 backdrop-blur-sm">
         <div class="bg-slate-800 border border-blue-500/50 rounded-xl w-full max-w-md mx-4 p-8 shadow-2xl text-center">
             <div class="relative w-24 h-24 mx-auto mb-6">
@@ -627,27 +616,6 @@
                 <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
             </div>
             <button onclick="cancelConnectionRequest()" class="text-red-400 hover:text-red-300 text-sm underline">Cancel Request</button>
-        </div>
-    </div>
-
-    <div id="pharmacistCallModal" class="modal hidden fixed inset-0 z-[80] flex items-center justify-center bg-black/95 backdrop-blur-md">
-        <div class="bg-slate-800 border border-green-500/50 rounded-xl w-full max-w-md mx-4 p-8 shadow-2xl text-center relative overflow-hidden">
-            <div class="absolute inset-0 bg-gradient-to-b from-green-500/10 to-transparent"></div>
-            <div class="relative z-10">
-                <div class="w-20 h-20 mx-auto mb-4 vibrating-icon">
-                    <i class="fa-solid fa-comment-medical text-6xl text-green-500"></i>
-                </div>
-                <h3 class="text-2xl font-bold text-white mb-2">Incoming Request</h3>
-                <p class="text-slate-400 mb-6">A client wants to chat with you</p>
-                <div class="flex gap-4 justify-center">
-                    <button onclick="declineCall()" class="bg-red-600 hover:bg-red-500 text-white px-6 py-3 rounded-full transition-colors flex items-center gap-2">
-                        <i class="fa-solid fa-phone-slash"></i> Decline
-                    </button>
-                    <button onclick="acceptCall()" class="bg-green-600 hover:bg-green-500 text-white px-6 py-3 rounded-full transition-colors flex items-center gap-2 vibrating-icon">
-                        <i class="fa-solid fa-phone"></i> Accept
-                    </button>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -1144,28 +1112,27 @@
             list.innerHTML = '';
             
             pharmacists.forEach(pharm => {
+                if (pharm.isBusy) return; // Don't show busy pharmacists
+
                 const card = document.createElement('div');
-                card.className = `pharmacist-card bg-slate-700/50 border border-slate-600 rounded-lg p-4 flex items-center gap-4 ${pharm.isBusy ? 'disabled' : 'cursor-pointer hover:border-blue-500'}`;
-                
-                if (!pharm.isBusy) {
-                    card.onclick = () => selectPharmacist(pharm);
-                } else {
-                    card.onclick = () => showRestrictionModal();
-                }
+                card.className = `pharmacist-card bg-slate-700/50 border border-slate-600 rounded-xl p-5 flex items-center gap-5 cursor-pointer hover:border-blue-500 hover:bg-slate-700/80 transition-all shadow-lg group`;
+                card.onclick = () => selectPharmacist(pharm);
 
                 card.innerHTML = `
                     <div class="relative">
-                        <img src="${pharm.image}" alt="${pharm.name}" class="w-14 h-14 rounded-full object-cover border-2 ${pharm.isBusy ? 'border-red-500' : 'border-green-500'}">
-                        <span class="status-badge ${pharm.isBusy ? 'busy' : 'online'}"></span>
+                        <img src="${pharm.image}" alt="${pharm.name}" class="w-16 h-16 rounded-full object-cover border-2 border-green-500 group-hover:scale-105 transition-transform">
+                        <span class="status-badge online absolute -bottom-1 -right-1"></span>
                     </div>
                     <div class="flex-1">
-                        <h4 class="font-bold text-white">${pharm.name}</h4>
-                        <p class="text-xs text-slate-400">${pharm.specialty}</p>
-                        <span class="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold ${pharm.isBusy ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}">
-                            ${pharm.isBusy ? 'BUSY WITH CLIENT' : 'AVAILABLE'}
+                        <h4 class="font-bold text-white text-lg">${pharm.name}</h4>
+                        <p class="text-xs text-slate-400 mb-2">${pharm.specialty}</p>
+                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-green-500/20 text-green-400 uppercase tracking-wider">
+                            Available Now
                         </span>
                     </div>
-                    <i class="fa-solid ${pharm.isBusy ? 'fa-lock' : 'fa-chevron-right'} text-slate-500"></i>
+                    <div class="bg-blue-600/20 p-2 rounded-lg text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                        <i class="fa-solid fa-comments"></i>
+                    </div>
                 `;
                 list.appendChild(card);
             });
@@ -1177,13 +1144,7 @@
             document.getElementById('pharmacyListModal').classList.add('hidden');
         }
 
-        function showRestrictionModal() {
-            document.getElementById('restrictionModal').classList.remove('hidden');
-        }
-
-        function closeRestrictionModal() {
-            document.getElementById('restrictionModal').classList.add('hidden');
-        }
+        let chatRequestTimeout = null;
 
         function selectPharmacist(pharmacist) {
             selectedPharmacist = pharmacist;
@@ -1193,18 +1154,61 @@
             document.getElementById('waitingPharmacistName').innerText = pharmacist.name;
             document.getElementById('clientWaitingModal').classList.remove('hidden');
             
-            setTimeout(() => {
-                showPharmacistIncomingCall(pharmacist);
-            }, 2000);
+            // Set chat request in localStorage
+            const request = {
+                id: 'REQ' + Date.now(),
+                pharmacistId: pharmacist.id,
+                pharmacistName: pharmacist.name,
+                status: 'pending',
+                timestamp: Date.now()
+            };
+            localStorage.setItem('medicore_pharmacist_chat_request', JSON.stringify(request));
+            localStorage.removeItem('medicore_pharmacist_chat_response');
+
+            // 1 minute timeout (60s)
+            if (chatRequestTimeout) clearTimeout(chatRequestTimeout);
+            chatRequestTimeout = setTimeout(() => {
+                const currentRequest = JSON.parse(localStorage.getItem('medicore_pharmacist_chat_request'));
+                if (currentRequest && currentRequest.status === 'pending') {
+                    cancelConnectionRequest();
+                    alert('Request timed out. The pharmacist is currently unavailable.');
+                }
+            }, 60000);
         }
+
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'medicoreAdminData') {
+                loadPharmacyData();
+                // If the pharmacy list modal is open, refresh it
+                if (!document.getElementById('pharmacyListModal').classList.contains('hidden')) {
+                    openPharmacyList();
+                }
+            }
+            if (e.key === 'medicore_pharmacist_chat_response' && e.newValue) {
+                const response = JSON.parse(e.newValue);
+                if (response.status === 'accepted') {
+                    if (chatRequestTimeout) clearTimeout(chatRequestTimeout);
+                    document.getElementById('clientWaitingModal').classList.add('hidden');
+                    openActiveChat(selectedPharmacist);
+                    localStorage.removeItem('medicore_pharmacist_chat_request');
+                    localStorage.removeItem('medicore_pharmacist_chat_response');
+                } else if (response.status === 'declined' || response.status === 'cancelled') {
+                    if (chatRequestTimeout) clearTimeout(chatRequestTimeout);
+                    declineCall();
+                    localStorage.removeItem('medicore_pharmacist_chat_request');
+                    localStorage.removeItem('medicore_pharmacist_chat_response');
+                }
+            }
+        });
 
         function cancelConnectionRequest() {
             document.getElementById('clientWaitingModal').classList.add('hidden');
             selectedPharmacist = null;
+            localStorage.removeItem('medicore_pharmacist_chat_request');
         }
 
         function showPharmacistIncomingCall(pharmacist) {
-            document.getElementById('pharmacistCallModal').classList.remove('hidden');
+            // This is now handled in the operator panel
         }
 
         function declineCall() {
@@ -1386,7 +1390,6 @@
             if (e.key === 'Escape') {
                 closeShelfModal();
                 closePharmacyList();
-                closeRestrictionModal();
             }
         });
     </script>

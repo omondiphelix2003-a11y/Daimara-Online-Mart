@@ -868,6 +868,83 @@ body {
 
 
 
+    /* PRODUCT DETAILS MODAL */
+    .product-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.95);
+      z-index: 2000;
+      overflow-y: auto;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 20px;
+    }
+    .product-modal.show { display: block; }
+    .modal-container {
+      max-width: 1000px;
+      margin: 40px auto;
+      background: #1e293b;
+      border-radius: 20px;
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      border: 1px solid #334155;
+      position: relative;
+    }
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      background: rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+      transition: 0.3s;
+    }
+    .modal-close:hover { background: #3b82f6; }
+    .modal-gallery { padding: 30px; }
+    .main-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 12px; margin-bottom: 15px; border: 1px solid #334155; }
+    .thumb-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .thumb-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 8px; cursor: pointer; border: 2px solid transparent; transition: 0.3s; }
+    .thumb-img:hover, .thumb-img.active { border-color: #3b82f6; }
+    .modal-info { padding: 40px; display: flex; flex-direction: column; gap: 20px; background: #1e293b; }
+    .modal-info h2 { text-align: left !important; margin-bottom: 5px; font-size: 2rem; color: #ffffff; }
+    .modal-price { font-size: 1.8rem; color: #3b82f6; font-weight: bold; }
+    .modal-desc { color: #94a3b8; line-height: 1.6; font-size: 1rem; }
+    .modal-meta { display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; color: #cbd5e1; border-top: 1px solid #334155; padding-top: 15px; }
+    .size-selector { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+    .size-option {
+      padding: 8px 16px;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: 0.3s;
+      background: #0f172a;
+      color: white;
+    }
+    .size-option:hover { border-color: #3b82f6; color: #3b82f6; }
+    .size-option.selected { background: #3b82f6; border-color: #3b82f6; color: white; }
+    .related-products { padding: 30px; border-top: 1px solid #334155; grid-column: span 2; }
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; }
+    
+    @media (max-width: 768px) {
+      .modal-container { grid-template-columns: 1fr; margin: 0; border-radius: 0; }
+      .modal-info { padding: 25px; }
+      .related-products { grid-column: span 1; }
+    }
 </style>
 
 </head>
@@ -875,7 +952,64 @@ body {
 <body>
 
 
- <!-- NAVBAR -->
+  <div id="productDetailsModal" class="product-modal">
+    <div class="modal-container">
+      <div class="modal-close" onclick="closeProductDetails()"><i class="fas fa-times"></i></div>
+      
+      <div class="modal-gallery">
+        <img id="modalMainImg" src="" class="main-img" alt="Product">
+        <div id="modalThumbGrid" class="thumb-grid"></div>
+      </div>
+      
+      <div class="modal-info">
+        <div>
+          <h2 id="modalTitle">Product Name</h2>
+          <p id="modalCategory" style="font-size: 0.9rem; color: #3b82f6;"></p>
+        </div>
+        
+        <div class="modal-price" id="modalPrice">Ksh 0.00</div>
+        
+        <div id="modalStars" class="stars" style="margin-bottom: 10px;"></div>
+        
+        <div class="modal-desc" id="modalDesc">
+          Detailed description goes here...
+        </div>
+        
+        <div id="sizeSection" style="display:none;">
+          <h4 style="font-size: 0.9rem; margin-bottom: 5px; color: white;">Select Size:</h4>
+          <div id="modalSizes" class="size-selector"></div>
+        </div>
+        
+        <div class="modal-meta">
+          <p><strong>Supplier:</strong> <span id="modalSupplier">N/A</span></p>
+          <p><strong>SKU:</strong> <span id="modalSKU">N/A</span></p>
+          <p><strong>Availability:</strong> <span id="modalStock" style="color: #10b981;">In Stock</span></p>
+        </div>
+        
+        <div style="display: flex; gap: 15px; margin-top: 10px;">
+          <button id="modalAddToCartBtn" style="flex: 1; padding: 15px; background: #3b82f6; color: white; border: none; font-weight: bold; font-size: 1rem; cursor: pointer; border-radius: 10px;">
+            <i class="fas fa-cart-plus"></i> ADD TO CART
+          </button>
+          <button onclick="toggleCart()" style="padding: 15px; background: #1e293b; color: white; border: 1px solid #334155; border-radius: 10px; display: flex; align-items: center; justify-content: center; width: 60px;">
+            <i class="fas fa-shopping-cart"></i>
+          </button>
+        </div>
+      </div>
+      
+      <div class="related-products">
+        <h3 style="border-bottom: 1px solid #334155; padding-bottom: 10px; margin-bottom: 20px; color: white;">Related Products</h3>
+        <div id="relatedGrid" class="related-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast" style="position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(100px);background:#1e293b;color:white;padding:1rem 1.5rem;border-radius:12px;box-shadow:0 10px 25px rgba(0,0,0,0.2);display:flex;align-items:center;gap:0.75rem;opacity:0;transition:all 0.3s;z-index:3000;font-weight:500;">
+    <i class="fas fa-check-circle" style="color:#3b82f6;font-size:1.2rem"></i>
+    <span id="toast-msg">Item added to cart!</span>
+  </div>
+
+  <!-- NAVBAR -->
 
 <div class="search-container">
   <input type="text" id="search-input" placeholder="Search products...">
@@ -996,8 +1130,8 @@ function renderProducts(category) {
     
     div.innerHTML = `
       <div class="product-image-wrapper">
-        <img src="${imgSrc}" alt="${product.name}" class="product-image">
-        <div class="product-overlay">Quick View</div>
+        <img src="${imgSrc}" alt="${product.name}" class="product-image" onclick="openProductDetails('${product.id}', '${category}')">
+        <div class="product-overlay" onclick="openProductDetails('${product.id}', '${category}')">Quick View</div>
       </div>
       <div class="product-info">
         <h3>${product.name}</h3>
@@ -1311,6 +1445,127 @@ document.addEventListener('click', (e) => {
     searchResults.style.display = 'none';
   }
 });
+
+// Product Details Modal logic
+window.openProductDetails = function(productId, category) {
+  const products = DataManager.getAllProducts();
+  const product = products[category]?.find(p => p.id === productId);
+  if(!product) return;
+
+  const modal = document.getElementById('productDetailsModal');
+  const mainImg = document.getElementById('modalMainImg');
+  const thumbGrid = document.getElementById('modalThumbGrid');
+  const title = document.getElementById('modalTitle');
+  const price = document.getElementById('modalPrice');
+  const desc = document.getElementById('modalDesc');
+  const categoryEl = document.getElementById('modalCategory');
+  const supplier = document.getElementById('modalSupplier');
+  const sku = document.getElementById('modalSKU');
+  const sizeSection = document.getElementById('sizeSection');
+  const sizeSelector = document.getElementById('modalSizes');
+  const relatedGrid = document.getElementById('relatedGrid');
+  const addToCartBtn = document.getElementById('modalAddToCartBtn');
+
+  // Basic Info
+  title.innerText = product.name;
+  price.innerText = `Ksh ${product.price.toLocaleString()}`;
+  desc.innerText = product.description || "No description available.";
+  categoryEl.innerText = `${category} > ${product.subcategory || ''}`;
+  supplier.innerText = product.supplier || "Daimara Store";
+  sku.innerText = product.sku || product.id.substring(0, 8).toUpperCase();
+  mainImg.src = product.image || 'image-placeholder.jpg';
+
+  // Stars
+  const starsEl = document.getElementById('modalStars');
+  if (starsEl) {
+    starsEl.innerHTML = '';
+    const rating = product.rating || 0;
+    for (let i = 1; i <= 5; i++) {
+      starsEl.innerHTML += `<i class="${i <= rating ? 'fas' : 'far'} fa-star" style="color:#fbbf24; font-size:1.2rem; margin-right:5px;"></i>`;
+    }
+  }
+
+  // Gallery
+  thumbGrid.innerHTML = '';
+  const images = [product.image, ...(product.otherImages || product.otherPhotos || [])].filter(Boolean);
+  images.forEach(imgUrl => {
+    const thumb = document.createElement('img');
+    thumb.src = imgUrl;
+    thumb.className = 'thumb-img' + (imgUrl === product.image ? ' active' : '');
+    thumb.onclick = () => {
+      mainImg.src = imgUrl;
+      document.querySelectorAll('.thumb-img').forEach(t => t.classList.remove('active'));
+      thumb.classList.add('active');
+    };
+    thumbGrid.appendChild(thumb);
+  });
+
+  // Sizes
+  if(product.sizes && product.sizes.length > 0) {
+    sizeSection.style.display = 'block';
+    sizeSelector.innerHTML = product.sizes.map(size => `
+      <label class="size-option" style="display:inline-flex; align-items:center; gap:5px; margin-right:10px; cursor:pointer; background:#1e293b; padding:5px 10px; border-radius:5px; border:1px solid #334155; color:white;">
+        <input type="checkbox" name="product-size" value="${size}" style="cursor:pointer;">
+        <span>${size}</span>
+      </label>
+    `).join('');
+  } else {
+    sizeSection.style.display = 'none';
+  }
+
+  // Related Products
+  const related = (products[category] || [])
+    .filter(p => p.id !== product.id && p.subcategory === product.subcategory)
+    .slice(0, 4);
+  
+  relatedGrid.innerHTML = related.map(p => `
+    <div class="related-item" onclick="openProductDetails('${p.id}', '${category}')">
+      <img src="${p.image || 'image-placeholder.jpg'}" alt="${p.name}">
+      <h4>${p.name}</h4>
+      <p>Ksh ${p.price}</p>
+    </div>
+  `).join('');
+
+  // Add to Cart from modal
+  addToCartBtn.onclick = () => {
+    const selectedSizes = Array.from(document.querySelectorAll('input[name="product-size"]:checked')).map(cb => cb.value);
+    const productToAdd = {...product, selectedSizes};
+    addToCart(productToAdd, addToCartBtn);
+    showToast(`${product.name} added to cart!`);
+    
+    // Close modal and show cart
+    setTimeout(() => {
+        closeProductDetails();
+        toggleCart();
+    }, 500);
+  };
+
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+};
+
+window.closeProductDetails = function() {
+  document.getElementById('productDetailsModal').style.display = 'none';
+  document.body.style.overflow = 'auto';
+};
+
+window.showToast = function(msg) {
+  const toast = document.getElementById('toast');
+  const toastMsg = document.getElementById('toast-msg');
+  toastMsg.innerText = msg;
+  toast.style.opacity = '1';
+  toast.style.transform = 'translateX(-50%) translateY(0)';
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(-50%) translateY(100px)';
+  }, 3000);
+};
+
+window.toggleCart = function() {
+  const cartModal = document.getElementById('cart-modal');
+  cartModal.classList.toggle('open');
+};
+
 </script>
 
 <script src="profile-service.js"></script>
