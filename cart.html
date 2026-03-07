@@ -31,12 +31,13 @@
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
         }
+
         .logo { color: white; font-size: 20px; font-weight: bold; text-decoration: none; }
         .nav-links { display: flex; align-items: center; gap: 15px; }
         .nav-links a { color: #3b82f6; text-decoration: none; font-size: 14px; transition: 0.3s; }
         .nav-links a:hover { color: white; }
         .nav-icons { display: flex; align-items: center; gap: 15px; }
-        .nav-icons a { color: #e2e8f0; font-size: 18px; transition: 0.3s; }
+        .nav-icons a { color: #e2e8f0; font-size: 18px; transition: 0.3s;}
 
         .cart-icon-container {
             position: relative;
@@ -95,6 +96,7 @@
 
 
         @media (max-width: 768px) {
+            .footer { display: block; } /* Show on tablet/mobile */
             body { padding-bottom: 80px; }
             .navbar { padding: 10px; flex-direction: row; justify-content: space-between; align-items: center; height: 60px; }
             .logo { font-size: 18px; }
@@ -366,8 +368,26 @@
         .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
         /* FOOTER */
-        .footer { background: none; color: #fff; padding: 15px; text-align: center; margin-top:40px; }
+        .footer { 
+            background: #0f172a; 
+            color: #fff; 
+            padding: 15px; 
+            text-align: center; 
+            margin-top:40px; 
+            border-top: 1px solid #334155;
+            display: none; /* Hidden on large screens */
+        }
         .footer p { color: #ffffff; font-size: 14px; font-weight: bold; }
+
+        @media (max-width: 768px) {
+            .footer { display: block; }
+            .bottom-nav { display: flex !important; }
+            .modal-container { grid-template-columns: 1fr; margin: 0; border-radius: 0; }
+        }
+        
+        @media (min-width: 769px) {
+            .bottom-nav { display: none !important; }
+        }
     </style>
 </head>
 <body>
@@ -428,9 +448,7 @@
     <div id="random-products"></div>
 </section>
 
-<!--<footer class="footer">
-    <p>Copyright © 2026 Daimara Online Mart. All rights reserved.</p>
-</footer>-->
+
 
 <div id="productDetailsModal" class="product-modal">
     <div class="modal-container">
@@ -445,6 +463,7 @@
                 <p id="modalCategory" style="font-size: 0.9rem; color: #3b82f6;"></p>
             </div>
             <div class="modal-price" id="modalPrice">Ksh 0.00</div>
+            <div id="modalStars" class="stars" style="margin-bottom: 10px;"></div>
             <div class="modal-desc" id="modalDesc">Detailed description goes here...</div>
             <div id="sizeSection" style="display:none;">
                 <h4 style="font-size: 0.9rem; margin-bottom: 5px; text-align: left; color: #fff;">Select Size:</h4>
@@ -497,7 +516,7 @@
         cartItems.innerHTML = '';
 
         if (cart.length === 0) {
-            cartItems.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">Your cart is empty. <a href="store.html">Continue shopping</a></p>';
+            cartItems.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">Your cart is empty. <a href="store.html" style="color:#3b82f6;">Continue shopping</a></p>';
             document.getElementById('total').textContent = '0';
             return;
         }
@@ -512,10 +531,10 @@
             div.setAttribute('data-product-id', item.id);
             div.innerHTML = `
                 <div class="cart-item-image">
-                    <img src="${item.image || 'https://picsum.photos/100/100'}" alt="${item.name}" onclick="openProductDetails('${item.id}')" style="cursor:pointer;">
+                    <img src="${item.image || 'https://picsum.photos/100/100'}" alt="${item.name}">
                 </div>
                 <div class="cart-item-details">
-                    <h3 onclick="openProductDetails('${item.id}')" style="cursor:pointer;">${item.name}</h3>
+                    <h3>${item.name}</h3>
                     <p class="price">Ksh ${item.price.toLocaleString()}</p>
                     <div class="quantity-control">
                         <button class="qty-btn decrease-btn">-</button>
@@ -608,6 +627,20 @@
         document.getElementById('modalSupplier').innerText = product.supplier || 'Daimara Official';
         document.getElementById('modalSKU').innerText = product.sku || 'N/A';
         document.getElementById('modalMainImg').src = product.image || 'https://picsum.photos/400/400';
+
+        const starsEl = document.getElementById('modalStars');
+        if (starsEl) {
+            starsEl.innerHTML = '';
+            const rating = product.rating || 0;
+            for (let i = 1; i <= 5; i++) {
+                const isFull = i <= Math.floor(rating);
+                const isHalf = !isFull && i <= Math.ceil(rating) && (rating % 1 !== 0);
+                if (isFull) starsEl.innerHTML += '<i class="fas fa-star" style="color:#fbbf24; font-size:1.2rem; margin-right:5px;"></i>';
+                else if (isHalf) starsEl.innerHTML += '<i class="fas fa-star-half-alt" style="color:#fbbf24; font-size:1.2rem; margin-right:5px;"></i>';
+                else starsEl.innerHTML += '<i class="far fa-star" style="color:#fbbf24; font-size:1.2rem; margin-right:5px;"></i>';
+            }
+            if (rating > 0) starsEl.innerHTML += `<span style="color:#94a3b8; margin-left:10px; font-size:0.9rem;">(${rating.toFixed(1)})</span>`;
+        }
 
         const thumbGrid = document.getElementById('modalThumbGrid');
         thumbGrid.innerHTML = '';

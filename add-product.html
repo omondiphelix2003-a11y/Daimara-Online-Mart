@@ -430,8 +430,9 @@
 
         <div class="content">
             <!-- Admin Only: Category Management -->
-            <div id="adminCategorySection" class="form-section" style="display:none;">
-                <h2>⚙️ Store Category Management</h2>
+            <div id="adminCategorySection" class="form-section" style="display:none; border-left-color: #f1c40f;">
+                <h2>⚙️ Store Category Management (Admin Only)</h2>
+                <p style="color: #94a3b8; margin-bottom: 15px; font-size: 0.9rem;">Add, edit or delete product categories and their sub-categories. These will appear in the Store page navigation.</p>
                 <div class="form-row">
                     <div class="form-group">
                         <label for="catName">Category Name</label>
@@ -447,11 +448,12 @@
                     <input type="text" id="catSubcategories" placeholder="Fresh food, Grocery, Beverage...">
                 </div>
                 <div class="button-group">
-                    <button type="button" onclick="saveCategory()" class="btn-add">Save Category</button>
+                    <button type="button" onclick="saveCategory()" class="btn-add" style="background: #f1c40f; color: black;">Save Category</button>
                     <button type="button" onclick="resetCatForm()" class="btn-reset">Reset</button>
                 </div>
                 
-                <div id="categoryList" style="margin-top: 20px;" class="products-grid">
+                <h3 style="color: #e2e8f0; margin: 20px 0 10px 0; font-size: 1.1em;">Current Categories</h3>
+                <div id="categoryList" class="products-grid">
                     <!-- Categories will be listed here -->
                 </div>
             </div>
@@ -674,7 +676,8 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             const user = DataManager.getCurrentUser();
-            if (user && user.role === 'admin') {
+            // Restrict category management to primary admin email only
+            if (user && user.role === 'admin' && user.email === "omondiphelix2003@gmail.com") {
                 document.getElementById('adminCategorySection').style.display = 'block';
             }
             
@@ -938,13 +941,29 @@
                 const rating = product.rating || 0;
                 let starsHtml = `<div class="rating-stars ${!isPrimaryAdmin ? 'readonly' : ''}" data-product-id="${product.id}">`;
                 for (let i = 1; i <= 5; i++) {
-                    starsHtml += `<i class="fas fa-star ${i <= rating ? 'active' : ''}" onclick="${isPrimaryAdmin ? `updateProductRating('${product.id}', ${i})` : ''}"></i>`;
+                    const isFull = i <= Math.floor(rating);
+                    const isHalf = !isFull && i <= Math.ceil(rating) && (rating % 1 !== 0);
+                    starsHtml += `<i class="${isFull ? 'fas' : (isHalf ? 'fas fa-star-half-alt' : 'far')} fa-star ${i <= rating ? 'active' : ''}" 
+                        style="${isPrimaryAdmin ? 'cursor:pointer;' : ''}"
+                        onclick="${isPrimaryAdmin ? `updateProductRating('${product.id}', ${i})` : ''}"></i>`;
                 }
-                starsHtml += `</div>`;
+                starsHtml += `<span style="color:#94a3b8; font-size:0.8rem; margin-left:5px;">(${rating.toFixed(1)})</span></div>`;
+
+                // Display sizes and other photos
+                const extraPhotosHtml = product.otherPhotos && product.otherPhotos.length > 0 ? 
+                    `<div class="extra-photos-preview" style="display:flex; gap:5px; margin-top:5px; overflow-x:auto;">
+                        ${product.otherPhotos.map(img => `<img src="${img}" style="width:40px; height:40px; object-fit:cover; border-radius:3px; border:1px solid #444;">`).join('')}
+                    </div>` : '';
+                
+                const sizesHtml = product.sizes && product.sizes.length > 0 ?
+                    `<p><strong>Sizes:</strong> ${product.sizes.join(', ')}</p>` : '';
 
                 return `
                 <div class="product-card">
-                    ${product.image ? `<img src="${product.image}" alt="${product.name}" class="product-image">` : '<div class="product-image" style="display: flex; align-items: center; justify-content: center; color: #999;">No Image</div>'}
+                    <div style="position:relative;">
+                        ${product.image ? `<img src="${product.image}" alt="${product.name}" class="product-image">` : '<div class="product-image" style="display: flex; align-items: center; justify-content: center; color: #999;">No Image</div>'}
+                        ${extraPhotosHtml}
+                    </div>
                     <span class="category-badge">${product.category}</span>
                     <div style="font-size: 0.85em; color: #888; margin-top: 5px; margin-bottom: 10px;"><strong>Sub:</strong> ${product.subcategory}</div>
                     <h3>${product.name}</h3>
@@ -953,6 +972,7 @@
                         <p><strong>SKU:</strong> ${product.sku || 'N/A'}</p>
                         <p><strong>Supplier:</strong> ${product.supplier || 'N/A'}</p>
                         <p><strong>Quantity:</strong> ${product.quantity} units</p>
+                        ${sizesHtml}
                         <p><strong>Date Added:</strong> ${product.createdAt}</p>
                         ${product.description ? `<p><strong>Description:</strong> ${product.description}</p>` : ''}
                     </div>

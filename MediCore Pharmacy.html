@@ -99,6 +99,87 @@
             font-size: 14px;
             border: 3px solid #0f172a;
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        /* PRODUCT DETAILS MODAL */
+        .product-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.171);
+            z-index: 3000;
+            overflow-y: auto;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 20px;
+        }
+        .product-modal.show { display: block; }
+        .modal-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: rgba(15, 23, 42, 0.171);
+            border-radius: 4px;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid #334155;
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .modal-gallery { padding: 30px; }
+        .main-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 12px; margin-bottom: 15px; border: 1px solid #334155; }
+        .thumb-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .thumb-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 8px; cursor: pointer; border: 2px solid transparent; }
+        .thumb-img.active { border-color: #3b82f6; }
+        .modal-info { padding: 40px; display: flex; flex-direction: column; gap: 20px; }
+        .modal-info h2 { font-size: 2rem; color: #fff; }
+        .modal-price { font-size: 1.8rem; color: #3b82f6; font-weight: bold; }
+        .modal-desc { color: #94a3b8; line-height: 1.6; }
+        .modal-meta { border-top: 1px solid #334155; padding-top: 15px; color: #cbd5e1; font-size: 0.9rem; }
+        .size-selector { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+        .size-option { padding: 8px 16px; border: 1px solid #475569; border-radius: 8px; cursor: pointer; background: #0f172a; }
+        .size-option.selected { background: rgba(15, 23, 42, 0.171); border-color: #3b82f6; color: white; }
+        .related-products { padding: 30px; border-top: 1px solid #334155; grid-column: span 2; }
+        .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
+
+        @media (max-width: 768px) {
+            .modal-container { grid-template-columns: 1fr; margin: 0; border-radius: 0; }
+            .modal-info { padding: 25px; }
+            .related-products { grid-column: span 1; }
+        }
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            border: 3px solid #0f172a;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
             z-index: 10;
         }
 
@@ -137,48 +218,7 @@
             animation: ring-pulse 1.5s ease-out infinite;
         }
 
-        /* MOBILE NAV STYLES */
-        .nav-toggle {
-          display: none;
-          background: transparent;
-          color: white;
-          border: 1px solid var(--glass-border);
-          padding: 8px 12px;
-          border-radius: 8px;
-          cursor: pointer;
-          z-index: 2001;
-          transition: 0.3s;
-          align-items: center;
-          justify-content: center;
-          font-size: 20px;
-        }
-        .nav-toggle:hover {
-          background: var(--glass);
-          border-color: #3b82f6;
-        }
-        .nav-toggle i {
-          transition: transform 0.3s;
-        }
-        .nav-toggle.active i {
-          transform: rotate(90deg);
-        }
-
-        .nav-links {
-          display: flex;
-          align-items: center;
-          gap: 20px;
-        }
-        .nav-links a {
-          color: #3b82f6;
-          text-decoration: none;
-          font-size: 16px;
-          transition: 0.3s;
-          font-weight: 600;
-        }
-        .nav-links a:hover {
-          color: white;
-        }
-
+       
         @media (min-width: 1025px) {
           .nav-links {
             display: flex !important;
@@ -473,7 +513,7 @@
     <!-- Navigation -->
     <nav class="glass-panel sticky top-0 z-40 px-6 py-4 flex justify-between items-center border-b border-slate-700">
         <div class="flex items-center gap-3">
-            <button class="nav-toggle" onclick="toggleNav()"><i class="fas fa-bars"></i></button>
+            
             <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-blue-500/30">
                 <i class="fa-solid fa-mortar-pestle"></i>
             </div>
@@ -483,14 +523,14 @@
             </div>
         </div>
         
-        <div class="nav-links" id="pharmacyNav">
+        <!--<div class="nav-links" id="pharmacyNav">
             <a href="index.html">Home</a>
-            <a href="store.html">Store</a>
+            <a href="store.html">Store</a>-->
             <!--<a href="supermarket.html">Supermarket</a>
             <a href="second-hand items.html">Second-hand</a>-->
-            <a href="about.html">About</a>
+            <!--<a href="about.html">About</a>
             <a href="contact.html">Contact</a>
-        </div>
+        </div>-->
         
         <div class="flex items-center gap-4">
             <div class="relative hidden md:block">
@@ -689,6 +729,63 @@
     </div>
 
     <div id="cartOverlay" onclick="toggleCart()" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[40] hidden transition-opacity"></div>
+
+    <div id="productDetailsModal" class="product-modal">
+        <div class="modal-container">
+            <div class="modal-close" onclick="closeProductDetails()"><i class="fas fa-times"></i></div>
+            
+            <div class="modal-gallery">
+                <img id="modalMainImg" src="" class="main-img" alt="Product">
+                <div id="modalThumbGrid" class="thumb-grid"></div>
+            </div>
+            
+            <div class="modal-info">
+                <div>
+                    <h2 id="modalTitle">Product Name</h2>
+                    <p id="modalCategory" style="font-size: 0.9rem; color: #3b82f6;"></p>
+                </div>
+                
+                <div class="modal-price" id="modalPrice">Ksh 0.00</div>
+                
+                <div id="modalStars" class="stars" style="margin-bottom: 10px;"></div>
+                
+                <div class="modal-desc" id="modalDesc">
+                    Detailed description goes here...
+                </div>
+                
+                <div id="sizeSection" style="display:none;">
+                    <h4 style="font-size: 0.9rem; margin-bottom: 5px; color: white;">Select Size:</h4>
+                    <div id="modalSizes" class="size-selector"></div>
+                </div>
+                
+                <div class="modal-meta">
+                    <p><strong>Supplier:</strong> <span id="modalSupplier">N/A</span></p>
+                    <p><strong>SKU:</strong> <span id="modalSKU">N/A</span></p>
+                    <p><strong>Availability:</strong> <span id="modalStock" style="color: #10b981;">In Stock</span></p>
+                </div>
+                
+                <div style="display: flex; gap: 15px; margin-top: 10px;">
+                    <button id="modalAddToCartBtn" style="flex: 1; padding: 15px; background: #3b82f6; color: white; border: none; font-weight: bold; font-size: 1rem; cursor: pointer; border-radius: 10px;">
+                        <i class="fas fa-cart-plus"></i> ADD TO CART
+                    </button>
+                    <button onclick="toggleCart()" style="padding: 15px; background: #1e293b; color: white; border: 1px solid #334155; border-radius: 10px; display: flex; align-items: center; justify-content: center; width: 60px;">
+                        <i class="fas fa-shopping-cart"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="related-products">
+                <h3 style="border-bottom: 1px solid #334155; padding-bottom: 10px; margin-bottom: 20px; color: white;">Related Products</h3>
+                <div id="relatedGrid" class="related-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast" style="position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(100px);background:#1e293b;color:white;padding:1rem 1.5rem;border-radius:12px;box-shadow:0 10px 25px rgba(0,0,0,0.2);display:flex;align-items:center;gap:0.75rem;opacity:0;transition:all 0.3s;z-index:3000;font-weight:500;">
+        <i class="fas fa-check-circle" style="color:#3b82f6;font-size:1.2rem"></i>
+        <span id="toast-msg">Item added to cart!</span>
+    </div>
 
     <script src="data-manager.js"></script>
     <script>
@@ -970,9 +1067,10 @@
             startSlideShow();
         }
 
-        // --- Random Drugs with Video Ad ---
-        function renderRandomDrugs() {
+        // --- Pharmacy Rendering and Product Modal ---
+        function renderPharmacyItems() {
             const container = document.getElementById('randomDrugsContainer');
+            if (!container) return;
             container.innerHTML = '';
             
             const allItems = [];
@@ -982,31 +1080,35 @@
                 });
             });
             
-            // Shuffle and pick 16 random items (to show more with video in middle)
             const shuffled = allItems.sort(() => 0.5 - Math.random());
             const selected = shuffled.slice(0, 16);
             
-            // Insert video ad after first 8 items (index 8)
             selected.forEach((item, index) => {
-                // Insert video ad at position 8
                 if (index === 8) {
                     container.appendChild(createVideoAdCard());
                 }
                 
                 const card = document.createElement('div');
-                card.className = 'drug-card';
+                card.className = 'drug-card cursor-pointer group';
+                card.onclick = (e) => {
+                    if (e.target.closest('button')) return;
+                    openProductDetails(item.id, 'MediCore Pharmacy');
+                };
                 card.innerHTML = `
-                    <div class="relative">
-                        <img src="${item.image}" alt="${item.name}" class="w-full h-40 object-cover">
+                    <div class="relative overflow-hidden">
+                        <img src="${item.image}" alt="${item.name}" class="w-full h-40 object-cover group-hover:scale-110 transition-transform duration-500">
                         <div class="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded font-bold">
                             ${item.shelfName}
                         </div>
                         <div class="absolute top-2 right-2 bg-slate-900/80 text-white text-xs px-2 py-1 rounded font-mono">
                             ${item.id}
                         </div>
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span class="text-white text-sm font-bold"><i class="fas fa-eye mr-1"></i> View Details</span>
+                        </div>
                     </div>
                     <div class="p-4">
-                        <h4 class="font-bold text-white text-sm mb-1">${item.name}</h4>
+                        <h4 class="font-bold text-white text-sm mb-1 truncate">${item.name}</h4>
                         <p class="text-xs text-slate-400 mb-2">${item.type} • Shelf ${item.shelfNumber}</p>
                         <div class="flex justify-between items-center">
                             <span class="text-blue-400 font-bold">KSh ${item.price.toLocaleString()}</span>
@@ -1018,6 +1120,139 @@
                 `;
                 container.appendChild(card);
             });
+        }
+
+        function openProductDetails(id, page = 'MediCore Pharmacy') {
+            let product = null;
+            // First check inventory
+            inventory.forEach(shelf => {
+                const found = shelf.items.find(i => i.id === id);
+                if (found) product = { ...found, category: shelf.name };
+            });
+
+            // If not found in inventory, check global DataManager (for related etc)
+            if (!product) product = DataManager.getProduct(id);
+            if (!product) return;
+            
+            const modal = document.getElementById('productDetailsModal');
+            const mainImg = document.getElementById('modalMainImg');
+            const title = document.getElementById('modalTitle');
+            const category = document.getElementById('modalCategory');
+            const price = document.getElementById('modalPrice');
+            const desc = document.getElementById('modalDesc');
+            const stars = document.getElementById('modalStars');
+            const supplier = document.getElementById('modalSupplier');
+            const sku = document.getElementById('modalSKU');
+            const thumbGrid = document.getElementById('modalThumbGrid');
+            const sizeSection = document.getElementById('sizeSection');
+            const sizeGrid = document.getElementById('modalSizes');
+            const addBtn = document.getElementById('modalAddToCartBtn');
+
+            mainImg.src = product.image;
+            title.textContent = product.name;
+            category.textContent = product.category || 'Pharmacy Item';
+            price.textContent = `Ksh ${Number(product.price).toLocaleString()}`;
+            desc.textContent = product.description || 'No description available for this medication. Please consult a pharmacist for more details.';
+            supplier.textContent = product.supplier || 'Daimara MediCore';
+            sku.textContent = product.id;
+            
+            // Stars
+            stars.innerHTML = '';
+            const rating = product.rating || 0;
+            for(let i=1; i<=5; i++) {
+                const isFull = i <= Math.floor(rating);
+                const isHalf = !isFull && i <= Math.ceil(rating) && (rating % 1 !== 0);
+                if (isFull) stars.innerHTML += '<i class="fas fa-star" style="color:#fbbf24; margin-right:2px;"></i>';
+                else if (isHalf) stars.innerHTML += '<i class="fas fa-star-half-alt" style="color:#fbbf24; margin-right:2px;"></i>';
+                else stars.innerHTML += '<i class="far fa-star" style="color:#fbbf24; margin-right:2px;"></i>';
+            }
+            if (rating > 0) stars.innerHTML += `<span style="color:#94a3b8; margin-left:10px; font-size:0.9rem;">(${rating.toFixed(1)})</span>`;
+            
+            // Thumbs
+            thumbGrid.innerHTML = '';
+            const allImages = [product.image, ...(product.otherPhotos || product.otherImages || product.images || [])].filter(Boolean);
+            allImages.forEach(imgSrc => {
+                const thumb = document.createElement('img');
+                thumb.src = imgSrc;
+                thumb.className = 'thumb-img';
+                thumb.onclick = () => mainImg.src = imgSrc;
+                thumbGrid.appendChild(thumb);
+            });
+
+            // Sizes
+            if (product.sizes && product.sizes.length > 0) {
+                sizeSection.style.display = 'block';
+                sizeGrid.innerHTML = product.sizes.map(size => `
+                    <div class="size-box" onclick="selectSize(this)">${size}</div>
+                `).join('');
+            } else {
+                sizeSection.style.display = 'none';
+            }
+
+            // Add to Cart Action
+            addBtn.onclick = (e) => {
+                addToCart(product.id, e);
+                closeProductDetails();
+            };
+
+            // Related
+            renderRelatedProducts(product.category, product.id);
+
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function selectSize(el) {
+            document.querySelectorAll('.size-box').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        function closeProductDetails() {
+            document.getElementById('productDetailsModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function renderRelatedProducts(category, excludeId) {
+            const relatedGrid = document.getElementById('relatedGrid');
+            let allItems = [];
+            inventory.forEach(shelf => {
+                shelf.items.forEach(item => {
+                    allItems.push({ ...item, category: shelf.name });
+                });
+            });
+
+            const related = allItems.filter(p => p.category === category && p.id !== excludeId).slice(0, 4);
+
+            if (related.length === 0) {
+                relatedGrid.innerHTML = '<p style="color: #64748b; font-size: 0.9rem;">No similar items found in this category.</p>';
+                return;
+            }
+
+            relatedGrid.innerHTML = related.map(p => `
+                <div class="related-card" onclick="openProductDetails('${p.id}')">
+                    <img src="${p.image}" alt="${p.name}">
+                    <div class="related-info">
+                        <div class="name">${p.name}</div>
+                        <div class="price">Ksh ${Number(p.price).toLocaleString()}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = msg;
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateX(-50%) translateY(0)';
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(-50%) translateY(100px)';
+            }, 3000);
+        }
+
+        // --- Random Drugs with Video Ad ---
+        function renderRandomDrugs() {
+            renderPharmacyItems();
         }
 
         function createVideoAdCard() {
@@ -1301,6 +1536,7 @@
                 }
                 syncCartWithStorage();
                 updateCartUI();
+                showToast(`Added ${item.name} to cart!`);
                 
                 if (event && event.currentTarget) {
                     const btn = event.currentTarget.closest('button') || event.target.closest('button');

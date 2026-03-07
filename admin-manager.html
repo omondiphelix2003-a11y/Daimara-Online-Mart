@@ -221,7 +221,7 @@
     <li><a href="manager(disabled).html"><i class="fas fa-users-cog"></i> Manager Dept</a></li>
     <li><a href="order fulfillment specialists(disabled).html"><i class="fas fa-box"></i> Order Packaging</a></li>
    <li><a href="Operator's Dashboard-for businesses.html"><i class="fas fa-headset"></i> Operator's Dashboard-for businesses</a></li>
- <li><a href="MediCore-Admin Panel.html">medicore admin</a></li>
+ <li><a href="MediCore-Admin Panel.html"><i class="fa-solid fa-mortar-pestle"></i>medicore admin</a></li>
 
 
     <div class="sidebar-footer">
@@ -769,10 +769,22 @@
     }
 
     function deletePageReview(id) {
-      if (!confirm('Are you sure you want to delete this page request from the review list?')) return;
+      const regs = DataManager.getPageRegistrations();
+      const reg = regs.find(r => r.id === id);
+      if (!reg) return;
+
+      if (!confirm(`Are you sure you want to delete this request for ${reg.email}? This will also delete the associated user account if it exists.`)) return;
+      
+      // Also delete the user if they were already created/approved
+      const allUsers = DataManager.getAllUsers();
+      const user = allUsers.find(u => u.email.toLowerCase() === reg.email.toLowerCase());
+      if (user) {
+        DataManager.deleteUser(user.id);
+      }
+
       const res = DataManager.deletePageRegistration(id);
       if (res.success) {
-        alert('Page request removed');
+        alert('Page request and associated user removed');
         renderPageReviews();
       } else {
         alert('Failed to remove request');

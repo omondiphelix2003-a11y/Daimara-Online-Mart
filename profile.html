@@ -873,14 +873,16 @@ body {
   padding: 20px 0;
   padding-left: 12px;
   padding-right: -12px;
-  background-color: rgba(0, 0, 0, 0.925);
+  background-color: rgba(15, 23, 42, 0);
+   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 .tracking-header {
   text-align: center;
   margin-bottom: 30px;
 }
 .tracking-header h2 {
-  color: #2c3e50;
+  color: #04090e;
   margin-bottom: 5px;
 }
 .tracking-progress {
@@ -897,7 +899,7 @@ body {
   top: 5px;
   bottom: 5px;
   width: 3px;
-  background: rgba(0, 0, 0, 0.925);
+  background: rgba(15, 23, 42, 0.171);
 }
 .tracking-step {
   display: flex;
@@ -924,7 +926,7 @@ body {
 }
 .step-info h4 {
   margin: 0 0 5px 0;
-  color: #2c3e50;
+  color: #000000;
   font-size: 18px;
 }
 .step-info p {
@@ -937,7 +939,7 @@ body {
 .no-data {
   text-align: center;
   padding: 40px 20px;
-  color: #4d5858;
+  color: #d9dbdb;
 }
 
 .no-data p {
@@ -954,10 +956,12 @@ body {
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.925);
+  background-color: none;
   animation: fadeIn 0.3s ease;
   align-items: center;
   justify-content: center;
+   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .modal.show {
@@ -965,12 +969,12 @@ body {
 }
 
 .modal-content {
-  background-color: rgba(0, 0, 0, 0.925);
+  background-color: rgba(15, 23, 42, 0.397);
   padding: 30px;
   border-radius: 12px;
   width: 90%;
   max-width: 500px;
-  box-shadow: 0 5px 30px rgba(0, 0, 0, 0.925);
+  /*box-shadow: 0 5px 30px rgba(0, 0, 0, 0.925);*/
   position: relative;
   max-height: 90vh;
   overflow-y: auto;
@@ -980,8 +984,7 @@ body {
   position: absolute;
   right: 20px;
   top: 20px;
-  font-size: 28px;
-  font-weight: bold;
+  font-size: 25px;
   color: #7f8c8d;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -994,30 +997,37 @@ body {
 
 /* RECEIPT STYLES */
 .receipt {
-  color: #1f1e1e;
-  background: rgba(0, 0, 0, 0.925);
+  background: none;
+   backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding-left: 12px;
+  padding-right: 42px;
 }
 .receipt-header {
   text-align: center;
   margin-bottom: 20px;
-  border-bottom: 2px dashed #ddd;
+  border-bottom: 2px dashed #000000;
   padding-bottom: 15px;
+  color: #000000bb;
+  font-size: 10px;
 }
 .receipt-header h1 {
   color: rgb(233, 157, 17);
-  font-size: 27px;
+  font-size: 37px;
   margin-bottom: 5px;
 }
 .receipt-info {
   margin-bottom: 20px;
   line-height: 1.6;
-  font-size: 12px;
+  font-size: 11px;
+  color: #000000bb;
 }
 .receipt-table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 20px;
-  font-size: 12px;
+  font-size: 11px;
+  color: #000000bb;
 }
 .receipt-table th {
   text-align: left;
@@ -1038,9 +1048,10 @@ body {
 }
 .receipt-total {
   text-align: right;
-  font-size: 14px;
+  font-size: 12px;
   border-top: 2px solid #333;
   padding-top: 10px;
+  color: #000;
 }
 .qr-container {
   text-align: center;
@@ -1075,7 +1086,7 @@ body {
   body * { visibility: hidden; }
   .modal, .modal-content, .receipt, .receipt * { visibility: visible; }
   .modal { position: absolute; left: 0; top: 0; background: rgba(0, 0, 0, 0.925); display: flex !important; }
-  .close, .print-btn, .navbar, .footer, .profile-sidebar { display: none !important; }
+  .close, .print-btn, .navbar, .footer, .profile-sidebar { display: none !important;font-weight: lighter; }
   .modal-content { box-shadow: none; border: none; width: 100%; max-width: 100%; padding: 0; }
 }
 
@@ -1106,7 +1117,8 @@ body {
 
 /* REGISTRATION STEPS */
 .reg-step { display: none; }
-.reg-step.active { display: block; animation: fadeIn 0.3s ease; }
+.reg-step.active { display: block; animation: fadeIn 0.3s ease; backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px); }
 </style>
 
 </head>
@@ -1344,7 +1356,7 @@ body {
 <!-- RECEIPT MODAL -->
 <div id="receiptModal" class="modal">
   <div class="modal-content">
-    <span class="close" onclick="closeReceiptModal()">&times;</span>
+    <span class="close" onclick="closeReceiptModal()" style="color: #000;font-weight: lighter;">&times;</span>
     <div id="receipt-content">
       <!-- Receipt content injected here -->
     </div>
@@ -1354,7 +1366,7 @@ body {
 <!-- TRACK ORDER MODAL -->
 <div id="trackOrderModal" class="modal">
   <div class="modal-content">
-    <span class="close" onclick="closeTrackModal()">&times;</span>
+    <span class="close" onclick="closeTrackModal()" style="color: #000;font-weight: lighter;">&times;</span>
     <div id="track-content">
       <!-- Tracking content injected here -->
     </div>

@@ -571,8 +571,8 @@
         cart.forEach((item, index) => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><img src="${item.image || 'https://picsum.photos/50/50'}" onclick="openProductDetails('${item.id}')" style="cursor:pointer;"></td>
-                <td onclick="openProductDetails('${item.id}')" style="cursor:pointer;"><strong>${item.name}</strong></td>
+                <td><img src="${item.image || 'https://picsum.photos/50/50'}"></td>
+                <td><strong>${item.name}</strong></td>
                 <td>KES ${item.price.toLocaleString()}</td>
                 <td>
                     <div style="display: flex; align-items: center; gap: 5px;">

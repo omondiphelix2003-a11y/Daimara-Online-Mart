@@ -267,6 +267,29 @@ const DataManager = (() => {
   }
 
   /**
+   * Get a single product by ID
+   */
+  function getProduct(productId) {
+    const products = getAllProducts();
+    for (const category in products) {
+      const product = products[category].find(p => p.id === productId);
+      if (product) return product;
+    }
+    
+    // Check warehouse too
+    const warehouse = getWarehouse();
+    const wProduct = warehouse.find(p => p.id === productId);
+    if (wProduct) return wProduct;
+
+    // Check added products
+    const added = getAddedProducts();
+    const aProduct = added.find(p => p.id === productId);
+    if (aProduct) return aProduct;
+
+    return null;
+  }
+
+  /**
    * Update a product
    */
   function updateProduct(productId, updatedData) {
@@ -1649,6 +1672,7 @@ const DataManager = (() => {
   // Public API
   return {
     getAllProducts,
+    getProduct,
     addProduct,
     addProductFromAddPage,
     updateProduct,

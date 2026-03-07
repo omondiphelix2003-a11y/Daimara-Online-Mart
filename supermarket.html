@@ -841,29 +841,54 @@ body {
 } 
 
     /* BOTTOM NAV */
+    .bottom-nav {
+      display: none !important;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: #000000;
+      height: 60px;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 2000;
+      border-top: 2px solid var(--primary);
+    }
+    
+    @media (max-width: 768px) {
       .bottom-nav {
         display: flex !important;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background: #000000;
-        height: 60px;
-        justify-content: space-around;
-        align-items: center;
-        z-index: 2000;
-        border-top: 2px solid var(--primary);
       }
-      .bottom-nav a {
-        color: #e2e8f0;
-        text-decoration: none;
-        font-size: 20px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+      .footer {
+        display: block !important;
       }
-      .bottom-nav a.active { color: var(--primary); }
-      .bottom-nav a span { font-size: 10px; margin-top: 4px; }
+    }
+    
+    @media (min-width: 769px) {
+      .footer {
+        display: none !important;
+      }
+    }
+
+    .bottom-nav a {
+      color: #e2e8f0;
+      text-decoration: none;
+      font-size: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .bottom-nav a.active { color: var(--primary); }
+    .bottom-nav a span { font-size: 10px; margin-top: 4px; }
+    
+    .footer {
+      background: #0f172a;
+      color: #94a3b8;
+      padding: 40px 20px;
+      text-align: center;
+      border-top: 1px solid #1e293b;
+      margin-top: 50px;
+    }
     
 
 
@@ -1090,9 +1115,9 @@ body {
   </div>
 </div>
 
-<!--<footer class="footer">
-  <p>Copyright © 2026 Daimara Stores.All rights reserved.</p>
-</footer>-->
+<footer class="footer">
+  <p>Copyright © 2026 Daimara Stores. All rights reserved.</p>
+</footer>
 
 <script src="data-manager.js"></script>
 <script src="auth-check.js"></script>
@@ -1481,7 +1506,19 @@ window.openProductDetails = function(productId, category) {
     starsEl.innerHTML = '';
     const rating = product.rating || 0;
     for (let i = 1; i <= 5; i++) {
-      starsEl.innerHTML += `<i class="${i <= rating ? 'fas' : 'far'} fa-star" style="color:#fbbf24; font-size:1.2rem; margin-right:5px;"></i>`;
+      const isFull = i <= Math.floor(rating);
+      const isHalf = !isFull && i <= Math.ceil(rating) && (rating % 1 !== 0);
+      
+      if (isFull) {
+        starsEl.innerHTML += '<i class="fas fa-star" style="color:#fbbf24; font-size:1.2rem; margin-right:5px;"></i>';
+      } else if (isHalf) {
+        starsEl.innerHTML += '<i class="fas fa-star-half-alt" style="color:#fbbf24; font-size:1.2rem; margin-right:5px;"></i>';
+      } else {
+        starsEl.innerHTML += '<i class="far fa-star" style="color:#fbbf24; font-size:1.2rem; margin-right:5px;"></i>';
+      }
+    }
+    if (rating > 0) {
+      starsEl.innerHTML += `<span style="color:#94a3b8; margin-left:10px; font-size:0.9rem;">(${rating.toFixed(1)})</span>`;
     }
   }
 
