@@ -469,7 +469,7 @@
                         <div id="customerAddress">
                             <!--<p>Priscila Omondi</p>-->
                             <p>3740 Kenyatta Lane,</p>
-                            <p>Nakuru, Kenya, 17143-20100</p>
+                            <p>Nakuru, 17143-20100</p>
                             <p>Kenya</p>
                         </div>
                     </div>
@@ -496,8 +496,7 @@
             <h2 class="modal-title">Payment Successful!</h2>
             <p class="modal-message">
                 Your transaction has been completed successfully. 
-                Confirmation Order Receipt (C.O.R) will be 
-                displayed in your profile page in the order section.
+                Confirmation Order Receipt (C.O.R) will be displayed in your profile page in the order section.
             </p>
             <button class="modal-btn" onclick="closeModal()">Done</button>
         </div>
@@ -642,7 +641,7 @@
                     btn.disabled = false;
                     btn.classList.remove('loading');
                     input.classList.add('error');
-                    errorMsg.innerText = "No match found. Please check the code in your M-PESA message and try again or contact Daimara customer care.";
+                    errorMsg.innerText = "No match found at the moment. Please check the code in your M-PESA message and try again or contact Daimara customer care.";
                     errorMsg.classList.add('show');
                 }
             }, 1500);

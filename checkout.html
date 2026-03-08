@@ -234,8 +234,14 @@
         .slide img { width: 100%; height: 100%; object-fit: cover; }
 
            
+        .products {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        padding: 5px;
+      }
+
          #random-products {
-            display: grid; grid-template-columns: repeat(3, 1fr) !important; background-color: transparent;
+            display: grid; grid-template-columns: repeat(2, 1fr) !important; background-color: transparent;
             gap: 15px;margin-bottom: 183px;
         }
            
