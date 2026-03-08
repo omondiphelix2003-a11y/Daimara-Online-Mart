@@ -658,8 +658,8 @@ body {
             background: rgba(15, 23, 42, 0.171);
             z-index: 3000;
             overflow-y: auto;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             padding: 20px;
         }
         .product-modal.show { display: block; }
@@ -667,12 +667,12 @@ body {
             max-width: 1000px;
             margin: 40px auto;
             background: rgba(15, 23, 42, 0.171);
-            border-radius: 20px;
+            border-radius: 4px;
             overflow: hidden;
             display: grid;
             grid-template-columns: 1fr 1fr;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            border: 1px solid #334155;
+           
             position: relative;
         }
         .modal-close {
@@ -682,9 +682,9 @@ body {
             width: 40px;
             height: 40px;
             background: rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.1);
+           /* border: 1px solid rgba(255,255,255,0.1);*/
             color: white;
-            border-radius: 50%;
+            border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -692,9 +692,9 @@ body {
             z-index: 10;
         }
         .modal-gallery { padding: 30px; }
-        .main-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 12px; margin-bottom: 15px; border: 1px solid #334155; }
+        .main-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 4px; margin-bottom: 15px; border: 1px solid #334155; }
         .thumb-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .thumb-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 8px; cursor: pointer; border: 2px solid transparent; }
+        .thumb-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 4px; cursor: pointer; border: 2px solid transparent; }
         .thumb-img.active { border-color: #3b82f6; }
         .modal-info { padding: 40px; display: flex; flex-direction: column; gap: 20px; }
         .modal-info h2 { font-size: 2rem; color: #fff; text-align: left; margin: 0; }
@@ -702,7 +702,7 @@ body {
         .modal-desc { color: #94a3b8; line-height: 1.6; text-align: left; }
         .modal-meta { border-top: 1px solid #334155; padding-top: 15px; color: #cbd5e1; font-size: 0.9rem; }
         .size-selector { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
-        .size-option { padding: 8px 16px; border: 1px solid #475569; border-radius: 8px; cursor: pointer; background: #0f172a; }
+        .size-option { padding: 8px 16px; border: 1px solid #475569; border-radius: 4px; cursor: pointer; background: #0f172a; }
         .size-option.selected { background: rgba(15, 23, 42, 0.171); border-color: #3b82f6; color: white; }
         .related-products { padding: 30px; border-top: 1px solid #334155; grid-column: span 2; }
         .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }

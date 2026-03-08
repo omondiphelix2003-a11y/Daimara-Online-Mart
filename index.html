@@ -507,8 +507,8 @@ div.h3{text-align: center; color: #082b61; font-size: 22px;
       background: rgba(15, 23, 42, 0.171);
       z-index: 2000;
       overflow-y: auto;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       padding: 20px;
     }
     .product-modal.show { display: block; }
@@ -520,20 +520,19 @@ div.h3{text-align: center; color: #082b61; font-size: 22px;
       overflow: hidden;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-      border: 1px solid #334155;
+      /*box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);*/
       position: relative;
     }
     .modal-close {
       position: absolute;
-      top: 20px;
-      right: 20px;
+      top: 32px;
+      right: 32px;
       width: 40px;
       height: 40px;
       background: rgba(0,0,0,0.5);
-      border: 1px solid rgba(255,255,255,0.1);
+      /*border: 1px solid rgba(255,255,255,0.1);*/
       color: white;
-      border-radius: 25%;
+      border-radius: 4;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -543,12 +542,12 @@ div.h3{text-align: center; color: #082b61; font-size: 22px;
     }
     .modal-close:hover { background: #3b82f6; }
     .modal-gallery { padding: 30px;  }
-    .main-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 4px; margin-bottom: 15px; border: 1px solid #334155; }
+    .main-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 4px; margin-bottom: 15px; /*border: 1px solid #334155;*/ }
     .thumb-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
     .thumb-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 4px; cursor: pointer; 
       border: 2px solid transparent; transition: 0.3s; }
     .thumb-img:hover, .thumb-img.active { border-color: #3b82f6; }
-    .modal-info { padding: 40px; display: flex; flex-direction: column; gap: 20px; background: #1e293b; }
+    .modal-info { padding: 40px; display: flex; flex-direction: column; gap: 20px; background: rgba(15, 23, 42, 0.171); }
     .modal-info h2 { text-align: left; margin-bottom: 5px; font-size: 2rem; color: #ffffff; }
     .modal-price { font-size: 1.8rem; color: #3b82f6; font-weight: bold; }
     .modal-desc { color: #94a3b8; line-height: 1.6; font-size: 1rem; }

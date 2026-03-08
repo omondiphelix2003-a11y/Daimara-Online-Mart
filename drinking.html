@@ -578,8 +578,8 @@ body {
             background: rgba(15, 23, 42, 0.171);
             z-index: 3000;
             overflow-y: auto;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             padding: 20px;
         }
         .product-modal.show { display: block; }
@@ -592,8 +592,10 @@ body {
             display: grid;
             grid-template-columns: 1fr 1fr;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            border: 1px solid #334155;
+            
+            
             position: relative;
+           
         }
         .modal-close {
             position: absolute;
@@ -602,9 +604,9 @@ body {
             width: 40px;
             height: 40px;
             background: rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.1);
+          
             color: white;
-            border-radius: 25%;
+            border-radius:4px;
             display: flex;
             align-items: center;
             justify-content: center;
