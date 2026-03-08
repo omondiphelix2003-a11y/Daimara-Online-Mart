@@ -414,7 +414,8 @@
         <div class="invoice-header">
             <div class="logo-section">
                 <div class="safaricom-logo">
-                    <span class="safaricom-text"><span>S</span>afaricom</span>
+                    <span class="safaricom-text" style="font-size: 25px;font-weight: bolder;"><span 
+                        style="font-size: 35px;font-weight: bolder;">S</span>afaricom</span>
                 </div>
                 <div class="business-text">BUSINESS</div>
             </div>
@@ -432,9 +433,14 @@
                     <li>Select <strong>M-PESA</strong></li>
                     <li>Select <strong>Lipa na MPESA</strong></li>
                     <li>Select <strong>Pay Bill</strong></li>
-                    <li>Enter Business No: <strong>777222</strong></li>
-                    <li>Enter Account No: <strong id="accountNum">4215357</strong></li>
-                    <li>Enter Amount (without commas): <strong id="invoiceAmount">26600</strong> then Confirm</li>
+                    <li>Enter Till No: <strong>777222</strong></li>
+                    <!--<li>Enter Account No: <strong id="accountNum">4215357</strong></li>-->
+                    <li>Enter Amount: <strong id="invoiceAmount">26600</strong> then Confirm</li>
+                   <div class="nav-center" id="homeNav">
+                    <a href="https://bit.ly/mpesalnk" style="color: #43a047;font-size: 14px;font-weight: bold;
+                    text-decoration: solid;"> 
+                        <i class="fa fa-shopping-bag desktop-only"> Click to open M-pesa App</i></a>
+                   </div>
                 </ul>
 
                 <div class="transaction-code-section">
@@ -459,23 +465,25 @@
                 <div class="customer-info">
                     <h3>Invoiced To</h3>
                     <div class="customer-details">
-                        <p><strong id="customerName">Daimara Stores</strong></p>
+                        <p><strong id="customerName" style="font-size: 22px;font-weight: bold;">Daimara Stores</strong></p>
                         <div id="customerAddress">
-                            <p>Priscila Omondi</p>
+                            <!--<p>Priscila Omondi</p>-->
                             <p>3740 Kenyatta Lane,</p>
                             <p>Nakuru, Kenya, 17143-20100</p>
                             <p>Kenya</p>
                         </div>
                     </div>
-                    <div class="kra-pin">Customer KRA PIN: A0223408575</div>
+                    <!--<div class="kra-pin">Customer KRA PIN: A0223408575</div>-->
                 </div>
 
+               
                 <div class="company-info">
-                    <p><strong>Safaricom Business</strong></p>
+                     <h3 style="font-size: 13px;font-weight: bold;color: #645f5f;">PAID TO</h3>
+                    <p><strong style="font-size: 22px;font-weight: bold;color: black;">Daimara Stores</strong></p>
                     <p>Safaricom House, Waiyaki Way</p>
                     <p>P.O. Box 66827-00800</p>
-                    <p>Nairobi, Kenya</p>
-                    <div class="vat-number">VAT Number: P051123423R</div>
+                    <p>Nakuru, Kenya</p>
+                    <!--<div class="vat-number">VAT Number: P051123423R</div>-->
                 </div>
             </div>
         </div>
@@ -488,7 +496,8 @@
             <h2 class="modal-title">Payment Successful!</h2>
             <p class="modal-message">
                 Your transaction has been completed successfully. 
-                A confirmation receipt has been sent to your registered email.
+                Confirmation Order Receipt (C.O.R) will be 
+                displayed in your profile page in the order section.
             </p>
             <button class="modal-btn" onclick="closeModal()">Done</button>
         </div>

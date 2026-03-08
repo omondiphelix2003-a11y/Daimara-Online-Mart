@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Daimara Stores | Water Refilling</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+:root {
+  --primary: #3b82f6;
+  --dark: #0f172a;
+  --bg: #0f172a;
+  --card: #1e293b;
+  --text: #e2e8f0;
+  --border: #334155;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  --glass: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --accent: rgb(233, 157, 17);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-size: 16px;
+  padding-bottom: 80px;
+}
+
+/* ADVERTISEMENT BAR */
+    .ad-bar{
+      background:var(--glass);
+      color:#ffffff;
+      text-align:center;
+      padding:0.7rem 3rem;
+      font-size:22px;
+      font-weight:600;
+      position:sticky;
+      top:0;
+      z-index:1001;
+      animation: adBarPulse 4s infinite ease-in-out, adBarFlicker 3s infinite;
+    }
+
+    @keyframes adBarPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    /*@keyframes adBarFlicker {
+      0%, 100% { opacity: 1; }
+      41% { opacity: 1; }
+      42% { opacity: 0.4; }
+      43% { opacity: 1; }
+      45% { opacity: 0.4; }
+      46% { opacity: 1; }
+    }*/
+
+/* NAVBAR */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 20px;
+  padding-top: 22px;
+  background: var(--glass);
+  color: #fff;
+  position: fixed;
+  top: 80px;
+  
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  border-bottom: 1px solid var(--glass-border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.logo {
+  color: var(--accent);
+  font-size: 20px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.logo i {
+  font-size: 24px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 20px;
+}
+
+.nav-links a {
+  color: var(--text);
+  text-decoration: none;
+  font-size: 18px;
+  transition: color 0.3s;
+}
+
+.nav-links a:hover {
+  color: var(--primary);
+}
+
+/* BOTTOM NAV */
+.bottom-nav {
+  display: none;
+}
+
+/* MAIN CONTAINER */
+.main-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  margin-top: 120px;
+}
+
+/* PAGE HEADER */
+.page-header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding: 30px 20px;
+  background: linear-gradient(145deg, var(--card), var(--bg));
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+.page-header h1 {
+  color: var(--accent);
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.page-header p {
+  color: #94a3b8;
+  font-size: 1.1rem;
+}
+
+/* PRODUCTS GRID */
+.products-section {
+  margin-bottom: 40px;
+}
+
+.section-title {
+  color: var(--text);
+  font-size: 1.5rem;
+  margin-bottom: 25px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-title i {
+  color: var(--primary);
+}
+
+.sizes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: linear-gradient(145deg, var(--card), var(--bg));
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px -15px rgba(59, 130, 246, 0.2);
+  border-color: var(--accent);
+}
+
+.card-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  display: block;
+}
+
+.card-content {
+  padding: 20px;
+}
+
+.card h3 {
+  color: var(--text);
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.card p {
+  color: #94a3b8;
+  font-size: 14px;
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+.card .price {
+  color: var(--primary);
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+  display: block;
+}
+
+.card button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 4px;
+  background: var(--dark);
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: 1px solid var(--accent);
+}
+
+.card button:hover {
+  background: var(--accent);
+  color: var(--dark);
+}
+
+.card.selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 20px rgba(233, 157, 17, 0.3);
+}
+
+.card.selected button {
+  background: var(--accent);
+  color: var(--dark);
+}
+
+/* ORDER SECTION */
+.order-section {
+  background: linear-gradient(145deg, var(--card), var(--bg));
+  border-radius: 4px;
+  padding: 30px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.order-section h2 {
+  color: var(--accent);
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #94a3b8;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  border-radius: 4px;
+  color: var(--text);
+  font-size: 16px;
+  transition: all 0.3s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-group input[readonly] {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: var(--primary);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.order-btn {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, var(--accent), #d4890a);
+  color: var(--dark);
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.order-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(233, 157, 17, 0.3);
+}
+
+/* FOOTER */
+.footer {
+  background: #3b82f6;
+  padding: 30px 20px;
+  text-align: center;
+  margin-top: 60px;
+  border-top: 1px solid var(--border);
+}
+
+.footer p {
+  color: #64748b;
+  font-size: 14px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+    padding-bottom: 80px;
+  }
+  
+  .navbar {
+    top: 30px;
+    padding: 12px 15px;
+  }
+  
+  .logo {
+    font-size: 18px;
+  }
+  
+  .nav-links {
+    display: none;
+  }
+  
+  .main-container {
+    margin-top: 100px;
+    padding: 15px;
+  }
+  
+  .page-header {
+    padding: 20px 15px;
+  }
+  
+  .page-header h1 {
+    font-size: 1.8rem;
+  }
+  
+  .page-header p {
+    font-size: 14px;
+  }
+  
+  .sizes {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .card-image {
+    height: 140px;
+  }
+  
+  .card-content {
+    padding: 15px;
+  }
+  
+  .card h3 {
+    font-size: 14px;
+  }
+  
+  .card p {
+    font-size: 12px;
+  }
+  
+  .card .price {
+    font-size: 1.1rem;
+  }
+  
+  .order-section {
+    padding: 20px;
+  }
+  
+  /* BOTTOM NAV */
+  .bottom-nav {
+    display: flex !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: var(--dark);
+    height: 60px;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 2000;
+    border-top: 2px solid var(--primary);
+  }
+  
+  .bottom-nav a {
+    color: var(--text);
+    text-decoration: none;
+    font-size: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: color 0.3s;
+  }
+  
+  .bottom-nav a.active {
+    color: var(--primary);
+  }
+  
+  .bottom-nav a span {
+    font-size: 10px;
+    margin-top: 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sizes {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  
+  .card-image {
+    height: 120px;
+  }
+  
+  .card-content {
+    padding: 12px;
+  }
+  
+  .card button {
+    padding: 10px;
+    font-size: 12px;
+  }
+  
+  .ad-bar {
+    font-size: 12px;
+    padding: 0.5rem;
+  }
+}
+
+/* TOAST NOTIFICATION */
+.toast {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--dark);
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 4px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  opacity: 0;
+  transition: all 0.3s;
+  z-index: 3000;
+  font-weight: 500;
+  border: 1px solid var(--border);
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+.toast i {
+  color: var(--accent);
+}
+
+
+ 
+     /* BOTTOM NAV */
+      .bottom-nav {
+        display: flex !important;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: #000;
+        height: 60px;
+        justify-content: space-around;
+        align-items: center;
+        z-index: 2000;
+        border-top: 2px solid var(--primary);
+      }
+    /* BOTTOM NAV */
+    .bottom-nav {
+      display: none !important;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: #000;
+      height: 60px;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 2000;
+      border-top: 2px solid var(--primary);
+    }
+    
+    @media (max-width: 768px) {
+      .bottom-nav {
+        display: flex !important;
+      }
+      .footer {
+        display: block !important;
+      }
+    }
+    
+    @media (min-width: 769px) {
+      .footer {
+        display: none !important;
+      }
+    }
+    
+    .footer {
+      background: #0f172a;
+      color: #94a3b8;
+      padding: 40px 20px;
+      text-align: center;
+      border-top: 1px solid #1e293b;
+      margin-top: 50px;
+    }
+
+    .bottom-nav a {
+      color: white;
+      text-decoration: none;
+      font-size: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .bottom-nav a.active { color: var(--primary); }
+    .bottom-nav a span { font-size: 10px; margin-top: 4px; }
+
+        /* PRODUCT DETAILS MODAL */
+        .product-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.171);
+            z-index: 3000;
+            overflow-y: auto;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 20px;
+        }
+        .product-modal.show { display: block; }
+        .modal-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: rgba(15, 23, 42, 0.171);
+            border-radius: 4px;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid #334155;
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            border-radius: 25%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .modal-gallery { padding: 30px; }
+        .main-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 4px; margin-bottom: 15px; border: 1px solid #334155; }
+        .thumb-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .thumb-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 4px; cursor: pointer; border: 2px solid transparent; }
+        .thumb-img.active { border-color: #3b82f6; }
+        .modal-info { padding: 40px; display: flex; flex-direction: column; gap: 20px; }
+        .modal-info h2 { font-size: 2rem; color: #fff; text-align: left; margin: 0; }
+        .modal-price { font-size: 1.8rem; color: #3b82f6; font-weight: bold; }
+        .modal-desc { color: #94a3b8; line-height: 1.6; text-align: left; }
+        .modal-meta { border-top: 1px solid #334155; padding-top: 15px; color: #cbd5e1; font-size: 0.9rem; }
+        .size-selector { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+        .size-option { padding: 8px 16px; border: 1px solid #475569; border-radius: 4px; cursor: pointer; background: #0f172a; }
+        .size-option.selected { background: rgba(15, 23, 42, 0.171); border-color: #3b82f6; color: white; }
+        .related-products { padding: 30px; border-top: 1px solid #334155; grid-column: span 2; }
+        .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
+
+</style>
+<base target="_self">
+</head>
+
+<body>
+
+<!-- ADVERTISEMENT BAR -->
+<div class="ad-bar">
+  <i class="fas fa-bullhorn"></i> Advertise with us! Contact sales@daimara.com
+</div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="index.html" class="logo">
+    <i class="fas fa-tint"style="color:#87CEEB"></i>
+    <span>Daimara Water</span>
+  </a>
+  <div class="nav-links">
+    <a href="index.html"><i class="fas fa-home"></i></a>
+    <a href="store.html"><i class="fas fa-shopping-bag"></i></a>
+    <a href="cart.html"><i class="fas fa-shopping-cart"></i></a>
+    <a href="profile.html"><i class="fas fa-user"></i></a>
+  </div>
+</nav>
+
+<!-- BOTTOM NAV (Mobile) -->
+<div class="bottom-nav">
+  <a href="index.html"><i class="fas fa-home"></i><span>Home</span></a>
+  <a href="store.html"><i class="fas fa-shopping-bag"></i><span>Store</span></a>
+  <a href="cart.html"><i class="fas fa-shopping-cart"></i><span>Cart</span></a>
+  <a href="profile.html"><i class="fas fa-user"></i><span>Profile</span></a>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-container">
+  
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <h1><i class="fas fa-tint" style="color: #87CEEB;"></i> Water Refilling</h1>
+    <p>Clean and safe water delivered to your doorstep. Select your preferred size below.</p>
+  </div>
+
+  <!-- PRODUCTS SECTION -->
+  <div class="products-section">
+    <h2 class="section-title">
+      <i class="fas fa-glass-water"></i>
+      Available Sizes
+    </h2>
+    <div class="sizes" id="water-products-container">
+      <!-- Dynamic content from DataManager -->
+    </div>
+  </div>
+
+  <!-- ORDER FORM -->
+  <div class="order-section">
+    <h2><i class="fas fa-cart-plus"></i> Order Details</h2>
+    
+    <div class="form-group">
+      <label><i class="fas fa-check-circle"></i> Selected Size</label>
+      <input type="text" id="size" readonly placeholder="Click a product above to select">
+    </div>
+    
+    <div class="form-group">
+      <label><i class="fas fa-hashtag"></i> Quantity</label>
+      <input type="number" id="qty" value="1" min="1" max="50">
+    </div>
+    
+    <button class="order-btn" onclick="placeOrder()">
+      <i class="fas fa-cart-plus"></i>
+      Add to Cart
+    </button>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<!--<footer class="footer">
+  <p>Copyright © 2026 Daimara Stores. All rights reserved.</p>
+</footer>-->
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <i class="fas fa-check-circle"></i>
+  <span id="toast-message">Added to cart!</span>
+</div>
+
+    <!-- Product Details Modal -->
+    <div id="productModal" class="product-modal">
+        <div class="modal-container">
+            <div class="modal-close" onclick="closeProductModal()"><i class="fas fa-times"></i></div>
+            <div class="modal-gallery">
+                <img id="modalMainImg" src="" alt="Main Product" class="main-img">
+                <div id="modalThumbGrid" class="thumb-grid"></div>
+            </div>
+            <div class="modal-info">
+                <h2 id="modalTitle">Product Name</h2>
+                <div class="modal-price" id="modalPrice">Ksh 0.00</div>
+                <div id="modalStars" class="stars"></div>
+                <p class="modal-desc" id="modalDesc">Detailed description goes here...</p>
+                <div id="sizeSection" style="display:none;">
+                    <h4>Select Size:</h4>
+                    <div id="modalSizes" class="size-selector"></div>
+                </div>
+                <div class="modal-meta">
+                    <p><strong>Supplier:</strong> <span id="modalSupplier">N/A</span></p>
+                    <p><strong>Category:</strong> <span id="modalCategory">Water</span></p>
+                </div>
+                <button id="modalAddToCart" class="add-to-cart-btn" style="width:100%; padding:15px; margin-top:10px; background: var(--accent); color: var(--dark); border:none; border-radius:10px; font-weight:bold; cursor:pointer;">
+                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                </button>
+            </div>
+            <div class="related-products">
+                <h3 style="color:white; margin-bottom:15px;">Related Products</h3>
+                <div id="relatedGrid" class="related-grid"></div>
+            </div>
+        </div>
+    </div>
+
+<footer class="footer">
+  <p>Copyright © 2026 Daimara Stores. All rights reserved.</p>
+</footer>
+
+<script src="data-manager.js"></script>
+<script src="auth-check.js"></script>
+<script>
+let selectedItem = null;
+let selectedCard = null;
+let selectedSize = '';
+
+// MODAL FUNCTIONS
+function openProductModal(productId) {
+  const allProducts = DataManager.getAllProducts();
+  let product = null;
+  for (const cat in allProducts) {
+    product = allProducts[cat].find(p => p.id === productId);
+    if (product) break;
+  }
+  
+  if (!product) return;
+
+  document.getElementById('modalTitle').textContent = product.name;
+  document.getElementById('modalPrice').textContent = `Ksh ${parseFloat(product.price).toLocaleString()}`;
+  document.getElementById('modalDesc').textContent = product.description || 'Clean purified water refill service.';
+  document.getElementById('modalSupplier').textContent = product.supplier || 'Medicore Supplier';
+  document.getElementById('modalCategory').textContent = product.category || 'Water';
+  
+  const mainImg = document.getElementById('modalMainImg');
+  mainImg.src = product.image || 'https://images.unsplash.com/photo-1548839140-29a749e1cf4d?w=400&h=300&fit=crop';
+
+  // Handle Stars
+  const starsContainer = document.getElementById('modalStars');
+  starsContainer.innerHTML = '';
+  const rating = product.rating || 0;
+  for(let i=1; i<=5; i++) {
+    starsContainer.innerHTML += `<i class="${i <= rating ? 'fas' : 'far'} fa-star" style="color:#fbbf24; margin-right:2px;"></i>`;
+  }
+
+  // Handle Gallery
+  const thumbGrid = document.getElementById('modalThumbGrid');
+  thumbGrid.innerHTML = `<img src="${product.image}" class="thumb-img active" onclick="updateModalMainImg(this.src, this)">`;
+  if (product.otherImages && product.otherImages.length > 0) {
+    product.otherImages.forEach(img => {
+      thumbGrid.innerHTML += `<img src="${img}" class="thumb-img" onclick="updateModalMainImg(this.src, this)">`;
+    });
+  }
+
+  // Handle Sizes
+  const sizeSection = document.getElementById('sizeSection');
+  const sizesContainer = document.getElementById('modalSizes');
+  if (product.sizes && product.sizes.length > 0) {
+    sizeSection.style.display = 'block';
+    sizesContainer.innerHTML = '';
+    product.sizes.forEach(size => {
+      const btn = document.createElement('div');
+      btn.className = 'size-option';
+      btn.style.color = 'white';
+      btn.textContent = size;
+      btn.onclick = () => {
+        document.querySelectorAll('.size-option').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedSize = size;
+      };
+      sizesContainer.appendChild(btn);
+    });
+  } else {
+    sizeSection.style.display = 'none';
+  }
+
+  // Add to Cart from Modal
+  document.getElementById('modalAddToCart').onclick = () => {
+    if (product.sizes && product.sizes.length > 0 && !selectedSize) {
+      alert('Please select a size');
+      return;
+    }
+    
+    DataManager.addToCart({
+      ...product,
+      selectedSize: selectedSize
+    });
+    
+    showToast(`Added ${product.name} to cart!`);
+    closeProductModal();
+  };
+
+  // Related Products
+  const relatedGrid = document.getElementById('relatedGrid');
+  relatedGrid.innerHTML = '';
+  const related = (allProducts['Water'] || [])
+    .filter(p => p.id !== product.id)
+    .slice(0, 4);
+  
+  related.forEach(p => {
+    relatedGrid.innerHTML += `
+      <div class="card" style="min-width:140px; margin:0; cursor:pointer;" onclick="openProductModal('${p.id}')">
+        <img src="${p.image}" alt="${p.name}" style="height:100px; width:100%; object-fit:cover;">
+        <div style="padding:10px;">
+          <h4 style="font-size:0.8rem; color:white; margin:0;">${p.name}</h4>
+          <p style="font-size:0.8rem; color:#3b82f6; margin:5px 0 0 0;">Ksh ${p.price}</p>
+        </div>
+      </div>
+    `;
+  });
+
+  document.getElementById('productModal').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function updateModalMainImg(src, thumb) {
+  document.getElementById('modalMainImg').src = src;
+  document.querySelectorAll('.thumb-img').forEach(t => t.classList.remove('active'));
+  thumb.classList.add('active');
+}
+
+function closeProductModal() {
+  document.getElementById('productModal').classList.remove('show');
+  document.body.style.overflow = 'auto';
+  selectedSize = '';
+}
+
+// Render Water Products
+function renderWaterProducts() {
+  const container = document.getElementById('water-products-container');
+  const allProducts = DataManager.getAllProducts();
+  const waterProducts = allProducts['Water'] || [];
+
+  if (waterProducts.length === 0) {
+    container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #94a3b8; padding: 40px;">No water products available.</p>';
+    return;
+  }
+
+  container.innerHTML = waterProducts.map(p => `
+    <div class="card" id="card-${p.id}" onclick="selectWaterById('${p.id}')">
+      <img src="${p.image || 'https://images.unsplash.com/photo-1548839140-29a749e1cf4d?w=400&h=300&fit=crop'}" 
+           class="card-image" alt="${p.name}" 
+           onclick="event.stopPropagation(); openProductModal('${p.id}')"
+           style="cursor:zoom-in;">
+      <div class="card-content">
+        <h3 onclick="event.stopPropagation(); openProductModal('${p.id}')" style="cursor:pointer;">${p.name}</h3>
+        <p>${p.description || 'Clean purified water refill service'}</p>
+        <div style="margin-bottom:10px;">
+            ${Array(5).fill(0).map((_, i) => `<i class="${i < (p.rating || 0) ? 'fas' : 'far'} fa-star" style="color:#fbbf24; font-size:12px;"></i>`).join('')}
+        </div>
+        <span class="price">KSh ${p.price}</span>
+        <button type="button" onclick="event.stopPropagation(); selectWaterById('${p.id}')">Select</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Select product by ID
+function selectWaterById(id){
+  const allProducts = DataManager.getAllProducts();
+  const waterProducts = allProducts['Water'] || [];
+  const product = waterProducts.find(p => p.id === id);
+  if(!product) return;
+
+  // Remove previous selection
+  if (selectedCard) {
+    selectedCard.classList.remove('selected');
+  }
+  
+  // Add selection to current card
+  selectedCard = document.getElementById('card-' + id);
+  if (selectedCard) {
+    selectedCard.classList.add('selected');
+  }
+
+  document.getElementById("size").value = product.name;
+  selectedItem = { ...product };
+  
+  // Ensure product is in warehouse for admin to see
+  DataManager.addToWarehouse(selectedItem, 1);
+  
+  // Show toast
+  showToast(`Selected: ${product.name}`);
+}
+
+// Select product (legacy support)
+function selectItem(size, price, image){
+  document.getElementById("size").value = size;
+  selectedItem = {
+    id: "water-" + size.replace(/\s+/g, '-').toLowerCase(),
+    name: "Water Refill (" + size + ")",
+    size,
+    price,
+    image,
+    subcategory: 'Water'
+  };
+
+  // Ensure product is in warehouse for admin to see
+  DataManager.addToWarehouse(selectedItem, 1);
+}
+
+// Toast notification
+function showToast(message) {
+  const toast = document.getElementById('toast');
+  const toastMessage = document.getElementById('toast-message');
+  toastMessage.textContent = message;
+  toast.classList.add('show');
+  setTimeout(() => {
+    toast.classList.remove('show');
+  }, 2000);
+}
+
+// Initialize
+renderWaterProducts();
+
+// Place order
+function placeOrder(){
+  if(!selectedItem){
+    alert("Please select a water size first");
+    return;
+  }
+
+  const quantity = parseInt(document.getElementById("qty").value) || 1;
+
+  // Use DataManager
+  for(let i=0; i<quantity; i++) {
+    DataManager.addToCart({
+      ...selectedItem
+    });
+  }
+
+  showToast(`Added ${quantity} x ${selectedItem.name} to cart!`);
+  
+  // Optional: redirect after short delay
+  setTimeout(() => {
+    window.location.href = "cart.html";
+  }, 1500);
+}
+</script>
+
+</body>
+</html>
