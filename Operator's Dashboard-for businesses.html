@@ -1037,6 +1037,8 @@
       <li><a href="Operator's Dashboard-for businesses.html?tab=orders" target="_self"><i class="fas fa-shopping-cart"></i> Orders</a></li>
       <li><a href="Operator's Dashboard-for businesses.html?tab=warehouse" target="_self"><i class="fas fa-warehouse"></i> Warehouse</a></li>
       <li><a href="Operator's Dashboard-for businesses.html?tab=profits" target="_self"><i class="fas fa-chart-line"></i> Profit & Loss</a></li>
+      <li><a href="#" onclick="openAgentRegistration()"><i class="fas fa-user-tie"></i> Register as Agent</a></li>
+      <li><a href="AgentPortal.html" id="agent-portal-link" style="display:none" target="_self"><i class="fas fa-external-link-alt"></i> Agent Portal</a></li>
     </ul>
     <div class="sidebar-footer">
       <button class="logout-btn" onclick="adminLogout()">
@@ -1047,11 +1049,28 @@
 
   <!-- MAIN CONTENT -->
   <main class="main-content">
+    <!-- AGENT PORTAL REGISTRATION BANNER -->
+    <div id="agent-banner" style="margin-bottom: 25px; padding: 20px; background: linear-gradient(135deg, #1e3a8a 0%, #1e293b 100%); border-radius: 12px; border: 1px solid rgba(59, 130, 246, 0.3); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+      <div>
+        <h2 style="color: white; margin-bottom: 5px; display: flex; align-items: center; gap: 10px;">
+          <i class="fas fa-store-alt" style="color: var(--primary);"></i>
+          Become a Daimara Agent
+        </h2>
+        <p style="color: var(--text-muted); font-size: 14px;">Register for the Agent Portal to process customer deposits and withdrawals.</p>
+      </div>
+      <button onclick="openAgentRegistration()" style="padding: 12px 24px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.3s;" onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='var(--primary)'">
+        <i class="fas fa-id-card"></i>
+        Register as Agent
+      </button>
+    </div>
     <header class="page-header">
       <div class="page-title">
         <h1 id="tab-title"><i class="fas fa-tachometer-alt"></i> Dashboard Overview</h1>
       </div>
       <div class="admin-profile">
+        <a href="client end money valt.html" class="btn btn-primary" style="margin-right:15px; background:var(--dark-bg); color:var(--primary); text-decoration:none; display:flex; align-items:center; gap:8px;">
+          <i class="fas fa-vault"></i> VaultPro
+        </a>
         <div class="admin-info">
           <p>Operator</p>
           <span>Main Office</span>
@@ -1216,6 +1235,52 @@
         <i class="fas fa-times"></i>
       </button>
       <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- AGENT REGISTRATION MODAL -->
+  <div id="agent-modal" class="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:2000; align-items:center; justify-content:center;">
+    <div class="modal-content" style="background:#1e293b; color:white; max-width:500px; width:95%; padding:30px; border-radius:16px; border:1px solid #334155; position:relative;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h2 style="font-size:24px; font-weight:700;"><i class="fas fa-user-tie text-blue-500"></i> Agent Registration</h2>
+        <span style="cursor:pointer; font-size:24px;" onclick="closeAgentModal()">&times;</span>
+      </div>
+      
+      <form onsubmit="submitAgentRegistration(event)" class="space-y-4">
+        <div style="margin-bottom:15px;">
+          <label style="display:block; margin-bottom:5px; font-size:14px; color:#94a3b8;">Registered Business Name</label>
+          <input type="text" id="agent-biz-name" readonly style="width:100%; padding:10px; border-radius:8px; border:1px solid #334155; background:#0f172a; color:white;">
+        </div>
+        <div style="margin-bottom:15px;">
+          <label style="display:block; margin-bottom:5px; font-size:14px; color:#94a3b8;">Phone Number</label>
+          <input type="tel" id="agent-phone" readonly style="width:100%; padding:10px; border-radius:8px; border:1px solid #334155; background:#0f172a; color:white;">
+        </div>
+        <div style="margin-bottom:15px;">
+          <label style="display:block; margin-bottom:5px; font-size:14px; color:#94a3b8;">National ID Number</label>
+          <input type="text" id="agent-id-num" required style="width:100%; padding:10px; border-radius:8px; border:1px solid #334155; background:#0f172a; color:white;" placeholder="Enter ID Number">
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
+          <div>
+            <label style="display:block; margin-bottom:5px; font-size:14px; color:#94a3b8;">ID Front Photo</label>
+            <input type="file" id="agent-id-front" required accept="image/*" style="font-size:12px;">
+          </div>
+          <div>
+            <label style="display:block; margin-bottom:5px; font-size:14px; color:#94a3b8;">ID Back Photo</label>
+            <input type="file" id="agent-id-back" required accept="image/*" style="font-size:12px;">
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
+          <div>
+            <label style="display:block; margin-bottom:5px; font-size:14px; color:#94a3b8;">Create Portal PIN</label>
+            <input type="password" id="agent-pin" required maxlength="4" style="width:100%; padding:10px; border-radius:8px; border:1px solid #334155; background:#0f172a; color:white; text-align:center; letter-spacing:0.5em;" placeholder="••••">
+          </div>
+          <div>
+            <label style="display:block; margin-bottom:5px; font-size:14px; color:#94a3b8;">Confirm PIN</label>
+            <input type="password" id="agent-pin-confirm" required maxlength="4" style="width:100%; padding:10px; border-radius:8px; border:1px solid #334155; background:#0f172a; color:white; text-align:center; letter-spacing:0.5em;" placeholder="••••">
+          </div>
+        </div>
+        <button type="submit" style="width:100%; padding:12px; background:#3b82f6; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Confirm Registration</button>
+      </form>
     </div>
   </div>
 
@@ -1963,6 +2028,173 @@
         }
       });
     };
+    // --- AGENT PORTAL LOGIC ---
+    function openAgentModal() {
+      const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+      const bizName = localStorage.getItem('businessName') || 'N/A';
+      
+      // Check if already an agent or pending
+      const agents = JSON.parse(localStorage.getItem('daimara_agents') || '[]');
+      const existing = agents.find(a => a.userId === user.id);
+      
+      if (existing) {
+        if (existing.status === 'approved') {
+          // Access portal with PIN
+          const pin = prompt("Enter your Agent Portal PIN:");
+          if (pin === existing.pin) {
+            window.location.href = 'agentportal.html';
+          } else {
+            alert("Incorrect PIN!");
+          }
+          return;
+        } else {
+          alert("Your agent registration is still pending approval.");
+          return;
+        }
+      }
+
+      document.getElementById('agent-biz-name').value = bizName;
+      document.getElementById('agent-phone').value = user.phone || 'N/A';
+      document.getElementById('agent-modal').style.display = 'flex';
+    }
+
+    function closeAgentModal() {
+      document.getElementById('agent-modal').style.display = 'none';
+    }
+
+    async function submitAgentRegistration(e) {
+      e.preventDefault();
+      const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+      const pin = document.getElementById('agent-pin').value;
+      const confirmPin = document.getElementById('agent-pin-confirm').value;
+
+      if (pin !== confirmPin) {
+        alert("PINs do not match!");
+        return;
+      }
+
+      // In a real app, we'd upload images. Here we'll just store placeholders/names
+      const registration = {
+        userId: user.id,
+        businessName: document.getElementById('agent-biz-name').value,
+        phone: document.getElementById('agent-phone').value,
+        idNumber: document.getElementById('agent-id-num').value,
+        idFront: "uploaded_front.jpg", // Placeholder
+        idBack: "uploaded_back.jpg",   // Placeholder
+        pin: pin,
+        status: 'pending',
+        timestamp: new Date().toISOString(),
+        agentNumber: null // To be assigned by admin
+      };
+
+      const agents = JSON.parse(localStorage.getItem('daimara_agents') || '[]');
+      agents.push(registration);
+      localStorage.setItem('daimara_agents', JSON.stringify(agents));
+
+      alert("Registration submitted! Please wait for admin approval.");
+      closeAgentModal();
+    }
+  </script>
+  <!-- AGENT REGISTRATION MODAL -->
+  <div id="agentModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(5px); z-index:2000; align-items:center; justify-content:center; padding:20px;">
+    <div style="background:#1e293b; width:100%; max-width:600px; border-radius:16px; overflow:hidden; border:1px solid #334155; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
+      <div style="padding:20px; background:#0f172a; border-bottom:1px solid #334155; display:flex; justify-content:space-between; align-items:center;">
+        <h3 style="color:white; margin:0; font-size:20px; display:flex; align-items:center; gap:10px;">
+          <i class="fas fa-id-card" style="color:var(--primary);"></i>
+          Agent Portal Registration
+        </h3>
+        <button onclick="closeAgentRegistration()" style="background:none; border:none; color:#94a3b8; cursor:pointer; font-size:20px;">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <form id="agentRegForm" onsubmit="handleAgentRegistration(event)" style="padding:25px; display:flex; flex-direction:column; gap:20px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+          <div style="display:flex; flex-direction:column; gap:5px;">
+            <label style="color:#94a3b8; font-size:12px; font-weight:600;">ID Number</label>
+            <input type="text" id="agent-id-num" required style="padding:12px; background:#0f172a; border:1px solid #334155; border-radius:8px; color:white;" placeholder="National ID">
+          </div>
+          <div style="display:flex; flex-direction:column; gap:5px;">
+            <label style="color:#94a3b8; font-size:12px; font-weight:600;">Business Name</label>
+            <input type="text" id="agent-biz-name" required style="padding:12px; background:#0f172a; border:1px solid #334155; border-radius:8px; color:white;" placeholder="Business Name">
+          </div>
+          <div style="display:flex; flex-direction:column; gap:5px;">
+            <label style="color:#94a3b8; font-size:12px; font-weight:600;">M-PESA Phone</label>
+            <input type="tel" id="agent-phone" required style="padding:12px; background:#0f172a; border:1px solid #334155; border-radius:8px; color:white;" placeholder="07XXXXXXXX">
+          </div>
+          <div style="display:flex; flex-direction:column; gap:5px;">
+            <label style="color:#94a3b8; font-size:12px; font-weight:600;">Portal Password</label>
+            <input type="password" id="agent-pass" required style="padding:12px; background:#0f172a; border:1px solid #334155; border-radius:8px; color:white;" placeholder="Create Password">
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+          <div style="display:flex; flex-direction:column; gap:5px;">
+            <label style="color:#94a3b8; font-size:12px; font-weight:600;">ID Front Photo</label>
+            <input type="file" required style="color:#94a3b8; font-size:12px;">
+          </div>
+          <div style="display:flex; flex-direction:column; gap:5px;">
+            <label style="color:#94a3b8; font-size:12px; font-weight:600;">ID Back Photo</label>
+            <input type="file" required style="color:#94a3b8; font-size:12px;">
+          </div>
+        </div>
+        <button type="submit" id="agentSubmitBtn" style="padding:15px; background:var(--primary); color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-top:10px;">
+          Submit Registration
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- SUCCESS MODAL -->
+  <div id="agentSuccessModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:3000; align-items:center; justify-content:center; padding:20px;">
+    <div style="background:#1e293b; width:100%; max-width:400px; border-radius:24px; padding:40px; text-align:center; border:1px solid #16a34a33;">
+      <div style="width:80px; height:80px; background:#16a34a22; color:#16a34a; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 20px; font-size:40px;">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <h3 style="color:white; margin-bottom:10px;">Success!</h3>
+      <p style="color:#94a3b8; margin-bottom:30px;">Application sent to admin for review. Your agent number will be revealed once approved.</p>
+      <button onclick="location.reload()" style="padding:12px 30px; background:#16a34a; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">
+        Return to Dashboard
+      </button>
+    </div>
+  </div>
+
+  <script src="data-manager.js"></script>
+  <script>
+    function openAgentRegistration() {
+      document.getElementById('agentModal').style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+    function closeAgentRegistration() {
+      document.getElementById('agentModal').style.display = 'none';
+      document.body.style.overflow = 'auto';
+    }
+    function handleAgentRegistration(e) {
+      e.preventDefault();
+      const btn = document.getElementById('agentSubmitBtn');
+      const user = DataManager.getCurrentUser();
+      
+      const details = {
+        userId: user ? user.id : 'unknown',
+        idNumber: document.getElementById('agent-id-num').value,
+        businessName: document.getElementById('agent-biz-name').value,
+        phone: document.getElementById('agent-phone').value,
+        password: document.getElementById('agent-pass').value
+      };
+
+      btn.disabled = true;
+      btn.innerHTML = 'Submitting...';
+
+      setTimeout(() => {
+        const res = DataManager.registerAgent(details);
+        if(res.success) {
+          document.getElementById('agentModal').style.display = 'none';
+          document.getElementById('agentSuccessModal').style.display = 'flex';
+        } else {
+          alert("Error: " + res.message);
+          btn.disabled = false;
+          btn.innerHTML = 'Submit Registration';
+        }
+      }, 1500);
+    }
   </script>
 </body>
 </html>

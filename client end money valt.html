@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vault Pro | Financial Command Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #ec4899;
+            --accent: #10b981;
+            --dark: #0f172a;
+            --darker: #020617;
+            --surface: #1e293b;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--darker);
+            color: #f8fafc;
+            overflow: hidden;
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--darker); }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        .glass {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .glass-panel {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9));
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-item {
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 0;
+            width: 3px;
+            background: var(--primary);
+            border-radius: 0 4px 4px 0;
+            transition: height 0.3s ease;
+        }
+
+        .nav-item.active {
+            background: rgba(99, 102, 241, 0.1);
+            color: #fff;
+        }
+
+        .nav-item.active::before {
+            height: 60%;
+        }
+
+        .nav-item.active i {
+            color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-enter {
+            animation: fadeSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .hover-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .hover-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px -10px rgba(99, 102, 241, 0.3);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .custom-input {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid #334155;
+            color: white;
+            transition: all 0.2s;
+        }
+        .custom-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+            outline: none;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-left-color: #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        #toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .toast {
+            background: #1e293b;
+            border-left: 4px solid var(--primary);
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateX(120%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .toast.show { transform: translateX(0); }
+
+        .agent-verified {
+            animation: pulse-green 2s infinite;
+        }
+        @keyframes pulse-green {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+        }
+    </style>
+<base target="_blank">
+    <script src="data-manager.js"></script>
+    <style>
+        /* Login Overlay */
+        #vault-login {
+            position: fixed;
+            inset: 0;
+            background: var(--darker);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-card {
+            background: var(--surface);
+            padding: 2rem;
+            border-radius: 1.5rem;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+    </style>
+</head>
+<body class="flex h-screen w-screen text-slate-300">
+    <!-- Vault Login Overlay -->
+    <div id="vault-login">
+        <div class="login-card animate-enter">
+            <div class="flex flex-col items-center mb-8">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-xl shadow-indigo-500/20 mb-4">
+                    <i class="fas fa-shield-halved text-white text-3xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-white">Vault<span class="text-indigo-400">Pro</span> Access</h2>
+                <p class="text-slate-500 text-sm mt-1">Enter your credentials to unlock</p>
+            </div>
+            
+            <form onsubmit="app.unlock(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">ID Number</label>
+                    <input type="text" id="login-id" required class="custom-input w-full rounded-xl py-3 px-4" placeholder="Enter ID Number">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Security PIN</label>
+                    <input type="password" id="login-pin" required maxlength="4" class="custom-input w-full rounded-xl py-3 px-4 tracking-[0.5em] text-center" placeholder="••••">
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-indigo-600/20 mt-4">
+                    Unlock Vault
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside class="w-72 bg-slate-900 border-r border-slate-800 flex flex-col h-full shrink-0 z-20">
+        <div class="p-6 flex items-center gap-3 border-b border-slate-800/50">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                <i class="fas fa-wallet text-white text-lg"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold text-white tracking-tight">Vault<span class="text-indigo-400">Pro</span></h1>
+                <p class="text-[10px] text-slate-500 uppercase tracking-widest font-semibold">Secure Banking</p>
+            </div>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-6 px-3 space-y-1">
+            <p class="px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Main</p>
+            
+            <button onclick="app.navigate('balance')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/50 group" data-page="balance">
+                <i class="fas fa-chart-pie w-5 text-center transition-transform duration-200"></i>
+                Check Balance
+            </button>
+
+            <button onclick="app.navigate('send')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/50 group" data-page="send">
+                <i class="fas fa-paper-plane w-5 text-center transition-transform duration-200"></i>
+                Send Money
+            </button>
+
+            <button onclick="app.navigate('withdraw')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/50 group" data-page="withdraw">
+                <i class="fas fa-hand-holding-dollar w-5 text-center transition-transform duration-200"></i>
+                Withdraw Funds
+            </button>
+
+            <button onclick="app.navigate('transactions')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/50 group" data-page="transactions">
+                <i class="fas fa-list-ul w-5 text-center transition-transform duration-200"></i>
+                Track Transactions
+            </button>
+
+            <div class="mt-8 px-4">
+                <div class="p-4 rounded-xl bg-gradient-to-br from-indigo-900/40 to-purple-900/40 border border-indigo-500/20">
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+                        <span class="text-xs font-semibold text-indigo-200">System Secure</span>
+                    </div>
+                    <p class="text-[10px] text-slate-400 leading-relaxed">Your funds are protected by 256-bit encryption.</p>
+                </div>
+            </div>
+        </nav>
+
+        <div class="p-4 border-t border-slate-800/50">
+            <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-800/50 cursor-pointer transition-colors">
+                <img id="user-avatar" src="https://i.pravatar.cc/150?img=11" alt="User" class="w-10 h-10 rounded-full border-2 border-slate-700">
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-white truncate" id="user-name">Alex Morgan</p>
+                    <p class="text-[10px] text-slate-500 truncate" id="user-phone">ID: 8839-2211</p>
+                </div>
+                <i class="fas fa-chevron-right text-xs text-slate-600"></i>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 relative overflow-hidden bg-slate-950">
+        <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+            <div class="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[100px]"></div>
+            <div class="absolute bottom-[-10%] left-[10%] w-[400px] h-[400px] bg-purple-600/10 rounded-full blur-[100px]"></div>
+        </div>
+
+        <div id="content-area" class="relative z-10 h-full overflow-y-auto p-8 md:p-12">
+            
+            <!-- VIEW: BALANCE -->
+            <div id="view-balance" class="view-section max-w-5xl mx-auto animate-enter">
+                <header class="mb-8 flex justify-between items-end">
+                    <div>
+                        <h2 class="text-3xl font-bold text-white mb-1">Account Overview</h2>
+                        <p class="text-slate-400">Welcome back, here's your financial summary.</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm text-slate-400 mb-1">Last Updated</p>
+                        <p class="text-xs font-mono text-indigo-400" id="last-updated">Just now</p>
+                    </div>
+                </header>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                    <div class="lg:col-span-2 glass-panel rounded-2xl p-8 relative overflow-hidden group">
+                        <div class="absolute inset-0 bg-gradient-to-r from-indigo-600/10 to-purple-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                        
+                        <div class="relative z-10">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="p-3 rounded-lg bg-indigo-500/10 border border-indigo-500/20">
+                                    <i class="fas fa-wallet text-indigo-400 text-xl"></i>
+                                </div>
+                                <button onclick="app.toggleVisibility()" class="text-slate-400 hover:text-white transition-colors">
+                                    <i class="fas fa-eye" id="eye-icon"></i>
+                                </button>
+                            </div>
+                            
+                            <p class="text-sm text-slate-400 font-medium mb-1">Total Available Balance</p>
+                            <h3 class="text-5xl font-bold text-white tracking-tight mb-4 mono" id="display-balance">$12,450.00</h3>
+                            
+                            <div class="flex gap-4 mt-6">
+                                <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold">
+                                    <i class="fas fa-arrow-trend-up"></i> +2.4% this month
+                                </div>
+                                <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-700/30 text-slate-300 text-xs font-medium">
+                                    USD Account
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div id="profit-section" class="hidden glass-panel rounded-2xl p-6 hover-card cursor-pointer bg-gradient-to-br from-emerald-900/20 to-teal-900/20 border-emerald-500/20">
+                            <div class="flex justify-between items-start mb-2">
+                                <p class="text-sm text-emerald-400 font-semibold uppercase tracking-wider">Earnings / Profit</p>
+                                <div class="p-1.5 rounded bg-emerald-500/10 text-emerald-400"><i class="fas fa-chart-line text-xs"></i></div>
+                            </div>
+                            <p class="text-2xl font-bold text-white mono" id="display-profit">KES 0.00</p>
+                        </div>
+                        <div class="glass-panel rounded-2xl p-6 hover-card cursor-pointer">
+                            <div class="flex justify-between items-start mb-2">
+                                <p class="text-sm text-slate-400">Income (30d)</p>
+                                <div class="p-1.5 rounded bg-emerald-500/10 text-emerald-400"><i class="fas fa-arrow-down text-xs"></i></div>
+                            </div>
+                            <p class="text-2xl font-bold text-white mono">KES 0.00</p>
+                        </div>
+                        <div class="glass-panel rounded-2xl p-6 hover-card cursor-pointer">
+                            <div class="flex justify-between items-start mb-2">
+                                <p class="text-sm text-slate-400">Expenses (30d)</p>
+                                <div class="p-1.5 rounded bg-rose-500/10 text-rose-400"><i class="fas fa-arrow-up text-xs"></i></div>
+                            </div>
+                            <p class="text-2xl font-bold text-white mono">KES 0.00</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-panel rounded-2xl p-6">
+                    <h4 class="text-sm font-semibold text-white mb-6">Balance History</h4>
+                    <div class="h-32 flex items-end justify-between gap-2">
+                        <div class="w-full bg-indigo-500/20 rounded-t-sm hover:bg-indigo-500/40 transition-all relative group" style="height: 40%">
+                            <div class="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-xs py-1 px-2 rounded border border-slate-700 transition-opacity">$8k</div>
+                        </div>
+                        <div class="w-full bg-indigo-500/20 rounded-t-sm hover:bg-indigo-500/40 transition-all relative group" style="height: 65%"></div>
+                        <div class="w-full bg-indigo-500/20 rounded-t-sm hover:bg-indigo-500/40 transition-all relative group" style="height: 50%"></div>
+                        <div class="w-full bg-indigo-500/20 rounded-t-sm hover:bg-indigo-500/40 transition-all relative group" style="height: 85%"></div>
+                        <div class="w-full bg-indigo-500/20 rounded-t-sm hover:bg-indigo-500/40 transition-all relative group" style="height: 60%"></div>
+                        <div class="w-full bg-indigo-500/20 rounded-t-sm hover:bg-indigo-500/40 transition-all relative group" style="height: 90%"></div>
+                        <div class="w-full bg-indigo-500/20 rounded-t-sm hover:bg-indigo-500/40 transition-all relative group" style="height: 75%"></div>
+                        <div class="w-full bg-gradient-to-t from-indigo-500 to-purple-500 rounded-t-sm shadow-[0_0_20px_rgba(99,102,241,0.5)] relative group" style="height: 100%">
+                            <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-indigo-600 text-xs py-1 px-2 rounded font-bold">Now</div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between mt-2 text-xs text-slate-500 font-mono">
+                        <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span><span>Today</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: SEND MONEY -->
+            <div id="view-send" class="view-section hidden max-w-2xl mx-auto animate-enter">
+                <h2 class="text-3xl font-bold text-white mb-6">Send Money</h2>
+                
+                <div class="glass-panel rounded-2xl p-8">
+                    <form id="form-send" onsubmit="app.handleAction(event, 'send')" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-400 mb-2">Recipient Phone Number</label>
+                                <div class="relative">
+                                    <i class="fas fa-phone absolute left-4 top-3.5 text-slate-500"></i>
+                                    <input type="tel" required class="custom-input w-full rounded-xl py-3 pl-10 pr-4" placeholder="e.g. 0712345678">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-400 mb-2">Recipient ID Number</label>
+                                <div class="relative">
+                                    <i class="fas fa-id-card absolute left-4 top-3.5 text-slate-500"></i>
+                                    <input type="text" required class="custom-input w-full rounded-xl py-3 pl-10 pr-4" placeholder="Enter ID Number">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-400 mb-2">Amount (KES)</label>
+                            <div class="relative">
+                                <span class="absolute left-4 top-3.5 text-slate-500 font-bold text-lg">Ksh</span>
+                                <input type="number" id="send-amount" required min="1" class="custom-input w-full rounded-xl py-3 pl-12 pr-4 text-xl font-bold mono" placeholder="0.00">
+                            </div>
+                            <p class="text-right text-xs text-slate-500 mt-2">Available: <span class="text-indigo-400 font-mono balance-ref">KES 0.00</span></p>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-400 mb-2">Security PIN</label>
+                            <input type="password" required maxlength="4" class="custom-input w-full rounded-xl py-3 px-4 text-center tracking-[1em] font-bold" placeholder="••••">
+                        </div>
+
+                        <div class="pt-4">
+                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-600/25 transition-all flex justify-center items-center gap-2">
+                                <span>Authorize Transfer</span>
+                                <i class="fas fa-shield-check text-sm"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- VIEW: WITHDRAW -->
+            <div id="view-withdraw" class="view-section hidden max-w-2xl mx-auto animate-enter">
+                <h2 class="text-3xl font-bold text-white mb-6">Withdraw Funds</h2>
+                
+                <div class="glass-panel rounded-2xl p-8">
+                    <form id="form-withdraw" onsubmit="app.handleAction(event, 'withdraw')" class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-400 mb-2">Agent Number</label>
+                            <div class="relative">
+                                <i class="fas fa-store absolute left-4 top-3.5 text-slate-500"></i>
+                                <input type="text" id="agent-number" required oninput="app.validateAgent(this)" class="custom-input w-full rounded-xl py-3 pl-10 pr-12 uppercase" placeholder="Enter 6-digit Agent #">
+                                <div id="agent-status" class="absolute right-4 top-3.5 hidden">
+                                    <i class="fas fa-check-circle text-emerald-400"></i>
+                                </div>
+                            </div>
+                            <div id="agent-details" class="mt-3 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 hidden">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                                        <i class="fas fa-check text-emerald-400 text-xs"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-emerald-400 font-bold uppercase tracking-wider">Verified Agent</p>
+                                        <p id="agent-name" class="text-sm text-white font-semibold">Agent Name</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <p id="agent-message" class="text-xs text-slate-500 mt-2">Enter the agent number provided by the agent.</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-400 mb-2">Amount to Withdraw (KES)</label>
+                            <div class="relative">
+                                <span class="absolute left-4 top-3.5 text-slate-500 font-bold text-lg">Ksh</span>
+                                <input type="number" id="withdraw-amount" required min="10" class="custom-input w-full rounded-xl py-3 pl-12 pr-4 text-xl font-bold mono" placeholder="0.00">
+                            </div>
+                            <p class="text-right text-xs text-slate-500 mt-2">Available: <span class="text-indigo-400 font-mono balance-ref">KES 0.00</span></p>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-400 mb-2">Security PIN</label>
+                            <input type="password" required maxlength="4" class="custom-input w-full rounded-xl py-3 px-4 text-center tracking-[1em] font-bold" placeholder="••••">
+                        </div>
+
+                        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-emerald-600/25 transition-all flex justify-center items-center gap-2">
+                            <span>Process Withdrawal</span>
+                            <i class="fas fa-money-bill-transfer text-sm"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- VIEW: TRANSACTIONS -->
+            <div id="view-transactions" class="view-section hidden max-w-5xl mx-auto animate-enter h-full flex flex-col">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold text-white">Transaction History</h2>
+                    <div class="flex gap-2">
+                        <button class="px-3 py-1.5 rounded-lg bg-slate-800 text-xs font-medium text-white border border-slate-700 hover:bg-slate-700">Export CSV</button>
+                        <button class="px-3 py-1.5 rounded-lg bg-indigo-600 text-xs font-medium text-white hover:bg-indigo-500">Filter</button>
+                    </div>
+                </div>
+
+                <div class="glass-panel rounded-2xl flex-1 overflow-hidden flex flex-col">
+                    <div class="grid grid-cols-12 gap-4 p-4 border-b border-slate-700/50 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                        <div class="col-span-1">Type</div>
+                        <div class="col-span-5">Description</div>
+                        <div class="col-span-3">Date</div>
+                        <div class="col-span-3 text-right">Amount</div>
+                    </div>
+                    
+                    <div id="transaction-list" class="overflow-y-auto flex-1 p-2 space-y-1">
+                        <!-- JS Populated -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <div id="toast-container"></div>
+
+    <script>
+        const app = {
+            state: {
+                user: null,
+                balance: 0,
+                profit: 0,
+                isHidden: false,
+                isUnlocked: false
+            },
+
+            init() {
+                this.state.user = DataManager.getCurrentUser();
+                if (!this.state.user) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                // Update UI with user info
+                document.getElementById('user-name').innerText = this.state.user.name;
+                document.getElementById('user-phone').innerText = 'Phone: ' + (this.state.user.phone || 'Not Set');
+                if (this.state.user.avatar) document.getElementById('user-avatar').src = this.state.user.avatar;
+
+                // Show profit section if applicable
+                const rolesWithProfit = ['admin', 'operator', 'delivery'];
+                if (rolesWithProfit.includes(this.state.user.role)) {
+                    document.getElementById('profit-section').classList.remove('hidden');
+                    this.updateProfit();
+                }
+
+                this.updateBalanceUI();
+                this.renderTransactions();
+                this.navigate('balance');
+            },
+
+            unlock(e) {
+                e.preventDefault();
+                const id = document.getElementById('login-id').value;
+                const pin = document.getElementById('login-pin').value;
+
+                // Check against user data
+                // For simplicity, we assume user.idCard and user.vaultPin exist
+                // If not first time, we check. If first time, we set them?
+                // The prompt says: "during accessing the vault page the first time, the user will only provide his id number and the pin(which he will use during transactions...)"
+                
+                if (!this.state.user.vaultPin) {
+                    // First time - setup
+                    this.state.user.idCard = id;
+                    this.state.user.vaultPin = pin;
+                    DataManager.updateUserProfile(this.state.user.id, { idCard: id, vaultPin: pin });
+                    this.showToast('Vault security setup successful', 'success');
+                } else {
+                    // Verification
+                    if (this.state.user.idCard !== id || this.state.user.vaultPin !== pin) {
+                        this.showToast('Invalid ID or PIN', 'error');
+                        return;
+                    }
+                }
+
+                this.state.isUnlocked = true;
+                document.getElementById('vault-login').style.display = 'none';
+                document.body.style.overflow = 'auto';
+            },
+
+            updateProfit() {
+                let profit = 0;
+                if (this.state.user.role === 'admin') {
+                    profit = DataManager.getPermanentEarnings();
+                } else if (this.state.user.role === 'operator') {
+                    profit = DataManager.getOperatorRevenue(this.state.user.email);
+                } else if (this.state.user.role === 'delivery') {
+                    // Assuming delivery earnings are stored similarly
+                    profit = parseFloat(localStorage.getItem('delivery_earnings_' + this.state.user.id)) || 0;
+                }
+                this.state.profit = profit;
+                document.getElementById('display-profit').innerText = this.formatMoney(profit);
+            },
+
+            navigate(pageId) {
+                if (!this.state.isUnlocked && pageId !== 'balance') {
+                    // Optional: force unlock for other pages if needed
+                }
+                
+                document.querySelectorAll('.nav-item').forEach(el => {
+                    if(el.dataset.page === pageId) {
+                        el.classList.add('active');
+                        el.classList.remove('text-slate-400');
+                    } else {
+                        el.classList.remove('active');
+                        el.classList.add('text-slate-400');
+                    }
+                });
+
+                document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+                const target = document.getElementById(`view-${pageId}`);
+                target.classList.remove('hidden');
+                
+                target.classList.remove('animate-enter');
+                void target.offsetWidth;
+                target.classList.add('animate-enter');
+
+                if (pageId === 'transactions') this.renderTransactions();
+            },
+
+            toggleVisibility() {
+                this.state.isHidden = !this.state.isHidden;
+                const icon = document.getElementById('eye-icon');
+                const display = document.getElementById('display-balance');
+                
+                if(this.state.isHidden) {
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                    display.innerText = '••••••';
+                } else {
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                    this.updateBalanceUI();
+                }
+            },
+
+            formatMoney(amount) {
+                return 'KES ' + amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+            },
+
+            updateBalanceUI() {
+                this.state.balance = DataManager.getVaultBalance(this.state.user.id);
+                if(!this.state.isHidden) {
+                    document.getElementById('display-balance').innerText = this.formatMoney(this.state.balance);
+                }
+                document.querySelectorAll('.balance-ref').forEach(el => el.innerText = this.formatMoney(this.state.balance));
+            },
+
+            validateAgent(input) {
+                const value = input.value.toUpperCase();
+                const statusIcon = document.getElementById('agent-status');
+                const agentDetails = document.getElementById('agent-details');
+                const agentName = document.getElementById('agent-name');
+                const message = document.getElementById('agent-message');
+
+                if (value.length >= 6) {
+                    const agent = DataManager.getAgentByNumber(value);
+                    if (agent) {
+                        statusIcon.classList.remove('hidden');
+                        statusIcon.innerHTML = '<i class="fas fa-check-circle text-emerald-400"></i>';
+                        input.classList.remove('border-rose-500');
+                        input.classList.add('border-emerald-500');
+                        
+                        agentDetails.classList.remove('hidden');
+                        agentName.innerText = agent.businessName || agent.name;
+                        message.innerText = 'Agent verified successfully';
+                        message.classList.add('text-emerald-400');
+                        message.classList.remove('text-slate-500', 'text-rose-400');
+                    } else {
+                        statusIcon.classList.remove('hidden');
+                        statusIcon.innerHTML = '<i class="fas fa-times-circle text-rose-400"></i>';
+                        input.classList.add('border-rose-500');
+                        input.classList.remove('border-emerald-500');
+                        
+                        agentDetails.classList.add('hidden');
+                        message.innerText = 'Invalid Agent Number. Please check and try again.';
+                        message.classList.add('text-rose-400');
+                        message.classList.remove('text-slate-500', 'text-emerald-400');
+                    }
+                } else {
+                    statusIcon.classList.add('hidden');
+                    input.classList.remove('border-emerald-500', 'border-rose-500');
+                    agentDetails.classList.add('hidden');
+                    message.innerText = 'Enter the agent number provided by the agent.';
+                    message.classList.remove('text-emerald-400', 'text-rose-400');
+                    message.classList.add('text-slate-500');
+                }
+            },
+
+            renderTransactions() {
+                const list = document.getElementById('transaction-list');
+                if (!list) return;
+                list.innerHTML = '';
+
+                const txs = DataManager.getVaultTransactions(this.state.user.id);
+
+                txs.reverse().forEach(tx => {
+                    const isPositive = tx.type === 'credit';
+                    const colorClass = isPositive ? 'text-emerald-400' : 'text-white';
+                    const icon = isPositive ? 'fa-arrow-down' : 'fa-arrow-up';
+                    const bgClass = isPositive ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400';
+                    
+                    const html = `
+                        <div class="grid grid-cols-12 gap-4 p-4 rounded-xl hover:bg-slate-800/30 transition-colors items-center group cursor-pointer border border-transparent hover:border-slate-700">
+                            <div class="col-span-1">
+                                <div class="w-8 h-8 rounded-lg ${bgClass} flex items-center justify-center">
+                                    <i class="fas ${icon} text-xs"></i>
+                                </div>
+                            </div>
+                            <div class="col-span-5">
+                                <p class="font-bold text-sm text-white">${tx.description}</p>
+                                <p class="text-[10px] text-slate-500 uppercase tracking-wider">${tx.type}</p>
+                            </div>
+                            <div class="col-span-3">
+                                <p class="text-xs text-slate-400 font-mono">${new Date(tx.date).toLocaleString()}</p>
+                            </div>
+                            <div class="col-span-3 text-right">
+                                <p class="font-bold text-sm ${colorClass} mono">${isPositive ? '+' : '-'}${this.formatMoney(Math.abs(tx.amount))}</p>
+                            </div>
+                        </div>
+                    `;
+                    list.insertAdjacentHTML('beforeend', html);
+                });
+
+                if (txs.length === 0) {
+                    list.innerHTML = '<div class="text-center py-10 text-slate-500">No transactions found</div>';
+                }
+            },
+
+            handleAction(e, type) {
+                e.preventDefault();
+                const btn = e.target.querySelector('button[type="submit"]');
+                const originalContent = btn.innerHTML;
+                
+                const pinInput = e.target.querySelector('input[type="password"]');
+                if (pinInput.value !== this.state.user.vaultPin) {
+                    this.showToast('Invalid Security PIN', 'error');
+                    return;
+                }
+
+                btn.disabled = true;
+                btn.innerHTML = `<div class="spinner mx-auto"></div>`;
+
+                setTimeout(() => {
+                    if (type === 'send') {
+                        const amount = parseFloat(document.getElementById('send-amount').value);
+                        const recipientPhone = e.target.querySelector('input[placeholder*="Phone"]').value;
+                        const recipientId = e.target.querySelector('input[placeholder*="ID"]').value;
+
+                        if (amount > this.state.balance) {
+                            this.showToast('Insufficient funds', 'error');
+                            btn.disabled = false;
+                            btn.innerHTML = originalContent;
+                            return;
+                        }
+
+                        // Find recipient by phone and ID
+                        const allUsers = DataManager.getAllUsers();
+                        const recipient = allUsers.find(u => u.phone === recipientPhone && u.idCard === recipientId);
+
+                        if (!recipient) {
+                            this.showToast('Recipient not found with provided Phone and ID', 'error');
+                            btn.disabled = false;
+                            btn.innerHTML = originalContent;
+                            return;
+                        }
+
+                        if (recipient.id === this.state.user.id) {
+                            this.showToast('Cannot send money to yourself', 'error');
+                            btn.disabled = false;
+                            btn.innerHTML = originalContent;
+                            return;
+                        }
+
+                        const res = DataManager.transferFunds(this.state.user.id, recipient.id, amount, `Transfer to ${recipient.name}`);
+                        if (res.success) {
+                            this.showToast(`Sent ${this.formatMoney(amount)} to ${recipient.name}`, 'success');
+                            e.target.reset();
+                            this.updateBalanceUI();
+                            this.navigate('transactions');
+                        } else {
+                            this.showToast(res.message, 'error');
+                        }
+                    } else if (type === 'withdraw') {
+                        const amount = parseFloat(document.getElementById('withdraw-amount').value);
+                        const agentNumber = document.getElementById('agent-number').value.toUpperCase();
+                        const agent = DataManager.getAgentByNumber(agentNumber);
+
+                        if (!agent) {
+                            this.showToast('Invalid Agent Number', 'error');
+                            btn.disabled = false;
+                            btn.innerHTML = originalContent;
+                            return;
+                        }
+
+                        if (amount > this.state.balance) {
+                            this.showToast('Insufficient funds', 'error');
+                            btn.disabled = false;
+                            btn.innerHTML = originalContent;
+                            return;
+                        }
+
+                        // Withdrawal logic:
+                        // 1. Decrease client vault balance
+                        // 2. Increase agent float
+                        DataManager.updateVaultBalance(this.state.user.id, -amount, `Withdrawal via Agent ${agentNumber}`);
+                        DataManager.updateAgentFloat(agentNumber, amount);
+                        
+                        // Notify agent (in a real system this would be a message)
+                        const agentMessages = JSON.parse(localStorage.getItem('agent_messages_' + agentNumber)) || [];
+                        agentMessages.push({
+                            type: 'withdrawal',
+                            clientPhone: this.state.user.phone,
+                            amount: amount,
+                            date: new Date().toISOString()
+                        });
+                        localStorage.setItem('agent_messages_' + agentNumber, JSON.stringify(agentMessages));
+
+                        this.showToast(`Withdrawal of ${this.formatMoney(amount)} successful`, 'success');
+                        e.target.reset();
+                        this.updateBalanceUI();
+                        this.navigate('transactions');
+                    }
+                    
+                    btn.disabled = false;
+                    btn.innerHTML = originalContent;
+                }, 1500);
+            },
+
+            showToast(message, type = 'success') {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                
+                const icon = type === 'success' ? '<i class="fas fa-check-circle text-emerald-400"></i>' : '<i class="fas fa-exclamation-circle text-rose-400"></i>';
+                
+                toast.style.borderLeftColor = type === 'success' ? '#10b981' : '#f43f5e';
+                toast.innerHTML = `
+                    ${icon}
+                    <div>
+                        <h4 class="text-sm font-bold text-white">${type === 'success' ? 'Success' : 'Error'}</h4>
+                        <p class="text-xs text-slate-400">${message}</p>
+                    </div>
+                `;
+                
+                container.appendChild(toast);
+                
+                requestAnimationFrame(() => {
+                    toast.classList.add('show');
+                });
+
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 400);
+                }, 3000);
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+    </script>
+</body>
+</html>

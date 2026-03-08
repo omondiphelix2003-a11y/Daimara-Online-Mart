@@ -1314,8 +1314,9 @@ body {
             <input type="email" id="settings-email" required>
           </div>
           <div class="form-group">
-            <label for="settings-phone">Phone Number:</label>
-            <input type="tel" id="settings-phone">
+            <label for="settings-phone">Phone Number (System Provided - Permanent):</label>
+            <input type="tel" id="settings-phone" disabled style="background: rgba(0,0,0,0.1); color: #888; cursor: not-allowed;">
+            <p style="font-size: 11px; color: #7f8c8d; margin-top: 5px;">Your unique system-provided phone number cannot be altered. It is used for all transactions.</p>
           </div>
           <button type="submit" class="btn btn-primary">💾 Save Changes</button>
         </form>

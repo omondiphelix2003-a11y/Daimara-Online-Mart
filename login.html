@@ -65,9 +65,9 @@
     .switch span:hover { text-decoration: underline; }
 
     @media (max-width: 480px) {
-      .auth-box { padding: 30px 20px; border-radius: 0; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; }
+      .auth-box { padding: 30px 20px; border-radius: 0; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; overflow-y: auto; }
       h2 { font-size: 28px; }
-      body { padding: 0; }
+      body { padding: 0; overflow-y: auto; }
     }
   </style>
 </head>
@@ -89,11 +89,11 @@
     <input type="text" id="signup-name" placeholder="Full Name" required>
     <input type="email" id="signup-email" placeholder="Email" required>
     <input type="password" id="signup-password" placeholder="Password" required>
-    <!--<select id="signup-role">
+    <select id="signup-role">
       <option value="user">Customer</option>
       <option value="operator">Operator / Business</option>
       <option value="delivery">Delivery Personnel</option>
-    </select>-->
+    </select>
     <div class="profile-image-group">
       <label for="profile-image">Profile Picture</label>
       <input type="file" id="profile-image" accept="image/*" required>

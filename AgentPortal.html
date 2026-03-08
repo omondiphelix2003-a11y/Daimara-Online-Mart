@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Daimara Stores | Agent Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    :root {
+      --primary: #3b82f6;
+      --bg: #0f172a;
+      --card: #1e293b;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --success: #10b981;
+      --danger: #ef4444;
+      --border: #334155;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; padding: 20px; }
+    .container { max-width: 800px; margin: 0 auto; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+    .agent-info { background: var(--card); padding: 20px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 20px; }
+    .balance-card { background: linear-gradient(135deg, #1e40af, #3b82f6); padding: 30px; border-radius: 16px; text-align: center; margin-bottom: 30px; }
+    .balance-amount { font-size: 36px; font-weight: 800; margin: 10px 0; }
+    
+    .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+    .action-btn { background: var(--card); border: 1px solid var(--border); color: white; padding: 20px; border-radius: 16px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 10px; transition: 0.3s; }
+    .action-btn:hover { background: #334155; transform: translateY(-2px); }
+    .action-btn i { font-size: 24px; color: var(--primary); }
+
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; }
+    .modal-content { background: var(--card); padding: 30px; border-radius: 16px; width: 90%; max-width: 400px; border: 1px solid var(--border); }
+    input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid var(--border); background: #0f172a; color: white; }
+    button.submit-btn { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+    
+    .logs-card { background: var(--card); padding: 20px; border-radius: 16px; border: 1px solid var(--border); }
+    .log-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+    .log-type { font-weight: 600; }
+    .log-amount-credit { color: var(--success); }
+    .log-amount-debit { color: var(--danger); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Agent Portal</h1>
+      <button onclick="location.href='index.html'" style="background:none; border:none; color:var(--muted); cursor:pointer;"><i class="fas fa-sign-out-alt"></i> Exit Portal</button>
+    </header>
+
+    <div class="agent-info">
+      <div style="display:flex; justify-content:space-between;">
+        <div>
+          <p style="color:var(--muted); font-size:12px;">AGENT NAME</p>
+          <h3 id="display-biz-name">Loading...</h3>
+        </div>
+        <div style="text-align:right;">
+          <p style="color:var(--muted); font-size:12px;">AGENT NUMBER</p>
+          <h3 id="display-agent-no" style="color:var(--primary);">...</h3>
+        </div>
+      </div>
+    </div>
+
+    <div class="balance-card">
+      <p style="opacity:0.8;">Available Float Balance</p>
+      <div class="balance-amount">KSH <span id="float-balance">0.00</span></div>
+      <p style="font-size:12px; opacity:0.6;">Daimara Stores Verified Agent</p>
+    </div>
+
+    <div class="actions-grid">
+      <button class="action-btn" onclick="openAction('deposit')">
+        <i class="fas fa-hand-holding-usd"></i>
+        <span>Process Deposit</span>
+      </button>
+      <button class="action-btn" onclick="openAction('withdraw')">
+        <i class="fas fa-money-bill-wave"></i>
+        <span>Process Withdrawal</span>
+      </button>
+      <button class="action-btn" onclick="openAction('transfer')">
+        <i class="fas fa-exchange-alt"></i>
+        <span>Transfer to Vault</span>
+      </button>
+      <button class="action-btn" onclick="openAction('logs')">
+        <i class="fas fa-history"></i>
+        <span>Transaction Logs</span>
+      </button>
+    </div>
+
+    <div class="logs-card" id="logs-section" style="display:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+        <h3>Transaction Logs</h3>
+        <button onclick="document.getElementById('logs-section').style.display='none'" style="background:none; border:none; color:var(--muted); cursor:pointer;">&times;</button>
+      </div>
+      <div id="logs-list"></div>
+    </div>
+  </div>
+
+  <!-- ACTION MODAL -->
+  <div id="action-modal" class="modal">
+    <div class="modal-content">
+      <h2 id="modal-title" style="margin-bottom:20px;">Action</h2>
+      <form onsubmit="handleAction(event)">
+        <div id="modal-fields"></div>
+        <input type="password" id="auth-pin" required maxlength="4" placeholder="Enter Portal PIN" style="text-align:center; letter-spacing:0.5em;">
+        <button type="submit" class="submit-btn">Confirm Transaction</button>
+        <button type="button" onclick="closeModal()" style="width:100%; background:none; color:var(--muted); border:none; margin-top:10px; cursor:pointer;">Cancel</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="data-manager.js"></script>
+  <script>
+    let currentAction = '';
+    let agentData = null;
+
+    function init() {
+      const user = JSON.parse(localStorage.getItem('currentUser'));
+      if (!user) { location.href = 'index.html'; return; }
+
+      const agents = JSON.parse(localStorage.getItem('daimara_agents') || '[]');
+      agentData = agents.find(a => a.userId === user.id && a.status === 'approved');
+
+      if (!agentData) {
+        alert("Unauthorized. Access denied.");
+        location.href = 'index.html';
+        return;
+      }
+
+      document.getElementById('display-biz-name').innerText = agentData.businessName;
+      document.getElementById('display-agent-no').innerText = agentData.agentNumber;
+      refreshBalance();
+    }
+
+    function refreshBalance() {
+      const floats = JSON.parse(localStorage.getItem('daimara_agent_floats') || '{}');
+      const balance = floats[agentData.agentNumber] || 0;
+      document.getElementById('float-balance').innerText = balance.toLocaleString(undefined, {minimumFractionDigits:2});
+    }
+
+    function openAction(type) {
+      currentAction = type;
+      const modal = document.getElementById('action-modal');
+      const title = document.getElementById('modal-title');
+      const fields = document.getElementById('modal-fields');
+      fields.innerHTML = '';
+      
+      if (type === 'logs') {
+        renderLogs();
+        document.getElementById('logs-section').style.display = 'block';
+        return;
+      }
+
+      modal.style.display = 'flex';
+      
+      if (type === 'deposit') {
+        title.innerText = 'Process Deposit';
+        fields.innerHTML = `
+          <input type="tel" id="client-phone" required placeholder="Client Phone Number">
+          <input type="number" id="tx-amount" required placeholder="Amount to Deposit">
+        `;
+      } else if (type === 'withdraw') {
+        title.innerText = 'Process Withdrawal';
+        fields.innerHTML = `
+          <p style="font-size:12px; color:var(--muted); margin-bottom:10px;">Select from client withdrawal requests</p>
+          <div id="withdrawal-requests" style="max-height:200px; overflow-y:auto; margin-bottom:10px;"></div>
+        `;
+        renderWithdrawalRequests();
+      } else if (type === 'transfer') {
+        title.innerText = 'Transfer to VaultPro';
+        fields.innerHTML = `
+          <input type="number" id="tx-amount" required placeholder="Amount to Transfer">
+          <p style="font-size:12px; color:var(--muted);">Transfer float funds back to your VaultPro account</p>
+        `;
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('action-modal').style.display = 'none';
+    }
+
+    function handleAction(e) {
+      e.preventDefault();
+      const pin = document.getElementById('auth-pin').value;
+      if (pin !== agentData.pin) {
+        alert("Incorrect Portal PIN!");
+        return;
+      }
+
+      const floats = JSON.parse(localStorage.getItem('daimara_agent_floats') || '{}');
+      let currentFloat = floats[agentData.agentNumber] || 0;
+
+      if (currentAction === 'deposit') {
+        const phone = document.getElementById('client-phone').value;
+        const amount = parseFloat(document.getElementById('tx-amount').value);
+
+        if (currentFloat < amount) { alert("Insufficient float balance!"); return; }
+
+        // Logic: Agent Float Decr, Client VaultPro Incr
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const client = users.find(u => u.phone === phone);
+        if (!client) { alert("Client phone number not registered!"); return; }
+
+        // Update Client VaultPro
+        const clientVault = JSON.parse(localStorage.getItem(`daimara_vault_${client.id}`) || '{"balance":0, "logs":[]}');
+        clientVault.balance += amount;
+        clientVault.logs.push({
+          timestamp: new Date().toISOString(),
+          type: 'credit',
+          details: `Deposit via Agent ${agentData.agentNumber}`,
+          amount: amount,
+          balance: clientVault.balance
+        });
+        localStorage.setItem(`daimara_vault_${client.id}`, JSON.stringify(clientVault));
+
+        // Update Agent Float
+        floats[agentData.agentNumber] -= amount;
+        localStorage.setItem('daimara_agent_floats', JSON.stringify(floats));
+        
+        recordAgentLog('debit', `Deposit to ${phone}`, amount, floats[agentData.agentNumber]);
+        alert("Deposit processed successfully!");
+
+      } else if (currentAction === 'transfer') {
+        const amount = parseFloat(document.getElementById('tx-amount').value);
+        if (currentFloat < amount) { alert("Insufficient float balance!"); return; }
+
+        // Logic: Agent Float Decr, Agent's own VaultPro Incr
+        const agentVault = JSON.parse(localStorage.getItem(`daimara_vault_${agentData.userId}`) || '{"balance":0, "logs":[]}');
+        agentVault.balance += amount;
+        agentVault.logs.push({
+          timestamp: new Date().toISOString(),
+          type: 'credit',
+          details: `Float Transfer from Agent Portal`,
+          amount: amount,
+          balance: agentVault.balance
+        });
+        localStorage.setItem(`daimara_vault_${agentData.userId}`, JSON.stringify(agentVault));
+
+        floats[agentData.agentNumber] -= amount;
+        localStorage.setItem('daimara_agent_floats', JSON.stringify(floats));
+
+        recordAgentLog('debit', `Transfer to VaultPro`, amount, floats[agentData.agentNumber]);
+        alert("Transfer completed!");
+      }
+
+      refreshBalance();
+      closeModal();
+    }
+
+    function renderWithdrawalRequests() {
+      // In a real system, we'd fetch pending withdrawals from a central queue
+      // For this demo, we'll look for 'pending_withdrawal' logs across all vault accounts
+      const container = document.getElementById('withdrawal-requests');
+      container.innerHTML = '<p style="text-align:center; padding:10px; color:var(--muted);">No pending requests found.</p>';
+      
+      // We can also let the agent manually input client details if no queue
+      container.innerHTML += `
+        <div style="margin-top:10px; border-top:1px solid var(--border); padding-top:10px;">
+          <input type="tel" id="withdraw-client-phone" placeholder="Enter Client Phone">
+          <input type="number" id="withdraw-amount" placeholder="Enter Requested Amount">
+          <button type="button" onclick="processManualWithdrawal()" style="width:100%; padding:8px; background:#334155; color:white; border:none; border-radius:4px; font-size:12px; cursor:pointer;">Process Manually</button>
+        </div>
+      `;
+    }
+
+    function processManualWithdrawal() {
+      const pin = document.getElementById('auth-pin').value;
+      if (pin !== agentData.pin) { alert("Incorrect Portal PIN!"); return; }
+
+      const phone = document.getElementById('withdraw-client-phone').value;
+      const amount = parseFloat(document.getElementById('withdraw-amount').value);
+      
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const client = users.find(u => u.phone === phone);
+      if (!client) { alert("Client not found!"); return; }
+
+      const clientVault = JSON.parse(localStorage.getItem(`daimara_vault_${client.id}`) || '{"balance":0, "logs":[]}');
+      if (clientVault.balance < amount) { alert("Client has insufficient funds in VaultPro!"); return; }
+
+      // Logic: Client VaultPro Decr, Agent Float Incr
+      clientVault.balance -= amount;
+      clientVault.logs.push({
+        timestamp: new Date().toISOString(),
+        type: 'debit',
+        details: `Withdrawal via Agent ${agentData.agentNumber}`,
+        amount: amount,
+        balance: clientVault.balance
+      });
+      localStorage.setItem(`daimara_vault_${client.id}`, JSON.stringify(clientVault));
+
+      const floats = JSON.parse(localStorage.getItem('daimara_agent_floats') || '{}');
+      floats[agentData.agentNumber] = (floats[agentData.agentNumber] || 0) + amount;
+      localStorage.setItem('daimara_agent_floats', JSON.stringify(floats));
+
+      recordAgentLog('credit', `Withdrawal from ${phone}`, amount, floats[agentData.agentNumber]);
+      alert("Withdrawal processed! You can now give the client cash.");
+      refreshBalance();
+      closeModal();
+    }
+
+    function recordAgentLog(type, details, amount, balance) {
+      const logs = JSON.parse(localStorage.getItem(`daimara_agent_logs_${agentData.agentNumber}`) || '[]');
+      logs.push({
+        timestamp: new Date().toISOString(),
+        type,
+        details,
+        amount,
+        balance
+      });
+      localStorage.setItem(`daimara_agent_logs_${agentData.agentNumber}`, JSON.stringify(logs));
+    }
+
+    function renderLogs() {
+      const logs = JSON.parse(localStorage.getItem(`daimara_agent_logs_${agentData.agentNumber}`) || '[]');
+      const list = document.getElementById('logs-list');
+      list.innerHTML = logs.map(l => `
+        <div class="log-item">
+          <div>
+            <div class="log-type">${l.details}</div>
+            <div style="font-size:11px; color:var(--muted);">${new Date(l.timestamp).toLocaleString()}</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="log-amount-${l.type === 'credit' ? 'credit' : 'debit'}">
+              ${l.type === 'credit' ? '+' : '-'} KSH ${l.amount.toLocaleString()}
+            </div>
+            <div style="font-size:11px; color:var(--muted);">Bal: KSH ${l.balance.toLocaleString()}</div>
+          </div>
+        </div>
+      `).reverse().join('') || '<p style="text-align:center; color:var(--muted);">No transactions yet.</p>';
+    }
+
+    init();
+  </script>
+</body>
+</html>

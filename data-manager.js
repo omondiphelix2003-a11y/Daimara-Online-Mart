@@ -29,7 +29,12 @@ const DataManager = (() => {
     USER_LOYALTY: 'ecommerce_user_loyalty',
     PHARMACIST_CHAT_REQUEST: 'medicore_pharmacist_chat_request',
     PHARMACIST_CHAT_RESPONSE: 'medicore_pharmacist_chat_response',
-    STORE_CATEGORIES: 'ecommerce_store_categories'
+    STORE_CATEGORIES: 'ecommerce_store_categories',
+    MPESA_TRANSACTIONS: 'ecommerce_mpesa_transactions',
+    VAULT_BALANCES: 'ecommerce_vault_balances',
+    AGENT_REGISTRATIONS: 'ecommerce_agent_registrations',
+    AGENT_FLOAT: 'ecommerce_agent_float',
+    VAULT_TRANSACTIONS: 'ecommerce_vault_transactions'
   };
 
   // Default Store Categories
@@ -119,6 +124,21 @@ const DataManager = (() => {
     if (!localStorage.getItem(STORAGE_KEYS.STORE_CATEGORIES)) {
       localStorage.setItem(STORAGE_KEYS.STORE_CATEGORIES, JSON.stringify(DEFAULT_CATEGORIES));
     }
+    if (!localStorage.getItem(STORAGE_KEYS.MPESA_TRANSACTIONS)) {
+      localStorage.setItem(STORAGE_KEYS.MPESA_TRANSACTIONS, JSON.stringify([]));
+    }
+    if (!localStorage.getItem(STORAGE_KEYS.VAULT_BALANCES)) {
+      localStorage.setItem(STORAGE_KEYS.VAULT_BALANCES, JSON.stringify({}));
+    }
+    if (!localStorage.getItem(STORAGE_KEYS.AGENT_REGISTRATIONS)) {
+      localStorage.setItem(STORAGE_KEYS.AGENT_REGISTRATIONS, JSON.stringify([]));
+    }
+    if (!localStorage.getItem(STORAGE_KEYS.AGENT_FLOAT)) {
+      localStorage.setItem(STORAGE_KEYS.AGENT_FLOAT, JSON.stringify({}));
+    }
+    if (!localStorage.getItem(STORAGE_KEYS.VAULT_TRANSACTIONS)) {
+      localStorage.setItem(STORAGE_KEYS.VAULT_TRANSACTIONS, JSON.stringify([]));
+    }
   }
 
   function getStoreCategories() {
@@ -168,6 +188,167 @@ const DataManager = (() => {
     return { success: false, message: 'Product not found' };
   }
 
+  function getMpesaTransactions() {
+    initializeStorage();
+    return JSON.parse(localStorage.getItem(STORAGE_KEYS.MPESA_TRANSACTIONS)) || [];
+  }
+
+  function addMpesaTransaction(code, date, time) {
+    const txs = getMpesaTransactions();
+    txs.push({ code: code.toUpperCase(), date, time, status: 'unused', createdAt: new Date().toISOString() });
+    localStorage.setItem(STORAGE_KEYS.MPESA_TRANSACTIONS, JSON.stringify(txs));
+    return { success: true };
+  }
+
+  function verifyMpesaTransaction(code) {
+    const txs = getMpesaTransactions();
+    const idx = txs.findIndex(t => t.code === code.toUpperCase() && t.status === 'unused');
+    if (idx !== -1) {
+      txs[idx].status = 'used';
+      txs[idx].usedAt = new Date().toISOString();
+      localStorage.setItem(STORAGE_KEYS.MPESA_TRANSACTIONS, JSON.stringify(txs));
+      return { success: true, transaction: txs[idx] };
+    }
+    return { success: false, message: 'Invalid or already used transaction code' };
+  }
+
+  function getVaultBalance(userId) {
+    initializeStorage();
+    const allUsers = getAllUsers();
+    const user = allUsers.find(u => u.id === userId);
+    
+    if (user) {
+      if (user.role === 'admin') {
+        // Admin vault is based on platform earnings
+        const earnings = getPermanentEarnings();
+        const vaultTransactions = JSON.parse(localStorage.getItem(STORAGE_KEYS.VAULT_TRANSACTIONS)) || [];
+        const adminSpecificTransactions = vaultTransactions.filter(t => t.userId === userId);
+        const transactionAdjustment = adminSpecificTransactions.reduce((sum, t) => sum + t.amount, 0);
+        return earnings + transactionAdjustment;
+      } else if (user.role === 'operator') {
+        return getOperatorRevenue(user.email);
+      } else if (user.role === 'delivery') {
+        return parseFloat(localStorage.getItem('delivery_earnings_' + user.id)) || 0;
+      }
+    }
+
+    const balances = JSON.parse(localStorage.getItem(STORAGE_KEYS.VAULT_BALANCES)) || {};
+    return balances[userId] || 0;
+  }
+
+  function updateVaultBalance(userId, amount, description = 'Transaction') {
+    initializeStorage();
+    const allUsers = getAllUsers();
+    const targetUser = allUsers.find(u => u.id === userId);
+    
+    let newBalance = 0;
+
+    if (targetUser) {
+      if (targetUser.role === 'admin') {
+        // Any transaction logic done by the admin affects the platform earnings
+        const current = getPermanentEarnings();
+        newBalance = current + amount;
+        localStorage.setItem(STORAGE_KEYS.PERMANENT_EARNINGS, newBalance.toString());
+      } else if (targetUser.role === 'operator') {
+        const current = getOperatorRevenue(targetUser.email);
+        newBalance = current + amount;
+        const allRev = JSON.parse(localStorage.getItem(STORAGE_KEYS.OPERATOR_REVENUE)) || {};
+        allRev[targetUser.email] = newBalance;
+        localStorage.setItem(STORAGE_KEYS.OPERATOR_REVENUE, JSON.stringify(allRev));
+      } else if (targetUser.role === 'delivery') {
+        const current = parseFloat(localStorage.getItem('delivery_earnings_' + targetUser.id)) || 0;
+        newBalance = current + amount;
+        localStorage.setItem('delivery_earnings_' + targetUser.id, newBalance.toString());
+      } else {
+        const balances = JSON.parse(localStorage.getItem(STORAGE_KEYS.VAULT_BALANCES)) || {};
+        const oldBalance = balances[userId] || 0;
+        newBalance = oldBalance + amount;
+        balances[userId] = newBalance;
+        localStorage.setItem(STORAGE_KEYS.VAULT_BALANCES, JSON.stringify(balances));
+      }
+    }
+    
+    // Log transaction
+    const txs = JSON.parse(localStorage.getItem(STORAGE_KEYS.VAULT_TRANSACTIONS)) || [];
+    txs.push({
+      userId,
+      amount,
+      type: amount >= 0 ? 'credit' : 'debit',
+      description,
+      balanceAfter: newBalance,
+      date: new Date().toISOString()
+    });
+    localStorage.setItem(STORAGE_KEYS.VAULT_TRANSACTIONS, JSON.stringify(txs));
+    
+    return { success: true, newBalance };
+  }
+
+  function getVaultTransactions(userId) {
+    const txs = JSON.parse(localStorage.getItem(STORAGE_KEYS.VAULT_TRANSACTIONS)) || [];
+    return txs.filter(t => t.userId === userId);
+  }
+
+  function registerAgent(details) {
+    const regs = JSON.parse(localStorage.getItem(STORAGE_KEYS.AGENT_REGISTRATIONS)) || [];
+    const id = 'AREG-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+    regs.push({ id, ...details, status: 'pending', createdAt: new Date().toISOString() });
+    localStorage.setItem(STORAGE_KEYS.AGENT_REGISTRATIONS, JSON.stringify(regs));
+    return { success: true, id };
+  }
+
+  function getAgentRegistrations() {
+    return JSON.parse(localStorage.getItem(STORAGE_KEYS.AGENT_REGISTRATIONS)) || [];
+  }
+
+  function approveAgent(registrationId, agentNumber) {
+    const regs = getAgentRegistrations();
+    const idx = regs.findIndex(r => r.id === registrationId);
+    if (idx !== -1) {
+      regs[idx].status = 'approved';
+      regs[idx].agentNumber = agentNumber;
+      localStorage.setItem(STORAGE_KEYS.AGENT_REGISTRATIONS, JSON.stringify(regs));
+      
+      // Initialize agent float
+      const floats = JSON.parse(localStorage.getItem(STORAGE_KEYS.AGENT_FLOAT)) || {};
+      floats[agentNumber] = 0;
+      localStorage.setItem(STORAGE_KEYS.AGENT_FLOAT, JSON.stringify(floats));
+      
+      return { success: true };
+    }
+    return { success: false, message: 'Registration not found' };
+  }
+
+  function getAgentByNumber(agentNumber) {
+    const regs = getAgentRegistrations();
+    return regs.find(r => r.agentNumber === agentNumber && r.status === 'approved');
+  }
+
+  function getAgentByUserId(userId) {
+    const regs = getAgentRegistrations();
+    return regs.find(r => r.userId === userId && r.status === 'approved');
+  }
+
+  function getAgentFloat(agentNumber) {
+    const floats = JSON.parse(localStorage.getItem(STORAGE_KEYS.AGENT_FLOAT)) || {};
+    return floats[agentNumber] || 0;
+  }
+
+  function updateAgentFloat(agentNumber, amount) {
+    const floats = JSON.parse(localStorage.getItem(STORAGE_KEYS.AGENT_FLOAT)) || {};
+    floats[agentNumber] = (floats[agentNumber] || 0) + amount;
+    localStorage.setItem(STORAGE_KEYS.AGENT_FLOAT, JSON.stringify(floats));
+    return { success: true, newFloat: floats[agentNumber] };
+  }
+
+  function transferFunds(fromUserId, toUserId, amount, description) {
+    const balance = getVaultBalance(fromUserId);
+    if (balance < amount) return { success: false, message: 'Insufficient funds' };
+    
+    updateVaultBalance(fromUserId, -amount, `Sent to user ${toUserId}: ${description}`);
+    updateVaultBalance(toUserId, amount, `Received from user ${fromUserId}: ${description}`);
+    return { success: true };
+  }
+
   function getUserLoyaltyPoints(userId) {
     const all = JSON.parse(localStorage.getItem(STORAGE_KEYS.USER_LOYALTY)) || {};
     return all[userId] || 0;
@@ -205,9 +386,16 @@ const DataManager = (() => {
   }
 
   function addOperatorRevenue(email, amount) {
-    const all = JSON.parse(localStorage.getItem(STORAGE_KEYS.OPERATOR_REVENUE)) || {};
-    all[email] = (all[email] || 0) + amount;
-    localStorage.setItem(STORAGE_KEYS.OPERATOR_REVENUE, JSON.stringify(all));
+    // This now just uses updateVaultBalance to keep things in sync
+    const user = getAllUsers().find(u => u.email === email);
+    if (user) {
+      updateVaultBalance(user.id, amount, 'Platform Revenue: Order commission');
+    } else {
+      // Fallback if user not found (unlikely)
+      const all = JSON.parse(localStorage.getItem(STORAGE_KEYS.OPERATOR_REVENUE)) || {};
+      all[email] = (all[email] || 0) + amount;
+      localStorage.setItem(STORAGE_KEYS.OPERATOR_REVENUE, JSON.stringify(all));
+    }
   }
 
   /**
@@ -556,6 +744,17 @@ const DataManager = (() => {
       return { success: false, message: 'Email already registered' };
     }
 
+    // Generate a unique system-provided phone number (Kenyan format)
+    let systemPhone;
+    let isUnique = false;
+    while (!isUnique) {
+      const randomDigits = Math.floor(Math.random() * 100000000).toString().padStart(8, '0');
+      systemPhone = '07' + randomDigits;
+      if (!users.find(u => u.phone === systemPhone)) {
+        isUnique = true;
+      }
+    }
+
     const newUser = {
       id: generateId(),
       name,
@@ -563,6 +762,7 @@ const DataManager = (() => {
       password, // In a real app, this should be hashed
       profileImage,
       role, // 'user', 'operator', 'delivery'
+      phone: systemPhone, // System-provided phone number, cannot be altered
       regDetails,
       registeredDate: new Date().toISOString(), // Consistent with admin-manager.html
       createdAt: new Date().toISOString()
@@ -584,20 +784,9 @@ const DataManager = (() => {
   function addPageRegistration(regData) {
     const regs = JSON.parse(localStorage.getItem(STORAGE_KEYS.PAGE_REGISTRATIONS)) || [];
     
-    // To avoid localStorage quota exceeded errors with large images, we strip
-    // out image base64 data before storing. We preserve all other metadata.
-    const regDataCopy = { ...regData };
-    if (regDataCopy.details) {
-      regDataCopy.details = { ...regDataCopy.details };
-      // remove large base64 image fields
-      delete regDataCopy.details.idPhotos;
-      delete regDataCopy.details.vehiclePhotos;
-      delete regDataCopy.details.profileImage;
-    }
-
     const newReg = {
       id: generateId(),
-      ...regDataCopy,
+      ...regData,
       status: 'pending',
       date: new Date().toISOString()
     };
@@ -608,21 +797,27 @@ const DataManager = (() => {
     } catch (e) {
       console.error('DataManager.addPageRegistration error:', e);
       if (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
-        // try again without details to see if that helps
+        // Fallback: try again without large base64 image fields if storage is full
+        const regDataCopy = { ...regData };
+        if (regDataCopy.details) {
+          regDataCopy.details = { ...regDataCopy.details };
+          delete regDataCopy.details.idPhotos;
+          delete regDataCopy.details.vehiclePhotos;
+          delete regDataCopy.details.profileImage;
+        }
         const minimalReg = {
           id: generateId(),
-          type: regData.type,
-          email: regData.email,
+          ...regDataCopy,
           status: 'pending',
           date: new Date().toISOString(),
-          details: { name: regData.details?.fullname || regData.details?.name || 'N/A' }
+          warning: 'Images removed due to storage constraints'
         };
         try {
           regs[regs.length - 1] = minimalReg;
           localStorage.setItem(STORAGE_KEYS.PAGE_REGISTRATIONS, JSON.stringify(regs));
           return { success: true, registration: minimalReg, warning: 'Registration saved with minimal data due to storage constraints.' };
         } catch (e2) {
-          return { success: false, message: 'Storage quota exceeded. Unable to save registration. Please clear browser cache and try again.' };
+          return { success: false, message: 'Storage quota exceeded. Unable to save registration.' };
         }
       }
       return { success: false, message: 'Registration failed to save: ' + e.message };
@@ -1749,7 +1944,21 @@ const DataManager = (() => {
     addUserLoyaltyPoints,
     getStoreCategories,
     saveStoreCategories,
-    updateProductRating
+    updateProductRating,
+    getMpesaTransactions,
+    addMpesaTransaction,
+    verifyMpesaTransaction,
+    getVaultBalance,
+    updateVaultBalance,
+    getVaultTransactions,
+    registerAgent,
+    getAgentRegistrations,
+    approveAgent,
+    getAgentByNumber,
+    getAgentByUserId,
+    getAgentFloat,
+    updateAgentFloat,
+    transferFunds
   };
 })();
 

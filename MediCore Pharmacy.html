@@ -101,6 +101,36 @@
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
         }
 
+        /* BOTTOM NAV */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #000;
+            height: 60px;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 2000;
+            border-top: 2px solid #3b82f6;
+        }
+
+        @media (max-width: 768px) {
+            body { padding-bottom: 70px; }
+            .bottom-nav { display: flex; }
+            .bottom-nav a {
+                color: white;
+                text-decoration: none;
+                font-size: 20px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            .bottom-nav a.active { color: #3b82f6; }
+            .bottom-nav a span { font-size: 10px; margin-top: 4px; }
+        }
+
         /* PRODUCT DETAILS MODAL */
         .product-modal {
             display: none;
@@ -119,10 +149,11 @@
         .product-modal.show { display: block; }
         .modal-container {
             max-width: 1000px;
-            margin: 40px auto;
-            background: rgba(15, 23, 42, 0.171);
-            border-radius: 4px;
-            overflow: hidden;
+            margin: 20px auto;
+            background: #1e293b;
+            border-radius: 12px;
+            overflow-y: auto;
+            max-height: 90vh;
             display: grid;
             grid-template-columns: 1fr 1fr;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
@@ -162,10 +193,14 @@
         .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
 
         @media (max-width: 768px) {
-            .modal-container { grid-template-columns: 1fr; margin: 0; border-radius: 0; }
+            .modal-container { grid-template-columns: 1fr; margin: 0; border-radius: 0; overflow-y: auto; }
             .modal-info { padding: 25px; }
             .related-products { grid-column: span 1; }
         }
+
+        .shelf-number {
+            position: absolute;
+            top: -10px;
             left: 50%;
             transform: translateX(-50%);
             background: linear-gradient(135deg, #3b82f6, #1d4ed8);
@@ -788,6 +823,19 @@
     </div>
 
     <script src="data-manager.js"></script>
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <a href="index.html"><i class="fa fa-home"></i><span>Home</span></a>
+        <a href="about.html"><i class="fas fa-info-circle"></i><span>About</span></a>
+        <a href="contact.html"><i class="fas fa-phone"></i><span>Contact</span></a>
+        <a href="javascript:void(0)" onclick="toggleCart()" style="position:relative;">
+            <i class="fa fa-shopping-cart"></i>
+            <span class="bg-red-500 text-white text-[10px] rounded-full px-1.5 py-0.5 absolute -top-1 -right-2 opacity-0" id="bottomCartBadge">0</span>
+            <span>Cart</span>
+        </a>
+        <a href="profile.html"><i class="fa fa-user"></i><span>Profile</span></a>
+    </div>
+
     <script>
         function toggleNav() {
             const nav = document.getElementById('pharmacyNav');
@@ -1556,9 +1604,17 @@
 
         function updateCartUI() {
             const count = document.getElementById('cartCount');
+            const bottomCount = document.getElementById('bottomCartBadge');
             const totalItems = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
-            count.innerText = totalItems;
-            count.classList.toggle('opacity-0', totalItems === 0);
+            
+            if (count) {
+                count.innerText = totalItems;
+                count.classList.toggle('opacity-0', totalItems === 0);
+            }
+            if (bottomCount) {
+                bottomCount.innerText = totalItems;
+                bottomCount.classList.toggle('opacity-0', totalItems === 0);
+            }
             
             const container = document.getElementById('cartItems');
             if (cart.length === 0) {

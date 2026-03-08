@@ -431,6 +431,24 @@
 
     <!-- Main Content -->
     <main class="flex-1 overflow-auto flex flex-col bg-slate-950">
+        <!-- AGENT PORTAL REGISTRATION BANNER -->
+        <div id="agent-banner" class="p-6 bg-gradient-to-r from-blue-900/40 to-slate-900 border-b border-blue-500/20">
+            <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-6">
+                <div class="flex items-center gap-5">
+                    <div class="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+                        <i class="fas fa-store-alt text-2xl text-white"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-white tracking-tight">Expand to Agent Network</h2>
+                        <p class="text-slate-400 text-sm">Become a certified Daimara Agent to process deposits and withdrawals.</p>
+                    </div>
+                </div>
+                <button onclick="openAgentRegistration()" class="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold transition-all shadow-lg hover:scale-105 active:scale-95 flex items-center gap-2">
+                    <i class="fas fa-id-card"></i>
+                    <span>Register as Agent</span>
+                </button>
+            </div>
+        </div>
         <!-- Top Bar -->
         <header class="h-16 bg-slate-900/50 border-b border-slate-800 flex items-center justify-between px-6 backdrop-blur-sm">
             <div class="flex items-center gap-4">
@@ -1579,13 +1597,19 @@
 
         function showSection(section) {
             // Hide all sections
-            document.querySelectorAll('main > div > section').forEach(s => s.classList.add('hidden'));
+            document.querySelectorAll('#contentArea > section').forEach(s => s.classList.add('hidden'));
             // Show selected
-            document.getElementById(section).classList.remove('hidden');
+            const target = document.getElementById(section);
+            if (target) {
+                target.classList.remove('hidden');
+                // Scroll content area to top
+                document.getElementById('contentArea').scrollTop = 0;
+            }
             
             // Update sidebar
             document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
-            event.target.closest('.sidebar-link').classList.add('active');
+            const activeLink = Array.from(document.querySelectorAll('.sidebar-link')).find(l => l.getAttribute('onclick')?.includes(section));
+            if (activeLink) activeLink.classList.add('active');
             
             // Update title
             const titles = {
@@ -1597,9 +1621,10 @@
                 slideshow: 'Slideshow Content',
                 pharmacists: 'Pharmacist Management',
                 branding: 'Brand Configuration',
-                warehouse: 'Warehouse Overview'
+                warehouse: 'Warehouse Overview',
+                profits: 'Financial Reports'
             };
-            document.getElementById('pageTitle').textContent = titles[section];
+            document.getElementById('pageTitle').textContent = titles[section] || 'Dashboard';
             currentSection = section;
             
             // Refresh data for section
@@ -3024,6 +3049,136 @@
                 document.querySelectorAll('[id$="Modal"]').forEach(m => m.classList.add('hidden'));
             }
         });
+    </script>
+    <!-- AGENT REGISTRATION MODAL -->
+    <div id="agentModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[4000] hidden items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl animate-enter">
+            <div class="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+                        <i class="fas fa-id-card text-white"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-white">Agent Portal Registration</h3>
+                        <p class="text-slate-500 text-xs">Register your business as a Daimara Agent</p>
+                    </div>
+                </div>
+                <button onclick="closeAgentRegistration()" class="w-10 h-10 rounded-xl hover:bg-slate-800 flex items-center justify-center text-slate-400 transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form id="agentRegForm" onsubmit="handleAgentRegistration(event)" class="p-8 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold text-slate-400">ID Number</label>
+                        <input type="text" id="agent-id-num" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white focus:border-blue-500 transition-all outline-none" placeholder="National ID Number">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold text-slate-400">Registered Business Name</label>
+                        <input type="text" id="agent-biz-name" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white focus:border-blue-500 transition-all outline-none" placeholder="Business Name">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold text-slate-400">Phone Number (M-PESA)</label>
+                        <input type="tel" id="agent-phone" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white focus:border-blue-500 transition-all outline-none" placeholder="07XXXXXXXX">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold text-slate-400">Agent Portal Password</label>
+                        <input type="password" id="agent-pass" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white focus:border-blue-500 transition-all outline-none" placeholder="Create Access PIN/Pass">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold text-slate-400">ID Front Photo</label>
+                        <div class="relative h-32 rounded-2xl border-2 border-dashed border-slate-700 bg-slate-800/50 flex flex-col items-center justify-center hover:border-blue-500 transition-all cursor-pointer group">
+                            <input type="file" id="id-front" accept="image/*" required class="absolute inset-0 opacity-0 cursor-pointer">
+                            <i class="fas fa-camera text-2xl text-slate-600 group-hover:text-blue-500 mb-2"></i>
+                            <span id="front-label" class="text-xs text-slate-500">Upload Front</span>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold text-slate-400">ID Back Photo</label>
+                        <div class="relative h-32 rounded-2xl border-2 border-dashed border-slate-700 bg-slate-800/50 flex flex-col items-center justify-center hover:border-blue-500 transition-all cursor-pointer group">
+                            <input type="file" id="id-back" accept="image/*" required class="absolute inset-0 opacity-0 cursor-pointer">
+                            <i class="fas fa-camera text-2xl text-slate-600 group-hover:text-blue-500 mb-2"></i>
+                            <span id="back-label" class="text-xs text-slate-500">Upload Back</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" id="agentSubmitBtn" class="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-bold transition-all shadow-xl shadow-blue-500/10 hover:scale-[1.02] active:scale-[0.98]">
+                    Confirm Registration Details
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- SUCCESS MODAL -->
+    <div id="agentSuccessModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[5000] hidden items-center justify-center p-4">
+        <div class="bg-slate-900 border border-emerald-500/30 w-full max-w-md rounded-3xl p-8 text-center shadow-2xl animate-enter">
+            <div class="w-24 h-24 bg-emerald-500/20 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl shadow-lg shadow-emerald-500/20">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-white mb-2">Application Submitted!</h3>
+            <p class="text-slate-400 mb-8 leading-relaxed">Your details have been sent to Daimara Admin for review. You will receive your Agent Number upon approval.</p>
+            <button onclick="location.reload()" class="w-full py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl font-bold transition-all shadow-lg shadow-emerald-500/20">
+                Return to Dashboard
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function openAgentRegistration() {
+            document.getElementById('agentModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAgentRegistration() {
+            document.getElementById('agentModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // File previews
+        document.getElementById('id-front').addEventListener('change', function(e) {
+            if(e.target.files[0]) document.getElementById('front-label').innerText = e.target.files[0].name;
+        });
+        document.getElementById('id-back').addEventListener('change', function(e) {
+            if(e.target.files[0]) document.getElementById('back-label').innerText = e.target.files[0].name;
+        });
+
+        async function handleAgentRegistration(e) {
+            e.preventDefault();
+            const btn = document.getElementById('agentSubmitBtn');
+            const user = DataManager.getCurrentUser();
+            
+            if(!user) return alert("Please login first");
+
+            const details = {
+                userId: user.id,
+                idNumber: document.getElementById('agent-id-num').value,
+                businessName: document.getElementById('agent-biz-name').value,
+                phone: document.getElementById('agent-phone').value,
+                password: document.getElementById('agent-pass').value,
+                // In a real app we'd convert files to base64, but here we just note they were provided
+                idPhotos: 'Photos Provided'
+            };
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Submitting...';
+
+            setTimeout(() => {
+                const res = DataManager.registerAgent(details);
+                if (res.success) {
+                    document.getElementById('agentModal').style.display = 'none';
+                    document.getElementById('agentSuccessModal').style.display = 'flex';
+                } else {
+                    alert("Registration failed: " + res.message);
+                    btn.disabled = false;
+                    btn.innerHTML = 'Confirm Registration Details';
+                }
+            }, 1500);
+        }
     </script>
 </body>
 </html>
