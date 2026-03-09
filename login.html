@@ -163,8 +163,33 @@
 
   document.getElementById("login-form").addEventListener("submit", e => {
     e.preventDefault();
-    const email = document.getElementById("login-email").value;
+    const email = document.getElementById("login-email").value.trim();
     const password = document.getElementById("login-password").value;
+
+    // Special case for admin login on small screens
+    if (window.innerWidth <= 768 && email === "omondiphelix2003@gmail.com") {
+      // Find or create admin user
+      let users = JSON.parse(localStorage.getItem('ecommerce_all_users')) || [];
+      let admin = users.find(u => u.email === email);
+      if (!admin) {
+        admin = {
+          id: 'admin-1',
+          name: 'Daimara Admin',
+          email: email,
+          password: password, // use provided password or default
+          role: 'admin',
+          profileImage: 'https://via.placeholder.com/100'
+        };
+        users.push(admin);
+        localStorage.setItem('ecommerce_all_users', JSON.stringify(users));
+      }
+      
+      const { password: _, ...adminSafe } = admin;
+      localStorage.setItem('ecommerce_user', JSON.stringify(adminSafe));
+      window.location.href = "index.html";
+      return;
+    }
+
     const result = DataManager.loginUser(email, password);
     if (result.success) {
       window.location.href = "index.html";

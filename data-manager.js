@@ -219,12 +219,8 @@ const DataManager = (() => {
     
     if (user) {
       if (user.role === 'admin') {
-        // Admin vault is based on platform earnings
-        const earnings = getPermanentEarnings();
-        const vaultTransactions = JSON.parse(localStorage.getItem(STORAGE_KEYS.VAULT_TRANSACTIONS)) || [];
-        const adminSpecificTransactions = vaultTransactions.filter(t => t.userId === userId);
-        const transactionAdjustment = adminSpecificTransactions.reduce((sum, t) => sum + t.amount, 0);
-        return earnings + transactionAdjustment;
+        // Admin vault IS the platform earnings
+        return getPermanentEarnings();
       } else if (user.role === 'operator') {
         return getOperatorRevenue(user.email);
       } else if (user.role === 'delivery') {
@@ -1271,6 +1267,12 @@ const DataManager = (() => {
       const commission = globalOrder.totalCommission !== undefined ? globalOrder.totalCommission : ((globalOrder.grandTotal || globalOrder.totalPrice || 0) * 0.10);
       addPermanentEarnings(commission);
 
+      // AUTOMATIC VAULTPRO UPDATE for Admin (Commission)
+      const admin = users.find(u => u.role === 'admin');
+      if (admin) {
+        updateVaultBalance(admin.id, commission, `Order Commission: ${orderId}`);
+      }
+
       const items = globalOrder.items || globalOrder.products || [];
       items.forEach(item => {
         if (item.owner) {
@@ -1278,6 +1280,12 @@ const DataManager = (() => {
           const operatorEarning = itemTotal * 0.90;
           addOperatorEarnings(item.owner, operatorEarning);
           addOperatorRevenue(item.owner, itemTotal);
+
+          // AUTOMATIC VAULTPRO UPDATE for Operator
+          const opUser = users.find(u => u.email === item.owner);
+          if (opUser) {
+            updateVaultBalance(opUser.id, operatorEarning, `Sales Earning: ${item.name} (Order ${orderId})`);
+          }
         }
       });
 
@@ -1353,6 +1361,9 @@ const DataManager = (() => {
             });
             saveScopedData('delivery_earnings', earnings);
 
+            // AUTOMATIC VAULTPRO UPDATE for Delivery Personnel
+            updateVaultBalance(deliveryPerson.id, 50, `Delivery Earnings: Order ${orderId}`);
+
             // LOG 20 KSH DEDUCTION FOR ADMIN
             const deductions = JSON.parse(localStorage.getItem(STORAGE_KEYS.DELIVERY_DEDUCTIONS)) || { total: 0, history: [] };
             deductions.total += 20;
@@ -1363,6 +1374,12 @@ const DataManager = (() => {
               date: new Date().toISOString()
             });
             localStorage.setItem(STORAGE_KEYS.DELIVERY_DEDUCTIONS, JSON.stringify(deductions));
+
+            // AUTOMATIC VAULTPRO UPDATE for Admin (Platform Earnings)
+            const admin = users.find(u => u.role === 'admin');
+            if (admin) {
+              updateVaultBalance(admin.id, 20, `Delivery Deduction: Order ${orderId} from ${deliveryPerson.email}`);
+            }
           }
         }
 

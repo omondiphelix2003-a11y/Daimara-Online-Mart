@@ -2095,6 +2095,8 @@ async function validateAndProceed() {
         dob, 
         district, 
         idnumber,
+        idFront: frontBase64,
+        idBack: backBase64,
         idPhotos: { front: frontBase64, back: backBase64 }
       };
       
@@ -2179,6 +2181,9 @@ async function submitRegistration(type) {
       
       details = { 
         means, email, locality: { state, city, street, address }, regnumber, krapin, serviceType, plate,
+        vehicleFront: fBase64,
+        vehicleSide: sBase64,
+        vehicleBack: bBase64,
         vehiclePhotos: { front: fBase64, side: sBase64, back: bBase64 }
       };
     }

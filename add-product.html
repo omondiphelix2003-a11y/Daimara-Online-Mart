@@ -313,25 +313,35 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            animation: fadeIn 0.3s;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            background-color: rgba(0, 0, 0, 0.7);
+            overflow-y: auto;
+            padding: 20px;
+            align-items: center;
+            justify-content: center;
         }
 
         .modal-content {
-            background: white;
-            margin: 5% auto;
+            background: #1e293b;
+            margin: auto;
             padding: 30px;
             border-radius: 8px;
-            width: 90%;
-            max-width: 500px;
-            max-height: 85vh;
+            width: 95%;
+            max-width: 800px;
+            max-height: 90vh;
             overflow-y: auto;
-            animation: slideIn 0.3s;
+            color: #e2e8f0;
+            border: 1px solid #334155;
+            position: relative;
+        }
+
+        .modal-content label {
+            color: #e2e8f0;
+        }
+
+        .modal-content input, .modal-content select, .modal-content textarea {
+            background: #0f172a;
+            color: #e2e8f0;
+            border-color: #334155;
         }
 
         @keyframes slideIn {
@@ -347,7 +357,7 @@
         }
 
         .modal-header h2 {
-            color: #333;
+            color: #e2e8f0;
             margin: 0;
         }
 
@@ -1039,7 +1049,7 @@
                 document.getElementById('editImagePreview').src = product.image;
             }
 
-            document.getElementById('editModal').style.display = 'block';
+            document.getElementById('editModal').style.display = 'flex';
         }
 
         // Close Edit Modal
