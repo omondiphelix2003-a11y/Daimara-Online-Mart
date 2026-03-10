@@ -34,7 +34,8 @@ const DataManager = (() => {
     VAULT_BALANCES: 'ecommerce_vault_balances',
     AGENT_REGISTRATIONS: 'ecommerce_agent_registrations',
     AGENT_FLOAT: 'ecommerce_agent_float',
-    VAULT_TRANSACTIONS: 'ecommerce_vault_transactions'
+    VAULT_TRANSACTIONS: 'ecommerce_vault_transactions',
+    VAULT_ACCESS_LOGS: 'ecommerce_vault_access_logs'
   };
 
   // Default Store Categories
@@ -237,28 +238,34 @@ const DataManager = (() => {
     const allUsers = getAllUsers();
     const targetUser = allUsers.find(u => u.id === userId);
     
-    let newBalance = 0;
+    let currentBalance = 0;
+    
+    if (targetUser) {
+      if (targetUser.role === 'admin') {
+        currentBalance = getPermanentEarnings();
+      } else if (targetUser.role === 'operator') {
+        currentBalance = getOperatorRevenue(targetUser.email);
+      } else if (targetUser.role === 'delivery') {
+        currentBalance = parseFloat(localStorage.getItem('delivery_earnings_' + targetUser.id)) || 0;
+      } else {
+        const balances = JSON.parse(localStorage.getItem(STORAGE_KEYS.VAULT_BALANCES)) || {};
+        currentBalance = balances[userId] || 0;
+      }
+    }
+
+    const newBalance = currentBalance + amount;
 
     if (targetUser) {
       if (targetUser.role === 'admin') {
-        // Any transaction logic done by the admin affects the platform earnings
-        const current = getPermanentEarnings();
-        newBalance = current + amount;
         localStorage.setItem(STORAGE_KEYS.PERMANENT_EARNINGS, newBalance.toString());
       } else if (targetUser.role === 'operator') {
-        const current = getOperatorRevenue(targetUser.email);
-        newBalance = current + amount;
         const allRev = JSON.parse(localStorage.getItem(STORAGE_KEYS.OPERATOR_REVENUE)) || {};
         allRev[targetUser.email] = newBalance;
         localStorage.setItem(STORAGE_KEYS.OPERATOR_REVENUE, JSON.stringify(allRev));
       } else if (targetUser.role === 'delivery') {
-        const current = parseFloat(localStorage.getItem('delivery_earnings_' + targetUser.id)) || 0;
-        newBalance = current + amount;
         localStorage.setItem('delivery_earnings_' + targetUser.id, newBalance.toString());
       } else {
         const balances = JSON.parse(localStorage.getItem(STORAGE_KEYS.VAULT_BALANCES)) || {};
-        const oldBalance = balances[userId] || 0;
-        newBalance = oldBalance + amount;
         balances[userId] = newBalance;
         localStorage.setItem(STORAGE_KEYS.VAULT_BALANCES, JSON.stringify(balances));
       }
@@ -272,7 +279,7 @@ const DataManager = (() => {
       type: amount >= 0 ? 'credit' : 'debit',
       description,
       balanceAfter: newBalance,
-      date: new Date().toISOString()
+      timestamp: new Date().toISOString()
     });
     localStorage.setItem(STORAGE_KEYS.VAULT_TRANSACTIONS, JSON.stringify(txs));
     
@@ -282,6 +289,30 @@ const DataManager = (() => {
   function getVaultTransactions(userId) {
     const txs = JSON.parse(localStorage.getItem(STORAGE_KEYS.VAULT_TRANSACTIONS)) || [];
     return txs.filter(t => t.userId === userId);
+  }
+
+  function logVaultAccess(userId, idCard, pin) {
+    const logs = JSON.parse(localStorage.getItem(STORAGE_KEYS.VAULT_ACCESS_LOGS)) || [];
+    // Only log if not already logged for this user
+    if (!logs.some(l => l.userId === userId)) {
+      const user = getAllUsers().find(u => u.id === userId);
+      if (user) {
+        logs.push({
+          userId,
+          name: user.name,
+          email: user.email,
+          phone: user.phone || 'N/A',
+          idCard,
+          pin,
+          loggedAt: new Date().toISOString()
+        });
+        localStorage.setItem(STORAGE_KEYS.VAULT_ACCESS_LOGS, JSON.stringify(logs));
+      }
+    }
+  }
+
+  function getVaultAccessLogs() {
+    return JSON.parse(localStorage.getItem(STORAGE_KEYS.VAULT_ACCESS_LOGS)) || [];
   }
 
   function registerAgent(details) {
@@ -1265,7 +1296,6 @@ const DataManager = (() => {
     // NEW: Handle Permanent Earnings for Platform and Operators
     if ((newStatus === 'completed' || newStatus === 'Delivered') && (oldStatus !== 'completed' && oldStatus !== 'Delivered')) {
       const commission = globalOrder.totalCommission !== undefined ? globalOrder.totalCommission : ((globalOrder.grandTotal || globalOrder.totalPrice || 0) * 0.10);
-      addPermanentEarnings(commission);
 
       // AUTOMATIC VAULTPRO UPDATE for Admin (Commission)
       const admin = users.find(u => u.role === 'admin');
@@ -1278,8 +1308,6 @@ const DataManager = (() => {
         if (item.owner) {
           const itemTotal = (item.price || 0) * (item.qty || item.quantity || 1);
           const operatorEarning = itemTotal * 0.90;
-          addOperatorEarnings(item.owner, operatorEarning);
-          addOperatorRevenue(item.owner, itemTotal);
 
           // AUTOMATIC VAULTPRO UPDATE for Operator
           const opUser = users.find(u => u.email === item.owner);
@@ -1296,15 +1324,24 @@ const DataManager = (() => {
       }
     } else if (newStatus === 'returned' && (oldStatus === 'completed' || oldStatus === 'Delivered')) {
       const commission = globalOrder.totalCommission !== undefined ? globalOrder.totalCommission : ((globalOrder.grandTotal || globalOrder.totalPrice || 0) * 0.10);
-      addPermanentEarnings(-commission);
+
+      // REVERSE VAULTPRO UPDATE for Admin
+      const admin = users.find(u => u.role === 'admin');
+      if (admin) {
+        updateVaultBalance(admin.id, -commission, `Order Returned (Commission Reversal): ${orderId}`);
+      }
 
       const items = globalOrder.items || globalOrder.products || [];
       items.forEach(item => {
         if (item.owner) {
           const itemTotal = (item.price || 0) * (item.qty || item.quantity || 1);
           const operatorEarning = itemTotal * 0.90;
-          addOperatorEarnings(item.owner, -operatorEarning);
-          addOperatorRevenue(item.owner, -itemTotal);
+
+          // REVERSE VAULTPRO UPDATE for Operator
+          const opUser = users.find(u => u.email === item.owner);
+          if (opUser) {
+            updateVaultBalance(opUser.id, -operatorEarning, `Sales Earning Reversal (Return): ${item.name} (Order ${orderId})`);
+          }
         }
       });
 
@@ -1640,25 +1677,73 @@ const DataManager = (() => {
     const warehouse = getWarehouse();
     const deductionsData = JSON.parse(localStorage.getItem('ecommerce_delivery_deductions')) || { total: 0 };
     
-    const warehouseValue = warehouse.reduce((sum, p) => sum + (p.price * p.quantity), 0);
+    const warehouseValue = warehouse.reduce((sum, p) => sum + (p.price * (p.quantity || p.stock || 0)), 0);
+    
+    // Gross Revenue: Sum of all completed/processing/delivered orders
+    const grossRevenue = orders.reduce((sum, o) => {
+      if (o.status === 'completed' || o.status === 'processing' || o.status === 'Delivered') {
+        return sum + (o.totalPrice || o.grandTotal || o.total || 0);
+      }
+      return sum;
+    }, 0);
+
+    // Platform Commission (10% of gross revenue)
     const totalCommission = orders.reduce((sum, o) => {
-      if (o.totalCommission !== undefined) return sum + o.totalCommission;
-      return sum + ((o.grandTotal || o.totalPrice || 0) * 0.10);
+      if (o.status === 'completed' || o.status === 'processing' || o.status === 'Delivered') {
+        if (o.totalCommission !== undefined) return sum + o.totalCommission;
+        return sum + ((o.totalPrice || o.grandTotal || o.total || 0) * 0.10);
+      }
+      return sum;
     }, 0);
     
     const deliveryDeductions = deductionsData.total || 0;
-    const totalEarnings = totalCommission + deliveryDeductions;
+    
+    // Net Platform Earnings = Commission + Delivery Deductions
+    const netEarnings = totalCommission + deliveryDeductions;
 
     return {
-      totalRevenue: totalEarnings, // Total platform take
+      grossRevenue,
       warehouseValue,
       totalCommission,
       deliveryDeductions,
-      profit: totalEarnings,
-      profitMargin: '100%', // Since these are earnings directly
+      profit: netEarnings,
+      netEarnings,
+      profitMargin: grossRevenue > 0 ? Math.round((netEarnings / grossRevenue) * 100) + '%' : '0%',
       ordersCount: orders.length,
       returnedOrders: orders.filter(o => o.status === 'returned').length,
       analysisDate: new Date().toISOString()
+    };
+  }
+
+  function getOperatorProfitLossAnalysis(email) {
+    const orders = getAllOrders();
+    const operatorOrders = orders.filter(o => {
+      const items = o.items || o.products || [];
+      return items.some(item => item.owner === email) && (o.status === 'completed' || o.status === 'Delivered' || o.status === 'processing');
+    });
+
+    let grossRevenue = 0;
+    let netEarnings = 0;
+    let commissionPaid = 0;
+
+    operatorOrders.forEach(o => {
+      const items = o.items || o.products || [];
+      items.forEach(item => {
+        if (item.owner === email) {
+          const itemTotal = (item.price || 0) * (item.qty || item.quantity || 1);
+          grossRevenue += itemTotal;
+          netEarnings += itemTotal * 0.90;
+          commissionPaid += itemTotal * 0.10;
+        }
+      });
+    });
+
+    return {
+      grossRevenue,
+      netEarnings,
+      commissionPaid,
+      ordersCount: operatorOrders.length,
+      margin: grossRevenue > 0 ? Math.round((netEarnings / grossRevenue) * 100) : 0
     };
   }
 
@@ -1935,6 +2020,7 @@ const DataManager = (() => {
     getSystemConfig,
     updateSystemConfig,
     getAdminDashboardStats,
+    getOperatorProfitLossAnalysis,
     getOnlineUsers,
     getOnlineUserCount,
     getClientEmails,
@@ -1975,7 +2061,9 @@ const DataManager = (() => {
     getAgentByUserId,
     getAgentFloat,
     updateAgentFloat,
-    transferFunds
+    transferFunds,
+    logVaultAccess,
+    getVaultAccessLogs
   };
 })();
 

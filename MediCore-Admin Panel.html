@@ -394,6 +394,9 @@
             <a href="#warehouse" class="sidebar-link flex items-center gap-3 px-4 py-3 text-sm text-slate-300" onclick="showSection('warehouse')">
                 <i class="fa-solid fa-warehouse w-5"></i> Warehouse View
             </a>
+            <a href="#vaultLogs" class="sidebar-link flex items-center gap-3 px-4 py-3 text-sm text-slate-300" onclick="showSection('vaultLogs')">
+                <i class="fa-solid fa-shield-halved w-5"></i> Vault Access Logs
+            </a>
         </nav>
         
         <div class="p-4 border-t border-slate-800">
@@ -837,10 +840,14 @@
                             </div>
                             <div class="pl-item">
                                 <span class="pl-label">System Commission (10%)</span>
-                                <span class="pl-value pl-negative" id="pl-costs">-KSh 0</span>
+                                <span class="pl-value pl-positive" id="pl-costs">KSh 0</span>
+                            </div>
+                            <div class="pl-item">
+                                <span class="pl-label">Delivery Service Deductions</span>
+                                <span class="pl-value pl-positive" id="pl-delivery-deductions">KSh 0</span>
                             </div>
                             <div class="pl-item border-t border-slate-700 mt-4 pt-4">
-                                <span class="pl-label text-lg">Net Earnings</span>
+                                <span class="pl-label text-lg">Net Platform Earnings</span>
                                 <span class="pl-value pl-positive text-xl" id="pl-profit">KSh 0</span>
                             </div>
                         </div>
@@ -860,6 +867,39 @@
                 <div class="admin-card rounded-xl p-6">
                     <h4 class="text-lg font-bold text-white mb-4">Earnings History</h4>
                     <canvas id="earningsChart" height="100"></canvas>
+                </div>
+            </section>
+
+            <!-- Vault Access Logs Section -->
+            <section id="vaultLogs" class="hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-lg font-bold text-white">Vault Access Logs (Credentials)</h3>
+                    <div class="flex gap-2">
+                        <button onclick="renderVaultLogs()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-rotate"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="admin-card rounded-xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-800 border-b border-slate-700">
+                                <tr>
+                                    <th class="px-6 py-4 text-sm font-semibold text-slate-400">Date/Time</th>
+                                    <th class="px-6 py-4 text-sm font-semibold text-slate-400">User ID</th>
+                                    <th class="px-6 py-4 text-sm font-semibold text-slate-400">User Name</th>
+                                    <th class="px-6 py-4 text-sm font-semibold text-slate-400">Email</th>
+                                    <th class="px-6 py-4 text-sm font-semibold text-slate-400">Phone</th>
+                                    <th class="px-6 py-4 text-sm font-semibold text-slate-400">Vault ID Number</th>
+                                    <th class="px-6 py-4 text-sm font-semibold text-slate-400">Vault PIN</th>
+                                </tr>
+                            </thead>
+                            <tbody id="vaultLogsTable" class="divide-y divide-slate-700">
+                                <!-- Logs populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
         </div>
@@ -1260,9 +1300,11 @@
                 slideshow: 'Slideshow Content',
                 pharmacists: 'Pharmacist Management',
                 branding: 'Brand Configuration',
-                warehouse: 'Warehouse Overview'
+                warehouse: 'Warehouse Overview',
+                vaultLogs: 'Vault Access Logs',
+                profits: 'Financial Analysis'
             };
-            document.getElementById('pageTitle').textContent = titles[section];
+            document.getElementById('pageTitle').textContent = titles[section] || 'Dashboard';
             currentSection = section;
             
             // Refresh data for section
@@ -1274,18 +1316,22 @@
             if (section === 'pharmacists') renderPharmacists();
             if (section === 'warehouse') renderWarehouse();
             if (section === 'profits') renderProfits();
+            if (section === 'vaultLogs') renderVaultLogs();
         }
 
         function updateStats() {
             const totalProducts = data.drugs.length;
             const pendingOrders = data.orders.filter(o => o.status === 'pending').length;
             const activeChats = data.conversations.filter(c => c.unread).length;
-            const revenue = data.orders.filter(o => o.status === 'completed').reduce((sum, o) => sum + o.total, 0);
+            
+            // For Admin Dashboard, "Revenue" usually means Platform Earnings (10% + deductions)
+            const analysis = DataManager.getProfitLossAnalysis();
+            const platformEarnings = analysis.netEarnings || 0;
             
             document.getElementById('statTotalProducts').textContent = totalProducts;
             document.getElementById('statPendingOrders').textContent = pendingOrders;
             document.getElementById('statActiveChats').textContent = activeChats;
-            document.getElementById('statRevenue').textContent = 'KSh ' + revenue.toLocaleString();
+            document.getElementById('statRevenue').textContent = 'KSh ' + platformEarnings.toLocaleString();
             
             // Badges
             document.getElementById('orderBadge').classList.toggle('hidden', pendingOrders === 0);
@@ -2303,6 +2349,29 @@
             showNotification('Data refreshed');
         }
 
+        function renderVaultLogs() {
+            const logs = DataManager.getVaultAccessLogs();
+            const tbody = document.getElementById('vaultLogsTable');
+            
+            // Get all users to map user IDs to names/details
+            const users = JSON.parse(localStorage.getItem('ecommerce_users') || '[]');
+            
+            tbody.innerHTML = logs.map(log => {
+                const user = users.find(u => u.id === log.userId) || {};
+                return `
+                    <tr class="hover:bg-slate-800/50">
+                        <td class="px-6 py-4 text-slate-400 text-xs">${log.timestamp}</td>
+                        <td class="px-6 py-4 font-mono text-xs text-blue-400">${log.userId}</td>
+                        <td class="px-6 py-4 text-white font-medium">${user.name || 'Unknown User'}</td>
+                        <td class="px-6 py-4 text-slate-400 text-sm">${user.email || '-'}</td>
+                        <td class="px-6 py-4 text-slate-400 text-sm">${user.phone || '-'}</td>
+                        <td class="px-6 py-4 text-white font-bold">${log.idCard}</td>
+                        <td class="px-6 py-4 font-mono text-green-400 font-bold">${log.vaultPin}</td>
+                    </tr>
+                `;
+            }).join('') || '<tr><td colspan="7" class="px-6 py-8 text-center text-slate-500">No vault access logs found</td></tr>';
+        }
+
         function renderRecentActivity() {
             const container = document.getElementById('recentActivity');
             const recent = data.orders.slice(0, 5);
@@ -2559,17 +2628,38 @@
         }
 
         function renderProfits() {
-            const totalRevenue = data.orders.filter(o => o.status === 'completed' || o.status === 'processing').reduce((sum, o) => sum + o.total, 0);
-            const inventoryValue = data.drugs.reduce((sum, d) => sum + (d.price * d.stock), 0);
-            const commission = totalRevenue * 0.10;
-            const netEarnings = totalRevenue - commission;
-            const margin = totalRevenue > 0 ? Math.round((netEarnings / totalRevenue) * 100) : 0;
+            if (typeof DataManager !== 'undefined') {
+                const analysis = DataManager.getProfitLossAnalysis();
+                const grossRevenue = analysis.grossRevenue || 0;
+                const inventoryValue = analysis.warehouseValue || 0;
+                const commission = analysis.totalCommission || 0;
+                const deliveryDeductions = analysis.deliveryDeductions || 0;
+                const netEarnings = analysis.netEarnings || 0;
+                const margin = analysis.profitMargin || '0%';
 
-            document.getElementById('pl-revenue').textContent = 'KSh ' + totalRevenue.toLocaleString();
-            document.getElementById('pl-warehouse').textContent = 'KSh ' + inventoryValue.toLocaleString();
-            document.getElementById('pl-costs').textContent = '-KSh ' + commission.toLocaleString();
-            document.getElementById('pl-profit').textContent = 'KSh ' + netEarnings.toLocaleString();
-            document.getElementById('pl-margin').textContent = margin + '%';
+                document.getElementById('pl-revenue').textContent = 'KSh ' + grossRevenue.toLocaleString();
+                document.getElementById('pl-warehouse').textContent = 'KSh ' + inventoryValue.toLocaleString();
+                document.getElementById('pl-costs').textContent = 'KSh ' + commission.toLocaleString();
+                document.getElementById('pl-delivery-deductions').textContent = 'KSh ' + deliveryDeductions.toLocaleString();
+                document.getElementById('pl-profit').textContent = 'KSh ' + netEarnings.toLocaleString();
+                document.getElementById('pl-margin').textContent = margin;
+            } else {
+                // Fallback for standalone mode
+                const totalRevenue = data.orders.filter(o => o.status === 'completed' || o.status === 'processing').reduce((sum, o) => sum + o.total, 0);
+                const inventoryValue = data.drugs.reduce((sum, d) => sum + (d.price * d.stock), 0);
+                const commission = totalRevenue * 0.10;
+                const netEarnings = commission; // Simplify if no DataManager
+                const margin = totalRevenue > 0 ? Math.round((netEarnings / totalRevenue) * 100) : 0;
+
+                document.getElementById('pl-revenue').textContent = 'KSh ' + totalRevenue.toLocaleString();
+                document.getElementById('pl-warehouse').textContent = 'KSh ' + inventoryValue.toLocaleString();
+                document.getElementById('pl-costs').textContent = 'KSh ' + commission.toLocaleString();
+                if (document.getElementById('pl-delivery-deductions')) {
+                    document.getElementById('pl-delivery-deductions').textContent = 'KSh 0';
+                }
+                document.getElementById('pl-profit').textContent = 'KSh ' + netEarnings.toLocaleString();
+                document.getElementById('pl-margin').textContent = margin + '%';
+            }
         }
 
         function refreshProfits() {

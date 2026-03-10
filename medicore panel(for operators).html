@@ -9,6 +9,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="data-manager.js"></script>
+    <script>
+        // Security check
+        (function() {
+            const user = DataManager.getCurrentUser();
+            if (!user) {
+                window.location.href = 'index.html';
+                return;
+            }
+            if (user.role !== 'admin') {
+                const regs = DataManager.getPageRegistrations();
+                const isMedicore = regs.some(r => r.email === user.email && r.type === 'medicore' && r.status === 'approved');
+                if (!isMedicore) {
+                    window.location.href = 'profile.html?unauthorized=medicore';
+                }
+            }
+        })();
+    </script>
     <style>
         :root {
             --primary: #0f172a;
@@ -360,6 +377,27 @@
 <base target="_self">
 </head>
 <body class="min-h-screen flex overflow-x-auto">
+    <script>
+        (function() {
+            const user = JSON.parse(localStorage.getItem('ecommerce_user'));
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Check if admin
+            if (user.role === 'admin' || user.email === "omondiphelix2003@gmail.com") return;
+            
+            // Check if registered for medicore
+            const regs = JSON.parse(localStorage.getItem('ecommerce_page_registrations')) || [];
+            const isRegistered = regs.some(r => r.type === 'medicore' && r.email === user.email);
+            
+            if (!isRegistered && user.role !== 'medicore_operator') {
+                alert('Access Denied. You must register for the MediCore Operator Panel first.');
+                window.location.href = 'profile.html';
+            }
+        })();
+    </script>
 
     <!-- Sidebar -->
     <aside class="w-64 bg-slate-900 border-r border-slate-700 flex flex-col z-20">
@@ -3076,17 +3114,31 @@
         }
 
         function renderProfits() {
-            const totalRevenue = data.orders.filter(o => o.status === 'completed' || o.status === 'processing').reduce((sum, o) => sum + o.total, 0);
-            const inventoryValue = data.drugs.reduce((sum, d) => sum + (d.price * d.stock), 0);
-            const commission = totalRevenue * 0.10;
-            const netEarnings = totalRevenue - commission;
-            const margin = totalRevenue > 0 ? Math.round((netEarnings / totalRevenue) * 100) : 0;
+            if (typeof DataManager !== 'undefined') {
+                const user = DataManager.getCurrentUser();
+                if (!user) return;
+                
+                const analysis = DataManager.getOperatorProfitLossAnalysis(user.email);
+                const inventoryValue = data.drugs.reduce((sum, d) => sum + (d.price * d.stock), 0);
+                
+                document.getElementById('pl-revenue').textContent = 'KSh ' + analysis.grossRevenue.toLocaleString();
+                document.getElementById('pl-warehouse').textContent = 'KSh ' + inventoryValue.toLocaleString();
+                document.getElementById('pl-costs').textContent = '-KSh ' + analysis.commissionPaid.toLocaleString();
+                document.getElementById('pl-profit').textContent = 'KSh ' + analysis.netEarnings.toLocaleString();
+                document.getElementById('pl-margin').textContent = analysis.margin + '%';
+            } else {
+                const totalRevenue = data.orders.filter(o => o.status === 'completed' || o.status === 'processing').reduce((sum, o) => sum + o.total, 0);
+                const inventoryValue = data.drugs.reduce((sum, d) => sum + (d.price * d.stock), 0);
+                const commission = totalRevenue * 0.10;
+                const netEarnings = totalRevenue - commission;
+                const margin = totalRevenue > 0 ? Math.round((netEarnings / totalRevenue) * 100) : 0;
 
-            document.getElementById('pl-revenue').textContent = 'KSh ' + totalRevenue.toLocaleString();
-            document.getElementById('pl-warehouse').textContent = 'KSh ' + inventoryValue.toLocaleString();
-            document.getElementById('pl-costs').textContent = '-KSh ' + commission.toLocaleString();
-            document.getElementById('pl-profit').textContent = 'KSh ' + netEarnings.toLocaleString();
-            document.getElementById('pl-margin').textContent = margin + '%';
+                document.getElementById('pl-revenue').textContent = 'KSh ' + totalRevenue.toLocaleString();
+                document.getElementById('pl-warehouse').textContent = 'KSh ' + inventoryValue.toLocaleString();
+                document.getElementById('pl-costs').textContent = '-KSh ' + commission.toLocaleString();
+                document.getElementById('pl-profit').textContent = 'KSh ' + netEarnings.toLocaleString();
+                document.getElementById('pl-margin').textContent = margin + '%';
+            }
         }
 
         function refreshProfits() {

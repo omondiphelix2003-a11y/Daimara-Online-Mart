@@ -1658,35 +1658,18 @@
       if (typeof DataManager === 'undefined') return;
       
       const user = DataManager.getCurrentUser();
-      const targetEmail = viewUserEmail || user.email;
-      const orders = DataManager.getScopedData('ecommerce_orders', [], targetEmail);
-      const warehouse = DataManager.getScopedData('ecommerce_warehouse', [], targetEmail);
-      
-      const permanentRevenue = DataManager.getOperatorRevenue(targetEmail);
-      const activeCompletedRevenue = orders.reduce((sum, o) => {
-        if (o.status === 'completed' || o.status === 'Delivered') return sum;
-        return sum + (o.grandTotal || 0);
-      }, 0);
-      const totalRevenue = permanentRevenue + activeCompletedRevenue;
+      const targetEmail = viewUserEmail || (user && user.email);
+      if (!targetEmail) return;
 
+      const analysis = DataManager.getOperatorProfitLossAnalysis(targetEmail);
+      const warehouse = DataManager.getScopedData('ecommerce_warehouse', [], targetEmail);
       const warehouseValue = warehouse.reduce((sum, p) => sum + ((p.price || 0) * (p.quantity || 0)), 0);
-      
-      const permanentEarnings = DataManager.getOperatorEarnings(targetEmail);
-      const activeCompletedEarnings = orders.reduce((sum, o) => {
-        if (o.status === 'completed' || o.status === 'Delivered') return sum;
-        const commission = o.totalCommission !== undefined ? o.totalCommission : ((o.grandTotal || 0) * 0.10);
-        return sum + ((o.grandTotal || 0) - commission);
-      }, 0);
-      
-      const netRevenue = permanentEarnings + activeCompletedEarnings;
-      const commission = totalRevenue - netRevenue;
-      const profitMargin = totalRevenue > 0 ? Math.round((netRevenue / totalRevenue) * 100) + '%' : '0%';
-      
-      document.getElementById('pl-revenue').innerText = 'KSH ' + totalRevenue.toLocaleString();
+
+      document.getElementById('pl-revenue').innerText = 'KSH ' + analysis.grossRevenue.toLocaleString();
       document.getElementById('pl-warehouse').innerText = 'KSH ' + warehouseValue.toLocaleString();
-      document.getElementById('pl-costs').innerText = '-KSH ' + commission.toLocaleString();
-      document.getElementById('pl-profit').innerText = 'KSH ' + netRevenue.toLocaleString();
-      document.getElementById('pl-margin').innerText = profitMargin;
+      document.getElementById('pl-costs').innerText = '-KSH ' + analysis.commissionPaid.toLocaleString();
+      document.getElementById('pl-profit').innerText = 'KSH ' + analysis.netEarnings.toLocaleString();
+      document.getElementById('pl-margin').innerText = analysis.margin + '%';
     }
 
     // MODAL FUNCTIONS

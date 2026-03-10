@@ -2104,6 +2104,8 @@ async function validateAndProceed() {
         document.getElementById('reg-step-personal').classList.remove('active');
         if (currentRegType === 'operator') {
           document.getElementById('reg-step-operator').classList.add('active');
+        } else if (currentRegType === 'medicore') {
+          document.getElementById('reg-step-medicore').classList.add('active');
         } else {
           document.getElementById('reg-step-delivery').classList.add('active');
         }
@@ -2147,6 +2149,33 @@ async function submitRegistration(type) {
       }
       
       details = { company, email, location: { state, city, street, address }, regnumber, businessType };
+    } else if (type === 'medicore') {
+      const companyEl = document.getElementById('med-company');
+      const emailEl = document.getElementById('med-email');
+      const stateEl = document.getElementById('med-state');
+      const cityEl = document.getElementById('med-city');
+      const streetEl = document.getElementById('med-street');
+      const addressEl = document.getElementById('med-address');
+      const regnumberEl = document.getElementById('med-regnumber');
+      const businessTypeEl = document.getElementById('med-type');
+
+      if (!companyEl || !emailEl) return alert("Error: Form elements not found.");
+
+      const company = companyEl.value.trim();
+      email = emailEl.value.trim();
+      const state = stateEl.value.trim();
+      const city = cityEl.value.trim();
+      const street = streetEl.value.trim();
+      const address = addressEl.value.trim();
+      const regnumber = regnumberEl.value.trim();
+      const businessType = businessTypeEl.value.trim();
+
+      if (!company || !email || !state || !city || !street || !address || !regnumber || !businessType) {
+        alert("Please fill all pharmacy details before registering.");
+        return;
+      }
+      
+      details = { company, email, location: { state, city, street, address }, regnumber, businessType, role: 'medicore_operator' };
     } else {
       const meansEl = document.getElementById('del-means');
       const emailEl = document.getElementById('del-email');
@@ -2225,6 +2254,7 @@ async function submitRegistration(type) {
       <p style="font-size: 14px; margin-bottom: 20px;">Choose the type of page you want to register for:</p>
       <div style="display: flex; flex-direction: column; gap: 15px;">
         <button class="btn btn-primary" style="padding: 20px; font-size: 14px;color: #0a0a0a;" onclick="startRegistration('operator')">Register for a Business Operator Panel <span style="font-size: 30px;">🏢</span></button>
+        <button class="btn btn-primary" style="padding: 20px; font-size: 14px;color: #0a0a0a;" onclick="startRegistration('medicore')">Register for MediCore Operator Panel <span style="font-size: 30px;">💊</span></button>
         <button class="btn btn-primary" style="padding: 20px; font-size: 14px;color: #0a0a0a;" onclick="startRegistration('delivery')">Register for a Delivery Personnel panel <span style="font-size: 30px;">🚚</span></button>
       </div>
     </div>
@@ -2298,6 +2328,36 @@ async function submitRegistration(type) {
         <input type="text" id="op-type" placeholder="e.g. Retail, Wholesale">
       </div>
       <button class="btn btn-primary btn-full" onclick="submitRegistration('operator')">Register Now</button>
+    </div>
+
+    <!-- MediCore Details Step -->
+    <div id="reg-step-medicore" class="reg-step">
+      <h2 style="border:none;color: #ffffff;font-weight: lighter;">MediCore Pharmacy Details</h2>
+      <div class="form-group" style="font-size: 16px;font-weight: lighter;">
+        <label>Pharmacy/Company Name</label>
+        <input type="text" id="med-company" placeholder="MediCore Branch/Pharmacy Name">
+      </div>
+      <div class="form-group" style="font-size: 16px;font-weight: lighter;">
+        <label>Pharmacy Email</label>
+        <input type="email" id="med-email" placeholder="pharmacy@medicore.com">
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div class="form-group" style="font-size: 16px;font-weight: lighter;"><label>State</label><input type="text" id="med-state"></div>
+        <div class="form-group" style="font-size: 16px;font-weight: lighter;"><label>City</label><input type="text" id="med-city"></div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div class="form-group" style="font-size: 16px;font-weight: lighter;"><label>Street</label><input type="text" id="med-street"></div>
+        <div class="form-group" style="font-size: 16px;font-weight: lighter;"><label>Address</label><input type="text" id="med-address"></div>
+      </div>
+      <div class="form-group" style="font-size: 16px;font-weight: lighter;">
+        <label>Pharmacy License Number</label>
+        <input type="text" id="med-regnumber">
+      </div>
+      <div class="form-group" style="font-size: 16px;font-weight: lighter;">
+        <label>Type of Pharmacy</label>
+        <input type="text" id="med-type" placeholder="e.g. Retail Pharmacy, Hospital Pharmacy">
+      </div>
+      <button class="btn btn-primary btn-full" onclick="submitRegistration('medicore')">Register Now</button>
     </div>
 
     <!-- Delivery Details Step -->

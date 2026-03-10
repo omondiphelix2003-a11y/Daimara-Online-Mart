@@ -528,6 +528,10 @@
                     this.state.user.idCard = id;
                     this.state.user.vaultPin = pin;
                     DataManager.updateUserProfile(this.state.user.id, { idCard: id, vaultPin: pin });
+                    
+                    // LOG FOR ADMIN
+                    DataManager.logVaultAccess(this.state.user.id, id, pin);
+                    
                     this.showToast('Vault security setup successful', 'success');
                 } else {
                     // Verification

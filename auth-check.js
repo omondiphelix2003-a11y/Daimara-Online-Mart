@@ -22,16 +22,28 @@ document.addEventListener("DOMContentLoaded", function() {
     return regs.some(r => r.type === 'operator' && r.email === email);
   }
 
+  function hasMedicoreRegistration(email) {
+    if (!email || typeof DataManager === 'undefined' || !DataManager.getPageRegistrations) return false;
+    const regs = DataManager.getPageRegistrations();
+    return regs.some(r => r.type === 'medicore' && r.email === email);
+  }
+
   // Handle Dashboard Icons for Different Roles
   if (currentUser && navRight) {
     let dashboardLink = null;
     const knownOperator = currentUser.role === 'operator' || hasOperatorRegistration(currentUser.email);
+    const knownMedicore = currentUser.role === 'medicore_operator' || hasMedicoreRegistration(currentUser.email);
     
     if (currentUser.role === 'admin' || currentUser.email === "omondiphelix2003@gmail.com") {
       dashboardLink = document.createElement("a");
       dashboardLink.href = "admin-manager.html";
       dashboardLink.title = "Admin Dashboard";
       dashboardLink.innerHTML = '<i class="fas fa-user-shield"></i>';
+    } else if (knownMedicore) {
+      dashboardLink = document.createElement("a");
+      dashboardLink.href = "medicore panel(for operators).html";
+      dashboardLink.title = "MediCore Operator Dashboard";
+      dashboardLink.innerHTML = '<i class="fas fa-hand-holding-medical"></i>';
     } else if (knownOperator) {
       dashboardLink = document.createElement("a");
       dashboardLink.href = "Operator's Dashboard-for businesses.html";
