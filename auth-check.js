@@ -19,13 +19,13 @@ document.addEventListener("DOMContentLoaded", function() {
   function hasOperatorRegistration(email) {
     if (!email || typeof DataManager === 'undefined' || !DataManager.getPageRegistrations) return false;
     const regs = DataManager.getPageRegistrations();
-    return regs.some(r => r.type === 'operator' && r.email === email);
+    return regs.some(r => r.type === 'operator' && r.email === email && r.status === 'approved');
   }
 
   function hasMedicoreRegistration(email) {
     if (!email || typeof DataManager === 'undefined' || !DataManager.getPageRegistrations) return false;
     const regs = DataManager.getPageRegistrations();
-    return regs.some(r => r.type === 'medicore' && r.email === email);
+    return regs.some(r => r.type === 'medicore' && r.email === email && r.status === 'approved');
   }
 
   // Handle Dashboard Icons for Different Roles

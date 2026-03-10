@@ -406,7 +406,7 @@ div.h3{text-align: center; color: #082b61; font-size: 22px;
       .search-container { top: 73px; width: 95%;margin-left: 34px; }
       .slider { margin-top: 100px; }
       
-     /* BOTTOM NAV */
+      /* BOTTOM NAV */
       .bottom-nav {
         display: flex !important;
         position: fixed;
@@ -417,7 +417,7 @@ div.h3{text-align: center; color: #082b61; font-size: 22px;
         height: 60px;
         justify-content: space-around;
         align-items: center;
-        z-index: 2000;
+        z-index: 5000;
         border-top: 2px solid var(--primary);
       }
       .bottom-nav a {
@@ -427,6 +427,9 @@ div.h3{text-align: center; color: #082b61; font-size: 22px;
         display: flex;
         flex-direction: column;
         align-items: center;
+        flex: 1;
+        height: 100%;
+        justify-content: center;
       }
       .bottom-nav a.active { color: var(--primary); }
       .bottom-nav a span { font-size: 10px; margin-top: 4px; }
@@ -605,7 +608,6 @@ div.h3{text-align: center; color: #082b61; font-size: 22px;
   </div>
 
   <div class="nav-icons" id="nav-icons-container">
-    <a href="medicore panel(for operators).html" title="Operator Panel"><i class="fa fa-shopping-bag"></i></a>
     <a href="login.html" id="userIconLink"><i class="fa fa-user"></i></a>
     <a href="cart.html" title="Cart" class="cart-icon-container">
       <i class="fa fa-shopping-cart"></i>
@@ -752,20 +754,6 @@ div.h3{text-align: center; color: #082b61; font-size: 22px;
     <i class="fas fa-check-circle" style="color:#3b82f6;font-size:1.2rem"></i>
     <span id="toast-msg">Item added to cart!</span>
   </div>
-
-  <div class="bottom-nav">
-    <a href="store.html" class="active"><i class="fa fa-shopping-bag"></i><span>Store</span></a>
-    <a href="about.html"><i class="fas fa-info-circle"></i><span>About</span></a>
-    <a href="contact.html"><i class="fas fa-phone"></i><span>Contact</span></a>
-    <a href="cart.html" style="position:relative;">
-      <i class="fa fa-shopping-cart"></i>
-      <span class="cart-badge" id="bottomCartBadge" style="position:absolute; top:-5px; right:15px; background:red; color:white; border-radius:50%; padding:2px 5px; font-size:10px; display:none;">0</span>
-      <span>Cart</span>
-    </a>
-    <a href="profile.html"><i class="fa fa-user"></i><span>Profile</span></a>
-  </div>
-
-
 
 <script src="data-manager.js"></script>
 <script src="auth-check.js"></script>
@@ -1099,5 +1087,16 @@ document.addEventListener('click', (e) => {
 
 
 </script>
+<div class="bottom-nav">
+  <a href="store.html" class="active"><i class="fa fa-shopping-bag"></i><span>Store</span></a>
+  <a href="about.html"><i class="fas fa-info-circle"></i><span>About</span></a>
+  <a href="contact.html"><i class="fas fa-phone"></i><span>Contact</span></a>
+  <a href="cart.html" style="position:relative;">
+    <i class="fa fa-shopping-cart"></i>
+    <span class="cart-badge" id="bottomCartBadge" style="position:absolute; top:-5px; right:15px; background:red; color:white; border-radius:50%; padding:2px 5px; font-size:10px; display:none;">0</span>
+    <span>Cart</span>
+  </a>
+  <a href="profile.html"><i class="fa fa-user"></i><span>Profile</span></a>
+</div>
 </body>
 </html>

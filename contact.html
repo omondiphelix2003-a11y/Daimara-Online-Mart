@@ -108,7 +108,7 @@ body {
     height: 60px;
     justify-content: space-around;
     align-items: center;
-    z-index: 2000;
+    z-index: 5000;
     border-top: 2px solid var(--primary);
   }
   .bottom-nav a {
@@ -118,6 +118,9 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    flex: 1;
+    height: 100%;
+    justify-content: center;
   }
   .bottom-nav a.active { color: var(--primary); }
   .bottom-nav a span { font-size: 10px; margin-top: 4px; }
@@ -445,18 +448,6 @@ body {
   </div>-->
 </nav>
 
-<div class="bottom-nav">
-  <a href="index.html"><i class="fa fa-home"></i><span>Home</span></a>
-  <a href="about.html"><i class="fas fa-info-circle"></i><span>About</span></a>
-  <a href="contact.html" class="active"><i class="fas fa-phone"></i><span>Contact</span></a>
-  <a href="cart.html" style="position:relative;">
-    <i class="fa fa-shopping-cart"></i>
-    <span class="cart-badge" style="position:absolute; top:-5px; right:15px; background:red; color:white; border-radius:50%; padding:2px 5px; font-size:10px; display:none;">0</span>
-    <span>Cart</span>
-  </a>
-  <a href="profile.html"><i class="fa fa-user"></i><span>Profile</span></a>
-</div>
-
 <!-- CONTACT SECTION -->
 <section class="contact-container">
   <h1>Contact Us</h1>
@@ -608,5 +599,16 @@ document.getElementById("contact-form").addEventListener("submit", async (e) => 
 </script>
   
 
+<div class="bottom-nav">
+  <a href="index.html"><i class="fa fa-home"></i><span>Home</span></a>
+  <a href="about.html"><i class="fas fa-info-circle"></i><span>About</span></a>
+  <a href="contact.html" class="active"><i class="fas fa-phone"></i><span>Contact</span></a>
+  <a href="cart.html" style="position:relative;">
+    <i class="fa fa-shopping-cart"></i>
+    <span class="cart-badge" id="bottomCartBadge" style="position:absolute; top:-5px; right:15px; background:red; color:white; border-radius:50%; padding:2px 5px; font-size:10px; display:none;">0</span>
+    <span>Cart</span>
+  </a>
+  <a href="profile.html"><i class="fa fa-user"></i><span>Profile</span></a>
+</div>
 </body>
 </html>

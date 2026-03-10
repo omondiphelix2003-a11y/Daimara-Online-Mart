@@ -563,6 +563,8 @@ body {
     font-size: 12px;
     padding: 0.5rem;
   }
+
+  .page-header.fas{margin-left: 12px;}
 }
 
 /* TOAST NOTIFICATION */
@@ -608,7 +610,7 @@ body {
       height: 60px;
       justify-content: space-around;
       align-items: center;
-      z-index: 2000;
+      z-index: 5000;
       border-top: 2px solid var(--primary);
     }
     
@@ -643,6 +645,9 @@ body {
       display: flex;
       flex-direction: column;
       align-items: center;
+      flex: 1;
+      height: 100%;
+      justify-content: center;
     }
     .bottom-nav a.active { color: var(--primary); }
     .bottom-nav a span { font-size: 10px; margin-top: 4px; }
@@ -732,15 +737,8 @@ body {
   </div>
 </nav>
 
-<!-- BOTTOM NAV (Mobile) -->
-<div class="bottom-nav">
-  <a href="index.html"><i class="fas fa-home"></i><span>Home</span></a>
-  <a href="store.html"><i class="fas fa-shopping-bag"></i><span>Store</span></a>
-  <a href="cart.html"><i class="fas fa-shopping-cart"></i><span>Cart</span></a>
-  <a href="profile.html"><i class="fas fa-user"></i><span>Profile</span></a>
-</div>
-
 <!-- MAIN CONTENT -->
+
 <div class="main-container">
   
   <!-- PAGE HEADER -->
@@ -1039,5 +1037,11 @@ function placeGasOrder(){
 }
 </script>
 
+<div class="bottom-nav">
+  <a href="index.html"><i class="fas fa-home"></i><span>Home</span></a>
+  <a href="store.html"><i class="fas fa-shopping-bag"></i><span>Store</span></a>
+  <a href="cart.html"><i class="fas fa-shopping-cart"></i><span>Cart</span></a>
+  <a href="profile.html"><i class="fas fa-user"></i><span>Profile</span></a>
+</div>
 </body>
 </html>
