@@ -1023,9 +1023,9 @@
     <i class="fas fa-bars"></i>
   </button>
 
-  <div class="topbar"></div>
+  <!--<div class="topbar"></div>
    <a href="index.html" class="logo">Operator Panel</a>
-  </div>
+  </div>-->
 
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
@@ -1038,7 +1038,8 @@
       <li><a href="Operator's Dashboard-for businesses.html?tab=warehouse" target="_self"><i class="fas fa-warehouse"></i> Warehouse</a></li>
       <li><a href="Operator's Dashboard-for businesses.html?tab=profits" target="_self"><i class="fas fa-chart-line"></i> Profit & Loss</a></li>
       <li><a href="#" onclick="openAgentRegistration()"><i class="fas fa-user-tie"></i> Register as Agent</a></li>
-      <li><a href="AgentPortal.html" id="agent-portal-link" style="display:none" target="_self"><i class="fas fa-external-link-alt"></i> Agent Portal</a></li>
+      <!--<li><a href="AgentPortal.html" id="agent-portal-link" style="display:none" target="_self"><i 
+        class="fas fa-external-link-alt"></i> Agent Portal</a></li>-->
     </ul>
     <div class="sidebar-footer">
       <button class="logout-btn" onclick="adminLogout()">
@@ -2036,11 +2037,11 @@
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
           <div style="display:flex; flex-direction:column; gap:5px;">
             <label style="color:#94a3b8; font-size:12px; font-weight:600;">ID Front Photo</label>
-            <input type="file" id="agent-id-front" required style="color:#94a3b8; font-size:12px;">
+            <input type="file" id="agent-id-front" style="color:#94a3b8; font-size:12px;">
           </div>
           <div style="display:flex; flex-direction:column; gap:5px;">
             <label style="color:#94a3b8; font-size:12px; font-weight:600;">ID Back Photo</label>
-            <input type="file" id="agent-id-back" required style="color:#94a3b8; font-size:12px;">
+            <input type="file" id="agent-id-back" style="color:#94a3b8; font-size:12px;">
           </div>
         </div>
         <button type="submit" id="agentSubmitBtn" style="padding:15px; background:var(--primary); color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer; margin-top:10px;">
@@ -2067,6 +2068,11 @@
   <script src="data-manager.js"></script>
   <script>
     function openAgentRegistration() {
+      const user = DataManager.getCurrentUser();
+      if (user) {
+        document.getElementById('agent-biz-name').value = user.name || '';
+        document.getElementById('agent-phone').value = user.phone || '';
+      }
       document.getElementById('agentModal').style.display = 'flex';
       document.body.style.overflow = 'hidden';
     }
@@ -2082,13 +2088,8 @@
       const idFrontFile = document.getElementById('agent-id-front').files[0];
       const idBackFile = document.getElementById('agent-id-back').files[0];
 
-      if (!idFrontFile || !idBackFile) {
-        alert("Please upload both ID photos");
-        return;
-      }
-
       btn.disabled = true;
-      btn.innerHTML = 'Processing Images...';
+      btn.innerHTML = 'Processing...';
 
       const details = {
         userId: user ? user.id : 'unknown',
@@ -2100,33 +2101,43 @@
         idBack: ''
       };
 
-      const readerFront = new FileReader();
-      readerFront.onload = (ef) => {
-        details.idFront = ef.target.result;
-        const readerBack = new FileReader();
-        readerBack.onload = (eb) => {
-          details.idBack = eb.target.result;
+      const submitData = () => {
+        btn.innerHTML = 'Submitting...';
+        const res = DataManager.registerAgent(details);
+        if(res.success) {
+          document.getElementById('agentModal').style.display = 'none';
+          document.getElementById('agentSuccessModal').style.display = 'flex';
           
-          btn.innerHTML = 'Submitting...';
-          const res = DataManager.registerAgent(details);
-          if(res.success) {
-            document.getElementById('agentModal').style.display = 'none';
-            document.getElementById('agentSuccessModal').style.display = 'flex';
-            
-            // Also store in daimara_agents for local UI consistency if needed, 
-            // but DataManager is the source of truth for admin.
-            const localAgents = JSON.parse(localStorage.getItem('daimara_agents') || '[]');
-            localAgents.push({ ...details, id: res.id, status: 'pending', timestamp: new Date().toISOString() });
-            localStorage.setItem('daimara_agents', JSON.stringify(localAgents));
-          } else {
-            alert("Error: " + res.message);
-            btn.disabled = false;
-            btn.innerHTML = 'Submit Registration';
-          }
-        };
-        readerBack.readAsDataURL(idBackFile);
+          const localAgents = JSON.parse(localStorage.getItem('daimara_agents') || '[]');
+          localAgents.push({ ...details, id: res.id, status: 'pending', timestamp: new Date().toISOString() });
+          localStorage.setItem('daimara_agents', JSON.stringify(localAgents));
+        } else {
+          alert("Error: " + res.message);
+          btn.disabled = false;
+          btn.innerHTML = 'Submit Registration';
+        }
       };
-      readerFront.readAsDataURL(idFrontFile);
+
+      if (idFrontFile || idBackFile) {
+        const promises = [];
+        if (idFrontFile) {
+          promises.push(new Promise(resolve => {
+            const reader = new FileReader();
+            reader.onload = (ef) => { details.idFront = ef.target.result; resolve(); };
+            reader.readAsDataURL(idFrontFile);
+          }));
+        }
+        if (idBackFile) {
+          promises.push(new Promise(resolve => {
+            const reader = new FileReader();
+            reader.onload = (eb) => { details.idBack = eb.target.result; resolve(); };
+            reader.readAsDataURL(idBackFile);
+          }));
+        }
+        Promise.all(promises).then(submitData);
+      } else {
+        submitData();
+      }
     }
 
     // Check agent status on load

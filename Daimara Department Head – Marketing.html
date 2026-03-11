@@ -594,11 +594,6 @@ function postAdvert() {
 
         const mediaUrl = uploadedMediaUrl || (mediaUrlEl ? mediaUrlEl.value.trim() : "");
         
-        // Size warning (base64 of 2MB is roughly 2.7MB)
-        if (uploadedMediaUrl && uploadedMediaUrl.length > 3 * 1024 * 1024) {
-            return alert("The uploaded file is too large for local storage. Please use a smaller file (under 2MB) or use a URL instead.");
-        }
-
         const adType = document.getElementById('ad-type').value;
         const targetPage = document.getElementById('target-page')?.value;
         const videoAudioType = document.getElementById('video-audio-type')?.value;

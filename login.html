@@ -89,14 +89,14 @@
     <input type="text" id="signup-name" placeholder="Full Name" required>
     <input type="email" id="signup-email" placeholder="Email" required>
     <input type="password" id="signup-password" placeholder="Password" required>
-    <select id="signup-role">
+    <!--<select id="signup-role">
       <option value="user">Customer</option>
       <option value="operator">Operator / Business</option>
       <option value="delivery">Delivery Personnel</option>
-    </select>
+    </select>-->
     <div class="profile-image-group">
       <label for="profile-image">Profile Picture</label>
-      <input type="file" id="profile-image" accept="image/*" required>
+      <input type="file" id="profile-image" accept="image/*">
       <div id="profile-preview" class="profile-preview"></div>
     </div>
     <button type="submit">Sign Up</button>
@@ -178,6 +178,7 @@
           email: email,
           password: password, // use provided password or default
           role: 'admin',
+          phone: '0742120329',
           profileImage: 'https://via.placeholder.com/100'
         };
         users.push(admin);
@@ -208,19 +209,30 @@
     const profileImageFile = document.getElementById("profile-image").files[0];
 
     if (password.length < 6) { alert("Password must be at least 6 characters"); return; }
-    if (!profileImageFile) { alert("Please select a profile picture"); return; }
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const res = DataManager.registerUser(name, email, password, event.target.result, role);
+    
+    if (profileImageFile) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const res = DataManager.registerUser(name, email, password, event.target.result, role);
+        if (res.success) {
+          alert("Account created! Please login.");
+          showLogin();
+        } else {
+          alert(res.message);
+        }
+      };
+      reader.readAsDataURL(profileImageFile);
+    } else {
+      // Default image if none provided
+      const defaultImg = "https://via.placeholder.com/100";
+      const res = DataManager.registerUser(name, email, password, defaultImg, role);
       if (res.success) {
         alert("Account created! Please login.");
         showLogin();
       } else {
         alert(res.message);
       }
-    };
-    reader.readAsDataURL(profileImageFile);
+    }
   });
 </script>
 </body>

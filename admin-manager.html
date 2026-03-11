@@ -678,8 +678,6 @@
     function renderDashboard() {
       const stats = DataManager.getAdminDashboardStats();
       // Use platform earnings (commission + deductions) instead of gross revenue
-      const deductionsData = JSON.parse(localStorage.getItem('ecommerce_delivery_deductions')) || { total: 0 };
-      
       // NEW: Permanent platform earnings (archived) + current active orders
       const permanentEarnings = DataManager.getPermanentEarnings();
       const activeCompletedCommission = (DataManager.getAllOrders() || []).reduce((sum, o) => {
@@ -688,7 +686,8 @@
         return sum + ((o.grandTotal || 0) * 0.10);
       }, 0);
       
-      const totalEarnings = permanentEarnings + activeCompletedCommission + (deductionsData.total || 0);
+      // FIX: permanentEarnings already includes delivery deductions via updateVaultBalance
+      const totalEarnings = permanentEarnings + activeCompletedCommission;
 
       document.getElementById('stat-revenue').innerText = 'KSH ' + totalEarnings.toLocaleString();
       document.getElementById('stat-orders').innerText = stats.totalOrders || 0;
@@ -831,14 +830,15 @@
         return sum + ((o.grandTotal || 0) * (config.commissionPercentage / 100));
       }, 0);
       
-      const totalCommission = permanentEarnings + activeCompletedCommission;
+      const totalProfit = permanentEarnings + activeCompletedCommission;
       const deliveryDeductions = deductionsData.total || 0;
-      const totalEarnings = totalCommission + deliveryDeductions;
+      // Commissions = Total Profit - Delivery Deductions
+      const onlyCommissions = totalProfit - deliveryDeductions;
       
       document.getElementById('pl-warehouse').innerText = 'KSH ' + warehouseValue.toLocaleString();
-      document.getElementById('pl-total-commission').innerText = 'KSH ' + totalCommission.toLocaleString();
+      document.getElementById('pl-total-commission').innerText = 'KSH ' + onlyCommissions.toLocaleString();
       document.getElementById('pl-delivery-deductions').innerText = 'KSH ' + deliveryDeductions.toLocaleString();
-      document.getElementById('pl-net-admin-take').innerText = 'KSH ' + totalEarnings.toLocaleString();
+      document.getElementById('pl-net-admin-take').innerText = 'KSH ' + totalProfit.toLocaleString();
       
       // Update config inputs
       document.getElementById('config-commission').value = config.commissionPercentage;

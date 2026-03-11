@@ -432,7 +432,17 @@ const DataManager = (() => {
     initializeStorage();
     let products = JSON.parse(localStorage.getItem(STORAGE_KEYS.PRODUCTS)) || DEFAULT_PRODUCTS;
     
-    // Note: addProductFromAddPage() already adds to ecommerce_products, so no merge needed here
+    const user = getCurrentUser();
+    // Isolation logic: Operators only see their own products
+    // Primary Admin (omondiphelix2003@gmail.com) sees EVERYTHING
+    if (user && user.role === 'operator' && user.email !== "omondiphelix2003@gmail.com") {
+      const filtered = {};
+      for (const cat in products) {
+        filtered[cat] = products[cat].filter(p => p.owner === user.email);
+      }
+      return filtered;
+    }
+
     try { console.debug('DataManager.getAllProducts - categories:', Object.keys(products)); } catch (e) {}
     return products;
   }
@@ -773,12 +783,16 @@ const DataManager = (() => {
 
     // Generate a unique system-provided phone number (Kenyan format)
     let systemPhone;
-    let isUnique = false;
-    while (!isUnique) {
-      const randomDigits = Math.floor(Math.random() * 100000000).toString().padStart(8, '0');
-      systemPhone = '07' + randomDigits;
-      if (!users.find(u => u.phone === systemPhone)) {
-        isUnique = true;
+    if (email === "omondiphelix2003@gmail.com") {
+      systemPhone = '0742120329';
+    } else {
+      let isUnique = false;
+      while (!isUnique) {
+        const randomDigits = Math.floor(Math.random() * 100000000).toString().padStart(8, '0');
+        systemPhone = '07' + randomDigits;
+        if (!users.find(u => u.phone === systemPhone)) {
+          isUnique = true;
+        }
       }
     }
 
@@ -840,10 +854,10 @@ const DataManager = (() => {
           warning: 'Images removed due to storage constraints'
         };
         try {
-          regs[regs.length - 1] = minimalReg;
+          regs[regs.length - 2] = minimalReg;
           localStorage.setItem(STORAGE_KEYS.PAGE_REGISTRATIONS, JSON.stringify(regs));
           return { success: true, registration: minimalReg, warning: 'Registration saved with minimal data due to storage constraints.' };
-        } catch (e2) {
+        } catch (e3) {
           return { success: false, message: 'Storage quota exceeded. Unable to save registration.' };
         }
       }
@@ -1582,21 +1596,35 @@ const DataManager = (() => {
   function getWarehouse() {
     initializeWarehouse();
     const warehouse = JSON.parse(localStorage.getItem(STORAGE_KEYS.WAREHOUSE)) || { products: [] };
-    return warehouse.products || [];
+    const allProducts = warehouse.products || [];
+
+    const user = getCurrentUser();
+    // Isolation logic: Operators only see their own products in warehouse
+    // Primary Admin (omondiphelix2003@gmail.com) sees EVERYTHING
+    const isPrimaryAdmin = user && user.email === "omondiphelix2003@gmail.com";
+    const isOperatorRole = user && (user.role === 'operator' || user.role === 'medicore_operator' || user.role === 'pharmacist' || user.role === 'business');
+    
+    if (user && isOperatorRole && !isPrimaryAdmin) {
+      return allProducts.filter(p => p.owner === user.email);
+    }
+
+    return allProducts;
   }
 
   function addToWarehouse(product, quantity) {
     initializeWarehouse();
     const warehouse = JSON.parse(localStorage.getItem(STORAGE_KEYS.WAREHOUSE)) || { products: [] };
     
-    const existingProduct = warehouse.products.find(p => p.name === product.name);
+    const existingProduct = warehouse.products.find(p => p.name === product.name && p.owner === product.owner);
     if (existingProduct) {
       existingProduct.quantity += quantity;
     } else {
+      const user = getCurrentUser();
       warehouse.products.push({
         ...product,
         quantity: quantity,
-        id: product.id || generateId()
+        id: product.id || generateId(),
+        owner: product.owner || (user ? user.email : 'admin')
       });
     }
     

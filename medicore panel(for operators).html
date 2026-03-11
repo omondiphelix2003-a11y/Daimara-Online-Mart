@@ -2094,7 +2094,8 @@
                 image: drugData.image,
                 subcategory: 'Pharmacy',
                 description: `${drugData.type} - MediCore Pharmacy Stock`,
-                stock: drugData.stock
+                stock: drugData.stock,
+                owner: targetEmail || (user ? user.email : 'admin')
             };
             DataManager.addProduct(websiteProduct);
             
@@ -3201,7 +3202,7 @@
                     <div class="space-y-2">
                         <label class="text-sm font-semibold text-slate-400">ID Front Photo</label>
                         <div class="relative h-32 rounded-2xl border-2 border-dashed border-slate-700 bg-slate-800/50 flex flex-col items-center justify-center hover:border-blue-500 transition-all cursor-pointer group">
-                            <input type="file" id="id-front" accept="image/*" required class="absolute inset-0 opacity-0 cursor-pointer">
+                            <input type="file" id="id-front" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
                             <i class="fas fa-camera text-2xl text-slate-600 group-hover:text-blue-500 mb-2"></i>
                             <span id="front-label" class="text-xs text-slate-500">Upload Front</span>
                         </div>
@@ -3209,7 +3210,7 @@
                     <div class="space-y-2">
                         <label class="text-sm font-semibold text-slate-400">ID Back Photo</label>
                         <div class="relative h-32 rounded-2xl border-2 border-dashed border-slate-700 bg-slate-800/50 flex flex-col items-center justify-center hover:border-blue-500 transition-all cursor-pointer group">
-                            <input type="file" id="id-back" accept="image/*" required class="absolute inset-0 opacity-0 cursor-pointer">
+                            <input type="file" id="id-back" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
                             <i class="fas fa-camera text-2xl text-slate-600 group-hover:text-blue-500 mb-2"></i>
                             <span id="back-label" class="text-xs text-slate-500">Upload Back</span>
                         </div>
@@ -3239,6 +3240,11 @@
 
     <script>
         function openAgentRegistration() {
+            const user = DataManager.getCurrentUser();
+            if (user) {
+                document.getElementById('agent-biz-name').value = user.name || '';
+                document.getElementById('agent-phone').value = user.phone || '';
+            }
             document.getElementById('agentModal').style.display = 'flex';
             document.body.style.overflow = 'hidden';
         }
@@ -3274,11 +3280,13 @@
             });
 
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing Photos...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
 
             try {
-                const frontBase64 = await toBase64(frontFile);
-                const backBase64 = await toBase64(backFile);
+                let frontBase64 = '';
+                let backBase64 = '';
+                if (frontFile) frontBase64 = await toBase64(frontFile);
+                if (backFile) backBase64 = await toBase64(backFile);
 
                 const details = {
                     userId: user.id,
@@ -3302,7 +3310,7 @@
                     btn.innerHTML = 'Confirm Registration Details';
                 }
             } catch (err) {
-                alert("Error processing images. Please try again.");
+                alert("Error processing details. Please try again.");
                 btn.disabled = false;
                 btn.innerHTML = 'Confirm Registration Details';
             }

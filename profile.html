@@ -2062,22 +2062,21 @@ async function validateAndProceed() {
   const front = document.getElementById('reg-id-front').files[0];
   const back = document.getElementById('reg-id-back').files[0];
 
-  if (!fullname || !dob || !district || !idnumber || !front || !back) {
-    alert("Please fill all personal details and upload both ID photos.");
+  if (!fullname || !dob || !district || !idnumber) {
+    alert("Please fill all personal identification fields.");
     return;
   }
 
-  // NOTE: earlier versions imposed a 1MB limit on ID photos to keep
-  // localStorage usage low. That quota check has been removed so registrants
-  // can submit larger images without being blocked.
-
   // Simulate ID Scanning
   const statusEl = document.getElementById('scan-status');
-  statusEl.innerText = "Scanning ID Photos... Please wait.";
+  statusEl.innerText = "Processing details... Please wait.";
   
   try {
-    const frontBase64 = await fileToBase64(front);
-    const backBase64 = await fileToBase64(back);
+    let frontBase64 = '';
+    let backBase64 = '';
+    
+    if (front) frontBase64 = await fileToBase64(front);
+    if (back) backBase64 = await fileToBase64(back);
     
     setTimeout(() => {
       statusEl.innerText = "Verification Successful! ID details match.";
@@ -2187,18 +2186,14 @@ async function submitRegistration(type) {
       const sImg = document.getElementById('del-img-side').files[0];
       const bImg = document.getElementById('del-img-back').files[0];
 
-      if (!means || !email || !state || !city || !street || !address || !regnumber || !krapin || !plate || !fImg || !sImg || !bImg) {
-        alert("Please fill all delivery details and upload vehicle photos.");
+      if (!means || !email || !state || !city || !street || !address || !regnumber || !krapin || !plate) {
+        alert("Please fill all delivery details.");
         return;
       }
 
-      // note: ID photos validated earlier are capped at 1MB. Other photos (vehicle,
-      // profile, etc.) may be any size per requirement, so we intentionally skip
-      // size checking here.
-
-      const fBase64 = await fileToBase64(fImg);
-      const sBase64 = await fileToBase64(sImg);
-      const bBase64 = await fileToBase64(bImg);
+      const fBase64 = fImg ? await fileToBase64(fImg) : null;
+      const sBase64 = sImg ? await fileToBase64(sImg) : null;
+      const bBase64 = bImg ? await fileToBase64(bImg) : null;
       
       details = { 
         means, email, locality: { state, city, street, address }, regnumber, krapin, serviceType, plate,

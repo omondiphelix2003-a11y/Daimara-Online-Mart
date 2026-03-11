@@ -399,52 +399,78 @@ const ProfileStyles = `
   background-color: rgba(0, 0, 0, 0.5);
   align-items: center;
   justify-content: center;
+  padding: 20px;
 }
 
-.custom-modal-content {
-  background-color: white;
-  padding: 30px;
+.modal-content {
+  background: white;
   border-radius: 12px;
-  width: 90%;
+  width: 100%;
   max-width: 500px;
-  box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  animation: modalIn 0.3s ease;
 }
 
-.custom-modal-content h2 {
-  margin-top: 0;
-  margin-bottom: 20px;
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-header {
+  padding: 20px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  margin: 0;
   color: #2c3e50;
 }
 
-.custom-modal-body {
-  margin-bottom: 20px;
-  color: #555;
+.close-modal {
+  font-size: 24px;
+  cursor: pointer;
+  color: #bdc3c7;
+  transition: 0.3s;
 }
 
-.custom-modal-actions {
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
+.close-modal:hover {
+  color: #2c3e50;
 }
 
-
-`;
-
-// Inject styles into page
-function injectProfileStyles() {
-  const styleElement = document.createElement('style');
-  styleElement.textContent = ProfileStyles;
-  document.head.appendChild(styleElement);
+.modal-body {
+  padding: 25px;
 }
 
-// Auto-inject on load
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', injectProfileStyles);
-} else {
-  injectProfileStyles();
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .profile-card-component {
+    flex-direction: column;
+    padding: 20px;
+    text-align: center;
+    gap: 20px;
+  }
+  
+  .profile-card-image {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .profile-card-info h2 {
+    font-size: 24px;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
 }
-
-// Export for use in other modules
-if (typeof module !== "undefined" && module.exports) {
-  module.exports = ProfileStyles;
-}
+\`;

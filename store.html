@@ -351,14 +351,14 @@
   /* CATEGORY MODAL */
   .category-modal {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(15, 23, 42, 0.9);
+    background: rgba(15, 23, 42, 0);
     display: none; justify-content: center; align-items: center;
     z-index: 10000; backdrop-filter: blur(8px);
   }
 
   .cat-modal-content {
-    background: #1e293b; padding: 30px; border-radius: 4px;
-    width: 90%; max-width: 500px; text-align: center;
+    background: #1e293b00; padding: 30px; border-radius: 4px;
+    width: 90%; max-width: 600px; text-align: center;
     border: 1px solid #334155; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
   }
   .subcat-grid {
@@ -376,18 +376,21 @@
   
   .rating-stars { color: #facc15; margin-bottom: 10px; font-size: 1.2rem; }
 
+
+
   </style>
 </head>
 <body>
 
 <!-- STORE CATEGORIES BELOW NAV -->
   <div class="store-categories-container" style="margin-top: 60px; padding: 10px 20px;
-   background: none; /*border-bottom: 2px solid #000000*/; 
+   background: black; /*border-bottom: 2px solid #000000*/; 
    position: sticky; top: 70px; z-index: 900; overflow-x: auto; 
    white-space: nowrap; display: flex; gap: 15px; scrollbar-width: none;">
-  <div id="storeNav" style="display: flex; gap: 15px;color: #000;font-size: 14px;background-color: #fdfdfd54;
+  
+  <div id="storeNav" style="display: flex; gap: 15px;color: #000;font-size: 14px;text-decoration: solid;
   padding: auto;border-radius: 2px;padding-top: 5px;padding-bottom: 5px;padding-left: 3px;
-  position: sticky; top: 70px;
+  position: sticky; top: 70px;text-decoration: solid;
   z-index: 900; overflow-x: auto;
   padding-right: 3px;">
       <!-- Dynamic Categories will be injected here -->
@@ -650,11 +653,11 @@
     function renderStoreNav() {
       const nav = document.getElementById('storeNav');
       if (!nav) return;
-      nav.innerHTML = '';
+      nav.innerHTML = '';   
       categories.forEach(cat => {
         const link = document.createElement('a');
         link.href = '#';
-        link.innerHTML = `<i class="${cat.icon || 'fas fa-tag'}"></i> ${cat.name}`;
+        link.innerHTML = `<i class="${cat.icon || 'fas fa-tag'}" ></i> ${cat.name}`;
         link.onclick = (e) => {
           e.preventDefault();
           openCategoryModal(cat.id);
@@ -684,7 +687,7 @@
       searchResults.innerHTML = results.map(p => {
         let url = 'store.html?search=' + encodeURIComponent(p.name);
         if (p.subcategory === 'Gas') url = 'gas-refill.html';
-        if (p.subcategory === 'Water') url = 'water refil.html';
+        if (p.subcategory === 'Water') url = 'drinking.html';
         
         return `
           <div onclick="window.location.href='${url}'">
