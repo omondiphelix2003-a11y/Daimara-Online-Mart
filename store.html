@@ -370,11 +370,28 @@
     color: #000000; cursor: pointer; border: 1px solid #334155;
     transition: 0.3s; font-weight: 600;
   }
-  .subcat-item:hover {
-    border-color: #3b82f6; background: #3b82f6; color: white;
-  }
-  
-  .rating-stars { color: #facc15; margin-bottom: 10px; font-size: 1.2rem; }
+    .category-link {
+      color: #3b82f6;
+      text-decoration: underline;
+      text-decoration-style: solid;
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      padding: 8px 16px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+    }
+    .category-link:hover {
+      background: rgba(59, 130, 246, 0.1);
+      border-color: #3b82f6;
+      color: white;
+    }
+    
+    .rating-stars { color: #facc15; margin-bottom: 10px; font-size: 1.2rem; }
 
 
 
@@ -398,10 +415,10 @@
   </div>
 
   <!-- CATEGORY MODAL -->
-  <div id="categoryModal" style="margin-top: 25px;" onclick="closeCategoryModal(event)" >
-    <div class="cat-modal-content" style="border-radius: 4px;margin-left: 20px;background:rgba(255, 255, 255, 0.1);
-    position:-webkit-sticky;z-index:900;overflow-x: auto; backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);" onclick="event.stopPropagation()">
+  <div id="categoryModal" class="category-modal" onclick="closeCategoryModal(event)" >
+    <div class="cat-modal-content" style="border-radius: 12px; background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border); padding: 40px;" onclick="event.stopPropagation()">
       <h2 id="catModalTitle" style="color: rgb(0, 0, 0); margin-top: 20px;top: 550px;">Category</h2>
       <p style="color: #94a3b8;">Select category to view products</p>
       <div id="subcatGrid" class="subcat-grid"></div>
@@ -657,7 +674,8 @@
       categories.forEach(cat => {
         const link = document.createElement('a');
         link.href = '#';
-        link.innerHTML = `<i class="${cat.icon || 'fas fa-tag'}" ></i> ${cat.name}`;
+        link.className = 'category-link';
+        link.innerHTML = `<i class="${cat.icon || 'fas fa-tag'}"></i> ${cat.name}`;
         link.onclick = (e) => {
           e.preventDefault();
           openCategoryModal(cat.id);

@@ -2172,7 +2172,7 @@
                 agentNoEl.style.color = 'var(--primary)';
                 agentNoEl.style.fontWeight = '800';
                 agentNoEl.style.marginTop = '4px';
-                agentNoEl.innerHTML = `AGENT NO: ${agent.agentNumber}`;
+                agentNoEl.innerHTML = `<a href="AgentPortal.html?agentNo=${agent.agentNumber}" style="color:inherit; text-decoration:none; cursor:pointer;">AGENT NO: ${agent.agentNumber}</a>`;
                 adminInfo.appendChild(agentNoEl);
               }
             }

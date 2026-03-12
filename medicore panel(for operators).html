@@ -1295,6 +1295,37 @@
     </div>
 
     <script>
+        // Sync Loop for Live Conversations
+        setInterval(() => {
+            if (selectedConversation) {
+                const conv = data.conversations.find(c => c.id === selectedConversation);
+                if (conv && conv.requestId) {
+                    const chats = JSON.parse(localStorage.getItem('medicore_live_chats') || '{}');
+                    const myMessages = chats[conv.requestId] || [];
+                    
+                    // Update conversation messages if new ones from client
+                    let changed = false;
+                    myMessages.forEach(m => {
+                        if (m.sender === 'client') {
+                            const exists = conv.messages.find(ex => ex.text === m.text && ex.sender === 'client');
+                            if (!exists) {
+                                const time = new Date(m.time).getHours() + ':' + String(new Date(m.time).getMinutes()).padStart(2, '0');
+                                conv.messages.push({ sender: 'client', text: m.text, time });
+                                conv.lastMessage = m.text;
+                                changed = true;
+                            }
+                        }
+                    });
+                    
+                    if (changed) {
+                        saveData();
+                        renderMessages(conv);
+                        renderConversations();
+                    }
+                }
+            }
+        }, 2000);
+
         function toggleNav() {
             const nav = document.getElementById('adminSiteNav');
             const toggle = document.querySelector('.nav-toggle');
@@ -1519,10 +1550,36 @@
                 saveData();
                 renderPharmacists();
             }
+
+            // Create or find existing conversation
+            let conv = data.conversations.find(c => c.clientId === activeChatRequest.clientId);
+            if (!conv) {
+                conv = {
+                    id: 'C' + Date.now(),
+                    clientId: activeChatRequest.clientId,
+                    requestId: activeChatRequest.id,
+                    client: activeChatRequest.clientName || 'Guest Client',
+                    lastMessage: 'Consultation started',
+                    time: 'Just now',
+                    unread: false,
+                    messages: [
+                        {sender: 'system', text: 'Live consultation started', time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                    ]
+                };
+                data.conversations.unshift(conv);
+                saveData();
+            } else {
+                // Update requestId for existing conversation to make it live
+                conv.requestId = activeChatRequest.id;
+                saveData();
+            }
             
             localStorage.removeItem('medicore_pharmacist_chat_request');
             closeChatRequestModal();
-            openLiveChat(activeChatRequest);
+            
+            // Navigate to conversation page (messages section)
+            showSection('messages');
+            openConversation(conv.id);
         }
 
         function closeChatRequestModal() {
@@ -1635,9 +1692,21 @@
         }
 
         function loadData() {
-            const saved = localStorage.getItem('medicoreAdminData');
+            const user = typeof DataManager !== 'undefined' ? DataManager.getCurrentUser() : null;
+            let storageKey = 'medicoreAdminData';
+            if (user && user.role === 'operator') {
+                storageKey = 'medicoreAdminData_' + user.email;
+            }
+
+            const saved = localStorage.getItem(storageKey);
             if (saved) {
                 data = JSON.parse(saved);
+            } else if (user && user.role === 'operator') {
+                // Initialize clean data for new operator
+                data.drugs = [];
+                data.warehouseDrugs = [];
+                data.orders = [];
+                data.conversations = [];
             }
             
             // Sync with global scoped orders if targetEmail is set
@@ -1670,7 +1739,12 @@
         }
 
         function saveData() {
-            localStorage.setItem('medicoreAdminData', JSON.stringify(data));
+            const user = typeof DataManager !== 'undefined' ? DataManager.getCurrentUser() : null;
+            let storageKey = 'medicoreAdminData';
+            if (user && user.role === 'operator') {
+                storageKey = 'medicoreAdminData_' + user.email;
+            }
+            localStorage.setItem(storageKey, JSON.stringify(data));
         }
 
         function showSection(section) {
@@ -2373,21 +2447,22 @@
             conv.lastMessage = text;
             conv.time = 'Just now';
             
+            // Sync with live chat if applicable
+            if (conv.requestId) {
+                const chats = JSON.parse(localStorage.getItem('medicore_live_chats') || '{}');
+                if (!chats[conv.requestId]) chats[conv.requestId] = [];
+                chats[conv.requestId].push({
+                    sender: 'pharmacist',
+                    text: text,
+                    time: now.toISOString()
+                });
+                localStorage.setItem('medicore_live_chats', JSON.stringify(chats));
+            }
+
             saveData();
             renderMessages(conv);
             renderConversations();
             input.value = '';
-            
-            // Simulate reply
-            setTimeout(() => {
-                const replies = ['Thank you!', 'I understand.', 'Could you clarify that?', 'I appreciate your help.'];
-                const reply = replies[Math.floor(Math.random() * replies.length)];
-                conv.messages.push({ sender: 'client', text: reply, time: time });
-                conv.lastMessage = reply;
-                renderMessages(conv);
-                renderConversations();
-                saveData();
-            }, 3000);
         }
 
         function closeConversation() {

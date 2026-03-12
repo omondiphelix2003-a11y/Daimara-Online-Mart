@@ -631,6 +631,9 @@
                 target.classList.add('animate-enter');
 
                 if (pageId === 'transactions') this.renderTransactions();
+                
+                // Close sidebar on mobile
+                document.body.classList.remove('sidebar-active');
             },
 
             toggleVisibility() {

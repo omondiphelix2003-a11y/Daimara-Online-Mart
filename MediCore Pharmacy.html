@@ -1422,6 +1422,7 @@
         }
 
         let chatRequestTimeout = null;
+        let currentRequestId = null;
 
         function selectPharmacist(pharmacist) {
             selectedPharmacist = pharmacist;
@@ -1432,13 +1433,17 @@
             document.getElementById('clientWaitingModal').classList.remove('hidden');
             
             // Set chat request in localStorage
+            const user = typeof DataManager !== 'undefined' ? DataManager.getCurrentUser() : null;
             const request = {
                 id: 'REQ' + Date.now(),
                 pharmacistId: pharmacist.id,
                 pharmacistName: pharmacist.name,
+                clientName: user ? user.name : 'Guest Client',
+                clientId: user ? user.id : 'GUEST-' + Date.now(),
                 status: 'pending',
                 timestamp: Date.now()
             };
+            currentRequestId = request.id;
             localStorage.setItem('medicore_pharmacist_chat_request', JSON.stringify(request));
             localStorage.removeItem('medicore_pharmacist_chat_response');
 
@@ -1503,6 +1508,7 @@
         }
 
         // --- Active Chat System ---
+        let chatSyncInterval = null;
         function openActiveChat(pharmacist) {
             currentChatPharmacist = pharmacist;
             document.getElementById('activeChatImg').src = pharmacist.image;
@@ -1517,42 +1523,67 @@
             `;
             
             document.getElementById('activeChatModal').classList.remove('hidden');
+            startChatSync();
+        }
+
+        function startChatSync() {
+            if (chatSyncInterval) clearInterval(chatSyncInterval);
+            chatSyncInterval = setInterval(() => {
+                if (!currentRequestId) return;
+                const chats = JSON.parse(localStorage.getItem('medicore_live_chats') || '{}');
+                const myMessages = chats[currentRequestId] || [];
+                const container = document.getElementById('activeChatMessages');
+                
+                // Clear and re-render to keep it simple, or only append new ones
+                // Let's only append new ones by tracking last rendered count
+                const lastCount = parseInt(container.dataset.messageCount || "1");
+                if (myMessages.length + 1 > lastCount) {
+                    for (let i = lastCount - 1; i < myMessages.length; i++) {
+                        const msg = myMessages[i];
+                        const bubble = document.createElement('div');
+                        bubble.className = `chat-bubble ${msg.sender === 'client' ? 'user' : 'bot'}`;
+                        if (msg.sender === 'pharmacist') {
+                            bubble.innerHTML = `
+                                <p class="font-semibold text-blue-400 mb-1">${currentChatPharmacist.name}:</p>
+                                ${msg.text}
+                            `;
+                        } else {
+                            bubble.innerText = msg.text;
+                        }
+                        container.appendChild(bubble);
+                    }
+                    container.dataset.messageCount = myMessages.length + 1;
+                    container.scrollTop = container.scrollHeight;
+                }
+            }, 1000);
         }
 
         function sendActiveMessage() {
             const input = document.getElementById('activeChatInput');
             const text = input.value.trim();
-            if (!text) return;
+            if (!text || !currentRequestId) return;
 
-            const messages = document.getElementById('activeChatMessages');
-            messages.innerHTML += `<div class="chat-bubble user">${text}</div>`;
+            const chats = JSON.parse(localStorage.getItem('medicore_live_chats') || '{}');
+            if (!chats[currentRequestId]) chats[currentRequestId] = [];
+            
+            chats[currentRequestId].push({
+                sender: 'client',
+                text: text,
+                time: new Date().toISOString()
+            });
+            
+            localStorage.setItem('medicore_live_chats', JSON.stringify(chats));
             input.value = '';
-            messages.scrollTop = messages.scrollHeight;
-
-            setTimeout(() => {
-                const responses = [
-                    "I understand. Let me check our inventory for that.",
-                    "Could you tell me more about your symptoms?",
-                    "Based on what you've described, I recommend checking our shelves for appropriate medication.",
-                    "Would you like me to guide you to a specific medication?",
-                    "Please make sure to read the dosage instructions carefully."
-                ];
-                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-                
-                messages.innerHTML += `
-                    <div class="chat-bubble bot">
-                        <p class="font-semibold text-blue-400 mb-1">${currentChatPharmacist.name}:</p>
-                        ${randomResponse}
-                    </div>
-                `;
-                messages.scrollTop = messages.scrollHeight;
-            }, 1500);
+            
+            // UI will be updated by sync interval
         }
 
         function endChat() {
+            if (chatSyncInterval) clearInterval(chatSyncInterval);
             document.getElementById('activeChatModal').classList.add('hidden');
             currentChatPharmacist = null;
             selectedPharmacist = null;
+            currentRequestId = null;
         }
 
         // --- Cart Functions ---

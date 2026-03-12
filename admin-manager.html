@@ -969,7 +969,8 @@
           <td>
             ${a.status === 'pending' ? `
               <button class="btn btn-success" style="padding:4px 8px" onclick="approveAgentRegistration('${a.id}')">Approve</button>
-            ` : `<button class="btn btn-danger" style="padding:4px 8px" onclick="deleteAgentRecord('${a.id}')">Delete</button>`}
+            ` : ''}
+            <button class="btn btn-danger" style="padding:4px 8px" onclick="deleteAgentRecord('${a.id}')">Delete</button>
           </td>
         </tr>
       `).reverse().join('') || '<tr><td colspan="7" style="text-align:center">No agent applications</td></tr>';

@@ -360,6 +360,13 @@ const DataManager = (() => {
     return floats[agentNumber] || 0;
   }
 
+  function deleteAgentRegistration(registrationId) {
+    const regs = getAgentRegistrations();
+    const updatedRegs = regs.filter(r => r.id !== registrationId);
+    localStorage.setItem(STORAGE_KEYS.AGENT_REGISTRATIONS, JSON.stringify(updatedRegs));
+    return { success: true };
+  }
+
   function updateAgentFloat(agentNumber, amount) {
     const floats = JSON.parse(localStorage.getItem(STORAGE_KEYS.AGENT_FLOAT)) || {};
     floats[agentNumber] = (floats[agentNumber] || 0) + amount;
@@ -1775,6 +1782,13 @@ const DataManager = (() => {
     };
   }
 
+  function deleteDeliveryOrder(orderId, email = null) {
+    const orders = getScopedData('delivery_orders', [], email);
+    const filtered = orders.filter(o => o.id !== orderId);
+    saveScopedData('delivery_orders', filtered, email);
+    return { success: true };
+  }
+
   function getAdminDashboardStats() {
     const users = JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS)) || [];
     const orders = JSON.parse(localStorage.getItem(STORAGE_KEYS.ORDERS)) || [];
@@ -2021,6 +2035,7 @@ const DataManager = (() => {
     deleteOrder,
     assignOrder,
     updateOrderStatus,
+    deleteDeliveryOrder,
     updateOrderPaymentStatus,
     processNewOrder,
     getUserAddresses,
@@ -2089,6 +2104,7 @@ const DataManager = (() => {
     getAgentByUserId,
     getAgentFloat,
     updateAgentFloat,
+    deleteAgentRegistration,
     transferFunds,
     logVaultAccess,
     getVaultAccessLogs

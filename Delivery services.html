@@ -362,11 +362,24 @@ function renderDeliveryData() {
       <td>
         ${(o.status === 'assigned' || o.status === 'Packed') ? `<button class="action-btn dispatch" onclick="viewReceipt('${o.id}')">View Details & Dispatch</button>` : ''}
         ${o.status === 'Out for Delivery' ? `<button class="action-btn delivered" onclick="updateStatus('${o.id}', 'completed')">Mark Delivered</button>` : ''}
-        ${(o.status === 'completed' || o.status === 'Delivered') ? '<span style="color:green">Completed</span>' : ''}
+        ${(o.status === 'completed' || o.status === 'Delivered' || o.status === 'unfound' || o.status === 'Not Found') ? `
+          <span style="color:${(o.status === 'unfound' || o.status === 'Not Found') ? 'orange' : 'green'}">${o.status}</span>
+          <button onclick="handleDelete('${o.id}')" class="action-btn" style="background:#dc2626; padding:4px 8px; margin-left:10px;">
+            <i class="fas fa-trash"></i>
+          </button>
+        ` : ''}
       </td>
     </tr>
   `;
   }).join('') || '<tr><td colspan="5" style="text-align:center">No active delivery assignments</td></tr>';
+}
+
+function handleDelete(id) {
+  if (!confirm("Are you sure you want to remove this order from your history?")) return;
+  const result = DataManager.deleteDeliveryOrder(id, viewUserEmail);
+  if (result.success) {
+    renderDeliveryData();
+  }
 }
 
 function updateStatus(id, newStatus) {
