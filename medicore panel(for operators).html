@@ -99,6 +99,16 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #64748b;
         }
+
+        /* Ensure horizontal scrollability for long content */
+        section {
+            overflow-x: auto;
+            scrollbar-width: thin;
+        }
+        
+        .admin-card {
+            min-width: min-content;
+        }
         
         .modal-enter {
             animation: modalSlide 0.3s ease-out;
@@ -896,11 +906,16 @@
 
             <!-- Profits Section -->
             <section id="profits" class="hidden space-y-6">
-                <div class="flex justify-between items-center">
+                <div class="flex flex-wrap justify-between items-center gap-4">
                     <h3 class="text-2xl font-bold text-white">Financial Analysis</h3>
-                    <button onclick="refreshProfits()" class="p-2 text-slate-400 hover:text-blue-400 transition-colors">
-                        <i class="fa-solid fa-rotate"></i>
-                    </button>
+                    <div class="flex flex-wrap gap-3">
+                        <button onclick="refreshMedicorePlatformEarnings()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg flex items-center gap-2 transition-all text-sm font-bold shadow-lg shadow-blue-500/20">
+                            <i class="fa-solid fa-rotate"></i> Refresh Platform Earnings
+                        </button>
+                        <button onclick="systemFinancialResetMedicore()" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg flex items-center gap-2 transition-all text-sm font-bold shadow-lg shadow-red-500/20">
+                            <i class="fa-solid fa-trash-alt"></i> Reset All Financials
+                        </button>
+                    </div>
                 </div>
                 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -1424,7 +1439,7 @@
                 if (agentBanner) agentBanner.style.display = 'none';
                 if (agentDisplay) {
                     agentDisplay.classList.remove('hidden');
-                    agentVal.innerText = agent.agentNumber;
+                    agentVal.innerHTML = `<a href="AgentPortal.html" class="hover:underline">${agent.agentNumber}</a>`;
                 }
                 
                 // Change any registration buttons to "Agent Portal"
@@ -3217,6 +3232,44 @@
                 document.getElementById('pl-costs').textContent = '-KSh ' + commission.toLocaleString();
                 document.getElementById('pl-profit').textContent = 'KSh ' + netEarnings.toLocaleString();
                 document.getElementById('pl-margin').textContent = margin + '%';
+            }
+        }
+
+        function refreshMedicorePlatformEarnings() {
+            if (typeof DataManager === 'undefined') return;
+            const user = DataManager.getCurrentUser();
+            if (!user || user.role !== 'admin') {
+                alert("Only Daimara Admin can perform this action.");
+                return;
+            }
+            if (!confirm("This will reset all platform amounts (Admin, Operators, and Delivery) to zero. Proceed?")) return;
+            
+            const res = DataManager.resetPlatformEarnings();
+            if (res.success) {
+                showNotification(res.message);
+                renderProfits();
+                updateStats();
+            }
+        }
+
+        function systemFinancialResetMedicore() {
+            if (typeof DataManager === 'undefined') return;
+            const user = DataManager.getCurrentUser();
+            if (!user || user.role !== 'admin') {
+                alert("Only Daimara Admin can perform this action.");
+                return;
+            }
+            if (!confirm("CRITICAL ACTION: This will reset EVERYTHING (Admin, Operators, Delivery, VaultPro balances, and Agent Floats) to ZERO. Are you absolutely sure?")) {
+                return;
+            }
+
+            const res = DataManager.resetAllFinancials();
+            if (res.success) {
+                showNotification(res.message);
+                renderProfits();
+                updateStats();
+            } else {
+                alert("Error during reset: " + res.message);
             }
         }
 

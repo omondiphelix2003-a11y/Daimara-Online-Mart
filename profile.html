@@ -33,7 +33,7 @@ body {
   min-height: 100vh;
   font-size: 16px;
   padding-bottom: 20px;
-  overflow-x: hidden;
+  overflow-x: auto;
   width: 100%;
   color: #e2e8f0;
 }
@@ -1131,7 +1131,7 @@ body {
 <!-- NAVBAR -->
 <nav class="navbar">
   <div class="nav-left">
-<a class="logo"href="index.html">
+<a class="logo"href="index.html" style="text-decoration: solid;">
         <span style="font-size:21px;color:white;margin-left:10px;
         margin-left: -3px;cursor: pointer;">Daimara <span style="color: #3b82f6;cursor: pointer;">Stores</span></span>
       </a>
@@ -1199,6 +1199,7 @@ body {
         <div class="profile-info">
           <h1 id="profile-name"></h1>
           <p id="profile-email"></p>
+          <div id="profile-agent-no" style="margin-top: 5px;"></div>
           <p class="member-since" id="member-since"></p>
         </div>
       </div>
@@ -1438,6 +1439,28 @@ function loadUserProfile() {
   document.getElementById("detail-email").textContent = loggedInUser.email;
   document.getElementById("detail-phone").textContent = loggedInUser.phone || "Not provided";
   document.getElementById("detail-id").textContent = loggedInUser.id;
+
+  // Agent check
+  const agent = DataManager.getAgentByUserId(loggedInUser.id);
+  const agentNoContainer = document.getElementById('profile-agent-no');
+  if (agent && agent.status === 'approved') {
+    // Add to header (visible on all screens)
+    if (agentNoContainer) {
+      agentNoContainer.innerHTML = `<span style="background:var(--primary); color:white; padding:2px 8px; border-radius:4px; font-size:12px; font-weight:bold;">AGENT: <a href="AgentPortal.html?agentNo=${agent.agentNumber}" style="color:white; text-decoration:none;">${agent.agentNumber}</a></span>`;
+    }
+
+    // Add agent number row if not exists
+    const accountInfo = document.querySelector('.detail-section');
+    if (accountInfo && !document.getElementById('detail-agent-no')) {
+      const agentRow = document.createElement('div');
+      agentRow.className = 'detail-row';
+      agentRow.innerHTML = `
+        <span class="label">Agent Number:</span>
+        <span class="value" id="detail-agent-no"><a href="AgentPortal.html?agentNo=${agent.agentNumber}" style="color:var(--primary); font-weight:800; text-decoration:none;">${agent.agentNumber}</a></span>
+      `;
+      accountInfo.appendChild(agentRow);
+    }
+  }
 
   // Display member since
   const memberDate = new Date(loggedInUser.registeredDate || Date.now());

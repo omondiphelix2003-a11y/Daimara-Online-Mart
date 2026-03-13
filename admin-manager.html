@@ -44,7 +44,7 @@
          justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
 
     /* MAIN CONTENT */
-    .main-content { flex: 1; margin-left: 270px; padding: 30px; transition: all 0.3s; width: calc(100% - 270px); }
+    .main-content { flex: 1; margin-left: 270px; padding: 30px; transition: all 0.3s; width: calc(100% - 270px); overflow-x: auto; }
     .main-content.full-width { margin-left: 0; width: 100%; }
 
     @media (max-width: 992px) {
@@ -544,6 +544,19 @@
               <button class="btn btn-success" onclick="performAdminManualTx('credit')">Credit (+)</button>
               <button class="btn btn-danger" onclick="performAdminManualTx('debit')">Debit (-)</button>
             </div>
+          </div>
+        </div>
+
+        <div style="background:rgba(239,68,68,0.1); padding:20px; border-radius:12px; margin-bottom:20px; border:1px solid #ef4444;">
+          <h3 style="color:#ef4444;">System Financial Maintenance</h3>
+          <p style="color:var(--text-muted); margin-bottom:15px;">Reset platform earnings or perform a full system financial reset. <strong>This action cannot be undone.</strong></p>
+          <div style="display:flex; gap:15px; flex-wrap: wrap;">
+            <button class="btn btn-primary" onclick="refreshPlatformEarnings()" style="background:var(--primary-color); border:none; padding:10px 20px;">
+              <i class="fas fa-sync"></i> Refresh Platform Earnings (Admin, Op, Delivery)
+            </button>
+            <button class="btn btn-danger" onclick="systemFinancialReset()" style="background:#ef4444; border:none; padding:10px 20px;">
+              <i class="fas fa-trash-alt"></i> Reset All Platform Earnings (Incl. Vault & Agent Float)
+            </button>
           </div>
         </div>
 
@@ -1056,6 +1069,18 @@
         return;
       }
 
+      const adminUser = DataManager.getCurrentUser();
+      const adminBalance = DataManager.getVaultBalance(adminUser.id);
+      
+      if (adminBalance <= 0) {
+        alert("Platform float is zero. Cannot add float to agent.");
+        return;
+      }
+      if (adminBalance < amount) {
+        alert(`Insufficient platform float. Available: KSH ${adminBalance.toLocaleString()}`);
+        return;
+      }
+
       // Use unified DataManager float logic
       const res = DataManager.updateAgentFloat(agentNo, amount, 'Float top-up by Admin');
       if (res.success) {
@@ -1090,6 +1115,31 @@
       document.getElementById('admin-tx-amount').value = '';
       document.getElementById('admin-tx-desc').value = '';
       renderAdminVault();
+    }
+
+    function refreshPlatformEarnings() {
+      if (!confirm("This will reset all platform amounts (Admin, Operators, and Delivery) to zero. Proceed?")) return;
+      const res = DataManager.resetPlatformEarnings();
+      if (res.success) {
+        alert(res.message);
+        renderAdminVault();
+        renderDashboard();
+      }
+    }
+
+    function systemFinancialReset() {
+      if (!confirm("CRITICAL ACTION: This will reset EVERYTHING (Admin, Operators, Delivery, VaultPro balances, and Agent Floats) to ZERO. Are you absolutely sure?")) {
+        return;
+      }
+
+      const res = DataManager.resetAllFinancials();
+      if (res.success) {
+        alert(res.message);
+        renderAdminVault();
+        renderDashboard();
+      } else {
+        alert("Error during reset: " + res.message);
+      }
     }
 
     function viewPageRequestDetails(regId) {

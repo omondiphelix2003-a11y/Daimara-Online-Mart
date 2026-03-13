@@ -237,6 +237,9 @@
                     <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Security PIN</label>
                     <input type="password" id="login-pin" required maxlength="4" class="custom-input w-full rounded-xl py-3 px-4 tracking-[0.5em] text-center" placeholder="••••">
                 </div>
+                <div class="text-right">
+                    <a href="#" onclick="openVaultForgotPin()" class="text-xs text-indigo-400 hover:text-indigo-300 transition-colors">Forgot PIN?</a>
+                </div>
                 <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-indigo-600/20 mt-4">
                     Unlock Vault
                 </button>
@@ -524,6 +527,30 @@
         </div>
     </main>
 
+    <!-- RESET PIN MODAL -->
+    <div id="reset-pin-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[2000] hidden items-center justify-center p-4">
+        <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl w-full max-w-md shadow-2xl">
+            <h2 class="text-xl font-bold text-white mb-2">Reset Vault PIN</h2>
+            <p class="text-slate-400 text-sm mb-6">Enter your ID Number used for first-time activation.</p>
+            <form onsubmit="handleVaultResetPin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">ID Number</label>
+                    <input type="text" id="reset-vault-id" required class="custom-input w-full rounded-xl py-3 px-4 bg-slate-900 border-slate-700 text-white" placeholder="Enter ID Number">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">New 4-Digit PIN</label>
+                    <input type="password" id="reset-vault-pin" required maxlength="4" class="custom-input w-full rounded-xl py-3 px-4 text-center tracking-[1em] font-bold bg-slate-900 border-slate-700 text-white" placeholder="••••">
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg mt-4">
+                    Update Security PIN
+                </button>
+                <button type="button" onclick="closeVaultResetModal()" class="w-full text-slate-400 hover:text-white transition-colors text-sm py-2">
+                    Cancel
+                </button>
+            </form>
+        </div>
+    </div>
+
     <div id="toast-container"></div>
 
     <script>
@@ -765,8 +792,15 @@
                         const recipientPhone = e.target.querySelector('input[placeholder*="Phone"]').value;
                         const recipientId = e.target.querySelector('input[placeholder*="ID"]').value;
 
+                        if (this.state.balance <= 0) {
+                            this.showToast('Your VaultPro amount is zero. Transaction cannot be made.', 'error');
+                            btn.disabled = false;
+                            btn.innerHTML = originalContent;
+                            return;
+                        }
+
                         if (amount > this.state.balance) {
-                            this.showToast('Insufficient funds', 'error');
+                            this.showToast('Insufficient funds. Transaction cannot proceed.', 'error');
                             btn.disabled = false;
                             btn.innerHTML = originalContent;
                             return;
@@ -811,30 +845,34 @@
                             return;
                         }
 
+                        if (this.state.balance <= 0) {
+                            this.showToast('Your VaultPro amount is zero. Transaction cannot be made.', 'error');
+                            btn.disabled = false;
+                            btn.innerHTML = originalContent;
+                            return;
+                        }
+
                         if (amount > this.state.balance) {
-                            this.showToast('Insufficient funds', 'error');
+                            this.showToast('Insufficient funds. Transaction cannot proceed.', 'error');
                             btn.disabled = false;
                             btn.innerHTML = originalContent;
                             return;
                         }
 
                         // Withdrawal logic:
-                        // 1. Decrease client vault balance
-                        // 2. Increase agent float
-                        DataManager.updateVaultBalance(this.state.user.id, -amount, `Withdrawal via Agent ${agentNumber}`);
-                        DataManager.updateAgentFloat(agentNumber, amount);
+                        // 1. Immediately deduct from client to "escrow" the funds
+                        DataManager.updateVaultBalance(this.state.user.id, -amount, `Withdrawal Request to Agent ${agentNumber}`);
                         
-                        // Notify agent (in a real system this would be a message)
-                        const agentMessages = JSON.parse(localStorage.getItem('agent_messages_' + agentNumber)) || [];
-                        agentMessages.push({
-                            type: 'withdrawal',
+                        // 2. Create withdrawal request for Agent to approve
+                        DataManager.addWithdrawalRequest({
+                            clientId: this.state.user.id,
                             clientPhone: this.state.user.phone,
-                            amount: amount,
-                            date: new Date().toISOString()
+                            clientName: this.state.user.name,
+                            agentNumber: agentNumber,
+                            amount: amount
                         });
-                        localStorage.setItem('agent_messages_' + agentNumber, JSON.stringify(agentMessages));
 
-                        this.showToast(`Withdrawal of ${this.formatMoney(amount)} successful`, 'success');
+                        this.showToast(`Withdrawal request of ${this.formatMoney(amount)} sent to Agent ${agentNumber}`, 'success');
                         e.target.reset();
                         this.updateBalanceUI();
                         this.navigate('transactions');
@@ -877,6 +915,38 @@
         document.addEventListener('DOMContentLoaded', () => {
             app.init();
         });
+
+        // Global Reset PIN Helpers
+        function openVaultForgotPin() {
+            document.getElementById('reset-pin-modal').classList.remove('hidden');
+            document.getElementById('reset-pin-modal').classList.add('flex');
+        }
+
+        function closeVaultResetModal() {
+            document.getElementById('reset-pin-modal').classList.add('hidden');
+            document.getElementById('reset-pin-modal').classList.remove('flex');
+        }
+
+        function handleVaultResetPin(e) {
+            e.preventDefault();
+            const id = document.getElementById('reset-vault-id').value;
+            const newPin = document.getElementById('reset-vault-pin').value;
+
+            if (newPin.length !== 4) {
+                app.showToast('PIN must be 4 digits', 'error');
+                return;
+            }
+
+            const res = DataManager.resetVaultPin(app.state.user.id, id, newPin);
+            if (res.success) {
+                app.showToast('PIN reset successfully', 'success');
+                // Sync local state
+                app.state.user.vaultPin = newPin;
+                closeVaultResetModal();
+            } else {
+                app.showToast(res.message, 'error');
+            }
+        }
     </script>
 </body>
 </html>

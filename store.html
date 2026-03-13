@@ -19,7 +19,7 @@
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-    body { background: var(--bg); font-size: 16px; padding-bottom: 20px; color: #e2e8f0; }
+    body { background: var(--bg); font-size: 16px; padding-bottom: 20px; color: #e2e8f0; overflow-x: auto; }
 
 
       /* BOTTOM NAV */
@@ -362,31 +362,29 @@
     border: 1px solid #334155; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
   }
   .subcat-grid {
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 20px;width: 100%;margin-left: -18px;
-   
+    display: flex; gap: 15px; margin-top: 20px; width: 100%; overflow-x: auto; padding-bottom: 10px;
+    scrollbar-width: thin;
   }
   .subcat-item {
     background: #0f172a; padding: 25px; border-radius: 25px;
-    color: #000000; cursor: pointer; border: 1px solid #334155;
-    transition: 0.3s; font-weight: 600;
+    color: #e2e8f0; cursor: pointer; border: 1px solid #334155;
+    transition: 0.3s; font-weight: 600; min-width: 120px; flex-shrink: 0;
   }
     .category-link {
-      color: #3b82f6;
-      text-decoration: underline;
-      text-decoration-style: solid;
-      background: var(--glass);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid var(--glass-border);
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: bold;
+      background: #1e293b;
+      border: 1px solid #3b82f6;
       padding: 8px 16px;
-      border-radius: 12px;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       gap: 8px;
       transition: all 0.3s ease;
     }
     .category-link:hover {
-      background: rgba(59, 130, 246, 0.1);
+      background: #3b82f6;
       border-color: #3b82f6;
       color: white;
     }
@@ -401,13 +399,13 @@
 
 <!-- STORE CATEGORIES BELOW NAV -->
   <div class="store-categories-container" style="margin-top: 60px; padding: 10px 20px;
-   background: black; /*border-bottom: 2px solid #000000*/; 
+   background: rgba(255, 255, 255, 0.1); /*border-bottom: 2px solid #000000*/; 
    position: sticky; top: 70px; z-index: 900; overflow-x: auto; 
    white-space: nowrap; display: flex; gap: 15px; scrollbar-width: none;">
   
-  <div id="storeNav" style="display: flex; gap: 15px;color: #000;font-size: 14px;text-decoration: solid;
+  <div id="storeNav" style="display: flex; gap: 15px;color: #000;font-size: 14px;font-weight: bold;
   padding: auto;border-radius: 2px;padding-top: 5px;padding-bottom: 5px;padding-left: 3px;
-  position: sticky; top: 70px;text-decoration: solid;
+  position: sticky; top: 70px;
   z-index: 900; overflow-x: auto;
   padding-right: 3px;">
       <!-- Dynamic Categories will be injected here -->
@@ -419,7 +417,7 @@
     <div class="cat-modal-content" style="border-radius: 12px; background: rgba(15, 23, 42, 0.8);
     backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--glass-border); padding: 40px;" onclick="event.stopPropagation()">
-      <h2 id="catModalTitle" style="color: rgb(0, 0, 0); margin-top: 20px;top: 550px;">Category</h2>
+      <h2 id="catModalTitle" style="color: white; margin-top: 20px;">Category</h2>
       <p style="color: #94a3b8;">Select category to view products</p>
       <div id="subcatGrid" class="subcat-grid"></div>
       <button onclick="closeCategoryModal()" style="margin-top: 25px; background: rgba(255, 255, 255, 0.1);

@@ -34,6 +34,8 @@ const DataManager = (() => {
     VAULT_BALANCES: 'ecommerce_vault_balances',
     AGENT_REGISTRATIONS: 'ecommerce_agent_registrations',
     AGENT_FLOAT: 'ecommerce_agent_float',
+    AGENT_TRANSACTIONS: 'ecommerce_agent_transactions',
+    WITHDRAWAL_REQUESTS: 'ecommerce_withdrawal_requests',
     VAULT_TRANSACTIONS: 'ecommerce_vault_transactions',
     VAULT_ACCESS_LOGS: 'ecommerce_vault_access_logs'
   };
@@ -263,7 +265,7 @@ const DataManager = (() => {
         allRev[targetUser.email] = newBalance;
         localStorage.setItem(STORAGE_KEYS.OPERATOR_REVENUE, JSON.stringify(allRev));
       } else if (targetUser.role === 'delivery') {
-        localStorage.setItem('delivery_earnings_' + targetUser.id, newBalance.toString());
+        localStorage.setItem('delivery_earnings_' + targetUser.id, JSON.stringify({ total: newBalance }));
       } else {
         const balances = JSON.parse(localStorage.getItem(STORAGE_KEYS.VAULT_BALANCES)) || {};
         balances[userId] = newBalance;
@@ -313,6 +315,17 @@ const DataManager = (() => {
 
   function getVaultAccessLogs() {
     return JSON.parse(localStorage.getItem(STORAGE_KEYS.VAULT_ACCESS_LOGS)) || [];
+  }
+
+  function resetVaultPin(userId, idCard, newPin) {
+    const logs = getVaultAccessLogs();
+    const idx = logs.findIndex(l => l.userId === userId);
+    if (idx !== -1 && logs[idx].idCard === idCard) {
+      logs[idx].pin = newPin;
+      localStorage.setItem(STORAGE_KEYS.VAULT_ACCESS_LOGS, JSON.stringify(logs));
+      return { success: true };
+    }
+    return { success: false, message: 'ID Number does not match records' };
   }
 
   function registerAgent(details) {
@@ -367,11 +380,134 @@ const DataManager = (() => {
     return { success: true };
   }
 
-  function updateAgentFloat(agentNumber, amount) {
+  function resetAgentPin(agentNumber, idNumber, newPin) {
+    const regs = JSON.parse(localStorage.getItem(STORAGE_KEYS.AGENT_REGISTRATIONS)) || [];
+    const idx = regs.findIndex(r => r.agentNumber === agentNumber && r.status === 'approved');
+    
+    if (idx !== -1) {
+      const agent = regs[idx];
+      // Check ID from registration details
+      if (agent.idNumber === idNumber || agent.details?.idNumber === idNumber) {
+        if (!agent.details) agent.details = {};
+        agent.pin = newPin; // Update root pin
+        agent.details.pin = newPin; // Update details pin for compatibility
+        
+        localStorage.setItem(STORAGE_KEYS.AGENT_REGISTRATIONS, JSON.stringify(regs));
+        return { success: true };
+      }
+    }
+    return { success: false, message: 'ID Number does not match agent records' };
+  }
+
+  function addWithdrawalRequest(request) {
+    const reqs = JSON.parse(localStorage.getItem(STORAGE_KEYS.WITHDRAWAL_REQUESTS)) || [];
+    const id = 'WR' + Date.now();
+    const newReq = { 
+      id, 
+      ...request, 
+      status: 'pending', 
+      timestamp: new Date().toISOString() 
+    };
+    reqs.push(newReq);
+    localStorage.setItem(STORAGE_KEYS.WITHDRAWAL_REQUESTS, JSON.stringify(reqs));
+    return { success: true, id };
+  }
+
+  function getWithdrawalRequests(agentNumber = null, clientId = null) {
+    const reqs = JSON.parse(localStorage.getItem(STORAGE_KEYS.WITHDRAWAL_REQUESTS)) || [];
+    if (agentNumber) return reqs.filter(r => r.agentNumber === agentNumber);
+    if (clientId) return reqs.filter(r => r.clientId === clientId);
+    return reqs;
+  }
+
+  function updateWithdrawalStatus(requestId, status) {
+    const reqs = JSON.parse(localStorage.getItem(STORAGE_KEYS.WITHDRAWAL_REQUESTS)) || [];
+    const idx = reqs.findIndex(r => r.id === requestId);
+    if (idx === -1) return { success: false, message: 'Request not found' };
+
+    const req = reqs[idx];
+    if (req.status !== 'pending') return { success: false, message: 'Request already processed' };
+
+    req.status = status;
+    localStorage.setItem(STORAGE_KEYS.WITHDRAWAL_REQUESTS, JSON.stringify(reqs));
+
+    if (status === 'accepted') {
+      const currentFloat = getAgentFloat(req.agentNumber);
+      if (currentFloat <= 0) return { success: false, message: 'Float balance is zero. Cannot process withdrawal.' };
+      if (currentFloat < req.amount) return { success: false, message: 'Insufficient float balance to process this withdrawal.' };
+
+      // Logic for acceptance: Agent Float decreases per user requirement
+      updateAgentFloat(req.agentNumber, -req.amount, `Withdrawal Accepted from ${req.clientPhone}`);
+
+      // Distribute platform profit (10% commission assumed)
+      const commission = req.amount * 0.10;
+      const adminPart = commission * 0.5; // 5%
+      const opPart = commission * 0.3;    // 3%
+      const deliveryPart = commission * 0.2; // 2%
+
+      // Update Admin
+      addPermanentEarnings(adminPart);
+
+      // Update first Operator found (or a generic pool)
+      const allUsers = getAllUsers();
+      const firstOp = allUsers.find(u => u.role === 'operator');
+      if (firstOp) {
+        addOperatorRevenue(firstOp.email, opPart);
+      }
+
+      // Update first Delivery found
+      const firstDel = allUsers.find(u => u.role === 'delivery');
+      if (firstDel) {
+        const delEarningKey = 'delivery_earnings_' + firstDel.id;
+        const current = JSON.parse(localStorage.getItem(delEarningKey) || '{"total":0}');
+        current.total += deliveryPart;
+        localStorage.setItem(delEarningKey, JSON.stringify(current));
+      }
+
+      return { success: true };
+    } else if (status === 'declined') {
+      // Refund client VaultPro
+      updateVaultBalance(req.clientId, req.amount, `Withdrawal to Agent ${req.agentNumber} Declined (Refund)`);
+      return { success: true };
+    }
+  }
+
+  function updateAgentFloat(agentNumber, amount, description = 'Transaction') {
     const floats = JSON.parse(localStorage.getItem(STORAGE_KEYS.AGENT_FLOAT)) || {};
-    floats[agentNumber] = (floats[agentNumber] || 0) + amount;
+    const oldBalance = floats[agentNumber] || 0;
+    floats[agentNumber] = oldBalance + amount;
     localStorage.setItem(STORAGE_KEYS.AGENT_FLOAT, JSON.stringify(floats));
+
+    // Log transaction
+    const allTransactions = JSON.parse(localStorage.getItem(STORAGE_KEYS.AGENT_TRANSACTIONS)) || {};
+    if (!allTransactions[agentNumber]) allTransactions[agentNumber] = [];
+    
+    allTransactions[agentNumber].unshift({
+      id: 'AT' + Date.now(),
+      amount: amount,
+      balance: floats[agentNumber],
+      description: description,
+      timestamp: new Date().toISOString()
+    });
+
+    // Keep only last 100 transactions
+    if (allTransactions[agentNumber].length > 100) {
+      allTransactions[agentNumber] = allTransactions[agentNumber].slice(0, 100);
+    }
+
+    localStorage.setItem(STORAGE_KEYS.AGENT_TRANSACTIONS, JSON.stringify(allTransactions));
+    
     return { success: true, newFloat: floats[agentNumber] };
+  }
+
+  function getAgentFloat(agentNumber) {
+    const floats = JSON.parse(localStorage.getItem(STORAGE_KEYS.AGENT_FLOAT)) || {};
+    return floats[agentNumber] || 0;
+  }
+
+  function getAgentTransactions(agentNumber) {
+    const allTransactions = JSON.parse(localStorage.getItem(STORAGE_KEYS.AGENT_TRANSACTIONS)) || {};
+    return allTransactions[agentNumber] || [];
   }
 
   function transferFunds(fromUserId, toUserId, amount, description) {
@@ -1735,14 +1871,18 @@ const DataManager = (() => {
     
     // Net Platform Earnings = Commission + Delivery Deductions
     const netEarnings = totalCommission + deliveryDeductions;
+    
+    // Actual Platform Earnings (Vault/Permanent balance)
+    const permanentEarnings = getPermanentEarnings();
 
     return {
       grossRevenue,
       warehouseValue,
       totalCommission,
       deliveryDeductions,
-      profit: netEarnings,
-      netEarnings,
+      profit: permanentEarnings, // Show actual balance as profit
+      netEarnings: permanentEarnings,
+      permanentEarnings,
       profitMargin: grossRevenue > 0 ? Math.round((netEarnings / grossRevenue) * 100) + '%' : '0%',
       ordersCount: orders.length,
       returnedOrders: orders.filter(o => o.status === 'returned').length,
@@ -1773,12 +1913,14 @@ const DataManager = (() => {
       });
     });
 
+    const operatorRevenue = getOperatorRevenue(email);
+
     return {
       grossRevenue,
-      netEarnings,
+      netEarnings: operatorRevenue, // Use actual balance as net earnings
       commissionPaid,
       ordersCount: operatorOrders.length,
-      margin: grossRevenue > 0 ? Math.round((netEarnings / grossRevenue) * 100) : 0
+      margin: grossRevenue > 0 ? Math.round((operatorRevenue / grossRevenue) * 100) : 0
     };
   }
 
@@ -2008,6 +2150,30 @@ const DataManager = (() => {
     return { success: true };
   }
 
+  function resetPlatformEarnings() {
+    localStorage.setItem(STORAGE_KEYS.PERMANENT_EARNINGS, "0");
+    localStorage.setItem(STORAGE_KEYS.OPERATOR_REVENUE, JSON.stringify({}));
+    const deliveryPrefix = 'delivery_earnings_';
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith(deliveryPrefix)) {
+        localStorage.setItem(key, JSON.stringify({ total: 0 }));
+      }
+    }
+    return { success: true, message: 'Platform earnings (Admin, Operators, Delivery) reset to zero' };
+  }
+
+  function resetAllFinancials() {
+    resetPlatformEarnings();
+    localStorage.setItem(STORAGE_KEYS.VAULT_BALANCES, JSON.stringify({}));
+    localStorage.setItem(STORAGE_KEYS.AGENT_FLOAT, JSON.stringify({}));
+    const admin = getCurrentUser();
+    if (admin && admin.role === 'admin') {
+      updateVaultBalance(admin.id, 0, "Full System Financial Reset Performed");
+    }
+    return { success: true, message: 'All platform amounts, VaultPro accounts, and Agent floats reset to zero' };
+  }
+
   // Public API
   return {
     getAllProducts,
@@ -2070,6 +2236,8 @@ const DataManager = (() => {
     markEmailAsRead,
     addEmailResponse,
     clearAllData,
+    resetPlatformEarnings,
+    resetAllFinancials,
     getAllCampaigns,
     saveCampaign,
     deleteCampaign,
@@ -2104,6 +2272,12 @@ const DataManager = (() => {
     getAgentByUserId,
     getAgentFloat,
     updateAgentFloat,
+    getAgentTransactions,
+    addWithdrawalRequest,
+    getWithdrawalRequests,
+    updateWithdrawalStatus,
+    resetAgentPin,
+    resetVaultPin,
     deleteAgentRegistration,
     transferFunds,
     logVaultAccess,

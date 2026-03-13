@@ -442,7 +442,7 @@
 
         <div class="content">
             <!-- Admin Only: Category Management -->
-            <div id="adminCategorySection" class="form-section" style="border-left-color: #f1c40f;">
+            <div id="adminCategorySection" class="form-section" style="border-left-color: #f1c40f; display: none;">
                 <h2>⚙️ Store Category Management (Admin Only)</h2>
                 <p style="color: #94a3b8; margin-bottom: 15px; font-size: 0.9rem;">Add, edit or delete product categories and their sub-categories. These will appear in the Store page navigation.</p>
                 <div class="form-row">
@@ -688,8 +688,8 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             const user = DataManager.getCurrentUser();
-            // Show category management for admin or operator
-            if (user && (user.role === 'admin' || user.role === 'operator')) {
+            // Show category management for daimara admin only
+            if (user && user.role === 'admin' && user.email === "omondiphelix2003@gmail.com") {
                 document.getElementById('adminCategorySection').style.display = 'block';
             }
             

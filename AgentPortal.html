@@ -17,8 +17,8 @@
       --border: #334155;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-    body { background: var(--bg); color: var(--text); min-height: 100vh; padding: 20px; }
-    .container { max-width: 800px; margin: 0 auto; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; padding: 20px; overflow-x: auto; }
+    .container { max-width: 800px; margin: 0 auto; min-width: 320px; }
     header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
     .agent-info { background: var(--card); padding: 20px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 20px; }
     .balance-card { background: linear-gradient(135deg, #1e40af, #3b82f6); padding: 30px; border-radius: 16px; text-align: center; margin-bottom: 30px; }
@@ -102,8 +102,25 @@
       <form onsubmit="handleAction(event)">
         <div id="modal-fields"></div>
         <input type="password" id="auth-pin" required maxlength="4" placeholder="Enter Portal PIN" style="text-align:center; letter-spacing:0.5em;">
+        <div style="text-align: right; margin-bottom: 10px;">
+          <a href="#" onclick="openForgotPin()" style="color: var(--primary); font-size: 12px; text-decoration: none;">Forgot PIN?</a>
+        </div>
         <button type="submit" class="submit-btn">Confirm Transaction</button>
         <button type="button" onclick="closeModal()" style="width:100%; background:none; color:var(--muted); border:none; margin-top:10px; cursor:pointer;">Cancel</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- FORGOT PIN MODAL -->
+  <div id="forgot-pin-modal" class="modal">
+    <div class="modal-content">
+      <h2>Reset Portal PIN</h2>
+      <p style="color:var(--muted); font-size:12px; margin-bottom:15px;">Enter your ID number used during registration to set a new PIN.</p>
+      <form onsubmit="handleResetPin(event)">
+        <input type="text" id="reset-id-num" required placeholder="Registration ID Number">
+        <input type="password" id="new-pin" required maxlength="4" placeholder="Enter New 4-Digit PIN" style="text-align:center; letter-spacing:0.5em;">
+        <button type="submit" class="submit-btn">Reset PIN</button>
+        <button type="button" onclick="closeForgotModal()" style="width:100%; background:none; color:var(--muted); border:none; margin-top:10px; cursor:pointer;">Cancel</button>
       </form>
     </div>
   </div>
@@ -114,26 +131,24 @@
     let agentData = null;
 
     function init() {
-      const user = JSON.parse(localStorage.getItem('currentUser'));
+      const user = DataManager.getCurrentUser();
       if (!user) { location.href = 'index.html'; return; }
 
-      const agents = JSON.parse(localStorage.getItem('daimara_agents') || '[]');
-      agentData = agents.find(a => a.userId === user.id && a.status === 'approved');
+      agentData = DataManager.getAgentByUserId(user.id);
 
-      if (!agentData) {
+      if (!agentData || agentData.status !== 'approved') {
         alert("Unauthorized. Access denied.");
         location.href = 'index.html';
         return;
       }
 
-      document.getElementById('display-biz-name').innerText = agentData.businessName;
+      document.getElementById('display-biz-name').innerText = agentData.businessName || agentData.details?.company || "Agent";
       document.getElementById('display-agent-no').innerText = agentData.agentNumber;
       refreshBalance();
     }
 
     function refreshBalance() {
-      const floats = JSON.parse(localStorage.getItem('daimara_agent_floats') || '{}');
-      const balance = floats[agentData.agentNumber] || 0;
+      const balance = DataManager.getAgentFloat(agentData.agentNumber);
       document.getElementById('float-balance').innerText = balance.toLocaleString(undefined, {minimumFractionDigits:2});
     }
 
@@ -178,67 +193,79 @@
       document.getElementById('action-modal').style.display = 'none';
     }
 
+    function openForgotPin() {
+      closeModal();
+      document.getElementById('forgot-pin-modal').style.display = 'flex';
+    }
+
+    function closeForgotModal() {
+      document.getElementById('forgot-pin-modal').style.display = 'none';
+    }
+
+    function handleResetPin(e) {
+      e.preventDefault();
+      const idNum = document.getElementById('reset-id-num').value.trim();
+      const newPin = document.getElementById('new-pin').value;
+      
+      if (newPin.length !== 4) { alert("PIN must be 4 digits"); return; }
+
+      const res = DataManager.resetAgentPin(agentData.agentNumber, idNum, newPin);
+      if (res.success) {
+        alert("PIN Reset Successful! You can now use your new PIN.");
+        // Reload agent data to get new pin
+        const user = DataManager.getCurrentUser();
+        agentData = DataManager.getAgentByUserId(user.id);
+        closeForgotModal();
+      } else {
+        alert("Error: " + res.message);
+      }
+    }
+
     function handleAction(e) {
       e.preventDefault();
       const pin = document.getElementById('auth-pin').value;
-      if (pin !== agentData.pin) {
+      // Agent pin might be in details or root
+      const agentPin = agentData.pin || agentData.details?.pin || '1234'; 
+      if (pin !== agentPin) {
         alert("Incorrect Portal PIN!");
         return;
       }
 
-      const floats = JSON.parse(localStorage.getItem('daimara_agent_floats') || '{}');
-      let currentFloat = floats[agentData.agentNumber] || 0;
+      const currentFloat = DataManager.getAgentFloat(agentData.agentNumber);
 
       if (currentAction === 'deposit') {
         const phone = document.getElementById('client-phone').value;
         const amount = parseFloat(document.getElementById('tx-amount').value);
 
-        if (currentFloat < amount) { alert("Insufficient float balance!"); return; }
+        if (isNaN(amount) || amount <= 0) { alert("Invalid amount!"); return; }
+        
+        if (currentFloat <= 0) { alert("Float balance is zero! Deposit cannot be processed."); return; }
+        if (currentFloat < amount) { alert("Insufficient float balance to process this deposit!"); return; }
 
         // Logic: Agent Float Decr, Client VaultPro Incr
-        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const users = DataManager.getAllUsers() || [];
         const client = users.find(u => u.phone === phone);
         if (!client) { alert("Client phone number not registered!"); return; }
 
-        // Update Client VaultPro
-        const clientVault = JSON.parse(localStorage.getItem(`daimara_vault_${client.id}`) || '{"balance":0, "logs":[]}');
-        clientVault.balance += amount;
-        clientVault.logs.push({
-          timestamp: new Date().toISOString(),
-          type: 'credit',
-          details: `Deposit via Agent ${agentData.agentNumber}`,
-          amount: amount,
-          balance: clientVault.balance
-        });
-        localStorage.setItem(`daimara_vault_${client.id}`, JSON.stringify(clientVault));
+        // Update Client Vault
+        DataManager.updateVaultBalance(client.id, amount, `Deposit via Agent ${agentData.agentNumber}`);
 
         // Update Agent Float
-        floats[agentData.agentNumber] -= amount;
-        localStorage.setItem('daimara_agent_floats', JSON.stringify(floats));
+        DataManager.updateAgentFloat(agentData.agentNumber, -amount, `Deposit to ${phone}`);
         
-        recordAgentLog('debit', `Deposit to ${phone}`, amount, floats[agentData.agentNumber]);
         alert("Deposit processed successfully!");
 
       } else if (currentAction === 'transfer') {
         const amount = parseFloat(document.getElementById('tx-amount').value);
-        if (currentFloat < amount) { alert("Insufficient float balance!"); return; }
+        if (isNaN(amount) || amount <= 0) { alert("Invalid amount!"); return; }
+        
+        if (currentFloat <= 0) { alert("Float balance is zero! Transfer cannot be processed."); return; }
+        if (currentFloat < amount) { alert("Insufficient float balance to process this transfer!"); return; }
 
         // Logic: Agent Float Decr, Agent's own VaultPro Incr
-        const agentVault = JSON.parse(localStorage.getItem(`daimara_vault_${agentData.userId}`) || '{"balance":0, "logs":[]}');
-        agentVault.balance += amount;
-        agentVault.logs.push({
-          timestamp: new Date().toISOString(),
-          type: 'credit',
-          details: `Float Transfer from Agent Portal`,
-          amount: amount,
-          balance: agentVault.balance
-        });
-        localStorage.setItem(`daimara_vault_${agentData.userId}`, JSON.stringify(agentVault));
+        DataManager.updateVaultBalance(agentData.userId, amount, `Float Transfer from Agent Portal`);
+        DataManager.updateAgentFloat(agentData.agentNumber, -amount, `Transfer to VaultPro`);
 
-        floats[agentData.agentNumber] -= amount;
-        localStorage.setItem('daimara_agent_floats', JSON.stringify(floats));
-
-        recordAgentLog('debit', `Transfer to VaultPro`, amount, floats[agentData.agentNumber]);
         alert("Transfer completed!");
       }
 
@@ -247,14 +274,30 @@
     }
 
     function renderWithdrawalRequests() {
-      // In a real system, we'd fetch pending withdrawals from a central queue
-      // For this demo, we'll look for 'pending_withdrawal' logs across all vault accounts
       const container = document.getElementById('withdrawal-requests');
-      container.innerHTML = '<p style="text-align:center; padding:10px; color:var(--muted);">No pending requests found.</p>';
+      const reqs = DataManager.getWithdrawalRequests(agentData.agentNumber).filter(r => r.status === 'pending');
       
-      // We can also let the agent manually input client details if no queue
+      if (reqs.length === 0) {
+        container.innerHTML = '<p style="text-align:center; padding:10px; color:var(--muted);">No pending requests found.</p>';
+      } else {
+        container.innerHTML = reqs.map(r => `
+          <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:12px; margin-bottom:10px; border:1px solid var(--border);">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+              <span>${r.clientName}<br><small style="color:var(--muted);">${r.clientPhone}</small></span>
+              <span style="font-weight:bold; color:var(--primary);">KSH ${r.amount.toLocaleString()}</span>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+              <button onclick="handleWithdrawalRequest('${r.id}', 'accepted')" style="padding:8px; background:var(--success); color:white; border:none; border-radius:6px; cursor:pointer;">Accept</button>
+              <button onclick="handleWithdrawalRequest('${r.id}', 'declined')" style="padding:8px; background:var(--danger); color:white; border:none; border-radius:6px; cursor:pointer;">Decline</button>
+            </div>
+          </div>
+        `).join('');
+      }
+      
+      // Still keep manual input just in case
       container.innerHTML += `
-        <div style="margin-top:10px; border-top:1px solid var(--border); padding-top:10px;">
+        <div style="margin-top:20px; border-top:1px solid var(--border); padding-top:10px;">
+          <p style="font-size:11px; color:var(--muted); margin-bottom:5px;">Or process manual withdrawal:</p>
           <input type="tel" id="withdraw-client-phone" placeholder="Enter Client Phone">
           <input type="number" id="withdraw-amount" placeholder="Enter Requested Amount">
           <button type="button" onclick="processManualWithdrawal()" style="width:100%; padding:8px; background:#334155; color:white; border:none; border-radius:4px; font-size:12px; cursor:pointer;">Process Manually</button>
@@ -262,70 +305,68 @@
       `;
     }
 
+    function handleWithdrawalRequest(reqId, status) {
+      const pin = prompt("Enter Portal PIN to confirm:");
+      const agentPin = agentData.pin || agentData.details?.pin || '1234';
+      if (pin !== agentPin) { alert("Incorrect Portal PIN!"); return; }
+
+      const res = DataManager.updateWithdrawalStatus(reqId, status);
+      if (res.success) {
+        alert(`Withdrawal ${status} successfully!`);
+        refreshBalance();
+        renderWithdrawalRequests();
+        if (status === 'accepted') closeModal();
+      } else {
+        alert("Error: " + res.message);
+      }
+    }
+
     function processManualWithdrawal() {
       const pin = document.getElementById('auth-pin').value;
-      if (pin !== agentData.pin) { alert("Incorrect Portal PIN!"); return; }
+      const agentPin = agentData.pin || agentData.details?.pin || '1234';
+      if (pin !== agentPin) { alert("Incorrect Portal PIN!"); return; }
 
       const phone = document.getElementById('withdraw-client-phone').value;
       const amount = parseFloat(document.getElementById('withdraw-amount').value);
       
-      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      if (isNaN(amount) || amount <= 0) { alert("Invalid amount!"); return; }
+
+      const users = DataManager.getAllUsers() || [];
       const client = users.find(u => u.phone === phone);
       if (!client) { alert("Client not found!"); return; }
 
-      const clientVault = JSON.parse(localStorage.getItem(`daimara_vault_${client.id}`) || '{"balance":0, "logs":[]}');
-      if (clientVault.balance < amount) { alert("Client has insufficient funds in VaultPro!"); return; }
+      const clientBalance = DataManager.getVaultBalance(client.id);
+      if (clientBalance < amount) { alert("Client has insufficient funds in VaultPro!"); return; }
 
-      // Logic: Client VaultPro Decr, Agent Float Incr
-      clientVault.balance -= amount;
-      clientVault.logs.push({
-        timestamp: new Date().toISOString(),
-        type: 'debit',
-        details: `Withdrawal via Agent ${agentData.agentNumber}`,
-        amount: amount,
-        balance: clientVault.balance
-      });
-      localStorage.setItem(`daimara_vault_${client.id}`, JSON.stringify(clientVault));
+      // Manual withdrawal:
+      // 1. Decrease client balance
+      DataManager.updateVaultBalance(client.id, -amount, `Manual Withdrawal via Agent ${agentData.agentNumber}`);
+      
+      // 2. Decrease agent float (per user request: "when he accepts the float amount decreases")
+      DataManager.updateAgentFloat(agentData.agentNumber, -amount, `Manual Withdrawal for ${phone}`);
 
-      const floats = JSON.parse(localStorage.getItem('daimara_agent_floats') || '{}');
-      floats[agentData.agentNumber] = (floats[agentData.agentNumber] || 0) + amount;
-      localStorage.setItem('daimara_agent_floats', JSON.stringify(floats));
-
-      recordAgentLog('credit', `Withdrawal from ${phone}`, amount, floats[agentData.agentNumber]);
       alert("Withdrawal processed! You can now give the client cash.");
       refreshBalance();
       closeModal();
     }
 
-    function recordAgentLog(type, details, amount, balance) {
-      const logs = JSON.parse(localStorage.getItem(`daimara_agent_logs_${agentData.agentNumber}`) || '[]');
-      logs.push({
-        timestamp: new Date().toISOString(),
-        type,
-        details,
-        amount,
-        balance
-      });
-      localStorage.setItem(`daimara_agent_logs_${agentData.agentNumber}`, JSON.stringify(logs));
-    }
-
     function renderLogs() {
-      const logs = JSON.parse(localStorage.getItem(`daimara_agent_logs_${agentData.agentNumber}`) || '[]');
+      const logs = DataManager.getAgentTransactions(agentData.agentNumber);
       const list = document.getElementById('logs-list');
       list.innerHTML = logs.map(l => `
         <div class="log-item">
           <div>
-            <div class="log-type">${l.details}</div>
+            <div class="log-type">${l.description}</div>
             <div style="font-size:11px; color:var(--muted);">${new Date(l.timestamp).toLocaleString()}</div>
           </div>
           <div style="text-align:right;">
-            <div class="log-amount-${l.type === 'credit' ? 'credit' : 'debit'}">
-              ${l.type === 'credit' ? '+' : '-'} KSH ${l.amount.toLocaleString()}
+            <div class="log-amount-${l.amount >= 0 ? 'credit' : 'debit'}">
+              ${l.amount >= 0 ? '+' : '-'} KSH ${Math.abs(l.amount).toLocaleString()}
             </div>
             <div style="font-size:11px; color:var(--muted);">Bal: KSH ${l.balance.toLocaleString()}</div>
           </div>
         </div>
-      `).reverse().join('') || '<p style="text-align:center; color:var(--muted);">No transactions yet.</p>';
+      `).join('') || '<p style="text-align:center; color:var(--muted);">No transactions yet.</p>';
     }
 
     init();
