@@ -349,7 +349,7 @@
                                     <i class="fas fa-arrow-trend-up"></i> +2.4% this month
                                 </div>
                                 <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-700/30 text-slate-300 text-xs font-medium">
-                                    USD Account
+                                    KES Account
                                 </div>
                             </div>
                         </div>
@@ -358,21 +358,21 @@
                     <div class="space-y-6">
                         <div id="profit-section" class="hidden glass-panel rounded-2xl p-6 hover-card cursor-pointer bg-gradient-to-br from-emerald-900/20 to-teal-900/20 border-emerald-500/20">
                             <div class="flex justify-between items-start mb-2">
-                                <p class="text-sm text-emerald-400 font-semibold uppercase tracking-wider">Earnings / Profit</p>
+                                <p class="text-sm text-emerald-400 font-semibold uppercase tracking-wider">Earnings</p><!-- / Profit-->
                                 <div class="p-1.5 rounded bg-emerald-500/10 text-emerald-400"><i class="fas fa-chart-line text-xs"></i></div>
                             </div>
                             <p class="text-2xl font-bold text-white mono" id="display-profit">KES 0.00</p>
                         </div>
                         <div class="glass-panel rounded-2xl p-6 hover-card cursor-pointer">
                             <div class="flex justify-between items-start mb-2">
-                                <p class="text-sm text-slate-400">Income (30d)</p>
+                                <p class="text-sm text-slate-400">Income <!--(30d)--></p>
                                 <div class="p-1.5 rounded bg-emerald-500/10 text-emerald-400"><i class="fas fa-arrow-down text-xs"></i></div>
                             </div>
                             <p class="text-2xl font-bold text-white mono">KES 0.00</p>
                         </div>
                         <div class="glass-panel rounded-2xl p-6 hover-card cursor-pointer">
                             <div class="flex justify-between items-start mb-2">
-                                <p class="text-sm text-slate-400">Expenses (30d)</p>
+                                <p class="text-sm text-slate-400">Expenses <!--(30d)--></p>
                                 <div class="p-1.5 rounded bg-rose-500/10 text-rose-400"><i class="fas fa-arrow-up text-xs"></i></div>
                             </div>
                             <p class="text-2xl font-bold text-white mono">KES 0.00</p>
@@ -429,9 +429,10 @@
                             <label class="block text-sm font-medium text-slate-400 mb-2">Amount (KES)</label>
                             <div class="relative">
                                 <span class="absolute left-4 top-3.5 text-slate-500 font-bold text-lg">Ksh</span>
-                                <input type="number" id="send-amount" required min="1" class="custom-input w-full rounded-xl py-3 pl-12 pr-4 text-xl font-bold mono" placeholder="0.00">
+                                <input type="number" id="send-amount" required min="1" class="custom-input w-full rounded-xl py-3 pl-12 pr-4 text-xl font-bold mono " placeholder="0.00" >
                             </div>
-                            <p class="text-right text-xs text-slate-500 mt-2">Available: <span class="text-indigo-400 font-mono balance-ref">KES 0.00</span></p>
+                            <p class="text-right text-xs text-slate-500 mt-2">Available: <span class="text-indigo-400 font-mono balance-ref" 
+                                >KES 0.00</span></p>
                         </div>
 
                         <div>
