@@ -67,9 +67,12 @@
     }
 
     /* DATA TABLES RESPONSIVE */
-    .table-container { width: 100%; overflow: auto; margin-top: 15px; max-height: 500px; }
-    table { width: 100%; min-width: 600px; }
-    td, th { padding: 12px; font-size: 14px !important; }
+    .table-container { width: 100%; overflow-x: auto; overflow-y: auto; margin-top: 15px; max-height: 500px; -webkit-overflow-scrolling: touch; }
+    table { width: 100%; min-width: 800px; }
+    td, th { padding: 12px; font-size: 14px !important; white-space: nowrap; }
+
+    /* Long content scrolling */
+    .long-content { overflow-x: auto; width: 100%; -webkit-overflow-scrolling: touch; }
 
     /* Ensure other content wraps */
     .card-header { flex-wrap: wrap; gap: 10px; }
@@ -231,12 +234,18 @@
 
 
     <div class="sidebar-footer">
+      <button class="btn btn-danger" onclick="refreshPlatformEarnings()" style="width:100%; margin-bottom:10px; background:#e74c3c; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer;">
+        <i class="fas fa-sync"></i> Refresh Earnings
+      </button>
+      <button class="btn btn-danger" onclick="systemFinancialReset()" style="width:100%; margin-bottom:10px; background:#000; color:#ff0000; border:2px solid #ff0000; padding:10px; border-radius:5px; cursor:pointer; font-weight:bold;">
+        <i class="fas fa-radiation"></i> Reset All Financials
+      </button>
       <button class="logout-btn" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
     </div>
   </aside>
 
   <!-- MAIN CONTENT -->
-  <main class="main-content">
+  <main class="main-content long-content">
     <header class="page-header">
       <div class="page-title">
         <h1 id="tab-title">Dashboard Overview</h1>
@@ -437,8 +446,8 @@
     <div id="transactions" class="tab-content">
       <div class="data-card">
         <div class="card-header"><h2 class="card-title">M-Pesa Transaction Entry</h2></div>
-        <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 15px; align-items: end;">
+        <div class="long-content" style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 15px; align-items: end; min-width: 800px;">
             <div>
               <label style="display:block; margin-bottom:5px; color:var(--text-muted)">Transaction Code</label>
               <input type="text" id="tx-code" style="width:100%; padding:10px; border-radius:6px; border:1px solid var(--border); background:var(--dark-bg); color:white;" placeholder="e.g. RCL838GH732">
@@ -512,10 +521,10 @@
           </div>
         </div>
         
-        <div style="background:rgba(0,0,0,0.2); padding:20px; border-radius:12px; margin-bottom:20px;">
+        <div class="long-content" style="background:rgba(0,0,0,0.2); padding:20px; border-radius:12px; margin-bottom:20px;">
           <h3>Manage Agent Float</h3>
           <p style="color:var(--text-muted); margin-bottom:15px;">Add funds to an agent's float balance</p>
-          <div style="display:grid; grid-template-columns:1fr 1fr auto; gap:15px; align-items:end;">
+          <div style="display:grid; grid-template-columns:1fr 1fr auto; gap:15px; align-items:end; min-width: 800px;">
             <div>
               <label style="display:block; margin-bottom:5px; color:var(--text-muted)">Agent Number</label>
               <input type="text" id="target-agent-num" style="width:100%; padding:10px; border-radius:6px; border:1px solid var(--border); background:var(--dark-bg); color:white;" placeholder="Enter Agent No.">
@@ -528,10 +537,10 @@
           </div>
         </div>
 
-        <div style="background:rgba(0,0,0,0.2); padding:20px; border-radius:12px; margin-bottom:20px; border:1px solid var(--primary);">
+        <div class="long-content" style="background:rgba(0,0,0,0.2); padding:20px; border-radius:12px; margin-bottom:20px; border:1px solid var(--primary);">
           <h3>Admin VaultPro Operations</h3>
           <p style="color:var(--text-muted); margin-bottom:15px;">Perform manual vault transactions (affects Platform Float)</p>
-          <div style="display:grid; grid-template-columns:1fr 2fr auto; gap:15px; align-items:end;">
+          <div style="display:grid; grid-template-columns:1fr 2fr auto; gap:15px; align-items:end; min-width: 800px;">
             <div>
               <label style="display:block; margin-bottom:5px; color:var(--text-muted)">Amount (KSH)</label>
               <input type="number" id="admin-tx-amount" style="width:100%; padding:10px; border-radius:6px; border:1px solid var(--border); background:var(--dark-bg); color:white;" placeholder="0.00">

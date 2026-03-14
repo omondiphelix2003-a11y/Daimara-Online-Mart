@@ -39,6 +39,14 @@
     .log-type { font-weight: 600; }
     .log-amount-credit { color: var(--success); }
     .log-amount-debit { color: var(--danger); }
+
+    @media (max-width: 480px) {
+      .agent-info { padding: 15px; }
+      .agent-info > div { flex-direction: column; gap: 10px; }
+      .agent-info h3 { font-size: 16px; }
+      .balance-amount { font-size: 28px; }
+      .actions-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>

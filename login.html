@@ -80,6 +80,9 @@
   <form id="login-form">
     <input type="email" id="login-email" placeholder="Email" required>
     <input type="password" id="login-password" placeholder="Password" required>
+    <div style="text-align: right; margin-top: -10px;">
+      <span onclick="openForgotPwd()" style="color: var(--primary); font-size: 13px; cursor: pointer;">Forgot Password?</span>
+    </div>
     <button type="submit">Login</button>
     <p class="switch">Don’t have an account? <span id="show-signup" class="switch-link" tabindex="0">Sign up</span></p>
   </form>
@@ -87,21 +90,39 @@
   <!-- SIGNUP FORM -->
   <form id="signup-form" style="display:none;">
     <input type="text" id="signup-name" placeholder="Full Name" required>
-    <input type="email" id="signup-email" placeholder="Email" required>
-    <input type="password" id="signup-password" placeholder="Password" required>
-    <!--<select id="signup-role">
-      <option value="user">Customer</option>
-      <option value="operator">Operator / Business</option>
+    <input type="email" id="signup-email" placeholder="Email Address" required>
+    <input type="password" id="signup-password" placeholder="Password (min 6 chars)" required minlength="6">
+    <select id="signup-role">
+      <option value="user">Normal User</option>
+      <option value="operator">Operator (Page Owner)</option>
       <option value="delivery">Delivery Personnel</option>
-    </select>-->
+    </select>
     <div class="profile-image-group">
-      <label for="profile-image">Profile Picture</label>
-      <input type="file" id="profile-image" accept="image/*">
-      <div id="profile-preview" class="profile-preview"></div>
+      <label>Profile Picture</label>
+      <div id="profile-preview" class="profile-preview">
+        <i class="fas fa-user-circle" style="font-size: 50px; color: #94a3b8;"></i>
+      </div>
+      <input type="file" id="profile-image" accept="image/*" style="display:none;">
+      <button type="button" onclick="document.getElementById('profile-image').click()" style="background:#1e293b; font-size:14px; padding:8px;">Choose Image</button>
     </div>
-    <button type="submit">Sign Up</button>
+    <button type="submit">Create Account</button>
     <p class="switch">Already have an account? <span id="show-login" class="switch-link" tabindex="0">Login</span></p>
   </form>
+
+  <!-- FORGOT PASSWORD MODAL -->
+  <div id="forgot-pwd-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:1000; align-items:center; justify-content:center; padding:20px;">
+    <div class="auth-box" style="margin:0;">
+      <h2 style="font-size: 24px;">Reset Password</h2>
+      <p style="text-align:center; color:#94a3b8; font-size:13px; margin-bottom:20px;">Enter your Email and New Password to reset. (ID Number required ONLY for VaultPro/Agent accounts)</p>
+      <form id="reset-pwd-form" onsubmit="handleResetPwd(event)">
+        <input type="email" id="reset-email" placeholder="Account Email" required>
+        <input type="text" id="reset-id" placeholder="ID Number (Required for Vault/Agent)">
+        <input type="password" id="reset-new-pwd" placeholder="New Password (min 6 chars)" required minlength="6">
+        <button type="submit">Update Password</button>
+        <button type="button" onclick="closeForgotPwd()" style="background:none; color:#94a3b8; border:1px solid rgba(255,255,255,0.1);">Cancel</button>
+      </form>
+    </div>
+  </div>
 </div>
 
 <script src="data-manager.js"></script>
@@ -130,6 +151,31 @@
     document.getElementById("signup-form").style.display = "none";
     document.getElementById("login-form").style.display = "flex";
     document.getElementById("form-title").textContent = "Login";
+  }
+
+  function openForgotPwd() {
+    document.getElementById('forgot-pwd-modal').style.display = 'flex';
+  }
+
+  function closeForgotPwd() {
+    document.getElementById('forgot-pwd-modal').style.display = 'none';
+  }
+
+  function handleResetPwd(e) {
+    e.preventDefault();
+    const email = document.getElementById('reset-email').value.trim();
+    const idNum = document.getElementById('reset-id').value.trim();
+    const newPwd = document.getElementById('reset-new-pwd').value;
+    
+    if (newPwd.length < 6) { alert("Password must be at least 6 characters"); return; }
+    
+    const res = DataManager.resetLoginPassword(email, idNum, newPwd);
+    if (res.success) {
+      alert("Password updated successfully! You can now login.");
+      closeForgotPwd();
+    } else {
+      alert(res.message);
+    }
   }
 
   // directly hook switch links (script runs after DOM elements exist)

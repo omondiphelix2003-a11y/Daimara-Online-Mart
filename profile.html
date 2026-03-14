@@ -1407,8 +1407,18 @@ function loadUserProfile() {
   loggedInUser = DataManager.getCurrentUser();
 
   if (!loggedInUser) {
-    alert("Please login first");
-    window.location.href = "login.html";
+    if (!window.loginAlertShown) {
+        window.loginAlertShown = true;
+        // Check if showNotification exists, else fallback to alert
+        if (typeof ProfileComponent !== 'undefined' && ProfileComponent.showNotification) {
+            ProfileComponent.showNotification("Please login first", "info");
+        } else {
+            alert("Please login first");
+        }
+        setTimeout(() => {
+            window.location.href = "login.html";
+        }, 1500); // Give time for notification to be seen
+    }
     return;
   }
 

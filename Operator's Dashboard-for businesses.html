@@ -1070,6 +1070,12 @@
         <h1 id="tab-title"><i class="fas fa-tachometer-alt"></i> Dashboard Overview</h1>
       </div>
       <div class="admin-profile">
+        <div id="agent-number-display" style="display:none; margin-right:15px; padding:5px 12px; background:rgba(59,130,246,0.1); border:1px solid var(--primary); border-radius:20px; color:var(--primary); font-size:12px; font-weight:bold; cursor:pointer;" onclick="location.href='AgentPortal.html'">
+          AGENT: <span id="agent-no-val"></span>
+        </div>
+        <button onclick="refreshPlatformFinancials()" class="btn btn-danger" style="margin-right:15px; padding:8px 12px; border-radius:6px; cursor:pointer; background:#ef4444; color:white; border:none; display:flex; align-items:center; gap:5px;" title="Reset Platform Earnings">
+          <i class="fas fa-sync"></i> Refresh Earnings
+        </button>
         <a href="client end money valt.html" class="btn btn-primary" style="margin-right:15px; background:var(--dark-bg); color:var(--primary); text-decoration:none; display:flex; align-items:center; gap:8px;">
           <i class="fas fa-vault"></i> VaultPro
         </a>
@@ -1946,6 +1952,15 @@
       window.location.href = "login.html";
     }
 
+    function refreshPlatformFinancials() {
+      if (!confirm("This will reset all platform earnings (Admin, Operators, and Delivery) to zero. Proceed?")) return;
+      const res = DataManager.resetPlatformEarnings();
+      if (res.success) {
+        alert(res.message);
+        location.reload();
+      }
+    }
+
     // Initialize
     window.onload = () => {
       if (typeof DataManager === 'undefined') {
@@ -1954,6 +1969,17 @@
       }
       renderDashboard();
 
+      // Show agent number if applicable
+      const user = DataManager.getCurrentUser();
+      const agent = DataManager.getAgentByUserId(user.id);
+      if (agent && agent.status === 'approved') {
+        const agentEl = document.getElementById('agent-number-display');
+        if (agentEl) {
+          agentEl.style.display = 'block';
+          document.getElementById('agent-no-val').innerText = agent.agentNumber;
+        }
+      }
+      
       // Sync with other tabs
       window.addEventListener('storage', (e) => {
         const ordersKey = DataManager.getScopedData ? DataManager.getUserScope ? DataManager.getUserScope('ecommerce_orders') : 'ecommerce_orders' : 'ecommerce_orders';

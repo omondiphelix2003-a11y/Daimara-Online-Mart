@@ -320,12 +320,49 @@ const DataManager = (() => {
   function resetVaultPin(userId, idCard, newPin) {
     const logs = getVaultAccessLogs();
     const idx = logs.findIndex(l => l.userId === userId);
-    if (idx !== -1 && logs[idx].idCard === idCard) {
-      logs[idx].pin = newPin;
-      localStorage.setItem(STORAGE_KEYS.VAULT_ACCESS_LOGS, JSON.stringify(logs));
+    // Try to find in logs or in user details
+    const user = getAllUsers().find(u => u.id === userId);
+    const storedId = (idx !== -1 ? logs[idx].idCard : (user ? user.idCard : null));
+
+    if (storedId === idCard) {
+      if (idx !== -1) {
+        logs[idx].pin = newPin;
+        localStorage.setItem(STORAGE_KEYS.VAULT_ACCESS_LOGS, JSON.stringify(logs));
+      }
+      if (user) {
+        updateUserProfile(userId, { vaultPin: newPin });
+      }
       return { success: true };
     }
     return { success: false, message: 'ID Number does not match records' };
+  }
+
+  function resetLoginPassword(email, idNumber, newPassword) {
+    const users = getAllUsers();
+    const user = users.find(u => u.email === email);
+    if (!user) return { success: false, message: 'User not found' };
+
+    // Check ID from VaultPro or Agent registration
+    const vaultLog = getVaultAccessLogs().find(l => l.userId === user.id);
+    const agentReg = getAgentRegistrations().find(r => r.userId === user.id);
+    const storedId = vaultLog ? (vaultLog.idCard || vaultLog.idNumber) : (agentReg ? (agentReg.idNumber || agentReg.details?.idNumber) : user.idCard);
+
+    // If user is registered for Vault or Agent, ID must match
+    if (vaultLog || agentReg) {
+        if (storedId === idNumber && idNumber) {
+            const uIdx = users.findIndex(u => u.id === user.id);
+            users[uIdx].password = newPassword;
+            localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+            return { success: true };
+        }
+        return { success: false, message: 'ID Number does not match records for registered VaultPro/Agent account' };
+    }
+
+    // Normal user reset (no Vault/Agent registration found)
+    const uIdx = users.findIndex(u => u.id === user.id);
+    users[uIdx].password = newPassword;
+    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+    return { success: true };
   }
 
   function registerAgent(details) {
@@ -448,20 +485,24 @@ const DataManager = (() => {
       // Update Admin
       addPermanentEarnings(adminPart);
 
-      // Update first Operator found (or a generic pool)
+      // Update ALL Operators
       const allUsers = getAllUsers();
-      const firstOp = allUsers.find(u => u.role === 'operator');
-      if (firstOp) {
-        addOperatorRevenue(firstOp.email, opPart);
+      const operators = allUsers.filter(u => u.role === 'operator');
+      if (operators.length > 0) {
+        const opShare = opPart / operators.length;
+        operators.forEach(op => addOperatorRevenue(op.email, opShare));
       }
 
-      // Update first Delivery found
-      const firstDel = allUsers.find(u => u.role === 'delivery');
-      if (firstDel) {
-        const delEarningKey = 'delivery_earnings_' + firstDel.id;
-        const current = JSON.parse(localStorage.getItem(delEarningKey) || '{"total":0}');
-        current.total += deliveryPart;
-        localStorage.setItem(delEarningKey, JSON.stringify(current));
+      // Update ALL Delivery personnel
+      const deliveryPersonnel = allUsers.filter(u => u.role === 'delivery');
+      if (deliveryPersonnel.length > 0) {
+        const delShare = deliveryPart / deliveryPersonnel.length;
+        deliveryPersonnel.forEach(del => {
+          const delEarningKey = 'delivery_earnings_' + del.id;
+          const current = JSON.parse(localStorage.getItem(delEarningKey) || '{"total":0}');
+          current.total += delShare;
+          localStorage.setItem(delEarningKey, JSON.stringify(current));
+        });
       }
 
       return { success: true };
@@ -2276,8 +2317,9 @@ const DataManager = (() => {
     addWithdrawalRequest,
     getWithdrawalRequests,
     updateWithdrawalStatus,
-    resetAgentPin,
     resetVaultPin,
+    resetAgentPin,
+    resetLoginPassword,
     deleteAgentRegistration,
     transferFunds,
     logVaultAccess,

@@ -553,11 +553,9 @@
             <div class="products-section">
                 <h2>📋 Product List</h2>
                 
-                <div class="category-filter">
+                <div class="category-filter" id="productFilterButtons">
                     <button class="category-btn active" data-category="all">All Products</button>
-                    <button class="category-btn" data-category="Supermarket">Supermarket</button>
-                    <button class="category-btn" data-category="Second-hand">Second-hand Items</button>
-                    <button class="category-btn" data-category="Refilling">Refilling</button>
+                    <!-- Categories will be injected here -->
                 </div>
 
                 <div id="alertBox"></div>
@@ -724,6 +722,36 @@
                 });
                 select.value = currentVal;
             });
+
+            // Update Product Filter Buttons
+            const filterContainer = document.getElementById('productFilterButtons');
+            if (filterContainer) {
+                filterContainer.innerHTML = `<button class="category-btn ${currentFilter === 'all' ? 'active' : ''}" data-category="all">All Products</button>`;
+                storeCategories.forEach(cat => {
+                    const btn = document.createElement('button');
+                    btn.className = `category-btn ${currentFilter === cat.name ? 'active' : ''}`;
+                    btn.dataset.category = cat.name;
+                    btn.textContent = cat.name;
+                    btn.onclick = () => {
+                        document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        currentFilter = cat.name;
+                        renderProducts();
+                    };
+                    filterContainer.appendChild(btn);
+                });
+                
+                // Re-bind click for "All Products" button
+                const allBtn = filterContainer.querySelector('[data-category="all"]');
+                if (allBtn) {
+                    allBtn.onclick = () => {
+                        document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                        allBtn.classList.add('active');
+                        currentFilter = 'all';
+                        renderProducts();
+                    };
+                }
+            }
 
             // Render admin category list
             const list = document.getElementById('categoryList');

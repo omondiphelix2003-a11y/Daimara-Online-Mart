@@ -186,9 +186,14 @@ body{
 
 <div class="topbar">
   <a href="index.html" class="logo" style="color:black;text-decoration: solid;">Daimara Delivery Services</a>
-  <a href="client end money valt.html" class="action-btn" style="background:#041344; text-decoration:none; display:flex; align-items:center; gap:8px;">
-    <i class="fas fa-vault"></i> VaultPro
-  </a>
+  <div style="display:flex; gap:10px; align-items:center;">
+    <button onclick="refreshPlatformEarnings()" style="background:#ef4444; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer;" title="Reset Platform Earnings">
+      <i class="fas fa-sync"></i> Reset Earnings
+    </button>
+    <a href="client end money valt.html" class="action-btn" style="background:#041344; text-decoration:none; display:flex; align-items:center; gap:8px;">
+      <i class="fas fa-vault"></i> VaultPro
+    </a>
+  </div>
 </div>
 
 <!-- DETAILS MODAL -->
@@ -267,6 +272,15 @@ body{
 
 <script src="data-manager.js"></script>
 <script>
+    function refreshPlatformEarnings() {
+      if (confirm("Are you sure you want to reset all platform earnings to zero? This cannot be undone.")) {
+        const res = DataManager.resetPlatformEarnings();
+        if (res.success) {
+            alert(res.message);
+            location.reload();
+        }
+      }
+    }
 function checkAccess() {
   const user = DataManager.getCurrentUser();
   if (!user) {
