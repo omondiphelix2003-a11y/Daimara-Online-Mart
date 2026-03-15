@@ -495,25 +495,12 @@
 <script src="data-manager.js"></script>
 <script src="auth-check.js"></script>
 <script>
-    function updateCartBadge() {
-        const cartItems = DataManager.getCart();
-        const totalQty = cartItems.reduce((acc, item) => acc + (item.qty || 1), 0);
-        const badge = document.getElementById('cartBadge');
-        if (badge) {
-            if (totalQty > 0) {
-                badge.innerText = totalQty;
-                badge.style.display = 'block';
-            } else {
-                badge.style.display = 'none';
-            }
-        }
-    }
-
     let cart = DataManager.getCart();
     let listenersAttached = false;
 
     function renderCart() {
         const cartItems = document.getElementById('cart-items');
+        if (!cartItems) return;
         cartItems.innerHTML = '';
 
         if (cart.length === 0) {
@@ -551,7 +538,6 @@
             cartItems.appendChild(div);
         });
         document.getElementById('total').textContent = total.toLocaleString();
-        updateCartBadge();
         setupCartEventListeners();
     }
 
@@ -698,7 +684,6 @@
             showToast(`${product.name} added to cart!`);
             cart = DataManager.getCart();
             renderCart();
-            updateCartBadge();
         };
 
         modal.classList.add('show');
@@ -742,7 +727,6 @@
             DataManager.addToCart(p); 
             cart = DataManager.getCart(); 
             renderCart(); 
-            updateCartBadge();
             alert('Added!'); 
         }
     }
@@ -756,7 +740,6 @@
         if (e.key === 'ecommerce_cart') {
             cart = DataManager.getCart();
             renderCart();
-            updateCartBadge();
         }
     });
 </script>

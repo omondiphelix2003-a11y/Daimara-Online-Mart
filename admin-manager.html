@@ -50,7 +50,7 @@
     @media (max-width: 992px) {
       .sidebar { left: -270px; }
       .sidebar.active { left: 0; }
-      .main-content { margin-left: 0; width: 100%; padding: 20px; padding-top: 70px; }
+      .main-content { margin-left: 0; width: 100%; padding: 20px; padding-top: 70px; overflow-x: auto !important; }
       .menu-toggle { display: flex; }
       .stats-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
       .card-title { font-size: 24px !important; }
@@ -72,7 +72,10 @@
     td, th { padding: 12px; font-size: 14px !important; white-space: nowrap; }
 
     /* Long content scrolling */
-    .long-content { overflow-x: auto; width: 100%; -webkit-overflow-scrolling: touch; }
+    .long-content { overflow-x: auto !important; width: 100%; -webkit-overflow-scrolling: touch; display: block; }
+
+    /* Ensure tables and grids scroll */
+    .table-container, .long-content > div { min-width: min-content; }
 
     /* Ensure other content wraps */
     .card-header { flex-wrap: wrap; gap: 10px; }
@@ -87,7 +90,7 @@
 
     /* TAB CONTENT */
     .tab-content { display: none; animation: fadeIn 0.3s ease; }
-    .tab-content.active { display: block; }
+    .tab-content.active { display: block; overflow-x: auto !important; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
     /* DATA TABLES */
@@ -1166,12 +1169,12 @@
       const matchedUserStatus = matchedUser ? matchedUser.status : null;
       
       let detailsHtml = '';
-      if (reg.type === 'operator' || reg.type === 'business') {
+      if (reg.type === 'operator' || reg.type === 'business' || reg.type === 'medicore') {
         detailsHtml = `
           <div style="display:grid; grid-template-columns: 150px 1fr; gap:10px; font-size:20px;">
-            <strong>Company:</strong> <span>${details.company || 'N/A'}</span>
-            <strong>Business Type:</strong> <span>${details.businessType || 'N/A'}</span>
-            <strong>Reg Number:</strong> <span>${details.regnumber || 'N/A'}</span>
+            <strong>${reg.type === 'medicore' ? 'Pharmacy' : 'Company'}:</strong> <span>${details.company || 'N/A'}</span>
+            <strong>${reg.type === 'medicore' ? 'Pharmacy Type' : 'Business Type'}:</strong> <span>${details.businessType || 'N/A'}</span>
+            <strong>Reg/License:</strong> <span>${details.regnumber || 'N/A'}</span>
             <strong>Location:</strong> <span>${details.location?.street || ''}, ${details.location?.city || ''}, ${details.location?.state || ''}</span>
             <strong>Exact Address:</strong> <span>${details.location?.address || 'N/A'}</span>
           </div>
@@ -1232,7 +1235,7 @@
             </div>
           </div>
           
-          <h3 style="margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">${(reg.type === 'operator' || reg.type === 'business') ? 'Business/Operator' : 'Delivery'} Information</h3>
+          <h3 style="margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">${(reg.type === 'operator' || reg.type === 'business' || reg.type === 'medicore') ? (reg.type === 'medicore' ? 'Pharmacy' : 'Business/Operator') : 'Delivery'} Information</h3>
           ${detailsHtml}
           
           <div style="margin-top:30px; display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">

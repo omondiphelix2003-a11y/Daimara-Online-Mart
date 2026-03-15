@@ -255,6 +255,11 @@ const DataManager = (() => {
       }
     }
 
+    // CHECK: Prevent negative balance if debit
+    if (amount < 0 && currentBalance < Math.abs(amount)) {
+        return { success: false, message: `Insufficient funds! Available: KSH ${currentBalance.toLocaleString()}` };
+    }
+
     const newBalance = currentBalance + amount;
 
     if (targetUser) {
@@ -516,7 +521,14 @@ const DataManager = (() => {
   function updateAgentFloat(agentNumber, amount, description = 'Transaction') {
     const floats = JSON.parse(localStorage.getItem(STORAGE_KEYS.AGENT_FLOAT)) || {};
     const oldBalance = floats[agentNumber] || 0;
-    floats[agentNumber] = oldBalance + amount;
+    
+    // CHECK: Block if insufficient float for debit
+    if (amount < 0 && oldBalance < Math.abs(amount)) {
+        return { success: false, message: `Insufficient float! Available: KSH ${oldBalance.toLocaleString()}` };
+    }
+
+    const next = oldBalance + amount;
+    floats[agentNumber] = next;
     localStorage.setItem(STORAGE_KEYS.AGENT_FLOAT, JSON.stringify(floats));
 
     // Log transaction
@@ -619,13 +631,13 @@ const DataManager = (() => {
     const user = getCurrentUser();
     // Isolation logic: Operators only see their own products
     // Primary Admin (omondiphelix2003@gmail.com) sees EVERYTHING
-    if (user && user.role === 'operator' && user.email !== "omondiphelix2003@gmail.com") {
+    /*if (user && user.role === 'operator' && user.email !== "omondiphelix2003@gmail.com") {
       const filtered = {};
       for (const cat in products) {
         filtered[cat] = products[cat].filter(p => p.owner === user.email);
       }
       return filtered;
-    }
+    }*/
 
     try { console.debug('DataManager.getAllProducts - categories:', Object.keys(products)); } catch (e) {}
     return products;
@@ -2194,6 +2206,7 @@ const DataManager = (() => {
   function resetPlatformEarnings() {
     localStorage.setItem(STORAGE_KEYS.PERMANENT_EARNINGS, "0");
     localStorage.setItem(STORAGE_KEYS.OPERATOR_REVENUE, JSON.stringify({}));
+    localStorage.setItem(STORAGE_KEYS.OPERATOR_EARNINGS, JSON.stringify({}));
     const deliveryPrefix = 'delivery_earnings_';
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
@@ -2201,7 +2214,7 @@ const DataManager = (() => {
         localStorage.setItem(key, JSON.stringify({ total: 0 }));
       }
     }
-    return { success: true, message: 'Platform earnings (Admin, Operators, Delivery) reset to zero' };
+    return { success: true, message: 'Platform earnings (Admin, Operators, Pharmacy, Delivery) reset to zero' };
   }
 
   function resetAllFinancials() {

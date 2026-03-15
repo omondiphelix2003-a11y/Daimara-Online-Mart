@@ -908,9 +908,12 @@ div.h3{text-align: center; color: #082b61; font-size: 22px;
         return;
       }
       const itemToCart = { ...product, selectedSize: selectedSize };
-      DataManager.addToCart(itemToCart);
-      showToast(`${product.name} added to cart!`);
-      updateCartBadge();
+      const res = DataManager.addToCart(itemToCart);
+      if (res.success) {
+        showToast(`${product.name} added to cart!`);
+      } else {
+        alert(res.message || 'Error adding to cart');
+      }
       
       // Redirect or show cart
       setTimeout(() => {
@@ -938,16 +941,6 @@ div.h3{text-align: center; color: #082b61; font-size: 22px;
     }
   }
 
-  function updateCartBadge() {
-    const cart = DataManager.getCart();
-    const badge = document.getElementById('cartBadge');
-    if (badge) {
-      const count = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
-      badge.innerText = count;
-      badge.style.display = count > 0 ? 'block' : 'none';
-    }
-  }
-
   function getAllFlattened(){
     const all = DataManager.getAllProducts();
     return Object.keys(all).reduce((acc,k)=> acc.concat(all[k]||[]), []);
@@ -959,11 +952,12 @@ div.h3{text-align: center; color: #082b61; font-size: 22px;
 
     window.addToCartById = function(id, e){
       if(e) e.stopPropagation();
-      const prod = getAllFlattened().find(p=>p.id===id);
-      if (!prod) { alert('Product not found'); return; }
-      DataManager.addToCart(prod);
-      showToast(`${prod.name} added to cart!`);
-      updateCartBadge();
+      const res = DataManager.addToCart(id);
+      if (res.success) {
+        showToast(`${res.product.name} added to cart!`);
+      } else {
+        alert(res.message || 'Error adding to cart');
+      }
     };
 
     function renderRandom(n=4){
@@ -985,7 +979,6 @@ div.h3{text-align: center; color: #082b61; font-size: 22px;
     }
 
     renderRandom(50);
-    updateCartBadge();
   })();
 
 // DELIVERY AUTO-SCROLL

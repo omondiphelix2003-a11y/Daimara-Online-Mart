@@ -1400,6 +1400,35 @@ document.addEventListener("DOMContentLoaded", function () {
   loadUserOrders();
   loadFavoriteProducts();
   setupEventListeners();
+
+  // CHECK IF RETURNING FROM FINAL PAYMENT
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('isFinalPayment') === 'true') {
+     alert("Payment successful! Your order is now officially paid.");
+     // We can remove the param from URL
+     window.history.replaceState({}, document.title, window.location.pathname);
+  }
+
+  // Update profile nav if function exists
+  if (typeof updateProfileNav === 'function') {
+    setTimeout(updateProfileNav, 100);
+  }
+
+  // when the modal form is displayed we want to auto-fill the email fields with the
+  // currently logged in user's address (makes later login seamless).
+  const user = DataManager.getCurrentUser();
+  if (user && user.email) {
+    const opEmail = document.getElementById('op-email');
+    const delEmail = document.getElementById('del-email');
+    if (opEmail) {
+      opEmail.value = user.email;
+      opEmail.readOnly = true;
+    }
+    if (delEmail) {
+      delEmail.value = user.email;
+      delEmail.readOnly = true;
+    }
+  }
 });
 
 // Load user profile
@@ -1995,40 +2024,6 @@ function logout() {
     window.location.href = "index.html";
   }
 }
-
-// Load profile on page load
-window.addEventListener("DOMContentLoaded", function() {
-  loadUserProfile();
-
-  // CHECK IF RETURNING FROM FINAL PAYMENT
-  const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.get('isFinalPayment') === 'true') {
-     alert("Payment successful! Your order is now officially paid.");
-     // We can remove the param from URL
-     window.history.replaceState({}, document.title, window.location.pathname);
-  }
-
-  // Update profile nav if function exists
-  if (typeof updateProfileNav === 'function') {
-    setTimeout(updateProfileNav, 100);
-  }
-
-  // when the modal form is displayed we want to auto-fill the email fields with the
-  // currently logged in user's address (makes later login seamless).
-  const user = DataManager.getCurrentUser();
-  if (user && user.email) {
-    const opEmail = document.getElementById('op-email');
-    const delEmail = document.getElementById('del-email');
-    if (opEmail) {
-      opEmail.value = user.email;
-      opEmail.readOnly = true;
-    }
-    if (delEmail) {
-      delEmail.value = user.email;
-      delEmail.readOnly = true;
-    }
-  }
-});
 
 /* REGISTRATION MODAL LOGIC */
 let currentRegType = '';

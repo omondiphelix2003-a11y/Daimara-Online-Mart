@@ -374,7 +374,7 @@
       color: #ffffff;
       text-decoration: none;
       font-weight: 800;
-      background: #000000;
+      background: #3b82f6;
       border: 2px solid #3b82f6;
       padding: 10px 20px;
       border-radius: 8px;
@@ -383,11 +383,13 @@
       gap: 8px;
       transition: all 0.3s ease;
       white-space: nowrap;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
     }
     .category-link:hover {
-      background: #3b82f6;
-      border-color: #3b82f6;
+      background: #2563eb;
+      border-color: #2563eb;
       color: white;
+      transform: translateY(-2px);
     }
     
     .rating-stars { color: #facc15; margin-bottom: 10px; font-size: 1.2rem; }
@@ -564,11 +566,13 @@
   }
 
   window.addToCartById = function(id){
-    const prod = getAllFlattened().find(p=>p.id===id);
-    if(!prod){ alert('Product not found'); return; }
-    DataManager.addToCart(prod);
-    alert('Added to cart');
-    updateCartBadge();
+    const res = DataManager.addToCart(id);
+    if (res.success) {
+      if (typeof window.showToast === 'function') window.showToast(`${res.product.name} added to cart!`);
+      else alert('Added to cart');
+    } else {
+      alert(res.message || 'Error adding to cart');
+    }
   }
 
   function renderProducts(productList, title = "Featured Products"){
@@ -835,8 +839,7 @@
       const selectedSizes = Array.from(document.querySelectorAll('input[name="product-size"]:checked')).map(cb => cb.value);
       const productToAdd = {...product, selectedSizes};
       DataManager.addToCart(productToAdd);
-      showToast(`${product.name} added to cart!`);
-      updateCartBadge();
+      if (typeof window.showToast === 'function') window.showToast(`${product.name} added to cart!`);
       
       // Close modal after delay
       setTimeout(() => {

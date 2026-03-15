@@ -214,6 +214,11 @@
             0%, 80%, 100% { transform: scale(0); }
             40% { transform: scale(1); }
         }
+
+        /* Long content scrolling */
+        .long-content { overflow-x: auto !important; width: 100%; -webkit-overflow-scrolling: touch; display: block; }
+        .table-container { width: 100%; overflow-x: auto; overflow-y: auto; margin-top: 15px; max-height: 500px; -webkit-overflow-scrolling: touch; }
+        table { min-width: 800px; }
         
         .image-preview {
             background: linear-gradient(135deg, #1e293b, #0f172a);

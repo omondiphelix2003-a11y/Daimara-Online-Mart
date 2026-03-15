@@ -231,6 +231,11 @@
       border: 3px solid var(--border);
     }
 
+    /* Long content scrolling */
+    .long-content { overflow-x: auto !important; width: 100%; -webkit-overflow-scrolling: touch; display: block; }
+    .table-container { width: 100%; overflow-x: auto; overflow-y: auto; margin-top: 15px; max-height: 500px; -webkit-overflow-scrolling: touch; }
+    table { min-width: 800px; }
+
     /* STATS GRID */
     .stats-grid { 
       display: grid; 

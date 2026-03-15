@@ -483,9 +483,6 @@
                             <label for="productCategory">Category *</label>
                             <select id="productCategory" required onchange="updateSubcategories()">
                                 <option value="">Select Category</option>
-                                <option value="Supermarket">Supermarket</option>
-                                <option value="Second-hand">Second-hand Items</option>
-                                <option value="Refilling">Refilling Services</option>
                             </select>
                         </div>
                     </div>
@@ -585,9 +582,7 @@
                 <div class="form-group">
                     <label for="editProductCategory">Category *</label>
                     <select id="editProductCategory" required onchange="updateEditSubcategories()">
-                        <option value="Supermarket">Supermarket</option>
-                        <option value="Second-hand">Second-hand Items</option>
-                        <option value="Refilling">Refilling Services</option>
+                        <option value="">Select Category</option>
                     </select>
                 </div>
 
@@ -693,16 +688,6 @@
             
             refreshCategories();
             loadProducts();
-            
-            // Set up category filters
-            document.querySelectorAll('.category-btn').forEach(btn => {
-                btn.onclick = () => {
-                    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    currentFilter = btn.dataset.category;
-                    renderProducts();
-                };
-            });
         });
 
         function refreshCategories() {
