@@ -931,13 +931,6 @@
             const result = DataManager.addProductFromAddPage(product);
             
             if (result.success) {
-                // Also add to scoped warehouse for Operator isolation
-                if (user && user.role === 'operator') {
-                    const scopedWarehouse = DataManager.getScopedData('ecommerce_warehouse');
-                    scopedWarehouse.push(product);
-                    DataManager.saveScopedData('ecommerce_warehouse', scopedWarehouse);
-                }
-
                 // Refresh local view from DataManager
                 loadProducts();
                 showAlert('✓ Product added successfully! It will appear on the store pages and warehouse.', 'success');

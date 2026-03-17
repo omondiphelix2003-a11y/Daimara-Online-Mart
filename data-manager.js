@@ -221,13 +221,17 @@ const DataManager = (() => {
     const user = allUsers.find(u => u.id === userId);
     
     if (user) {
-      if (user.role === 'admin') {
+      const role = user.role;
+      const isOperator = ['operator', 'medicore_operator', 'pharmacist', 'business'].includes(role);
+      
+      if (role === 'admin') {
         // Admin vault IS the platform earnings
         return getPermanentEarnings();
-      } else if (user.role === 'operator') {
+      } else if (isOperator) {
         return getOperatorRevenue(user.email);
-      } else if (user.role === 'delivery') {
-        return parseFloat(localStorage.getItem('delivery_earnings_' + user.id)) || 0;
+      } else if (role === 'delivery') {
+        const dEarnings = JSON.parse(localStorage.getItem('delivery_earnings_' + user.id)) || { total: 0 };
+        return dEarnings.total || 0;
       }
     }
 
@@ -243,12 +247,16 @@ const DataManager = (() => {
     let currentBalance = 0;
     
     if (targetUser) {
-      if (targetUser.role === 'admin') {
+      const role = targetUser.role;
+      const isOperator = ['operator', 'medicore_operator', 'pharmacist', 'business'].includes(role);
+
+      if (role === 'admin') {
         currentBalance = getPermanentEarnings();
-      } else if (targetUser.role === 'operator') {
+      } else if (isOperator) {
         currentBalance = getOperatorRevenue(targetUser.email);
-      } else if (targetUser.role === 'delivery') {
-        currentBalance = parseFloat(localStorage.getItem('delivery_earnings_' + targetUser.id)) || 0;
+      } else if (role === 'delivery') {
+        const dEarnings = JSON.parse(localStorage.getItem('delivery_earnings_' + targetUser.id)) || { total: 0 };
+        currentBalance = dEarnings.total || 0;
       } else {
         const balances = JSON.parse(localStorage.getItem(STORAGE_KEYS.VAULT_BALANCES)) || {};
         currentBalance = balances[userId] || 0;
@@ -263,18 +271,51 @@ const DataManager = (() => {
     const newBalance = currentBalance + amount;
 
     if (targetUser) {
-      if (targetUser.role === 'admin') {
+      const role = targetUser.role;
+      const isOperator = ['operator', 'medicore_operator', 'pharmacist', 'business', 'business_operator'].includes(role);
+
+      if (role === 'admin') {
         localStorage.setItem(STORAGE_KEYS.PERMANENT_EARNINGS, newBalance.toString());
-      } else if (targetUser.role === 'operator') {
+      } else if (isOperator) {
         const allRev = JSON.parse(localStorage.getItem(STORAGE_KEYS.OPERATOR_REVENUE)) || {};
         allRev[targetUser.email] = newBalance;
         localStorage.setItem(STORAGE_KEYS.OPERATOR_REVENUE, JSON.stringify(allRev));
-      } else if (targetUser.role === 'delivery') {
+      } else if (role === 'delivery') {
         localStorage.setItem('delivery_earnings_' + targetUser.id, JSON.stringify({ total: newBalance }));
       } else {
         const balances = JSON.parse(localStorage.getItem(STORAGE_KEYS.VAULT_BALANCES)) || {};
         balances[userId] = newBalance;
         localStorage.setItem(STORAGE_KEYS.VAULT_BALANCES, JSON.stringify(balances));
+
+        // Logic: Platform earnings link (for non-earning roles aka Clients)
+        // As VaultPro amount changes, platform earnings follow
+        const commission = amount * 0.10; // 10% total commission link
+        
+        // 50% of commission to Admin
+        addPermanentEarnings(commission * 0.5);
+
+        // 30% to Operators
+        const operators = allUsers.filter(u => ['operator', 'medicore_operator', 'pharmacist', 'business', 'business_operator'].includes(u.role));
+        if (operators.length > 0) {
+          const opShare = (commission * 0.3) / operators.length;
+          operators.forEach(op => {
+            const allRev = JSON.parse(localStorage.getItem(STORAGE_KEYS.OPERATOR_REVENUE)) || {};
+            allRev[op.email] = (allRev[op.email] || 0) + opShare;
+            localStorage.setItem(STORAGE_KEYS.OPERATOR_REVENUE, JSON.stringify(allRev));
+          });
+        }
+
+        // 20% to Delivery
+        const deliveryPersonnel = allUsers.filter(u => u.role === 'delivery');
+        if (deliveryPersonnel.length > 0) {
+          const delShare = (commission * 0.2) / deliveryPersonnel.length;
+          deliveryPersonnel.forEach(del => {
+            const delEarningKey = 'delivery_earnings_' + del.id;
+            const current = JSON.parse(localStorage.getItem(delEarningKey) || '{"total":0}');
+            current.total += delShare;
+            localStorage.setItem(delEarningKey, JSON.stringify(current));
+          });
+        }
       }
     }
     
@@ -474,41 +515,8 @@ const DataManager = (() => {
     localStorage.setItem(STORAGE_KEYS.WITHDRAWAL_REQUESTS, JSON.stringify(reqs));
 
     if (status === 'accepted') {
-      const currentFloat = getAgentFloat(req.agentNumber);
-      if (currentFloat <= 0) return { success: false, message: 'Float balance is zero. Cannot process withdrawal.' };
-      if (currentFloat < req.amount) return { success: false, message: 'Insufficient float balance to process this withdrawal.' };
-
-      // Logic for acceptance: Agent Float decreases per user requirement
-      updateAgentFloat(req.agentNumber, -req.amount, `Withdrawal Accepted from ${req.clientPhone}`);
-
-      // Distribute platform profit (10% commission assumed)
-      const commission = req.amount * 0.10;
-      const adminPart = commission * 0.5; // 5%
-      const opPart = commission * 0.3;    // 3%
-      const deliveryPart = commission * 0.2; // 2%
-
-      // Update Admin
-      addPermanentEarnings(adminPart);
-
-      // Update ALL Operators
-      const allUsers = getAllUsers();
-      const operators = allUsers.filter(u => u.role === 'operator');
-      if (operators.length > 0) {
-        const opShare = opPart / operators.length;
-        operators.forEach(op => addOperatorRevenue(op.email, opShare));
-      }
-
-      // Update ALL Delivery personnel
-      const deliveryPersonnel = allUsers.filter(u => u.role === 'delivery');
-      if (deliveryPersonnel.length > 0) {
-        const delShare = deliveryPart / deliveryPersonnel.length;
-        deliveryPersonnel.forEach(del => {
-          const delEarningKey = 'delivery_earnings_' + del.id;
-          const current = JSON.parse(localStorage.getItem(delEarningKey) || '{"total":0}');
-          current.total += delShare;
-          localStorage.setItem(delEarningKey, JSON.stringify(current));
-        });
-      }
+      // Logic for acceptance: Agent Float increases per user requirement
+      updateAgentFloat(req.agentNumber, req.amount, `Withdrawal Accepted from ${req.clientPhone}`);
 
       return { success: true };
     } else if (status === 'declined') {
@@ -647,6 +655,7 @@ const DataManager = (() => {
    * Add a product to the system
    */
   function addProduct(product) {
+    // Operators and MediCore Pharmacy operators can add any number of items/products in their warehouse
     if (!product || !product.subcategory) {
       return { success: false, message: 'Invalid product data' };
     }
@@ -1216,6 +1225,11 @@ const DataManager = (() => {
    * Process a new order: save globally and scope it to relevant operators
    */
   function processNewOrder(order) {
+    // Ensure the order has a unique ID for QR code generation and tracking
+    if (!order.id) {
+        order.id = '#DM' + Math.floor(1000 + Math.random() * 9000);
+    }
+    
     // Ensure status is pending by default
     if (!order.status) order.status = 'pending';
     
@@ -1397,8 +1411,10 @@ const DataManager = (() => {
    */
   function assignOrder(orderId, deliveryPersonEmail, operatorEmail = null) {
     const users = getAllUsers();
-    const deliveryPerson = users.find(u => u.email === deliveryPersonEmail);
+    const deliveryPerson = users.find(u => u.email.toLowerCase() === deliveryPersonEmail.toLowerCase());
     if (!deliveryPerson) return { success: false, message: 'Delivery person not found' };
+
+    const actualDeliveryEmail = deliveryPerson.email; // Use the case from the database
 
     // 1. Update Global Order
     const allOrders = getAllOrders();
@@ -1406,12 +1422,12 @@ const DataManager = (() => {
     if (!globalOrder) return { success: false, message: 'Order not found' };
 
     // Check if someone else already assigned to a DIFFERENT delivery person
-    if (globalOrder.deliveryPersonEmail && globalOrder.deliveryPersonEmail !== deliveryPersonEmail) {
+    if (globalOrder.deliveryPersonEmail && globalOrder.deliveryPersonEmail.toLowerCase() !== actualDeliveryEmail.toLowerCase()) {
       return { success: false, message: `This order must be assigned to ${globalOrder.deliveryPersonEmail} as per the lead operator's choice.` };
     }
 
     globalOrder.status = 'assigned';
-    globalOrder.deliveryPersonEmail = deliveryPersonEmail;
+    globalOrder.deliveryPersonEmail = actualDeliveryEmail;
     
     // Track who has assigned this order
     if (operatorEmail) {
@@ -1433,25 +1449,15 @@ const DataManager = (() => {
     const owners = [...new Set(items.map(item => item.owner).filter(Boolean))];
 
     owners.forEach(opEmail => {
-      const opUser = users.find(u => u.email === opEmail);
-      if (opUser) {
-        const originalUser = localStorage.getItem(STORAGE_KEYS.USER);
-        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(opUser));
-        
-        const scopedOrders = getScopedData('ecommerce_orders');
-        const scopedOrder = scopedOrders.find(o => o.id === orderId);
-        if (scopedOrder) {
-          scopedOrder.status = 'assigned';
-          scopedOrder.deliveryPersonEmail = deliveryPersonEmail;
-          // Sync extra fields
-          scopedOrder.openedBy = globalOrder.openedBy;
-          scopedOrder.assignedBy = globalOrder.assignedBy;
-          saveScopedData('ecommerce_orders', scopedOrders);
-        }
-
-        // Restore
-        if (originalUser) localStorage.setItem(STORAGE_KEYS.USER, originalUser);
-        else localStorage.removeItem(STORAGE_KEYS.USER);
+      const scopedOrders = getScopedData('ecommerce_orders', [], opEmail);
+      const scopedOrder = scopedOrders.find(o => o.id === orderId);
+      if (scopedOrder) {
+        scopedOrder.status = 'assigned';
+        scopedOrder.deliveryPersonEmail = actualDeliveryEmail;
+        // Sync extra fields
+        scopedOrder.openedBy = globalOrder.openedBy;
+        scopedOrder.assignedBy = globalOrder.assignedBy;
+        saveScopedData('ecommerce_orders', scopedOrders, opEmail);
       }
     });
 
@@ -1461,23 +1467,17 @@ const DataManager = (() => {
       client: globalOrder.customerName || globalOrder.customer?.name,
       destination: globalOrder.deliveryLocation || 'See details',
       status: 'assigned',
-      date: globalOrder.date
+      date: globalOrder.date || new Date().toISOString()
     };
 
-    const originalUser = localStorage.getItem(STORAGE_KEYS.USER);
-    localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(deliveryPerson));
-    
-    const dOrders = getScopedData('delivery_orders');
+    const dOrders = getScopedData('delivery_orders', [], actualDeliveryEmail);
     const existingIndex = dOrders.findIndex(o => o.id === deliveryOrder.id);
     if (existingIndex === -1) {
       dOrders.push(deliveryOrder);
     } else {
       dOrders[existingIndex] = deliveryOrder;
     }
-    saveScopedData('delivery_orders', dOrders);
-
-    if (originalUser) localStorage.setItem(STORAGE_KEYS.USER, originalUser);
-    else localStorage.removeItem(STORAGE_KEYS.USER);
+    saveScopedData('delivery_orders', dOrders, actualDeliveryEmail);
 
     return { success: true };
   }
@@ -1567,46 +1567,36 @@ const DataManager = (() => {
     const owners = [...new Set(items.map(item => item.owner).filter(Boolean))];
 
     owners.forEach(opEmail => {
-      const opUser = users.find(u => u.email === opEmail);
-      if (opUser) {
-        const originalUser = localStorage.getItem(STORAGE_KEYS.USER);
-        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(opUser));
-        
-        const scopedOrders = getScopedData('ecommerce_orders');
-        const scopedOrder = scopedOrders.find(o => o.id === orderId);
-        if (scopedOrder) {
-          scopedOrder.status = newStatus;
-          saveScopedData('ecommerce_orders', scopedOrders);
-        }
-
-        if (originalUser) localStorage.setItem(STORAGE_KEYS.USER, originalUser);
-        else localStorage.removeItem(STORAGE_KEYS.USER);
+      const scopedOrders = getScopedData('ecommerce_orders', [], opEmail);
+      const scopedOrder = scopedOrders.find(o => o.id === orderId);
+      if (scopedOrder) {
+        scopedOrder.status = newStatus;
+        saveScopedData('ecommerce_orders', scopedOrders, opEmail);
       }
     });
 
     // 3. Update for Delivery Person if assigned
     if (globalOrder.deliveryPersonEmail) {
-      const deliveryPerson = users.find(u => u.email === globalOrder.deliveryPersonEmail);
+      const deliveryEmail = globalOrder.deliveryPersonEmail;
+      const deliveryPerson = users.find(u => u.email.toLowerCase() === deliveryEmail.toLowerCase());
+      
       if (deliveryPerson) {
-        const originalUser = localStorage.getItem(STORAGE_KEYS.USER);
-        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(deliveryPerson));
-        
-        const dOrders = getScopedData('delivery_orders');
+        const dOrders = getScopedData('delivery_orders', [], deliveryEmail);
         const dOrder = dOrders.find(o => o.id === orderId);
         if (dOrder) {
           dOrder.status = newStatus;
-          saveScopedData('delivery_orders', dOrders);
+          saveScopedData('delivery_orders', dOrders, deliveryEmail);
 
           // ADD PROFIT LOGIC HERE
           if ((newStatus === 'completed' || newStatus === 'Delivered') && (oldStatus !== 'completed' && oldStatus !== 'Delivered')) {
-            const earnings = getScopedData('delivery_earnings', { total: 0, history: [] });
+            const earnings = getScopedData('delivery_earnings', { total: 0, history: [] }, deliveryEmail);
             earnings.total = (earnings.total || 0) + 50;
             earnings.history.push({
               orderId,
               amount: 50,
               date: new Date().toISOString()
             });
-            saveScopedData('delivery_earnings', earnings);
+            saveScopedData('delivery_earnings', earnings, deliveryEmail);
 
             // AUTOMATIC VAULTPRO UPDATE for Delivery Personnel
             updateVaultBalance(deliveryPerson.id, 50, `Delivery Earnings: Order ${orderId}`);
@@ -1617,7 +1607,7 @@ const DataManager = (() => {
             deductions.history.push({
               orderId,
               amount: 20,
-              deliveryPerson: deliveryPerson.email,
+              deliveryPerson: deliveryEmail,
               date: new Date().toISOString()
             });
             localStorage.setItem(STORAGE_KEYS.DELIVERY_DEDUCTIONS, JSON.stringify(deductions));
@@ -1625,13 +1615,10 @@ const DataManager = (() => {
             // AUTOMATIC VAULTPRO UPDATE for Admin (Platform Earnings)
             const admin = users.find(u => u.role === 'admin');
             if (admin) {
-              updateVaultBalance(admin.id, 20, `Delivery Deduction: Order ${orderId} from ${deliveryPerson.email}`);
+              updateVaultBalance(admin.id, 20, `Delivery Deduction: Order ${orderId} from ${deliveryEmail}`);
             }
           }
         }
-
-        if (originalUser) localStorage.setItem(STORAGE_KEYS.USER, originalUser);
-        else localStorage.removeItem(STORAGE_KEYS.USER);
       }
     }
 
@@ -1670,20 +1657,12 @@ const DataManager = (() => {
     const owners = [...new Set(items.map(item => item.owner).filter(Boolean))];
 
     owners.forEach(opEmail => {
-      const opUser = users.find(u => u.email === opEmail);
-      if (opUser) {
-        const originalUser = localStorage.getItem(STORAGE_KEYS.USER);
-        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(opUser));
-        
-        const scopedOrders = getScopedData('ecommerce_orders');
-        const scopedOrder = scopedOrders.find(o => o.id === orderId);
-        if (scopedOrder) {
-          scopedOrder.paymentStatus = newPaymentStatus;
-          saveScopedData('ecommerce_orders', scopedOrders);
-        }
-
-        if (originalUser) localStorage.setItem(STORAGE_KEYS.USER, originalUser);
-        else localStorage.removeItem(STORAGE_KEYS.USER);
+      const scopedOrders = getScopedData('ecommerce_orders', [], opEmail);
+      const scopedOrder = scopedOrders.find(o => o.id === orderId);
+      if (scopedOrder) {
+        scopedOrder.status = globalOrder.status; // Keep status in sync too
+        scopedOrder.paymentStatus = newPaymentStatus;
+        saveScopedData('ecommerce_orders', scopedOrders, opEmail);
       }
     });
 
@@ -1811,28 +1790,57 @@ const DataManager = (() => {
     initializeWarehouse();
     const warehouse = JSON.parse(localStorage.getItem(STORAGE_KEYS.WAREHOUSE)) || { products: [] };
     
-    const existingProduct = warehouse.products.find(p => p.name === product.name && p.owner === product.owner);
-    if (existingProduct) {
-      existingProduct.quantity += quantity;
+    const user = getCurrentUser();
+    const ownerEmail = product.owner || (user ? user.email : 'admin');
+    const adminEmail = "omondiphelix2003@gmail.com";
+
+    // 1. GLOBAL WAREHOUSE (Object {products: []})
+    const existingGlobal = warehouse.products.find(p => p.name === product.name && p.owner === ownerEmail);
+    if (existingGlobal) {
+      existingGlobal.quantity += quantity;
     } else {
-      const user = getCurrentUser();
       warehouse.products.push({
         ...product,
         quantity: quantity,
         id: product.id || generateId(),
-        owner: product.owner || (user ? user.email : 'admin')
+        owner: ownerEmail
       });
     }
-    
     localStorage.setItem(STORAGE_KEYS.WAREHOUSE, JSON.stringify(warehouse));
+
+    // 2. OPERATOR SCOPED WAREHOUSE (Array)
+    const operatorWarehouse = getScopedData('ecommerce_warehouse', [], ownerEmail);
+    const existingOp = operatorWarehouse.find(p => p.id === product.id || p.name === product.name);
+    if (existingOp) {
+      existingOp.quantity = (existingOp.quantity || 0) + quantity;
+    } else {
+      operatorWarehouse.push({ ...product, quantity, owner: ownerEmail });
+    }
+    saveScopedData('ecommerce_warehouse', operatorWarehouse, ownerEmail);
+
+    // 3. ADMIN SCOPED WAREHOUSE (Array)
+    if (ownerEmail !== adminEmail) {
+      const adminWarehouse = getScopedData('ecommerce_warehouse', [], adminEmail);
+      const existingAdmin = adminWarehouse.find(p => p.id === product.id || p.name === product.name);
+      if (existingAdmin) {
+        existingAdmin.quantity = (existingAdmin.quantity || 0) + quantity;
+      } else {
+        adminWarehouse.push({ ...product, quantity, owner: ownerEmail });
+      }
+      saveScopedData('ecommerce_warehouse', adminWarehouse, adminEmail);
+    }
+    
     return { success: true, message: 'Product added to warehouse' };
   }
 
   function updateWarehouseQuantity(productId, newQty) {
     const warehouse = JSON.parse(localStorage.getItem(STORAGE_KEYS.WAREHOUSE)) || { products: [] };
-    const product = warehouse.products.find(p => p.id === productId);
-    if (product) {
-      product.quantity = newQty;
+    const globalProduct = warehouse.products.find(p => p.id === productId);
+    const adminEmail = "omondiphelix2003@gmail.com";
+
+    if (globalProduct) {
+      globalProduct.quantity = newQty;
+      const ownerEmail = globalProduct.owner;
       localStorage.setItem(STORAGE_KEYS.WAREHOUSE, JSON.stringify(warehouse));
       
       // SYNC WITH STOREFRONT PRODUCTS
@@ -1845,6 +1853,24 @@ const DataManager = (() => {
           break;
         }
       }
+
+      // SYNC WITH OPERATOR SCOPED WAREHOUSE
+      const operatorWarehouse = getScopedData('ecommerce_warehouse', [], ownerEmail);
+      const opIdx = operatorWarehouse.findIndex(p => p.id === productId);
+      if (opIdx !== -1) {
+        operatorWarehouse[opIdx].quantity = newQty;
+        saveScopedData('ecommerce_warehouse', operatorWarehouse, ownerEmail);
+      }
+
+      // SYNC WITH ADMIN SCOPED WAREHOUSE
+      if (ownerEmail !== adminEmail) {
+        const adminWarehouse = getScopedData('ecommerce_warehouse', [], adminEmail);
+        const adminIdx = adminWarehouse.findIndex(p => p.id === productId);
+        if (adminIdx !== -1) {
+          adminWarehouse[adminIdx].quantity = newQty;
+          saveScopedData('ecommerce_warehouse', adminWarehouse, adminEmail);
+        }
+      }
       
       return { success: true };
     }
@@ -1853,8 +1879,29 @@ const DataManager = (() => {
 
   function removeFromWarehouse(productId) {
     const warehouse = JSON.parse(localStorage.getItem(STORAGE_KEYS.WAREHOUSE)) || { products: [] };
-    warehouse.products = warehouse.products.filter(p => p.id !== productId);
-    localStorage.setItem(STORAGE_KEYS.WAREHOUSE, JSON.stringify(warehouse));
+    const globalProduct = warehouse.products.find(p => p.id === productId);
+    const adminEmail = "omondiphelix2003@gmail.com";
+
+    if (globalProduct) {
+        const ownerEmail = globalProduct.owner;
+        
+        // 1. Remove from GLOBAL
+        warehouse.products = warehouse.products.filter(p => p.id !== productId);
+        localStorage.setItem(STORAGE_KEYS.WAREHOUSE, JSON.stringify(warehouse));
+        
+        // 2. Remove from OPERATOR SCOPED
+        const operatorWarehouse = getScopedData('ecommerce_warehouse', [], ownerEmail);
+        const filteredOp = operatorWarehouse.filter(p => p.id !== productId);
+        saveScopedData('ecommerce_warehouse', filteredOp, ownerEmail);
+
+        // 3. Remove from ADMIN SCOPED
+        if (ownerEmail !== adminEmail) {
+            const adminWarehouse = getScopedData('ecommerce_warehouse', [], adminEmail);
+            const filteredAdmin = adminWarehouse.filter(p => p.id !== productId);
+            saveScopedData('ecommerce_warehouse', filteredAdmin, adminEmail);
+        }
+    }
+    
     return { success: true };
   }
 
@@ -2204,28 +2251,88 @@ const DataManager = (() => {
   }
 
   function resetPlatformEarnings() {
+    // 1. Reset Admin Earnings
     localStorage.setItem(STORAGE_KEYS.PERMANENT_EARNINGS, "0");
+    
+    // 2. Reset All Operators Revenue and Earnings
     localStorage.setItem(STORAGE_KEYS.OPERATOR_REVENUE, JSON.stringify({}));
     localStorage.setItem(STORAGE_KEYS.OPERATOR_EARNINGS, JSON.stringify({}));
+    
+    // 3. Reset Delivery Earnings and Deductions
+    localStorage.setItem(STORAGE_KEYS.DELIVERY_EARNINGS, JSON.stringify({ total: 0, history: [] }));
+    localStorage.setItem(STORAGE_KEYS.DELIVERY_DEDUCTIONS, JSON.stringify({ total: 0, history: [] }));
+
+    // 4. Iterate through all keys to find scoped data
+    const keys = Object.keys(localStorage);
     const deliveryPrefix = 'delivery_earnings_';
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith(deliveryPrefix)) {
-        localStorage.setItem(key, JSON.stringify({ total: 0 }));
+    const medicorePrefix = 'medicoreAdminData';
+    const ordersPrefix = 'ecommerce_orders_';
+
+    keys.forEach(key => {
+      // Reset individual delivery person earnings
+      if (key.startsWith(deliveryPrefix)) {
+        localStorage.setItem(key, JSON.stringify({ total: 0, history: [] }));
       }
-    }
-    return { success: true, message: 'Platform earnings (Admin, Operators, Pharmacy, Delivery) reset to zero' };
+      
+      // Reset MediCore operator data (specifically orders which drive revenue)
+      if (key === medicorePrefix || key.startsWith(medicorePrefix + '_')) {
+        try {
+          const data = JSON.parse(localStorage.getItem(key));
+          if (data) {
+            if (data.orders) data.orders = [];
+            // If MediCore has revenue/earnings fields, reset them too
+            if (data.revenue !== undefined) data.revenue = 0;
+            if (data.earnings !== undefined) data.earnings = 0;
+            localStorage.setItem(key, JSON.stringify(data));
+          }
+        } catch (e) { console.error("Error resetting medicore data:", key, e); }
+      }
+
+      // Optional: Reset scoped orders if financials are derived from them
+      if (key.startsWith(ordersPrefix)) {
+        localStorage.setItem(key, JSON.stringify([]));
+      }
+    });
+
+    // 5. Global Orders - Should we clear these? 
+    // Usually financials are linked to orders. Let's clear them to ensure consistency.
+    localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify([]));
+
+    return { success: true, message: 'All Platform Earnings (Admin, Operators, Pharmacy, Delivery) and associated Orders have been reset to zero.' };
   }
 
   function resetAllFinancials() {
+    // Perform earnings reset first
     resetPlatformEarnings();
+    
+    // 6. Reset VaultPro (Balances and Transactions)
     localStorage.setItem(STORAGE_KEYS.VAULT_BALANCES, JSON.stringify({}));
+    localStorage.setItem(STORAGE_KEYS.VAULT_TRANSACTIONS, JSON.stringify([]));
+    
+    // 7. Reset Agent Floats and Transactions
     localStorage.setItem(STORAGE_KEYS.AGENT_FLOAT, JSON.stringify({}));
+    localStorage.setItem(STORAGE_KEYS.AGENT_TRANSACTIONS, JSON.stringify([]));
+    
+    // 8. Reset Withdrawal Requests
+    localStorage.setItem(STORAGE_KEYS.WITHDRAWAL_REQUESTS, JSON.stringify([]));
+    
+    // 9. Log the reset action if admin is logged in
     const admin = getCurrentUser();
     if (admin && admin.role === 'admin') {
-      updateVaultBalance(admin.id, 0, "Full System Financial Reset Performed");
+      // We need to re-initialize the empty transactions array we just set
+      const txs = [];
+      txs.push({
+        userId: admin.id,
+        amount: 0,
+        type: 'credit',
+        description: "Full System Financial Reset Performed",
+        balanceAfter: 0,
+        timestamp: new Date().toISOString()
+      });
+      localStorage.setItem(STORAGE_KEYS.VAULT_TRANSACTIONS, JSON.stringify(txs));
     }
-    return { success: true, message: 'All platform amounts, VaultPro accounts, and Agent floats reset to zero' };
+    
+    return { success: true, message: 'COMPLETE RESET: All Platform Earnings, VaultPro accounts, Transactions, and Agent Floats have been reset to ZERO.' };
   }
 
   // Public API

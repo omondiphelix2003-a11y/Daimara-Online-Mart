@@ -629,7 +629,8 @@
                     profit = DataManager.getOperatorRevenue(this.state.user.email);
                 } else if (this.state.user.role === 'delivery') {
                     // Assuming delivery earnings are stored similarly
-                    profit = parseFloat(localStorage.getItem('delivery_earnings_' + this.state.user.id)) || 0;
+                    const dEarnings = JSON.parse(localStorage.getItem('delivery_earnings_' + this.state.user.id)) || { total: 0 };
+                    profit = dEarnings.total || 0;
                 }
                 this.state.profit = profit;
                 document.getElementById('display-profit').innerText = this.formatMoney(profit);

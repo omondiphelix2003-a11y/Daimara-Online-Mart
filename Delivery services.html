@@ -502,7 +502,7 @@ window.onclick = function(event) {
 
 function onScanSuccess(decodedText) {
   const resultDiv = document.getElementById("result");
-  const orders = DataManager.getScopedData('delivery_orders');
+  const orders = DataManager.getScopedData('delivery_orders', [], viewUserEmail);
   
   // Try to find the order in the delivery person's assigned list
   // Handle both with and without '#' prefix

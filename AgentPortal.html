@@ -350,8 +350,8 @@
       // 1. Decrease client balance
       DataManager.updateVaultBalance(client.id, -amount, `Manual Withdrawal via Agent ${agentData.agentNumber}`);
       
-      // 2. Decrease agent float (per user request: "when he accepts the float amount decreases")
-      DataManager.updateAgentFloat(agentData.agentNumber, -amount, `Manual Withdrawal for ${phone}`);
+      // 2. Increase agent float
+      DataManager.updateAgentFloat(agentData.agentNumber, amount, `Manual Withdrawal for ${phone}`);
 
       alert("Withdrawal processed! You can now give the client cash.");
       refreshBalance();
