@@ -23,6 +23,12 @@
             overflow-x: hidden;
         }
 
+        @media (orientation: landscape) and (max-height: 500px) {
+            header { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+            .shelf-container { padding: 0.5rem; }
+            .cart-modal { max-height: 90vh; overflow-y: auto; }
+        }
+
         .shelf-scroll::-webkit-scrollbar { height: 6px; }
         .shelf-scroll::-webkit-scrollbar-track { background: #1e293b; border-radius: 3px; }
         .shelf-scroll::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
@@ -943,6 +949,29 @@
             initSlideshow();
             renderRandomDrugs();
             updateCartUI();
+
+            // Restore active chat session
+            const activePharm = sessionStorage.getItem('medicore_active_pharmacist');
+            const activeRequestId = sessionStorage.getItem('medicore_current_request_id');
+            const chatActive = sessionStorage.getItem('medicore_chat_active');
+
+            if (activePharm && activeRequestId) {
+                selectedPharmacist = JSON.parse(activePharm);
+                currentRequestId = activeRequestId;
+                
+                if (chatActive === 'true') {
+                    openActiveChat(selectedPharmacist);
+                } else {
+                    // It was in pending state
+                    const request = JSON.parse(localStorage.getItem('medicore_pharmacist_chat_request'));
+                    if (request && request.id === currentRequestId && request.status === 'pending') {
+                        document.getElementById('waitingPharmacistImg').src = selectedPharmacist.image;
+                        document.getElementById('waitingPharmacistName').innerText = selectedPharmacist.name;
+                        document.getElementById('clientWaitingModal').classList.remove('hidden');
+                        document.getElementById('clientWaitingModal').classList.add('visible');
+                    }
+                }
+            }
         }
 
         // Handle real-time updates from other tabs (Admin panel)
@@ -1426,11 +1455,13 @@
 
         function selectPharmacist(pharmacist) {
             selectedPharmacist = pharmacist;
+            sessionStorage.setItem('medicore_active_pharmacist', JSON.stringify(pharmacist));
             closePharmacyList();
             
             document.getElementById('waitingPharmacistImg').src = pharmacist.image;
             document.getElementById('waitingPharmacistName').innerText = pharmacist.name;
             document.getElementById('clientWaitingModal').classList.remove('hidden');
+            document.getElementById('clientWaitingModal').classList.add('visible');
             
             // Set chat request in localStorage
             const user = typeof DataManager !== 'undefined' ? DataManager.getCurrentUser() : null;
@@ -1444,6 +1475,7 @@
                 timestamp: Date.now()
             };
             currentRequestId = request.id;
+            sessionStorage.setItem('medicore_current_request_id', currentRequestId);
             localStorage.setItem('medicore_pharmacist_chat_request', JSON.stringify(request));
             localStorage.removeItem('medicore_pharmacist_chat_response');
 
@@ -1485,7 +1517,12 @@
 
         function cancelConnectionRequest() {
             document.getElementById('clientWaitingModal').classList.add('hidden');
+            document.getElementById('clientWaitingModal').classList.remove('visible');
             selectedPharmacist = null;
+            currentRequestId = null;
+            sessionStorage.removeItem('medicore_active_pharmacist');
+            sessionStorage.removeItem('medicore_current_request_id');
+            sessionStorage.removeItem('medicore_chat_active');
             localStorage.removeItem('medicore_pharmacist_chat_request');
         }
 
@@ -1511,18 +1548,25 @@
         let chatSyncInterval = null;
         function openActiveChat(pharmacist) {
             currentChatPharmacist = pharmacist;
+            sessionStorage.setItem('medicore_chat_active', 'true');
+            sessionStorage.setItem('medicore_active_pharmacist', JSON.stringify(pharmacist));
+            
             document.getElementById('activeChatImg').src = pharmacist.image;
             document.getElementById('activeChatName').innerText = pharmacist.name;
             
             const messages = document.getElementById('activeChatMessages');
-            messages.innerHTML = `
-                <div class="chat-bubble bot">
-                    <p class="font-semibold text-blue-400 mb-1">${pharmacist.name}:</p>
-                    Hello! I've accepted your request. How can I help you today?
-                </div>
-            `;
+            if (!messages.dataset.messageCount || messages.dataset.messageCount === "0") {
+                messages.innerHTML = `
+                    <div class="chat-bubble bot">
+                        <p class="font-semibold text-blue-400 mb-1">${pharmacist.name}:</p>
+                        Hello! I've accepted your request. How can I help you today?
+                    </div>
+                `;
+                messages.dataset.messageCount = "1";
+            }
             
             document.getElementById('activeChatModal').classList.remove('hidden');
+            document.getElementById('activeChatModal').classList.add('visible');
             startChatSync();
         }
 
@@ -1534,8 +1578,7 @@
                 const myMessages = chats[currentRequestId] || [];
                 const container = document.getElementById('activeChatMessages');
                 
-                // Clear and re-render to keep it simple, or only append new ones
-                // Let's only append new ones by tracking last rendered count
+                // Track last rendered count
                 const lastCount = parseInt(container.dataset.messageCount || "1");
                 if (myMessages.length + 1 > lastCount) {
                     for (let i = lastCount - 1; i < myMessages.length; i++) {
@@ -1581,6 +1624,10 @@
         function endChat() {
             if (chatSyncInterval) clearInterval(chatSyncInterval);
             document.getElementById('activeChatModal').classList.add('hidden');
+            document.getElementById('activeChatModal').classList.remove('visible');
+            sessionStorage.removeItem('medicore_chat_active');
+            sessionStorage.removeItem('medicore_active_pharmacist');
+            sessionStorage.removeItem('medicore_current_request_id');
             currentChatPharmacist = null;
             selectedPharmacist = null;
             currentRequestId = null;

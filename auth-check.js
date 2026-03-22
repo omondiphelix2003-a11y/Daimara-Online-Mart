@@ -30,37 +30,32 @@ document.addEventListener("DOMContentLoaded", function() {
 
   // Handle Dashboard Icons for Different Roles
   if (currentUser && navRight) {
-    let dashboardLink = null;
     const knownOperator = currentUser.role === 'operator' || hasOperatorRegistration(currentUser.email);
     const knownMedicore = currentUser.role === 'medicore_operator' || hasMedicoreRegistration(currentUser.email);
-    
-    if (currentUser.role === 'admin' || currentUser.email === "omondiphelix2003@gmail.com") {
-      dashboardLink = document.createElement("a");
-      dashboardLink.href = "admin-manager.html";
-      dashboardLink.title = "Admin Dashboard";
-      dashboardLink.innerHTML = '<i class="fas fa-user-shield"></i>';
-    } else if (knownMedicore) {
-      dashboardLink = document.createElement("a");
-      dashboardLink.href = "medicore panel(for operators).html";
-      dashboardLink.title = "MediCore Operator Dashboard";
-      dashboardLink.innerHTML = '<i class="fas fa-hand-holding-medical"></i>';
-    } else if (knownOperator) {
-      dashboardLink = document.createElement("a");
-      dashboardLink.href = "Operator's Dashboard-for businesses.html";
-      dashboardLink.title = "Operator Dashboard";
-      dashboardLink.innerHTML = '<i class="fas fa-briefcase"></i>';
-    } else if (currentUser.role === 'delivery') {
-      dashboardLink = document.createElement("a");
-      dashboardLink.href = "Delivery services.html";
-      dashboardLink.title = "Delivery Dashboard";
-      dashboardLink.innerHTML = '<i class="fas fa-truck"></i>';
-    }
+    const knownDelivery = currentUser.role === 'delivery';
+    const isAdmin = currentUser.role === 'admin' || currentUser.email === "omondiphelix2003@gmail.com";
 
-    if (dashboardLink) {
-      dashboardLink.className = "dashboard-nav-link";
-      dashboardLink.style.marginLeft = "10px";
-      // Insert as first child of navRight/navIcons to maintain order
-      navRight.insertBefore(dashboardLink, navRight.firstChild);
+    const addDashboardIcon = (href, title, iconClass) => {
+      const link = document.createElement("a");
+      link.href = href;
+      link.title = title;
+      link.innerHTML = `<i class="fas ${iconClass}"></i>`;
+      link.className = "dashboard-nav-link";
+      link.style.marginLeft = "10px";
+      navRight.insertBefore(link, navRight.firstChild);
+    };
+
+    if (isAdmin) {
+      addDashboardIcon("admin-manager.html", "Admin Dashboard", "fa-user-shield");
+    }
+    if (knownMedicore) {
+      addDashboardIcon("medicore panel(for operators).html", "MediCore Operator Dashboard", "fa-hand-holding-medical");
+    }
+    if (knownOperator) {
+      addDashboardIcon("Operator's Dashboard-for businesses.html", "Operator Dashboard", "fa-briefcase");
+    }
+    if (knownDelivery) {
+      addDashboardIcon("Delivery services.html", "Delivery Dashboard", "fa-truck");
     }
   }
 

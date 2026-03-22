@@ -35,6 +35,22 @@ body {
   color: var(--text);
   font-size: 16px;
   padding-bottom: 80px;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+@media (max-width: 768px) {
+  body { font-size: 14px; }
+  .ad-bar { padding: 0.5rem 1rem; font-size: 18px; }
+  .navbar { padding: 10px; top: 60px; }
+  .logo { font-size: 18px; }
+}
+
+/* Horizontal scrolling for wide content */
+.scroll-x, .table-container, .grid-container, .product-grid {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
 }
 
 /* ADVERTISEMENT BAR */

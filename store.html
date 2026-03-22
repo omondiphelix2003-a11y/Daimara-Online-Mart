@@ -19,7 +19,20 @@
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-    body { background: var(--bg); font-size: 16px; padding-bottom: 20px; color: #e2e8f0; overflow-x: auto; }
+    body { background: var(--bg); font-size: 16px; padding-bottom: 20px; color: #e2e8f0; width: 100%; overflow-x: hidden; }
+    
+    @media (max-width: 768px) {
+      body { font-size: 14px; }
+      .navbar { padding: 10px; }
+      .search-container { margin-left: 0; width: 80%; }
+    }
+    
+    /* Horizontal scrolling for wide content */
+    .scroll-x, .table-container, .nav-links, .category-grid, .product-grid {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      max-width: 100%;
+    }
 
 
       /* BOTTOM NAV */

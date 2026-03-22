@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Daimara Stores | Login</title>
+  <base target="_self">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
@@ -95,6 +96,7 @@
     <select id="signup-role">
       <option value="user">Normal User</option>
       <option value="operator">Operator (Page Owner)</option>
+      <option value="medicore_operator">MediCore Operator</option>
       <option value="delivery">Delivery Personnel</option>
     </select>
     <div class="profile-image-group">
@@ -212,34 +214,27 @@
     const email = document.getElementById("login-email").value.trim();
     const password = document.getElementById("login-password").value;
 
-    // Special case for admin login on small screens
-    if (window.innerWidth <= 768 && email === "omondiphelix2003@gmail.com") {
-      // Find or create admin user
-      let users = JSON.parse(localStorage.getItem('ecommerce_all_users')) || [];
-      let admin = users.find(u => u.email === email);
-      if (!admin) {
-        admin = {
-          id: 'admin-1',
-          name: 'Daimara Admin',
-          email: email,
-          password: password, // use provided password or default
-          role: 'admin',
-          phone: '0742120329',
-          profileImage: 'https://via.placeholder.com/100'
-        };
-        users.push(admin);
-        localStorage.setItem('ecommerce_all_users', JSON.stringify(users));
-      }
-      
-      const { password: _, ...adminSafe } = admin;
-      localStorage.setItem('ecommerce_user', JSON.stringify(adminSafe));
-      window.location.href = "index.html";
-      return;
-    }
-
     const result = DataManager.loginUser(email, password);
     if (result.success) {
-      window.location.href = "index.html";
+      const user = result.user;
+      
+      // Helper to check page registrations
+      const regs = DataManager.getPageRegistrations ? DataManager.getPageRegistrations() : [];
+      const isMedicore = regs.some(r => r.email === user.email && r.type === 'medicore' && r.status === 'approved');
+      const isOperator = regs.some(r => r.email === user.email && r.type === 'operator' && r.status === 'approved');
+
+      // Role-based redirection
+      if (user.role === 'admin' || user.email === "omondiphelix2003@gmail.com") {
+        window.location.href = "admin-manager.html";
+      } else if (user.role === 'medicore_operator' || isMedicore) {
+        window.location.href = "medicore panel(for operators).html";
+      } else if (user.role === 'operator' || isOperator) {
+        window.location.href = "Operator's Dashboard-for businesses.html";
+      } else if (user.role === 'delivery') {
+        window.location.href = "Delivery services.html";
+      } else {
+        window.location.href = "index.html";
+      }
     } else {
       alert(result.message);
     }

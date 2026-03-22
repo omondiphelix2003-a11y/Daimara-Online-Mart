@@ -436,8 +436,8 @@
         </div>
 
         <div class="btn-group">
-            <button onclick="checkout()" class="btn-primary">Pay (Now)</button>
-            <button onclick="initiatePayAfterDelivery()" class="btn-secondary">Pay (After Delivery)</button>
+            <button onclick="checkout(event)" class="btn-primary">Pay (Now)</button>
+            <button onclick="initiatePayAfterDelivery(event)" class="btn-secondary">Pay (After Delivery)</button>
         </div>
     </div>
 
@@ -611,23 +611,27 @@
         
         if (paymentSuccess) {
             if (purpose === 'delivery-fee') {
-                const pending = JSON.parse(localStorage.getItem('pendingPayAfterDeliveryOrder'));
+                let pending = JSON.parse(localStorage.getItem('pendingPayAfterDeliveryOrder'));
+                if (!pending) pending = JSON.parse(sessionStorage.getItem('pendingPayAfterDeliveryOrder'));
                 if (pending) {
                     const res = DataManager.processNewOrder({...pending, paymentStatus: 'unpaid', date: new Date().toISOString(), id: 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase()});
                     if (res.success) { 
                         DataManager.clearCart(); 
                         localStorage.removeItem('pendingPayAfterDeliveryOrder'); 
+                        sessionStorage.removeItem('pendingPayAfterDeliveryOrder');
                         alert('Order placed! You will pay items on delivery.'); 
                         window.location.href = "index.html"; 
                     }
                 }
             } else if (purpose === 'full-payment') {
-                const pending = JSON.parse(localStorage.getItem('pendingFullPaymentOrder'));
+                let pending = JSON.parse(localStorage.getItem('pendingFullPaymentOrder'));
+                if (!pending) pending = JSON.parse(sessionStorage.getItem('pendingFullPaymentOrder'));
                 if (pending) {
                     const res = DataManager.processNewOrder({...pending, paymentStatus: 'paid', date: new Date().toISOString()});
                     if (res.success) {
                         DataManager.clearCart();
                         localStorage.removeItem('pendingFullPaymentOrder');
+                        sessionStorage.removeItem('pendingFullPaymentOrder');
                         alert('Payment successful! Order placed.');
                         window.location.href = "index.html";
                     }
@@ -644,6 +648,8 @@
             // Force fresh payment process if returning from payment page without success
             localStorage.removeItem('pendingPayAfterDeliveryOrder');
             localStorage.removeItem('pendingFullPaymentOrder');
+            sessionStorage.removeItem('pendingPayAfterDeliveryOrder');
+            sessionStorage.removeItem('pendingFullPaymentOrder');
             const delOpt = document.getElementById('delivery-option');
             if (delOpt) {
                 delOpt.checked = false;
@@ -652,71 +658,132 @@
         }
     });
 
-    function checkout() {
-        if (cart.length === 0) { alert('Your cart is empty'); return; }
-        const name = document.getElementById('name').value;
-        const email = document.getElementById('email').value;
-        const locationCoords = document.getElementById('location-coords').value;
-        const addDelivery = document.getElementById('delivery-option').checked;
+    function checkout(event) {
+        const btn = event ? event.currentTarget : document.querySelector('.btn-primary');
+        const originalText = btn.innerHTML;
+        try {
+            console.log("Checkout initiated");
+            const currentCart = DataManager.getCart();
+            if (currentCart.length === 0) { alert('Your cart is empty'); return; }
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const locationCoords = document.getElementById('location-coords').value;
+            const addDelivery = document.getElementById('delivery-option').checked;
 
-        if (!name || !email) { alert('Fill all fields'); return; }
-        if (addDelivery && !locationCoords) { alert('Provide location'); return; }
+            if (!name || !email) { alert('Please fill in your name and email'); return; }
+            if (addDelivery && !locationCoords) { alert('Please provide your delivery location'); return; }
 
-        const config = DataManager.getSystemConfig();
-        const subtotal = cart.reduce((a, b) => a + b.price * (b.qty || 1), 0);
-        const total = addDelivery ? subtotal + config.deliveryFee : subtotal;
+            const user = DataManager.getCurrentUser();
+            if (!user) { alert('User session expired. Please login again.'); window.location.href = 'login.html'; return; }
 
-        const order = {
-            id: 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
-            items: cart,
-            totalPrice: total,
-            grandTotal: total,
-            customerName: name,
-            customerEmail: email,
-            userId: DataManager.getCurrentUser().id,
-            paymentMethod: document.getElementById('paymentMethod').value,
-            deliveryLocation: addDelivery ? locationCoords : 'N/A',
-            date: new Date().toISOString(),
-            status: 'pending',
-            paymentStatus: 'paid'
-        };
+            // Show loading state on button
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
 
-        localStorage.setItem('pendingFullPaymentOrder', JSON.stringify(order));
-        alert(`Redirecting to payment for KES ${total.toLocaleString()}...`);
-        window.location.href = `mpesa invoice payment.html?amount=${total}&purpose=full-payment&orderId=${order.id}`;
+            const config = DataManager.getSystemConfig();
+            const subtotal = currentCart.reduce((a, b) => a + (Number(b.price) || 0) * (b.qty || 1), 0);
+            const deliveryFee = addDelivery ? (config.deliveryFee || 0) : 0;
+            const total = subtotal + deliveryFee;
+
+            const order = {
+                id: 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
+                items: currentCart,
+                totalPrice: subtotal,
+                deliveryFee: deliveryFee,
+                grandTotal: total,
+                customerName: name,
+                customerEmail: email,
+                userId: user.id,
+                paymentMethod: document.getElementById('paymentMethod').value,
+                deliveryLocation: addDelivery ? locationCoords : 'N/A',
+                date: new Date().toISOString(),
+                status: 'pending',
+                paymentStatus: 'paid'
+            };
+
+            console.log("Saving order to localStorage", order);
+            try {
+                localStorage.setItem('pendingFullPaymentOrder', JSON.stringify(order));
+            } catch (e) {
+                console.warn("localStorage quota exceeded, using sessionStorage as fallback", e);
+                sessionStorage.setItem('pendingFullPaymentOrder', JSON.stringify(order));
+            }
+            
+            const targetUrl = `mpesa%20invoice%20payment.html?amount=${total}&purpose=full-payment&orderId=${order.id}`;
+            console.log("Redirecting to:", targetUrl);
+            
+            // Use location.assign for more reliable redirection
+            window.location.assign(targetUrl);
+        } catch (error) {
+            console.error("Checkout error:", error);
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+            alert("An error occurred during checkout: " + error.message);
+        }
     }
 
-    function initiatePayAfterDelivery() {
-        if (cart.length === 0) { alert('Your cart is empty'); return; }
-        const cb = document.getElementById('delivery-option');
-        const loc = document.getElementById('location-coords').value;
-        if (!cb.checked || !loc) { alert("Select delivery and provide location coordinates."); return; }
-        
-        const name = document.getElementById('name').value;
-        const email = document.getElementById('email').value;
-        if (!name || !email) { alert('Fill all fields'); return; }
+    function initiatePayAfterDelivery(event) {
+        const btn = event ? event.currentTarget : document.querySelector('.btn-secondary');
+        const originalText = btn.innerHTML;
+        try {
+            console.log("Pay after delivery initiated");
+            const currentCart = DataManager.getCart();
+            if (currentCart.length === 0) { alert('Your cart is empty'); return; }
+            
+            const cb = document.getElementById('delivery-option');
+            const loc = document.getElementById('location-coords').value;
+            if (!cb.checked || !loc) { alert("Please select delivery and provide location coordinates."); return; }
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            if (!name || !email) { alert('Please fill in your name and email'); return; }
 
-        const subtotal = cart.reduce((a, b) => a + b.price * (b.qty || 1), 0);
-        const config = DataManager.getSystemConfig();
-        
-        const order = {
-            items: cart,
-            subtotal: subtotal,
-            deliveryFee: config.deliveryFee,
-            totalPrice: subtotal,
-            grandTotal: subtotal,
-            customerName: name,
-            customerEmail: email,
-            userId: DataManager.getCurrentUser().id,
-            paymentMethod: 'Pay After Delivery',
-            deliveryLocation: loc,
-            paymentStatus: 'unpaid',
-            status: 'pending'
-        };
+            const user = DataManager.getCurrentUser();
+            if (!user) { alert('User session expired. Please login again.'); window.location.href = 'login.html'; return; }
 
-        localStorage.setItem('pendingPayAfterDeliveryOrder', JSON.stringify(order));
-        alert(`Proceeding to pay delivery fee of KES ${config.deliveryFee}...`);
-        window.location.href = `mpesa invoice payment.html?amount=${config.deliveryFee}&purpose=delivery-fee&orderId=temp-${Date.now()}`;
+            // Show loading state on button
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+            const subtotal = currentCart.reduce((a, b) => a + (Number(b.price) || 0) * (b.qty || 1), 0);
+            const config = DataManager.getSystemConfig();
+            const deliveryFee = config.deliveryFee || 0;
+            
+            const order = {
+                id: 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
+                items: currentCart,
+                totalPrice: subtotal,
+                deliveryFee: deliveryFee,
+                grandTotal: subtotal, // For pay after delivery, the grandTotal is just the items cost as 70 is paid separately now
+                customerName: name,
+                customerEmail: email,
+                userId: user.id,
+                paymentMethod: 'Pay After Delivery',
+                deliveryLocation: loc,
+                paymentStatus: 'unpaid',
+                status: 'pending'
+            };
+
+            console.log("Saving delivery-fee order to localStorage", order);
+            try {
+                localStorage.setItem('pendingPayAfterDeliveryOrder', JSON.stringify(order));
+            } catch (e) {
+                console.warn("localStorage quota exceeded, using sessionStorage as fallback", e);
+                sessionStorage.setItem('pendingPayAfterDeliveryOrder', JSON.stringify(order));
+            }
+            
+            const targetUrl = `mpesa%20invoice%20payment.html?amount=${config.deliveryFee || 0}&purpose=delivery-fee&orderId=temp-${Date.now()}`;
+            console.log("Redirecting to:", targetUrl);
+            
+            // Use location.assign for more reliable redirection
+            window.location.assign(targetUrl);
+        } catch (error) {
+            console.error("Pay after delivery error:", error);
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+            alert("An error occurred: " + error.message);
+        }
     }
 
     function initSlideshow() {
@@ -856,11 +923,17 @@
 
     // Listen for changes from other tabs (e.g. cart cleared)
     window.addEventListener('storage', (e) => {
-        if (e.key === 'ecommerce_cart') {
+        if (e.key === 'ecommerce_cart' || e.key === 'ecommerce_cart_cleared') {
             cart = DataManager.getCart();
             renderCart();
             updateCartBadge();
         }
+    });
+
+    window.addEventListener('cartUpdated', () => {
+        cart = DataManager.getCart();
+        renderCart();
+        updateCartBadge();
     });
 </script>
 <div class="bottom-nav">

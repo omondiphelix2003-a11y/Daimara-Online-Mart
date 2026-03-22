@@ -19,6 +19,23 @@
             justify-content: center;
             align-items: flex-start;
             padding: 40px 20px;
+            width: 100%;
+            overflow-x: hidden;
+        }
+        
+        @media (max-width: 768px) {
+            .invoice-header, .invoice-content { padding: 20px; flex-direction: column; text-align: center; gap: 20px; }
+            .invoice-title-section { text-align: center; }
+            .business-text { font-size: 28px; }
+            .invoice-content { grid-template-columns: 1fr; gap: 30px; }
+            table { font-size: 12px; }
+        }
+
+        /* Horizontal scrolling for wide content */
+        .invoice-container, .table-container, table {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            max-width: 100%;
         }
 
         .invoice-container {
@@ -407,7 +424,7 @@
             }
         }
     </style>
-<base target="_blank">
+<base target="_self">
 </head>
 <body>
     <div class="invoice-container" >
@@ -623,18 +640,43 @@
                     const purpose = params.get('purpose');
 
                     if (purpose === 'full-payment') {
-                        const pending = JSON.parse(localStorage.getItem('pendingFullPaymentOrder'));
+                        let pending = JSON.parse(localStorage.getItem('pendingFullPaymentOrder'));
+                        if (!pending) {
+                            pending = JSON.parse(sessionStorage.getItem('pendingFullPaymentOrder'));
+                        }
                         if (pending) {
-                            DataManager.processNewOrder({...pending, paymentStatus: 'paid', mpesaCode: code});
-                            localStorage.removeItem('pendingFullPaymentOrder');
-                            DataManager.clearCart();
+                            const res = DataManager.processNewOrder({...pending, paymentStatus: 'paid', mpesaCode: code});
+                            if (res.success) {
+                                localStorage.removeItem('pendingFullPaymentOrder');
+                                sessionStorage.removeItem('pendingFullPaymentOrder');
+                                DataManager.clearCart();
+                            } else {
+                                console.error("Order processing failed:", res.message);
+                                alert("Error saving order: " + res.message);
+                            }
                         }
                     } else if (purpose === 'delivery-fee') {
-                        const pending = JSON.parse(localStorage.getItem('pendingPayAfterDeliveryOrder'));
+                        let pending = JSON.parse(localStorage.getItem('pendingPayAfterDeliveryOrder'));
+                        if (!pending) {
+                            pending = JSON.parse(sessionStorage.getItem('pendingPayAfterDeliveryOrder'));
+                        }
                         if (pending) {
-                            DataManager.processNewOrder({...pending, paymentStatus: 'unpaid', mpesaCode: code, deliveryFeePaid: true});
-                            localStorage.removeItem('pendingPayAfterDeliveryOrder');
-                            DataManager.clearCart();
+                            const res = DataManager.processNewOrder({...pending, paymentStatus: 'unpaid', mpesaCode: code, deliveryFeePaid: true});
+                            if (res.success) {
+                                localStorage.removeItem('pendingPayAfterDeliveryOrder');
+                                sessionStorage.removeItem('pendingPayAfterDeliveryOrder');
+                                DataManager.clearCart();
+                            } else {
+                                console.error("Order processing failed:", res.message);
+                                alert("Error saving order: " + res.message);
+                            }
+                        }
+                    } else if (purpose === 'repay-order') {
+                        const res = DataManager.updateOrderPaymentStatus(orderId, 'paid');
+                        if (res.success) {
+                            console.log("Order payment status updated to paid");
+                        } else {
+                            console.error("Failed to update order payment status:", res.message);
                         }
                     }
                 } else {
@@ -649,7 +691,15 @@
 
         function closeModal() {
             document.getElementById('successModal').classList.remove('active');
-            window.location.href = "index.html";
+            
+            const params = new URLSearchParams(window.location.search);
+            const purpose = params.get('purpose');
+            
+            if (purpose === 'repay-order') {
+                window.location.href = "profile.html?isFinalPayment=true";
+            } else {
+                window.location.href = "index.html";
+            }
         }
 
         // Close modal when clicking outside

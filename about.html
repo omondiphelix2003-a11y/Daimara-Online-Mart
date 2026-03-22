@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Daimara Stores | About Us</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link rel="stylesheet" href="about.css">
 
@@ -30,11 +30,24 @@
   
 body {
   background: #0f172a;
-  font-size: 25px;
+  font-size: 16px;
   padding-bottom: 100px;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+@media (max-width: 768px) {
+  body { font-size: 14px; }
+}
+
+/* Horizontal scrolling for wide content */
+.scroll-x, .table-container, .about-stats {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
 }
 
 .main-content-wrapper {

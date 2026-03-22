@@ -29,8 +29,24 @@
 body {
   font-family: 'Inter', sans-serif;
   background: #0f172a;
-  font-size: 25px;
+  font-size: 16px;
   padding-bottom: 100px;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+@media (max-width: 768px) {
+  body { font-size: 14px; }
+  .logo { font-size: 18px; }
+  .navbar { padding: 10px; }
+  .nav-links { gap: 10px; }
+}
+
+/* Horizontal scrolling for wide content */
+.scroll-x, .table-container, .nav-links, .category-grid, .product-grid {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
 }
 
 /* FOOTER */

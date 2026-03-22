@@ -21,6 +21,27 @@
             font-family: 'Inter', sans-serif;
             background-color: #020617;
             color: #e2e8f0;
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        @media (orientation: landscape) and (max-height: 500px) {
+            aside { width: 200px; }
+            .admin-card { padding: 1rem; }
+            header { padding: 0.5rem 1rem; }
+        }
+        
+        @media (max-width: 992px) {
+            aside { transform: translateX(-100%); transition: transform 0.3s; position: fixed; z-index: 50; }
+            aside.active { transform: translateX(0); }
+            main { margin-left: 0 !important; width: 100% !important; padding: 10px !important; }
+        }
+
+        /* Horizontal scrolling for wide content */
+        .scroll-x, .table-container, .custom-scrollbar, table, .admin-card {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            max-width: 100%;
         }
         
         .glass-panel {
@@ -1761,6 +1782,9 @@
                     <p class="font-bold text-white">${order.customer}</p>
                     <p class="text-sm text-slate-300">${order.email}</p>
                     <p class="text-sm text-slate-300">${order.phone}</p>
+                    <p class="text-xs mt-2 ${order.paymentStatus === 'paid' ? 'text-green-400' : 'text-amber-400'} font-bold">
+                        PAYMENT STATUS: ${order.paymentStatus ? order.paymentStatus.toUpperCase() : 'PAID'}
+                    </p>
                 </div>
                 <div class="bg-slate-900 p-4 rounded-lg mb-4">
                     <p class="text-xs text-slate-400 mb-2">Order Items</p>

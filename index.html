@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Daimara Stores | Home</title>
+  <base target="_self">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
@@ -20,7 +21,28 @@
 
 
     *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter', sans-serif}
-    body{background:#0f172a; font-size: 25px; padding-bottom: 80px; color: #e2e8f0;}
+    body{background:#0f172a; font-size: 16px; padding-bottom: 80px; color: #e2e8f0; width: 100%; overflow-x: hidden;}
+    
+    @media (max-width: 768px) {
+      body { font-size: 14px; }
+      .ad-bar { padding: 0.5rem 1rem; font-size: 18px; }
+      .navbar { padding: 10px; }
+      .nav-center { display: none; }
+      .logo { font-size: 18px; }
+    }
+    
+    @media (orientation: landscape) and (max-height: 500px) {
+      .ad-bar { display: none; }
+      .navbar { top: 0; padding: 5px 10px; }
+      body { padding-top: 60px; }
+    }
+    
+    /* Horizontal scrolling for wide content */
+    .table-responsive, .scroll-x, .category-grid, .product-grid {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      max-width: 100%;
+    }
 
 /* PARA */
 .para{

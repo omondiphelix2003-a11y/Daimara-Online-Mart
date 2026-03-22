@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Daimara Stores | My Profile</title>
+  <base target="_self">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link rel="stylesheet" href="profile.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
@@ -33,9 +34,20 @@ body {
   min-height: 100vh;
   font-size: 16px;
   padding-bottom: 20px;
-  overflow-x: auto;
+  overflow-x: hidden;
   width: 100%;
   color: #e2e8f0;
+}
+
+@media (max-width: 768px) {
+  body { font-size: 14px; }
+}
+
+/* Horizontal scrolling for wide content */
+.scroll-x, .table-container, .order-history, .reward-card {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
 }
 
 * { max-width: 100%; }
@@ -358,6 +370,7 @@ body {
   padding: 30px;
   box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
   display: none;
+  scroll-margin-top: 100px;
 }
 
 .tab-content.active {
@@ -640,6 +653,11 @@ body {
 }
 
 .status-delivered {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-paid {
   background: #d4edda;
   color: #155724;
 }
@@ -1429,6 +1447,15 @@ document.addEventListener("DOMContentLoaded", function () {
       delEmail.readOnly = true;
     }
   }
+
+  // Listen for data changes from other tabs (e.g. payment success)
+  window.addEventListener('storage', (e) => {
+    const ordersKey = DataManager.getUserScope ? DataManager.getUserScope('ecommerce_orders') : 'ecommerce_orders';
+    if (e.key === ordersKey || e.key === 'ecommerce_orders') {
+      loadUserOrders();
+      loadUserProfile(); // To update stats
+    }
+  });
 });
 
 // Load user profile
@@ -1594,7 +1621,7 @@ function loadUserOrders() {
         <div style="margin-top: 15px; text-align: right; display: flex; justify-content: flex-end; gap: 10px;">
           ${order.paymentStatus === 'unpaid' ? 
             `<button class="btn btn-primary" onclick="payForOrder('${order.id}')" style="background-color:#e67e22;color:white;border:none;">💳 Pay for this order</button>` : 
-            `<button class="btn btn-secondary" onclick="showReceipt('${order.id}')" style="background-color:black;color:rgb(233, 157, 17);" >📄 View Receipt </button>`
+            `<button class="btn btn-secondary" onclick="showReceipt('${order.id}')" style="background-color:black;color:rgb(233, 157, 17);" >📄 View Order </button>`
           }
           <button class="btn btn-primary" onclick="trackOrder('${order.id}')" style="background-color:rgb(233, 157, 17);color:black;border:none;" >🚚 Track Order </button>
         </div>
@@ -1612,7 +1639,7 @@ function payForOrder(orderId) {
   if (!order) return;
 
   const amount = order.grandTotal || order.totalPrice;
-  window.location.href = `mpesa-payment.html?amount=${amount}&purpose=repay-order&orderId=${order.id}`;
+  window.location.href = `mpesa%20invoice%20payment.html?amount=${amount}&purpose=repay-order&orderId=${order.id}`;
 }
 
 function showReceipt(orderId) {
@@ -1627,6 +1654,20 @@ function showReceipt(orderId) {
   const phone = order.customerPhone || order.customer?.phone || loggedInUser.phone || 'Not provided';
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(order.id)}`;
 
+  // Process delivery location to be clickable if it exists
+  let locationLink = '';
+  if (order.deliveryLocation) {
+    const loc = order.deliveryLocation.trim();
+    if (loc.startsWith('http')) {
+      locationLink = `<a href="${loc}" target="_self" style="color:#e67e22; text-decoration:underline;">${loc}</a>`;
+    } else if (loc !== 'N/A') {
+      locationLink = `<a href="https://www.google.com/maps/search/${encodeURIComponent(loc)}" target="_self" style="color:#e67e22; text-decoration:underline;">${loc}</a>`;
+    } else {
+      locationLink = loc;
+    }
+  }
+
+  const config = DataManager.getSystemConfig();
   receiptContent.innerHTML = `
     <div class="receipt">
       <div class="receipt-header" style="font-size:30px">
@@ -1639,7 +1680,7 @@ function showReceipt(orderId) {
         <p><strong>Customer:</strong> ${order.customerName || loggedInUser.name}</p>
         <p><strong>Phone:</strong> ${phone}</p>
         <p><strong>Status:</strong> ${order.status.toUpperCase()}</p>
-        ${order.deliveryLocation ? `<p style="margin-top:5px; color:#e67e22;font-size:20px"><strong>📍 Delivery Location:</strong><br>${order.deliveryLocation}</p>` : ''}
+        ${order.deliveryLocation && order.deliveryLocation !== 'N/A' ? `<p style="margin-top:5px; color:#e67e22;font-size:20px"><strong>📍 Delivery Location:</strong><br>${locationLink}</p>` : ''}
       </div>
       <table class="receipt-table" style="font-size:22px">
         <thead>
@@ -1653,22 +1694,29 @@ function showReceipt(orderId) {
           ${items.map(item => `
             <tr>
               <td style="display:flex; align-items:center;">
-                <img src="${item.image || 'image-placeholder.jpg'}" class="receipt-prod-img">
+                <img src="${item.image || 'image-placeholder.jpg'}" class="receipt-prod-img" onerror="this.src='https://via.placeholder.com/40'">
                 <span>${item.name}</span>
               </td>
               <td style="text-align:center;">${item.qty || item.quantity || 1}</td>
-              <td style="text-align:right;"  style="font-size:20px">KSH ${item.price.toLocaleString()}</td>
+              <td style="text-align:right;">KSH ${(item.price || 0).toLocaleString()}</td>
             </tr>
           `).join('')}
         </tbody>
       </table>
-      <div class="receipt-total"  style="font-size:23px">
-        TOTAL: KSH ${(order.grandTotal || order.totalPrice || 0).toLocaleString()}
+      <div class="receipt-total" style="font-size:23px">
+        ${order.paymentMethod === 'Pay After Delivery' && order.paymentStatus !== 'paid' ? 
+          `<div style="font-size:0.6em; color:#27ae60;">Delivery Fee (KES ${config.deliveryFee || 0}): PAID UPFRONT</div>
+           DUE ON DELIVERY: KSH ${(order.grandTotal || order.totalPrice || 0).toLocaleString()}` : 
+          `TOTAL: KSH ${(order.grandTotal || order.totalPrice || 0).toLocaleString()} (${order.paymentStatus === 'paid' ? 'PAID' : 'PENDING'})`
+        }
       </div>
-      <div class="qr-container" >
+      <div class="qr-container">
         <img src="${qrUrl}" class="qr-code" alt="Order QR Code">
         <div class="qr-text" style="font-size:20px">Scan to verify order details</div>
         <div style="font-size:16px; color:#999; margin-top:5px;">${order.id}</div>
+      </div>
+      <div style="margin-top:30px; text-align:center;">
+         <button class="btn btn-primary" onclick="window.print()" style="background:black; color:rgb(233, 157, 17); border:none; width:100%; padding:15px; font-weight:bold;"><i class="fas fa-print"></i> Print Receipt</button>
       </div>
     </div>
   `;
@@ -1827,17 +1875,20 @@ function showTab(tabName, element) {
   const targetTab = document.getElementById(tabName);
   if (targetTab) {
     targetTab.classList.add("active");
+    // Scroll the clicked section into view
+    setTimeout(() => {
+      targetTab.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
   }
 
   // Add active class to clicked menu item
   if (element) {
     element.classList.add("active");
+    // Also scroll the sidebar if it's too long
+    element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   } else if (event && event.target) {
     event.target.classList.add("active");
   }
-
-  // Scroll to top
-  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 // Modal functions

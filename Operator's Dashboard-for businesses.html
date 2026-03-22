@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Daimara Stores | Admin Panel</title>
+  <base target="_self">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
@@ -34,6 +35,23 @@
       display: flex; 
       min-height: 100vh;
       color: var(--text-main);
+      width: 100%;
+      overflow-x: hidden;
+    }
+    
+    @media (max-width: 992px) {
+      body { flex-direction: column; }
+      .sidebar { transform: translateX(-100%); width: 100%; max-width: 280px; }
+      .sidebar.active { transform: translateX(0); }
+      .main-content { margin-left: 0 !important; width: 100% !important; padding: 15px !important; padding-top: 80px !important; }
+      .menu-toggle { display: flex; }
+    }
+    
+    /* Horizontal scrolling for wide content */
+    .scroll-x, .table-container, .tab-content, .stats-grid {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      max-width: 100%;
     }
 
     /* MOBILE MENU TOGGLE */
@@ -286,6 +304,13 @@
     }
 
     /* DATA CARDS */
+    .tab-content {
+      display: none;
+      scroll-margin-top: 100px;
+    }
+    .tab-content.active {
+      display: block;
+    }
     .data-card { 
       background: white; 
       border-radius: 16px; 
@@ -1039,11 +1064,12 @@
       <h2><i class="fas fa-warehouse"></i> Main Warehouse</h2>
     </div>
     <ul class="nav-links">
+      <li><a href="index.html" target="_self"><i class="fas fa-home"></i> Home</a></li>
       <li><a href="Operator's Dashboard-for businesses.html?tab=dashboard" target="_self"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
       <li><a href="Operator's Dashboard-for businesses.html?tab=orders" target="_self"><i class="fas fa-shopping-cart"></i> Orders</a></li>
       <li><a href="Operator's Dashboard-for businesses.html?tab=warehouse" target="_self"><i class="fas fa-warehouse"></i> Warehouse</a></li>
       <li><a href="Operator's Dashboard-for businesses.html?tab=profits" target="_self"><i class="fas fa-chart-line"></i> Profit & Loss</a></li>
-      <li><a href="#" onclick="openAgentRegistration()"><i class="fas fa-user-tie"></i> Register as Agent</a></li>
+      <!--<li><a href="#" onclick="openAgentRegistration()"><i class="fas fa-user-tie"></i> Register as Agent</a></li>-->
       <li><a href="AgentPortal.html" id="agent-portal-link" style="display:none" target="_self"><i 
         class="fas fa-external-link-alt"></i> Agent Portal</a></li>
     </ul>
@@ -1354,11 +1380,20 @@
     // TAB SWITCHING
     function showTab(tabId, el) {
       document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
+      const targetTab = document.getElementById(tabId);
+      if (targetTab) {
+        targetTab.classList.add('active');
+        // Auto-scroll to the section
+        setTimeout(() => {
+          targetTab.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      }
       
       if (el) {
         document.querySelectorAll('.nav-links a').forEach(link => link.classList.remove('active'));
         el.classList.add('active');
+        // Ensure the clicked link is visible in the sidebar if it's scrollable
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
 
       const titleMap = {
@@ -1527,8 +1562,8 @@
                   <button class="btn btn-success btn-sm" onclick="assignDelivery('${o.id}')" ${assignDisabled ? 'disabled style="background:#bdc3c7; cursor:not-allowed;" title="Assignment locked or already completed"' : ''}>
                     <i class="fas fa-truck"></i>
                   </button>
-                  <button class="btn btn-primary btn-sm" onclick="showAdminReceipt('${o.id}')">
-                    <i class="fas fa-receipt"></i>
+                  <button class="btn btn-primary btn-sm" onclick="showAdminReceipt('${o.id}')" title="View Order Content">
+                    <i class="fas fa-receipt"></i> View Content
                   </button>
                   <button class="btn btn-danger btn-sm" onclick="returnOrder('${o.id}')">
                     <i class="fas fa-undo"></i>
@@ -1585,8 +1620,8 @@
               <button class="btn btn-success btn-sm" onclick="assignDelivery('${o.id}')" ${assignDisabled ? 'disabled style="background:#bdc3c7; cursor:not-allowed;"' : ''}>
                 <i class="fas fa-truck"></i> Assign
               </button>
-              <button class="btn btn-primary btn-sm" onclick="showAdminReceipt('${o.id}')">
-                <i class="fas fa-receipt"></i> Receipt
+              <button class="btn btn-primary btn-sm" onclick="showAdminReceipt('${o.id}')" title="View Order Content">
+                <i class="fas fa-receipt"></i> View Content
               </button>
               <button class="btn btn-danger btn-sm" onclick="returnOrder('${o.id}')">
                 <i class="fas fa-undo"></i> Return
@@ -1695,9 +1730,23 @@
       // Mark as opened by this operator
       DataManager.markOrderAsOpened(orderId, targetEmail);
       
+      // Try scoped orders first
       const orders = DataManager.getScopedData('ecommerce_orders', [], targetEmail);
-      const order = orders.find(o => o.id === orderId);
-      if (!order) return alert("Order not found");
+      let order = orders.find(o => o.id === orderId);
+      
+      // Fallback: try global orders if not found in scoped or if user is admin (to see all items)
+      if (!order || user.role === 'admin') {
+        const allOrders = DataManager.getAllOrders() || [];
+        const globalOrder = allOrders.find(o => o.id === orderId);
+        if (globalOrder) {
+            // If admin, show all items, otherwise show only items owned by this operator
+            const items = (globalOrder.items || globalOrder.products || []).filter(i => i.owner === targetEmail || user.role === 'admin');
+            const total = items.reduce((sum, i) => sum + ((i.price || 0) * (i.qty || i.quantity || 1)), 0);
+            order = { ...globalOrder, items, grandTotal: total };
+        }
+      }
+
+      if (!order) return alert("Order details not found or you don't have access.");
 
       const items = order.items || order.products || [];
       const body = document.getElementById('modal-body');
@@ -1755,31 +1804,55 @@
       // Mark as opened by this operator
       DataManager.markOrderAsOpened(orderId, targetEmail);
       
-      const orders = (DataManager.getAllOrders() || []).filter(o => {
-        const items = o.items || o.products || [];
-        return items.some(i => i.owner === targetEmail);
-      });
-      const order = orders.find(o => o.id === orderId);
-      if (!order) return alert("Order not found");
+      // Try scoped orders first
+      const orders = DataManager.getScopedData('ecommerce_orders', [], targetEmail);
+      let order = orders.find(o => o.id === orderId);
+      
+      // Fallback: try global orders if not found in scoped or if user is admin (to see all items)
+      if (!order || user.role === 'admin') {
+        const allOrders = DataManager.getAllOrders() || [];
+        const globalOrder = allOrders.find(o => o.id === orderId);
+        if (globalOrder) {
+            // If admin, show all items, otherwise show only items owned by this operator
+            const items = (globalOrder.items || globalOrder.products || []).filter(i => i.owner === targetEmail || user.role === 'admin');
+            const total = items.reduce((sum, i) => sum + ((i.price || 0) * (i.qty || i.quantity || 1)), 0);
+            order = { ...globalOrder, items, grandTotal: total };
+        }
+      }
+
+      if (!order) return alert("Order details not found or you don't have access.");
 
       const items = order.items || order.products || [];
       const phone = order.customerPhone || order.customer?.phone || 'Not provided';
+      const status = (order.status || 'pending').toUpperCase();
       const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(order.id)}`;
       const body = document.getElementById('modal-body');
 
+      // Process delivery location to be clickable if it exists
+      let locationLink = '';
+      if (order.deliveryLocation) {
+        const loc = order.deliveryLocation.trim();
+        if (loc.startsWith('http')) {
+          locationLink = `<a href="${loc}" target="_self" style="color:#e67e22; text-decoration:underline;">${loc}</a>`;
+        } else {
+          locationLink = `<a href="https://www.google.com/maps/search/${encodeURIComponent(loc)}" target="_self" style="color:#e67e22; text-decoration:underline;">${loc}</a>`;
+        }
+      }
+
+      const config = DataManager.getSystemConfig();
       body.innerHTML = `
         <div class="receipt">
-          <div class="receipt-header">
-            <h1><i class="fas fa-store"></i> Daimara Online Mart</h1>
+          <div class="receipt-header" style="font-size:27px">
+            <h1>Daimara Online Mart</h1>
             <p>Official Order Receipt</p>
           </div>
           <div class="receipt-info">
-            <p><span>Order ID:</span> <strong>${order.id}</strong></p>
-            <p><span>Date:</span> <strong>${new Date(order.date).toLocaleString()}</strong></p>
-            <p><span>Customer:</span> <strong>${order.customerName || order.customer?.name || 'Guest'}</strong></p>
-            <p><span>Phone:</span> <strong>${phone}</strong></p>
-            <p><span>Status:</span> <strong>${order.status.toUpperCase()}</strong></p>
-            ${order.deliveryLocation ? `<p style="color:var(--primary);"><span><i class="fas fa-map-marker-alt"></i> Delivery:</span> <strong>${order.deliveryLocation}</strong></p>` : ''}
+            <p><strong>Order ID:</strong> ${order.id}</p>
+            <p><strong>Date:</strong> ${new Date(order.date).toLocaleString()}</p>
+            <p><strong>Customer:</strong> ${order.customerName || order.customer?.name || 'Guest'}</p>
+            <p><strong>Phone:</strong> ${phone}</p>
+            <p><strong>Status:</strong> ${status}</p>
+            ${order.deliveryLocation ? `<p style="margin-top:5px; color:#e67e22;"><strong>📍 Delivery Location:</strong><br>${locationLink}</p>` : ''}
           </div>
           <table class="receipt-table">
             <thead>
@@ -1790,31 +1863,36 @@
               </tr>
             </thead>
             <tbody>
-              ${items.map(item => `
+              ${items.length > 0 ? items.map(item => `
                 <tr>
-                  <td style="display:flex; align-items:center; gap:0.75rem;">
-                    <img src="${item.image || ''}" style="width:40px; height:40px; object-fit:cover; border-radius:6px;">
-                    <span>${item.name}</span>
+                  <td style="display:flex; align-items:center; gap:10px;">
+                    <img src="${item.image || 'image-placeholder.jpg'}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;" onerror="this.src='https://via.placeholder.com/40'">
+                    <span>${item.name || 'Unknown Product'}</span>
                   </td>
                   <td style="text-align:center;">${item.qty || item.quantity || 1}</td>
-                  <td style="text-align:right;">KSH ${item.price.toLocaleString()}</td>
+                  <td style="text-align:right;">KSH ${(item.price || 0).toLocaleString()}</td>
                 </tr>
-              `).join('')}
+              `).join('') : '<tr><td colspan="3" style="text-align:center;">No items found</td></tr>'}
             </tbody>
           </table>
           <div class="receipt-total">
-            TOTAL: KSH ${(order.grandTotal || order.totalPrice || 0).toLocaleString()}
+            ${order.paymentMethod === 'Pay After Delivery' && order.paymentStatus !== 'paid' ? 
+              `<div style="font-size:0.6em; color:#27ae60;">Delivery Fee (KES ${config.deliveryFee}): PAID UPFRONT</div>
+               DUE ON DELIVERY: KSH ${(order.grandTotal || order.totalPrice || 0).toLocaleString()}` : 
+              `TOTAL: KSH ${(order.grandTotal || order.totalPrice || 0).toLocaleString()} (${order.paymentStatus === 'paid' ? 'PAID' : 'PENDING'})`
+            }
           </div>
-          <div style="text-align:center; margin-top:1.5rem;">
-            <img src="${qrUrl}" style="width:120px; height:120px; border-radius:12px;" alt="Order QR">
-            <div style="font-size:0.875rem; color:var(--text-muted); margin-top:0.5rem;">
-              Scan to verify order details
-            </div>
-            <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.25rem;">${order.id}</div>
+          <div style="text-align:center; margin-top:20px;">
+            <img src="${qrUrl}" style="width:120px; height:120px;" alt="Order QR Code">
+            <div style="font-size:25px; color:#666; margin-top:5px;">Scan to verify order details</div>
+            <div style="font-size:18px; color:#999; margin-top:5px;">${order.id}</div>
           </div>
-          <button class="print-btn" onclick="window.print()">
-            <i class="fas fa-print"></i> Print Receipt
-          </button>
+          <div style="margin-top:30px; text-align:center; display:flex; gap:10px;">
+             <button class="print-btn" onclick="window.print()" style="flex:1;"><i class="fas fa-print"></i> Print Receipt</button>
+             <button class="btn btn-secondary" onclick="closeModal()" style="flex:1; background:#64748b; color:white; border-radius:12px; margin-top: 20px;">
+                Close
+             </button>
+          </div>
         </div>
       `;
       document.getElementById('details-modal').style.display = 'flex';

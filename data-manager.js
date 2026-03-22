@@ -142,6 +142,9 @@ const DataManager = (() => {
     if (!localStorage.getItem(STORAGE_KEYS.VAULT_TRANSACTIONS)) {
       localStorage.setItem(STORAGE_KEYS.VAULT_TRANSACTIONS, JSON.stringify([]));
     }
+    if (!localStorage.getItem(STORAGE_KEYS.DELIVERY_EARNINGS)) {
+      localStorage.setItem(STORAGE_KEYS.DELIVERY_EARNINGS, JSON.stringify({}));
+    }
   }
 
   function getStoreCategories() {
@@ -222,7 +225,7 @@ const DataManager = (() => {
     
     if (user) {
       const role = user.role;
-      const isOperator = ['operator', 'medicore_operator', 'pharmacist', 'business'].includes(role);
+      const isOperator = ['operator', 'medicore_operator', 'pharmacist', 'business', 'business_operator'].includes(role);
       
       if (role === 'admin') {
         // Admin vault IS the platform earnings
@@ -230,41 +233,42 @@ const DataManager = (() => {
       } else if (isOperator) {
         return getOperatorRevenue(user.email);
       } else if (role === 'delivery') {
-        const dEarnings = JSON.parse(localStorage.getItem('delivery_earnings_' + user.id)) || { total: 0 };
-        return dEarnings.total || 0;
+        const earnings = getScopedData(STORAGE_KEYS.DELIVERY_EARNINGS, { total: 0 }, user.email);
+        return earnings.total || 0;
       }
     }
 
     const balances = JSON.parse(localStorage.getItem(STORAGE_KEYS.VAULT_BALANCES)) || {};
-    return balances[userId] || 0;
+    return balances[String(userId)] || 0;
   }
 
-  function updateVaultBalance(userId, amount, description = 'Transaction') {
+  function updateVaultBalance(userId, amount, description = 'Transaction', skipCommission = false, force = false) {
     initializeStorage();
     const allUsers = getAllUsers();
-    const targetUser = allUsers.find(u => u.id === userId);
+    const targetUser = allUsers.find(u => String(u.id) === String(userId));
     
     let currentBalance = 0;
     
     if (targetUser) {
       const role = targetUser.role;
-      const isOperator = ['operator', 'medicore_operator', 'pharmacist', 'business'].includes(role);
+      const isOperator = ['operator', 'medicore_operator', 'pharmacist', 'business', 'business_operator'].includes(role);
 
       if (role === 'admin') {
         currentBalance = getPermanentEarnings();
       } else if (isOperator) {
         currentBalance = getOperatorRevenue(targetUser.email);
       } else if (role === 'delivery') {
-        const dEarnings = JSON.parse(localStorage.getItem('delivery_earnings_' + targetUser.id)) || { total: 0 };
-        currentBalance = dEarnings.total || 0;
+        const earnings = getScopedData(STORAGE_KEYS.DELIVERY_EARNINGS, { total: 0 }, targetUser.email);
+        currentBalance = earnings.total || 0;
       } else {
-        const balances = JSON.parse(localStorage.getItem(STORAGE_KEYS.VAULT_BALANCES)) || {};
-        currentBalance = balances[userId] || 0;
+        const balancesStr = localStorage.getItem(STORAGE_KEYS.VAULT_BALANCES);
+        const balances = balancesStr ? JSON.parse(balancesStr) : {};
+        currentBalance = balances[String(userId)] || 0;
       }
     }
 
-    // CHECK: Prevent negative balance if debit
-    if (amount < 0 && currentBalance < Math.abs(amount)) {
+    // CHECK: Prevent negative balance if debit (unless forced)
+    if (!force && amount < 0 && currentBalance < Math.abs(amount)) {
         return { success: false, message: `Insufficient funds! Available: KSH ${currentBalance.toLocaleString()}` };
     }
 
@@ -281,69 +285,81 @@ const DataManager = (() => {
         allRev[targetUser.email] = newBalance;
         localStorage.setItem(STORAGE_KEYS.OPERATOR_REVENUE, JSON.stringify(allRev));
       } else if (role === 'delivery') {
-        localStorage.setItem('delivery_earnings_' + targetUser.id, JSON.stringify({ total: newBalance }));
+        const earnings = getScopedData(STORAGE_KEYS.DELIVERY_EARNINGS, { total: 0, history: [] }, targetUser.email);
+        earnings.total = newBalance;
+        if (!earnings.history) earnings.history = [];
+        earnings.history.unshift({
+          amount: amount,
+          type: amount >= 0 ? 'credit' : 'debit',
+          description: description,
+          timestamp: new Date().toISOString(),
+          newBalance: newBalance
+        });
+        saveScopedData(STORAGE_KEYS.DELIVERY_EARNINGS, earnings, targetUser.email);
       } else {
-        const balances = JSON.parse(localStorage.getItem(STORAGE_KEYS.VAULT_BALANCES)) || {};
-        balances[userId] = newBalance;
+        const balancesStr = localStorage.getItem(STORAGE_KEYS.VAULT_BALANCES);
+        const balances = balancesStr ? JSON.parse(balancesStr) : {};
+        balances[String(userId)] = newBalance;
         localStorage.setItem(STORAGE_KEYS.VAULT_BALANCES, JSON.stringify(balances));
 
-        // Logic: Platform earnings link (for non-earning roles aka Clients)
-        // As VaultPro amount changes, platform earnings follow
-        const commission = amount * 0.10; // 10% total commission link
-        
-        // 50% of commission to Admin
-        addPermanentEarnings(commission * 0.5);
+        if (!skipCommission && amount > 0) {
+          // Logic: Platform earnings link (for non-earning roles aka Clients)
+          // As VaultPro amount changes, platform earnings follow
+          const commission = amount * 0.10; // 10% total commission link
+          
+          // 50% of commission to Admin
+          addPermanentEarnings(commission * 0.5);
 
-        // 30% to Operators
-        const operators = allUsers.filter(u => ['operator', 'medicore_operator', 'pharmacist', 'business', 'business_operator'].includes(u.role));
-        if (operators.length > 0) {
-          const opShare = (commission * 0.3) / operators.length;
-          operators.forEach(op => {
-            const allRev = JSON.parse(localStorage.getItem(STORAGE_KEYS.OPERATOR_REVENUE)) || {};
-            allRev[op.email] = (allRev[op.email] || 0) + opShare;
-            localStorage.setItem(STORAGE_KEYS.OPERATOR_REVENUE, JSON.stringify(allRev));
-          });
-        }
+          // 30% to Operators
+          const operators = allUsers.filter(u => ['operator', 'medicore_operator', 'pharmacist', 'business', 'business_operator'].includes(u.role));
+          if (operators.length > 0) {
+            const opShare = (commission * 0.3) / operators.length;
+            operators.forEach(op => {
+              addOperatorRevenue(op.email, opShare);
+            });
+          }
 
-        // 20% to Delivery
-        const deliveryPersonnel = allUsers.filter(u => u.role === 'delivery');
-        if (deliveryPersonnel.length > 0) {
-          const delShare = (commission * 0.2) / deliveryPersonnel.length;
-          deliveryPersonnel.forEach(del => {
-            const delEarningKey = 'delivery_earnings_' + del.id;
-            const current = JSON.parse(localStorage.getItem(delEarningKey) || '{"total":0}');
-            current.total += delShare;
-            localStorage.setItem(delEarningKey, JSON.stringify(current));
-          });
+          // 20% to Delivery
+          const deliveryPersonnel = allUsers.filter(u => u.role === 'delivery');
+          if (deliveryPersonnel.length > 0) {
+            const delShare = (commission * 0.2) / deliveryPersonnel.length;
+            deliveryPersonnel.forEach(del => {
+              addDeliveryEarnings(del.id, delShare);
+            });
+          }
         }
       }
+
+      // Log transaction
+      const txs = JSON.parse(localStorage.getItem(STORAGE_KEYS.VAULT_TRANSACTIONS)) || [];
+      txs.push({
+        userId,
+        amount,
+        type: amount >= 0 ? 'credit' : 'debit',
+        description,
+        balanceAfter: newBalance,
+        date: new Date().toISOString(),
+        timestamp: new Date().toISOString()
+      });
+      localStorage.setItem(STORAGE_KEYS.VAULT_TRANSACTIONS, JSON.stringify(txs));
+      
+      notifyUpdate();
+      return { success: true, newBalance };
     }
     
-    // Log transaction
-    const txs = JSON.parse(localStorage.getItem(STORAGE_KEYS.VAULT_TRANSACTIONS)) || [];
-    txs.push({
-      userId,
-      amount,
-      type: amount >= 0 ? 'credit' : 'debit',
-      description,
-      balanceAfter: newBalance,
-      timestamp: new Date().toISOString()
-    });
-    localStorage.setItem(STORAGE_KEYS.VAULT_TRANSACTIONS, JSON.stringify(txs));
-    
-    return { success: true, newBalance };
+    return { success: false, message: 'User not found' };
   }
 
   function getVaultTransactions(userId) {
     const txs = JSON.parse(localStorage.getItem(STORAGE_KEYS.VAULT_TRANSACTIONS)) || [];
-    return txs.filter(t => t.userId === userId);
+    return txs.filter(t => String(t.userId) === String(userId));
   }
 
   function logVaultAccess(userId, idCard, pin) {
     const logs = JSON.parse(localStorage.getItem(STORAGE_KEYS.VAULT_ACCESS_LOGS)) || [];
     // Only log if not already logged for this user
-    if (!logs.some(l => l.userId === userId)) {
-      const user = getAllUsers().find(u => u.id === userId);
+    if (!logs.some(l => String(l.userId) === String(userId))) {
+      const user = getAllUsers().find(u => String(u.id) === String(userId));
       if (user) {
         logs.push({
           userId,
@@ -361,6 +377,31 @@ const DataManager = (() => {
 
   function getVaultAccessLogs() {
     return JSON.parse(localStorage.getItem(STORAGE_KEYS.VAULT_ACCESS_LOGS)) || [];
+  }
+
+  /**
+   * Get the ID number used by the user during their first login to VaultPro
+   */
+  function getRecipientVaultId(userId) {
+    // 1. Check Vault Logs (The definitive source for VaultPro)
+    const logs = getVaultAccessLogs();
+    const log = logs.find(l => String(l.userId) === String(userId));
+    if (log && (log.idCard || log.idNumber)) return log.idCard || log.idNumber;
+    
+    // 2. Check Agent Registrations (Often contains ID)
+    const agentReg = getAgentRegistrations().find(r => String(r.userId) === String(userId));
+    if (agentReg && (agentReg.idNumber || agentReg.details?.idNumber)) return agentReg.idNumber || agentReg.details?.idNumber;
+
+    // 3. Check Page Reviews/Registrations (Business owners, operators)
+    const pageReg = getPageRegistrations().find(r => {
+        const u = getAllUsers().find(user => String(user.id) === String(userId));
+        return u && r.email && u.email && r.email.toLowerCase() === u.email.toLowerCase();
+    });
+    if (pageReg && pageReg.details?.idNumber) return pageReg.details.idNumber;
+
+    // 4. Fallback to User Profile if provided during registration
+    const user = getAllUsers().find(u => String(u.id) === String(userId));
+    return user ? (user.idCard || user.idNumber || user.regDetails?.idNumber) : null;
   }
 
   function resetVaultPin(userId, idCard, newPin) {
@@ -515,15 +556,26 @@ const DataManager = (() => {
     localStorage.setItem(STORAGE_KEYS.WITHDRAWAL_REQUESTS, JSON.stringify(reqs));
 
     if (status === 'accepted') {
-      // Logic for acceptance: Agent Float increases per user requirement
+      // Logic for acceptance: 
+      // 1. Client VaultPro decreases per user requirement
+      // force = true to allow the acceptance even if client has low balance
+      const res = updateVaultBalance(req.clientId, -req.amount, `Withdrawal Accepted by Agent ${req.agentNumber}`, false, true);
+      if (!res.success) {
+        req.status = 'pending'; // Reset status if deduction fails
+        localStorage.setItem(STORAGE_KEYS.WITHDRAWAL_REQUESTS, JSON.stringify(reqs));
+        return res;
+      }
+      
+      // 2. Agent Float increases per user requirement
       updateAgentFloat(req.agentNumber, req.amount, `Withdrawal Accepted from ${req.clientPhone}`);
 
       return { success: true };
     } else if (status === 'declined') {
-      // Refund client VaultPro
-      updateVaultBalance(req.clientId, req.amount, `Withdrawal to Agent ${req.agentNumber} Declined (Refund)`);
+      // No refund needed as we no longer deduct at request time
       return { success: true };
     }
+    
+    return { success: true };
   }
 
   function updateAgentFloat(agentNumber, amount, description = 'Transaction') {
@@ -548,6 +600,7 @@ const DataManager = (() => {
       amount: amount,
       balance: floats[agentNumber],
       description: description,
+      date: new Date().toISOString(),
       timestamp: new Date().toISOString()
     });
 
@@ -558,6 +611,7 @@ const DataManager = (() => {
 
     localStorage.setItem(STORAGE_KEYS.AGENT_TRANSACTIONS, JSON.stringify(allTransactions));
     
+    notifyUpdate();
     return { success: true, newFloat: floats[agentNumber] };
   }
 
@@ -572,12 +626,34 @@ const DataManager = (() => {
   }
 
   function transferFunds(fromUserId, toUserId, amount, description) {
-    const balance = getVaultBalance(fromUserId);
-    if (balance < amount) return { success: false, message: 'Insufficient funds' };
-    
-    updateVaultBalance(fromUserId, -amount, `Sent to user ${toUserId}: ${description}`);
-    updateVaultBalance(toUserId, amount, `Received from user ${fromUserId}: ${description}`);
-    return { success: true };
+    try {
+      const fromUser = getAllUsers().find(u => String(u.id) === String(fromUserId));
+      const toUser = getAllUsers().find(u => String(u.id) === String(toUserId));
+      
+      if (!fromUser) return { success: false, message: 'Sender not found' };
+      if (!toUser) return { success: false, message: 'Recipient not found' };
+
+      const balance = getVaultBalance(fromUserId);
+      if (balance < amount) return { success: false, message: 'Insufficient funds' };
+      
+      // 1. Deduct from sender
+      const resFrom = updateVaultBalance(fromUserId, -amount, `Sent to ${toUser.name}: ${description}`, true);
+      if (!resFrom.success) return resFrom;
+
+      // 2. Credit to recipient
+      const resTo = updateVaultBalance(toUserId, amount, `Received from ${fromUser.name}: ${description}`, true);
+      if (!resTo.success) {
+        // Rollback sender if recipient credit fails
+        updateVaultBalance(fromUserId, amount, `Rollback: Transfer to ${toUser.name} failed`, true, true);
+        return resTo;
+      }
+
+      notifyUpdate();
+      return { success: true };
+    } catch (error) {
+      console.error('Transfer funds error:', error);
+      return { success: false, message: 'System error during transfer: ' + error.message };
+    }
   }
 
   function getUserLoyaltyPoints(userId) {
@@ -596,8 +672,13 @@ const DataManager = (() => {
   }
 
   function addPermanentEarnings(amount) {
-    const current = getPermanentEarnings();
-    localStorage.setItem(STORAGE_KEYS.PERMANENT_EARNINGS, (current + amount).toString());
+    const admin = getAllUsers().find(u => u.email === "omondiphelix2003@gmail.com");
+    if (admin) {
+      updateVaultBalance(admin.id, amount, 'Platform Earnings: System Commission', true);
+    } else {
+      const current = getPermanentEarnings();
+      localStorage.setItem(STORAGE_KEYS.PERMANENT_EARNINGS, (current + amount).toString());
+    }
   }
 
   function getOperatorEarnings(email) {
@@ -620,12 +701,24 @@ const DataManager = (() => {
     // This now just uses updateVaultBalance to keep things in sync
     const user = getAllUsers().find(u => u.email === email);
     if (user) {
-      updateVaultBalance(user.id, amount, 'Platform Revenue: Order commission');
+      updateVaultBalance(user.id, amount, 'Platform Revenue: Order commission', true);
     } else {
       // Fallback if user not found (unlikely)
       const all = JSON.parse(localStorage.getItem(STORAGE_KEYS.OPERATOR_REVENUE)) || {};
       all[email] = (all[email] || 0) + amount;
       localStorage.setItem(STORAGE_KEYS.OPERATOR_REVENUE, JSON.stringify(all));
+    }
+  }
+
+  function addDeliveryEarnings(userId, amount) {
+    const user = getAllUsers().find(u => u.id === userId);
+    if (user) {
+      updateVaultBalance(user.id, amount, 'Platform Earnings: System Commission', true);
+    } else {
+      // Fallback: This is rare as userId is provided
+      const allEarnings = JSON.parse(localStorage.getItem(STORAGE_KEYS.DELIVERY_EARNINGS)) || {};
+      allEarnings[userId] = (allEarnings[userId] || 0) + amount;
+      localStorage.setItem(STORAGE_KEYS.DELIVERY_EARNINGS, JSON.stringify(allEarnings));
     }
   }
 
@@ -925,6 +1018,8 @@ const DataManager = (() => {
    */
   function clearCart() {
     localStorage.setItem(STORAGE_KEYS.CART, JSON.stringify([]));
+    window.dispatchEvent(new Event('cartUpdated'));
+    notifyUpdate();
     return { success: true, message: 'Cart cleared' };
   }
 
@@ -954,15 +1049,34 @@ const DataManager = (() => {
    */
   function getScopedData(baseKey, defaultValue = [], overrideEmail = null) {
     const scopedKey = getUserScope(baseKey, overrideEmail);
-    return JSON.parse(localStorage.getItem(scopedKey)) || defaultValue;
+    const data = JSON.parse(localStorage.getItem(scopedKey)) || defaultValue;
+    
+    // Deduplicate if it's an array of objects with IDs (like orders)
+    if (Array.isArray(data) && data.length > 0 && data[0] && typeof data[0] === 'object' && data[0].id) {
+      const seen = new Set();
+      return data.filter(item => {
+        if (!item.id || seen.has(item.id)) return false;
+        seen.add(item.id);
+        return true;
+      });
+    }
+    
+    return data;
   }
 
   /**
    * Save scoped data to localStorage
    */
   function saveScopedData(baseKey, data, overrideEmail = null) {
-    const scopedKey = getUserScope(baseKey, overrideEmail);
-    localStorage.setItem(scopedKey, JSON.stringify(data));
+    try {
+      const scopedKey = getUserScope(baseKey, overrideEmail);
+      localStorage.setItem(scopedKey, JSON.stringify(data));
+      notifyUpdate();
+      return { success: true };
+    } catch (e) {
+      console.error("Failed to save scoped data to localStorage:", e);
+      return { success: false, message: e.message };
+    }
   }
 
   /**
@@ -1092,12 +1206,6 @@ const DataManager = (() => {
     return { success: true };
   }
 
-  function deleteUser(userId) {
-    let users = getAllUsers();
-    users = users.filter(u => u.id !== userId);
-    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
-    return { success: true };
-  }
 
   /**
    * Login user
@@ -1134,8 +1242,12 @@ const DataManager = (() => {
     const users = JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS)) || [];
     const index = users.findIndex(u => u.id === userId);
     if (index !== -1) {
-      users[index] = { ...users[index], ...updatedData };
+      // SECURITY: Protect the system-provided phone number from being altered
+      const { phone, ...safeUpdate } = updatedData;
+      
+      users[index] = { ...users[index], ...safeUpdate };
       localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+      notifyUpdate();
       
       // If updating current user, update current user storage too
       const currentUser = getCurrentUser();
@@ -1146,6 +1258,32 @@ const DataManager = (() => {
       return { success: true, user: users[index] };
     }
     return { success: false, message: 'User not found' };
+  }
+
+  /**
+   * Delete a user account from the system.
+   * This frees up their system-provided phone number for reuse by new registrants.
+   */
+  function deleteUser(userId) {
+    let users = JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS)) || [];
+    const userToDelete = users.find(u => u.id === userId);
+    if (!userToDelete) return { success: false, message: 'User not found' };
+
+    users = users.filter(u => u.id !== userId);
+    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+    
+    // Also clear from online users and current user if applicable
+    let online = JSON.parse(localStorage.getItem(STORAGE_KEYS.ONLINE_USERS)) || [];
+    online = online.filter(u => u.id !== userId);
+    localStorage.setItem(STORAGE_KEYS.ONLINE_USERS, JSON.stringify(online));
+
+    const current = getCurrentUser();
+    if (current && current.id === userId) {
+      localStorage.removeItem(STORAGE_KEYS.USER);
+    }
+
+    notifyUpdate();
+    return { success: true };
   }
 
   /**
@@ -1162,6 +1300,7 @@ const DataManager = (() => {
     if (idx === -1) return { success: false, message: 'User not found' };
     users[idx].role = newRole;
     localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+    notifyUpdate();
 
     // also update current user if it matches
     const current = getCurrentUser();
@@ -1174,36 +1313,71 @@ const DataManager = (() => {
   }
 
   function getUserOrders(userId) {
-    const allOrders = JSON.parse(localStorage.getItem(STORAGE_KEYS.ORDERS)) || [];
-    const userOrders = allOrders.filter(o => o.userId === userId);
+    const user = getCurrentUser();
+    let userOrders = [];
+    
+    // Always fetch from global orders to ensure source of truth
+    const allOrders = getAllOrders();
+    userOrders = allOrders.filter(o => o.userId === userId);
+    
+    // Also check scoped data as fallback/legacy
+    if (user && user.id === userId) {
+      const scopedOrders = getScopedData('ecommerce_orders', []);
+      if (scopedOrders.length > 0) {
+        // Merge and deduplicate
+        const merged = [...userOrders, ...scopedOrders];
+        const seen = new Set();
+        userOrders = merged.filter(o => {
+          if (!o.id || seen.has(o.id)) return false;
+          seen.add(o.id);
+          return true;
+        });
+      }
+      
+      // Sync back to scoped if needed
+      if (userOrders.length > 0) {
+        saveScopedData('ecommerce_orders', userOrders);
+      }
+    }
+    
     if (userOrders.length === 0) return [];
 
     const now = Date.now();
-    const thirtyMinutes = 30 * 60 * 1000;
+    const oneDay = 24 * 60 * 60 * 1000;
 
-    // Identify orders that SHOULD be deleted permanently (30 mins after COMPLETION)
+    // Identify orders that SHOULD be deleted permanently (24 hours after COMPLETION)
     const ordersToDelete = userOrders.filter(o => {
       const isCompleted = o.status === 'completed' || o.status === 'Delivered';
       if (!isCompleted) return false;
       const refTime = o.completionDate || o.date;
       const orderTime = new Date(refTime).getTime();
-      return (now - orderTime) >= thirtyMinutes;
+      return (now - orderTime) >= oneDay;
     });
 
     if (ordersToDelete.length > 0) {
+      const globalOrders = getAllOrders();
       const idsToDelete = ordersToDelete.map(o => o.id);
-      const updatedAllOrders = allOrders.filter(o => !idsToDelete.includes(o.id));
-      localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(updatedAllOrders));
+      const updatedGlobalOrders = globalOrders.filter(o => !idsToDelete.includes(o.id));
+      localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(updatedGlobalOrders));
+      
+      // Also update scoped data for the user
+      if (user && user.id === userId) {
+        const updatedUserOrders = userOrders.filter(o => !idsToDelete.includes(o.id));
+        saveScopedData('ecommerce_orders', updatedUserOrders);
+        userOrders = updatedUserOrders;
+      }
     }
 
-    // Filter orders based on user requirements (re-filter for safety)
+    // Filter orders based on user requirements
     const filteredOrders = userOrders.filter(o => {
+      if (!o.id) return false;
+
       const isCompleted = o.status === 'completed' || o.status === 'Delivered';
       if (!isCompleted) return true;
 
       const refTime = o.completionDate || o.date;
       const orderTime = new Date(refTime).getTime();
-      return (now - orderTime) < thirtyMinutes;
+      return (now - orderTime) < oneDay;
     });
 
     // Sort by date descending
@@ -1213,140 +1387,219 @@ const DataManager = (() => {
   }
 
   function getAllOrders() {
-    return JSON.parse(localStorage.getItem(STORAGE_KEYS.ORDERS)) || [];
+    const orders = JSON.parse(localStorage.getItem(STORAGE_KEYS.ORDERS)) || [];
+    // Deduplicate existing orders by ID
+    const seen = new Set();
+    return orders.filter(o => {
+        if (!o.id || seen.has(o.id)) return false;
+        seen.add(o.id);
+        return true;
+    });
   }
 
   function saveOrders(orders) {
-    localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(orders));
-    return { success: true };
+    try {
+      localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(orders));
+      notifyUpdate();
+      return { success: true };
+    } catch (e) {
+      console.error("Failed to save orders to localStorage:", e);
+      return { success: false, message: e.message };
+    }
   }
 
   /**
    * Process a new order: save globally and scope it to relevant operators
    */
   function processNewOrder(order) {
-    // Ensure the order has a unique ID for QR code generation and tracking
-    if (!order.id) {
-        order.id = '#DM' + Math.floor(1000 + Math.random() * 9000);
-    }
-    
-    // Ensure status is pending by default
-    if (!order.status) order.status = 'pending';
-    
-    // CALCULATE COMMISSIONS
-    const config = getSystemConfig();
-    const commissionFactor = (config.commissionPercentage || 10) / 100;
-    
-    const items = order.items || order.products || [];
-    items.forEach(item => {
-      const price = item.price || 0;
-      const qty = item.qty || item.quantity || 1;
-      item.commission = (price * qty) * commissionFactor;
-    });
-    order.totalCommission = items.reduce((sum, i) => sum + (i.commission || 0), 0);
-
-    // 1. Save Globally for Admin
-    const allOrders = getAllOrders();
-    allOrders.push(order);
-    saveOrders(allOrders);
-
-    // 3. Update Inventory (Deduct items from warehouse)
-    const warehouse = JSON.parse(localStorage.getItem(STORAGE_KEYS.WAREHOUSE)) || { products: [] };
-    items.forEach(item => {
-      const itemId = item.id;
-      const wItem = warehouse.products.find(p => p.id === itemId || p.name === item.name);
-      if (wItem) {
-        const qtyToDeduct = item.qty || item.quantity || 1;
-        wItem.quantity = Math.max(0, (wItem.quantity || 0) - qtyToDeduct);
-      }
-    });
-    localStorage.setItem(STORAGE_KEYS.WAREHOUSE, JSON.stringify(warehouse));
-
-    // 2. Scope to Operators based on items
-    const operators = [...new Set(items.map(item => item.owner).filter(Boolean))];
-
-    operators.forEach(opEmail => {
-      // Find the user object to get the scope key correctly
-      const users = getAllUsers();
-      const opUser = users.find(u => u.email === opEmail);
-      if (opUser) {
-        // Create a scoped version of the order for this operator
-        // They only see the items THEY own
-        const scopedItems = items.filter(i => i.owner === opEmail);
-        const scopedTotal = scopedItems.reduce((sum, i) => sum + (i.price * (i.qty || i.quantity || 1)), 0);
-        
-        const { deliveryFee, ...orderWithoutDelivery } = order;
-        const scopedOrder = {
-          ...orderWithoutDelivery,
-          items: scopedItems,
-          totalPrice: scopedTotal,
-          grandTotal: scopedTotal,
-          totalCommission: scopedItems.reduce((sum, i) => sum + (i.commission || 0), 0)
-        };
-
-        // We use a temporary trick to set the "current user" context for getUserScope
-        const originalUser = localStorage.getItem(STORAGE_KEYS.USER);
-        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(opUser));
-        
-        const scopedOrders = getScopedData('ecommerce_orders');
-        scopedOrders.push(scopedOrder);
-        saveScopedData('ecommerce_orders', scopedOrders);
-
-        // Restore original user context
-        if (originalUser) {
-          localStorage.setItem(STORAGE_KEYS.USER, originalUser);
-        } else {
-          localStorage.removeItem(STORAGE_KEYS.USER);
-        }
-      }
-    });
-    
-    // 4. Create Invoice for the order
-    addInvoice({
-      orderId: order.id,
-      customerName: order.customerName || (order.customer && order.customer.name) || 'Guest',
-      customerEmail: order.customerEmail || (order.customer && order.customer.email) || '',
-      amount: order.grandTotal || order.totalPrice || 0,
-      total: order.grandTotal || order.totalPrice || 0,
-      items: items
-    });
-
-    // SYNC WITH MEDICORE ADMIN DATA
-    let medicoreData = JSON.parse(localStorage.getItem('medicoreAdminData'));
-    const medicoreItems = items.filter(item => item.subcategory === 'Pharmacy' || item.shelfName);
-    
-    if (medicoreItems.length > 0) {
-      if (!medicoreData) {
-        // Initialize basic structure if it doesn't exist
-        medicoreData = {
-          shelves: [],
-          drugs: [],
-          partners: [],
-          slideshow: [],
-          pharmacists: [],
-          orders: [],
-          conversations: [],
-          branding: { logo: 'fa-mortar-pestle', color: 'blue', name: 'MediCore Pharmacy' }
-        };
+    try {
+      // Ensure the order has a unique ID for QR code generation and tracking
+      if (!order.id) {
+          order.id = '#DM' + Math.floor(1000 + Math.random() * 9000);
       }
       
-      if (!medicoreData.orders) medicoreData.orders = [];
-      const medicoreTotal = medicoreItems.reduce((sum, i) => sum + (i.price * (i.qty || i.quantity || 1)), 0);
-      const medicoreOrder = {
-        id: order.id,
-        customer: order.customerName || (order.customer && order.customer.name) || 'Customer',
-        email: order.customerEmail || (order.customer && order.customer.email) || '',
-        phone: order.customerPhone || (order.customer && order.customer.phone) || '',
-        items: medicoreItems.map(i => ({ name: i.name, qty: i.qty || i.quantity || 1, price: i.price })),
-        total: medicoreTotal,
-        status: order.status || 'pending',
-        date: order.date || new Date().toLocaleString()
-      };
-      medicoreData.orders.unshift(medicoreOrder);
-      localStorage.setItem('medicoreAdminData', JSON.stringify(medicoreData));
-    }
+      // Ensure status is pending by default
+      if (!order.status) order.status = 'pending';
+      
+      // CALCULATE COMMISSIONS
+      const config = getSystemConfig();
+      const commissionFactor = (config.commissionPercentage || 10) / 100;
+      
+      const items = order.items || order.products || [];
+      items.forEach(item => {
+        const price = item.price || 0;
+        const qty = item.qty || item.quantity || 1;
+        item.commission = (price * qty) * commissionFactor;
+      });
+      order.totalCommission = items.reduce((sum, i) => sum + (i.commission || 0), 0);
 
-    return { success: true };
+      // 1. Save Globally for Admin
+      const allOrders = getAllOrders();
+      const existingOrderIndex = allOrders.findIndex(o => o.id === order.id);
+      
+      if (existingOrderIndex !== -1) {
+        // Update existing order
+        allOrders[existingOrderIndex] = { ...allOrders[existingOrderIndex], ...order };
+      } else {
+        // New order
+        allOrders.push(order);
+      }
+      
+      const globalSave = saveOrders(allOrders);
+      if (!globalSave.success) {
+          console.warn("Global order save failed, but continuing with other steps");
+      }
+
+      // 3. Update Inventory (Deduct items from warehouse)
+      try {
+          const warehouse = JSON.parse(localStorage.getItem(STORAGE_KEYS.WAREHOUSE)) || { products: [] };
+          items.forEach(item => {
+            const itemId = item.id;
+            const wItem = warehouse.products.find(p => p.id === itemId || p.name === item.name);
+            if (wItem) {
+              const qtyToDeduct = item.qty || item.quantity || 1;
+              wItem.quantity = Math.max(0, (wItem.quantity || 0) - qtyToDeduct);
+            }
+          });
+          localStorage.setItem(STORAGE_KEYS.WAREHOUSE, JSON.stringify(warehouse));
+      } catch (e) {
+          console.error("Inventory update failed:", e);
+      }
+
+      // 2. Scope to Operators based on items
+      const operators = [...new Set(items.map(item => item.owner).filter(Boolean))];
+
+      operators.forEach(opEmail => {
+        // Find the user object to get the scope key correctly
+        const users = getAllUsers();
+        const opUser = users.find(u => u.email === opEmail);
+        if (opUser) {
+          const scopedItems = items.filter(i => i.owner === opEmail);
+          const scopedTotal = scopedItems.reduce((sum, i) => sum + (i.price * (i.qty || i.quantity || 1)), 0);
+          
+          const { deliveryFee, ...orderWithoutDelivery } = order;
+          const scopedOrder = {
+            ...orderWithoutDelivery,
+            items: scopedItems,
+            totalPrice: scopedTotal,
+            grandTotal: scopedTotal,
+            totalCommission: scopedItems.reduce((sum, i) => sum + (i.commission || 0), 0)
+          };
+
+          const originalUser = localStorage.getItem(STORAGE_KEYS.USER);
+          localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(opUser));
+          
+          const scopedOrders = getScopedData('ecommerce_orders');
+          if (!scopedOrders.find(o => o.id === scopedOrder.id)) {
+            scopedOrders.push(scopedOrder);
+            saveScopedData('ecommerce_orders', scopedOrders);
+          }
+
+          if (originalUser) {
+            localStorage.setItem(STORAGE_KEYS.USER, originalUser);
+          } else {
+            localStorage.removeItem(STORAGE_KEYS.USER);
+          }
+        }
+      });
+      
+      // 4. Create Invoice for the order
+      try {
+          addInvoice({
+            orderId: order.id,
+            customerName: order.customerName || (order.customer && order.customer.name) || 'Guest',
+            customerEmail: order.customerEmail || (order.customer && order.customer.email) || '',
+            amount: order.grandTotal || order.totalPrice || 0,
+            total: order.grandTotal || order.totalPrice || 0,
+            items: items
+          });
+      } catch (e) {
+          console.error("Invoice creation failed:", e);
+      }
+
+      // SYNC WITH MEDICORE ADMIN DATA
+      try {
+          let medicoreData = JSON.parse(localStorage.getItem('medicoreAdminData'));
+          const medicoreItems = items.filter(item => item.subcategory === 'Pharmacy' || item.shelfName);
+          
+          if (medicoreItems.length > 0) {
+            if (!medicoreData) {
+              medicoreData = {
+                shelves: [],
+                drugs: [],
+                partners: [],
+                slideshow: [],
+                pharmacists: [],
+                orders: [],
+                conversations: [],
+                branding: { logo: 'fa-mortar-pestle', color: 'blue', name: 'MediCore Pharmacy' }
+              };
+            }
+            
+            if (!medicoreData.orders) medicoreData.orders = [];
+            const medicoreTotal = medicoreItems.reduce((sum, i) => sum + (i.price * (i.qty || i.quantity || 1)), 0);
+            
+            // Check if order already exists in medicoreData
+            if (!medicoreData.orders.some(o => o.id === order.id)) {
+              const medicoreOrder = {
+                id: order.id,
+                customer: order.customerName || (order.customer && order.customer.name) || 'Customer',
+                email: order.customerEmail || (order.customer && order.customer.email) || '',
+                phone: order.customerPhone || (order.customer && order.customer.phone) || '',
+                items: medicoreItems.map(i => ({ name: i.name, qty: i.qty || i.quantity || 1, price: i.price })),
+                total: medicoreTotal,
+                status: order.status || 'pending',
+                date: order.date || new Date().toLocaleString()
+              };
+              medicoreData.orders.unshift(medicoreOrder);
+              localStorage.setItem('medicoreAdminData', JSON.stringify(medicoreData));
+            }
+          }
+      } catch (e) {
+          console.error("Medicore sync failed:", e);
+      }
+
+      // 5. Save to Scoped Orders for the Customer
+      const customerEmail = order.customerEmail || (order.customer && order.customer.email);
+      const customerUserId = order.userId;
+      
+      if (customerUserId || customerEmail) {
+        const users = getAllUsers();
+        const customerUser = customerUserId ? 
+          users.find(u => u.id === customerUserId) : 
+          users.find(u => u.email === customerEmail);
+          
+        if (customerUser) {
+          const originalUser = localStorage.getItem(STORAGE_KEYS.USER);
+          localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(customerUser));
+          
+          const customerOrders = getScopedData('ecommerce_orders');
+          const existingIdx = customerOrders.findIndex(o => o.id === order.id);
+          
+          if (existingIdx !== -1) {
+            customerOrders[existingIdx] = { ...customerOrders[existingIdx], ...order };
+          } else {
+            customerOrders.unshift(order);
+          }
+          
+          saveScopedData('ecommerce_orders', customerOrders);
+
+          if (originalUser) {
+            localStorage.setItem(STORAGE_KEYS.USER, originalUser);
+          } else {
+            localStorage.removeItem(STORAGE_KEYS.USER);
+          }
+        }
+      }
+
+      // Clear cart after successful order processing
+      clearCart();
+
+      return { success: true, orderId: order.id };
+    } catch (err) {
+      console.error("CRITICAL ERROR IN processNewOrder:", err);
+      return { success: false, message: err.message };
+    }
   }
 
   function deleteOrder(orderId) {
@@ -1589,15 +1842,6 @@ const DataManager = (() => {
 
           // ADD PROFIT LOGIC HERE
           if ((newStatus === 'completed' || newStatus === 'Delivered') && (oldStatus !== 'completed' && oldStatus !== 'Delivered')) {
-            const earnings = getScopedData('delivery_earnings', { total: 0, history: [] }, deliveryEmail);
-            earnings.total = (earnings.total || 0) + 50;
-            earnings.history.push({
-              orderId,
-              amount: 50,
-              date: new Date().toISOString()
-            });
-            saveScopedData('delivery_earnings', earnings, deliveryEmail);
-
             // AUTOMATIC VAULTPRO UPDATE for Delivery Personnel
             updateVaultBalance(deliveryPerson.id, 50, `Delivery Earnings: Order ${orderId}`);
 
@@ -1622,7 +1866,17 @@ const DataManager = (() => {
       }
     }
 
-    // 4. Sync with MediCore Admin Data if pharmacy order
+    // 4. Update for Customer
+    if (globalOrder.customerEmail) {
+      const customerOrders = getScopedData('ecommerce_orders', [], globalOrder.customerEmail);
+      const customerOrder = customerOrders.find(o => o.id === orderId);
+      if (customerOrder) {
+        customerOrder.status = newStatus;
+        saveScopedData('ecommerce_orders', customerOrders, globalOrder.customerEmail);
+      }
+    }
+
+    // 5. Sync with MediCore Admin Data if pharmacy order
     const isPharmacyOrder = items.some(item => item.subcategory === 'Pharmacy' || item.shelfName);
     if (isPharmacyOrder) {
       let medicoreData = JSON.parse(localStorage.getItem('medicoreAdminData'));
@@ -1634,6 +1888,8 @@ const DataManager = (() => {
         }
       }
     }
+
+    notifyUpdate();
 
     return { success: true };
   }
@@ -1650,6 +1906,10 @@ const DataManager = (() => {
     if (!globalOrder) return { success: false, message: 'Order not found' };
 
     globalOrder.paymentStatus = newPaymentStatus;
+    // Update main status too if it's a final payment
+    if (newPaymentStatus === 'paid') {
+      globalOrder.status = 'paid';
+    }
     saveOrders(allOrders);
 
     // 2. Update Scoped Orders for Operators
@@ -1674,10 +1934,42 @@ const DataManager = (() => {
         const mOrder = medicoreData.orders.find(o => o.id === orderId);
         if (mOrder) {
           mOrder.paymentStatus = newPaymentStatus;
+          if (newPaymentStatus === 'paid') {
+            mOrder.status = 'paid';
+          }
           localStorage.setItem('medicoreAdminData', JSON.stringify(medicoreData));
         }
       }
     }
+
+    // 4. Update Scoped Orders for the Customer
+    if (globalOrder.customerEmail) {
+      const customerOrders = getScopedData('ecommerce_orders', [], globalOrder.customerEmail);
+      const customerOrder = customerOrders.find(o => o.id === orderId);
+      if (customerOrder) {
+        customerOrder.paymentStatus = newPaymentStatus;
+        if (newPaymentStatus === 'paid') {
+          customerOrder.status = 'paid';
+        }
+        saveScopedData('ecommerce_orders', customerOrders, globalOrder.customerEmail);
+      }
+    }
+
+    // 5. Update Scoped Orders for Delivery Personnel (if assigned)
+    if (globalOrder.deliveryPersonEmail) {
+      const deliveryEmail = globalOrder.deliveryPersonEmail;
+      const dOrders = getScopedData('delivery_orders', [], deliveryEmail);
+      const dOrder = dOrders.find(o => o.id === orderId);
+      if (dOrder) {
+        dOrder.paymentStatus = newPaymentStatus;
+        if (newPaymentStatus === 'paid') {
+          dOrder.status = 'paid';
+        }
+        saveScopedData('delivery_orders', dOrders, deliveryEmail);
+      }
+    }
+
+    notifyUpdate();
 
     return { success: true };
   }
@@ -2007,8 +2299,8 @@ const DataManager = (() => {
         if (item.owner === email) {
           const itemTotal = (item.price || 0) * (item.qty || item.quantity || 1);
           grossRevenue += itemTotal;
-          netEarnings += itemTotal * 0.90;
-          commissionPaid += itemTotal * 0.10;
+          netEarnings += (itemTotal * 0.90);
+          commissionPaid += (itemTotal * 0.10);
         }
       });
     });
@@ -2247,8 +2539,48 @@ const DataManager = (() => {
   function saveCart(cart) {
     localStorage.setItem(STORAGE_KEYS.CART, JSON.stringify(cart));
     window.dispatchEvent(new Event('cartUpdated'));
+    notifyUpdate();
     return { success: true };
   }
+
+  /**
+   * Notify all tabs that data has changed
+   */
+  function playNotificationSound() {
+    try {
+      const audio = new Audio('notification.mp3');
+      audio.play().catch(e => console.log('Audio play blocked or file not found:', e.message));
+    } catch (error) {
+      console.log('Audio error:', error.message);
+    }
+  }
+
+  function notifyUpdate() {
+    window.dispatchEvent(new Event('dataUpdated'));
+    playNotificationSound();
+    // Trigger storage event for other tabs
+    localStorage.setItem('daimara_sync_timestamp', Date.now().toString());
+  }
+
+  // Global listener for instant updates across tabs
+  window.addEventListener('storage', (e) => {
+    // If any relevant key changes or our sync timestamp changes, refresh
+    const relevantKeys = Object.values(STORAGE_KEYS);
+    if (e.key === 'daimara_sync_timestamp' || relevantKeys.includes(e.key) || (e.key && e.key.includes('medicoreAdminData'))) {
+      if (e.key === 'daimara_sync_timestamp') {
+        playNotificationSound();
+      }
+      
+      // Small delay to allow localStorage to settle
+      setTimeout(() => {
+        // Some pages might handle updates without reload, but reload is safest for sync
+        // unless they have a dataUpdated listener
+        if (!document.body.dataset.manualSync) {
+           location.reload();
+        }
+      }, 100);
+    }
+  });
 
   function resetPlatformEarnings() {
     // 1. Reset Admin Earnings
@@ -2259,8 +2591,8 @@ const DataManager = (() => {
     localStorage.setItem(STORAGE_KEYS.OPERATOR_EARNINGS, JSON.stringify({}));
     
     // 3. Reset Delivery Earnings and Deductions
-    localStorage.setItem(STORAGE_KEYS.DELIVERY_EARNINGS, JSON.stringify({ total: 0, history: [] }));
-    localStorage.setItem(STORAGE_KEYS.DELIVERY_DEDUCTIONS, JSON.stringify({ total: 0, history: [] }));
+    localStorage.setItem(STORAGE_KEYS.DELIVERY_EARNINGS, JSON.stringify({}));
+    localStorage.setItem(STORAGE_KEYS.DELIVERY_DEDUCTIONS, JSON.stringify({}));
 
     // 4. Iterate through all keys to find scoped data
     const keys = Object.keys(localStorage);
@@ -2311,7 +2643,7 @@ const DataManager = (() => {
     
     // 7. Reset Agent Floats and Transactions
     localStorage.setItem(STORAGE_KEYS.AGENT_FLOAT, JSON.stringify({}));
-    localStorage.setItem(STORAGE_KEYS.AGENT_TRANSACTIONS, JSON.stringify([]));
+    localStorage.setItem(STORAGE_KEYS.AGENT_TRANSACTIONS, JSON.stringify({}));
     
     // 8. Reset Withdrawal Requests
     localStorage.setItem(STORAGE_KEYS.WITHDRAWAL_REQUESTS, JSON.stringify([]));
@@ -2362,8 +2694,8 @@ const DataManager = (() => {
     deleteOrder,
     assignOrder,
     updateOrderStatus,
-    deleteDeliveryOrder,
     updateOrderPaymentStatus,
+    deleteDeliveryOrder,
     processNewOrder,
     getUserAddresses,
     addAddress,
@@ -2443,6 +2775,7 @@ const DataManager = (() => {
     deleteAgentRegistration,
     transferFunds,
     logVaultAccess,
+    getRecipientVaultId,
     getVaultAccessLogs
   };
 })();

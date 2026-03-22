@@ -49,6 +49,12 @@
             .nav-toggle-btn { display: flex !important; }
         }
 
+        @media (orientation: landscape) and (max-height: 500px) {
+            #content-area { padding: 1rem !important; }
+            .login-card { padding: 1rem; }
+            .nav-item { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+        }
+
         .nav-toggle-btn {
             display: none;
             position: fixed;
@@ -89,6 +95,38 @@
         .nav-item {
             position: relative;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Responsive horizontal scroll for wide content */
+        .view-section {
+          width: 100%;
+          max-width: 100vw;
+          overflow-x: hidden;
+        }
+        
+        #transaction-list, .glass-panel, #withdrawal-requests {
+          max-width: 100%;
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        .notif-badge {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            background: #ef4444;
+            color: white;
+            font-size: 10px;
+            min-width: 18px;
+            height: 18px;
+            padding: 2px 5px;
+            border-radius: 10px;
+            border: 2px solid #0f172a;
+            font-weight: bold;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
         }
         
         .nav-item::before {
@@ -189,7 +227,7 @@
             50% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
         }
     </style>
-<base target="_blank">
+<base target="_self">
     <script src="data-manager.js"></script>
     <style>
         /* Login Overlay */
@@ -212,7 +250,7 @@
         }
     </style>
 </head>
-<body class="flex h-screen w-screen text-slate-300">
+<body class="flex h-screen w-screen text-slate-300" data-manual-sync="true">
     <button class="nav-toggle-btn" onclick="document.body.classList.toggle('sidebar-active')">
         <i class="fas fa-bars"></i>
     </button>
@@ -263,6 +301,7 @@
             <p class="px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Main</p>
             
             <button onclick="app.navigate('balance')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/50 group" data-page="balance">
+                <div class="notif-badge" id="balance-badge">0</div>
                 <i class="fas fa-chart-pie w-5 text-center transition-transform duration-200"></i>
                 Check Balance
             </button>
@@ -278,6 +317,7 @@
             </button>
 
             <button onclick="app.navigate('transactions')" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/50 group" data-page="transactions">
+                <div class="notif-badge" id="transactions-badge">0</div>
                 <i class="fas fa-list-ul w-5 text-center transition-transform duration-200"></i>
                 Track Transactions
             </button>
@@ -413,14 +453,27 @@
                                 <label class="block text-sm font-medium text-slate-400 mb-2">Recipient Phone Number</label>
                                 <div class="relative">
                                     <i class="fas fa-phone absolute left-4 top-3.5 text-slate-500"></i>
-                                    <input type="tel" required class="custom-input w-full rounded-xl py-3 pl-10 pr-4" placeholder="e.g. 0712345678">
+                                    <input type="tel" id="send-phone" oninput="app.validateRecipient(this)" required class="custom-input w-full rounded-xl py-3 pl-10 pr-10" placeholder="e.g. 0712345678">
+                                    <div id="recipient-status" class="absolute right-4 top-3.5 hidden"></div>
                                 </div>
+                                <div id="recipient-details" class="mt-3 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 hidden">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                                            <i class="fas fa-user-check text-emerald-400 text-xs"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">Verified Recipient</p>
+                                            <p id="recipient-name" class="text-sm text-white font-semibold"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p id="recipient-message" class="text-[10px] text-slate-500 mt-2">Enter the system-provided 07XXXXXXXX phone number.</p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-400 mb-2">Recipient ID Number</label>
                                 <div class="relative">
                                     <i class="fas fa-id-card absolute left-4 top-3.5 text-slate-500"></i>
-                                    <input type="text" required class="custom-input w-full rounded-xl py-3 pl-10 pr-4" placeholder="Enter ID Number">
+                                    <input type="text" id="send-recipient-id" required class="custom-input w-full rounded-xl py-3 pl-10 pr-4" placeholder="Enter Recipient's ID Number">
                                 </div>
                             </div>
                         </div>
@@ -577,7 +630,7 @@
                 if (this.state.user.avatar) document.getElementById('user-avatar').src = this.state.user.avatar;
 
                 // Show profit section if applicable
-                const rolesWithProfit = ['admin', 'operator', 'delivery'];
+                const rolesWithProfit = ['admin', 'operator', 'medicore_operator', 'pharmacist', 'business', 'business_operator', 'delivery'];
                 if (rolesWithProfit.includes(this.state.user.role)) {
                     document.getElementById('profit-section').classList.remove('hidden');
                     this.updateProfit();
@@ -585,7 +638,51 @@
 
                 this.updateBalanceUI();
                 this.renderTransactions();
+                this.updateNotifBadge();
                 this.navigate('balance');
+
+                // Listen for data updates (cross-tab sync)
+                window.addEventListener('dataUpdated', () => {
+                    this.updateBalanceUI();
+                    this.renderTransactions();
+                    this.updateNotifBadge();
+                });
+
+                window.addEventListener('storage', (e) => {
+                    if (e.key === 'daimara_sync_timestamp' || e.key.includes('ecommerce_')) {
+                        this.updateBalanceUI();
+                        this.renderTransactions();
+                        this.updateNotifBadge();
+                    }
+                });
+            },
+
+            updateNotifBadge() {
+                const txs = DataManager.getVaultTransactions(this.state.user.id);
+                const txBadge = document.getElementById('transactions-badge');
+                const balBadge = document.getElementById('balance-badge');
+                
+                // Track Transactions badge logic
+                const lastViewedTxs = localStorage.getItem(`vault_last_viewed_txs_${this.state.user.id}`) || 0;
+                const newTxs = txs.filter(t => new Date(t.timestamp).getTime() > parseInt(lastViewedTxs));
+
+                if (newTxs.length > 0) {
+                    txBadge.innerText = newTxs.length;
+                    txBadge.style.display = 'flex';
+                } else {
+                    txBadge.style.display = 'none';
+                }
+
+                // Check Balance badge logic - show if there are new transactions since last check
+                const lastViewedBal = localStorage.getItem(`vault_last_viewed_balance_${this.state.user.id}`) || 0;
+                const unseenTxs = txs.filter(t => new Date(t.timestamp).getTime() > parseInt(lastViewedBal));
+                
+                if (unseenTxs.length > 0) {
+                    balBadge.innerText = unseenTxs.length;
+                    balBadge.style.display = 'flex';
+                } else {
+                    balBadge.style.display = 'none';
+                }
             },
 
             unlock(e) {
@@ -622,21 +719,48 @@
             },
 
             updateProfit() {
-                let profit = 0;
-                if (this.state.user.role === 'admin') {
-                    profit = DataManager.getPermanentEarnings();
-                } else if (this.state.user.role === 'operator') {
-                    profit = DataManager.getOperatorRevenue(this.state.user.email);
-                } else if (this.state.user.role === 'delivery') {
-                    // Assuming delivery earnings are stored similarly
-                    const dEarnings = JSON.parse(localStorage.getItem('delivery_earnings_' + this.state.user.id)) || { total: 0 };
-                    profit = dEarnings.total || 0;
+                const rolesWithProfit = ['operator', 'medicore_operator', 'pharmacist', 'business', 'business_operator'];
+                if (rolesWithProfit.includes(this.state.user.role)) {
+                    const analysis = DataManager.getOperatorProfitLossAnalysis(this.state.user.email);
+                    this.state.profit = analysis.netEarnings;
+                    
+                    // Update profit display to show operator's share
+                    document.getElementById('display-profit').innerText = this.formatMoney(this.state.profit);
+                    
+                    // Find or create platform earning display
+                    let platformElem = document.getElementById('platform-commission-display');
+                    if (!platformElem) {
+                        const container = document.getElementById('profit-section');
+                        const div = document.createElement('div');
+                        div.className = 'mt-4 pt-4 border-t border-slate-700/50';
+                        div.innerHTML = `
+                            <p class="text-[10px] text-slate-500 uppercase tracking-widest font-semibold mb-1">System Commission (10%)</p>
+                            <p class="text-xl font-bold text-rose-400 mono" id="platform-commission-display">KES 0.00</p>
+                        `;
+                        container.appendChild(div);
+                        platformElem = document.getElementById('platform-commission-display');
+                    }
+                    platformElem.innerText = this.formatMoney(analysis.commissionPaid);
+                } else if (this.state.user.role === 'admin') {
+                    const analysis = DataManager.getProfitLossAnalysis();
+                    this.state.profit = analysis.netEarnings;
+                    document.getElementById('display-profit').innerText = this.formatMoney(this.state.profit);
+                } else {
+                    // For other roles (like delivery), the balance is the profit
+                    this.state.profit = this.state.balance;
+                    document.getElementById('display-profit').innerText = this.formatMoney(this.state.profit);
                 }
-                this.state.profit = profit;
-                document.getElementById('display-profit').innerText = this.formatMoney(profit);
             },
 
             navigate(pageId) {
+                if (pageId === 'transactions') {
+                    localStorage.setItem(`vault_last_viewed_txs_${this.state.user.id}`, Date.now().toString());
+                    this.updateNotifBadge();
+                } else if (pageId === 'balance') {
+                    localStorage.setItem(`vault_last_viewed_balance_${this.state.user.id}`, Date.now().toString());
+                    this.updateNotifBadge();
+                }
+
                 if (!this.state.isUnlocked && pageId !== 'balance') {
                     // Optional: force unlock for other pages if needed
                 }
@@ -691,6 +815,67 @@
                     document.getElementById('display-balance').innerText = this.formatMoney(this.state.balance);
                 }
                 document.querySelectorAll('.balance-ref').forEach(el => el.innerText = this.formatMoney(this.state.balance));
+                
+                // Update notif badge
+                this.updateNotifBadge();
+
+                // Keep profit in sync if applicable
+                const rolesWithProfit = ['admin', 'operator', 'medicore_operator', 'pharmacist', 'business', 'business_operator', 'delivery'];
+                if (rolesWithProfit.includes(this.state.user.role)) {
+                    this.updateProfit();
+                }
+            },
+
+            validateRecipient(input) {
+                const value = input.value.trim();
+                const statusIcon = document.getElementById('recipient-status');
+                const details = document.getElementById('recipient-details');
+                const nameDisplay = document.getElementById('recipient-name');
+                const message = document.getElementById('recipient-message');
+
+                if (value.length >= 10) {
+                    const allUsers = DataManager.getAllUsers();
+                    const recipient = allUsers.find(u => u.phone === value);
+                    
+                    if (recipient && recipient.id !== this.state.user.id) {
+                        statusIcon.classList.remove('hidden');
+                        statusIcon.innerHTML = '<i class="fas fa-check-circle text-emerald-400"></i>';
+                        input.classList.remove('border-rose-500');
+                        input.classList.add('border-emerald-500');
+                        
+                        details.classList.remove('hidden');
+                        nameDisplay.innerText = recipient.name;
+                        message.innerText = 'Recipient verified successfully';
+                        message.classList.add('text-emerald-400');
+                        message.classList.remove('text-slate-500', 'text-rose-400');
+                    } else if (recipient && recipient.id === this.state.user.id) {
+                        statusIcon.classList.remove('hidden');
+                        statusIcon.innerHTML = '<i class="fas fa-exclamation-circle text-amber-400"></i>';
+                        input.classList.add('border-amber-500');
+                        
+                        details.classList.add('hidden');
+                        message.innerText = 'You cannot send money to yourself';
+                        message.classList.add('text-amber-400');
+                        message.classList.remove('text-slate-500', 'text-emerald-400', 'text-rose-400');
+                    } else {
+                        statusIcon.classList.remove('hidden');
+                        statusIcon.innerHTML = '<i class="fas fa-times-circle text-rose-400"></i>';
+                        input.classList.add('border-rose-500');
+                        input.classList.remove('border-emerald-500');
+                        
+                        details.classList.add('hidden');
+                        message.innerText = 'Recipient not found. Check phone number.';
+                        message.classList.add('text-rose-400');
+                        message.classList.remove('text-slate-500', 'text-emerald-400');
+                    }
+                } else {
+                    statusIcon.classList.add('hidden');
+                    input.classList.remove('border-emerald-500', 'border-rose-500', 'border-amber-500');
+                    details.classList.add('hidden');
+                    message.innerText = 'Enter the system-provided 07XXXXXXXX phone number.';
+                    message.classList.remove('text-emerald-400', 'text-rose-400', 'text-amber-400');
+                    message.classList.add('text-slate-500');
+                }
             },
 
             validateAgent(input) {
@@ -763,6 +948,7 @@
                             </div>
                             <div class="col-span-3 text-right">
                                 <p class="font-bold text-sm ${colorClass} mono">${isPositive ? '+' : '-'}${this.formatMoney(Math.abs(tx.amount))}</p>
+                                <p class="text-[10px] text-slate-500 mt-1">Bal: ${this.formatMoney(tx.balanceAfter || tx.balance || 0)}</p>
                             </div>
                         </div>
                     `;
@@ -788,11 +974,18 @@
                 btn.disabled = true;
                 btn.innerHTML = `<div class="spinner mx-auto"></div>`;
 
-                setTimeout(() => {
+                try {
                     if (type === 'send') {
                         const amount = parseFloat(document.getElementById('send-amount').value);
-                        const recipientPhone = e.target.querySelector('input[placeholder*="Phone"]').value;
-                        const recipientId = e.target.querySelector('input[placeholder*="ID"]').value;
+                        const recipientPhone = document.getElementById('send-phone').value.trim();
+                        const recipientId = document.getElementById('send-recipient-id').value.trim();
+
+                        if (isNaN(amount) || amount <= 0) {
+                            this.showToast('Please enter a valid amount', 'error');
+                            btn.disabled = false;
+                            btn.innerHTML = originalContent;
+                            return;
+                        }
 
                         if (this.state.balance <= 0) {
                             this.showToast('Your VaultPro amount is zero. Transaction cannot be made.', 'error');
@@ -808,12 +1001,29 @@
                             return;
                         }
 
-                        // Find recipient by phone and ID
+                        // Find recipient by phone
                         const allUsers = DataManager.getAllUsers();
-                        const recipient = allUsers.find(u => u.phone === recipientPhone && u.idCard === recipientId);
+                        const recipient = allUsers.find(u => u.phone === recipientPhone);
 
                         if (!recipient) {
-                            this.showToast('Recipient not found with provided Phone and ID', 'error');
+                            this.showToast('Recipient not found with provided Phone Number', 'error');
+                            btn.disabled = false;
+                            btn.innerHTML = originalContent;
+                            return;
+                        }
+
+                        // Ensure recipient is a valid system user with a system number
+                        if (!recipient.phone || !recipient.phone.startsWith('07') || recipient.phone.length !== 10) {
+                            this.showToast('Invalid Recipient: Must have a system-provided 07XXXXXXXX number', 'error');
+                            btn.disabled = false;
+                            btn.innerHTML = originalContent;
+                            return;
+                        }
+
+                        // The ID used during money transfer is the one used by the user during the first login to the vaultpro page
+                        const recipientVaultId = DataManager.getRecipientVaultId(recipient.id);
+                        if (recipientVaultId && String(recipientVaultId).trim() !== String(recipientId).trim()) {
+                            this.showToast('Recipient ID Number does not match our records', 'error');
                             btn.disabled = false;
                             btn.innerHTML = originalContent;
                             return;
@@ -826,7 +1036,7 @@
                             return;
                         }
 
-                        const res = DataManager.transferFunds(this.state.user.id, recipient.id, amount, `Transfer to ${recipient.name}`);
+                        const res = DataManager.transferFunds(this.state.user.id, recipient.id, amount, `Transfer to ${recipient.name} (${recipientPhone})`);
                         if (res.success) {
                             this.showToast(`Sent ${this.formatMoney(amount)} to ${recipient.name}`, 'success');
                             e.target.reset();
@@ -834,6 +1044,8 @@
                             this.navigate('transactions');
                         } else {
                             this.showToast(res.message, 'error');
+                            btn.disabled = false;
+                            btn.innerHTML = originalContent;
                         }
                     } else if (type === 'withdraw') {
                         const amount = parseFloat(document.getElementById('withdraw-amount').value);
@@ -862,10 +1074,7 @@
                         }
 
                         // Withdrawal logic:
-                        // 1. Immediately deduct from client to "escrow" the funds
-                        DataManager.updateVaultBalance(this.state.user.id, -amount, `Withdrawal Request to Agent ${agentNumber}`);
-                        
-                        // 2. Create withdrawal request for Agent to approve
+                        // 1. Create withdrawal request for Agent to approve
                         DataManager.addWithdrawalRequest({
                             clientId: this.state.user.id,
                             clientPhone: this.state.user.phone,
@@ -879,10 +1088,13 @@
                         this.updateBalanceUI();
                         this.navigate('transactions');
                     }
-                    
+                } catch (error) {
+                    console.error('Vault action error:', error);
+                    this.showToast(error.message, 'error');
+                } finally {
                     btn.disabled = false;
                     btn.innerHTML = originalContent;
-                }, 1500);
+                }
             },
 
             showToast(message, type = 'success') {
