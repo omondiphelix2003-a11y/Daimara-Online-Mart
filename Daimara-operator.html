@@ -3,55 +3,172 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Daimara Stores | Daimara Operators</title>
+<title>Daimara Stores | Operators Panel</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
 :root {
   --primary:#3b82f6;
   --bg:#0f172a;
   --card:#1e293b;
-  --glass: rgba(255, 255, 255, 0.05);
-  --glass-border: rgba(255, 255, 255, 0.1);
+  --text:#f8fafc;
+  --muted:#94a3b8;
+  --border:rgba(255, 255, 255, 0.1);
+  --success:#22c55e;
+  --danger:#ef4444;
 }
-body{margin:0;font-family:'Inter';background:var(--bg);} 
-.topbar{background:var(--primary);padding:16px 24px;display:flex;justify-content:space-between;align-items:center;border-bottom: 1px solid var(--glass-border);backdrop-filter: blur(12px);-webkit-backdrop-filter: blur(12px);}
-.topbar h1{margin:0;color:black;}
-.btn{background:black;color:white;border:none;padding:10px 16px;border-radius:8px;cursor:pointer;}
-.container{padding:24px;}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px;margin-bottom:25px;}
-.card{background:var(--card);border-radius:12px;padding:20px;box-shadow:0 6px 15px rgba(0,0,0,0.1);} 
-.table{width:100%;border-collapse:collapse;margin-top:10px;}
-.table th,.table td{padding:12px;border-bottom:1px solid #eee;text-align:left;font-size:16px;}
-.section{margin-top:30px;}
-.section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
-.sub-btn{padding:8px 12px;border:none;border-radius:6px;cursor:pointer;background:#111;color:var(--primary);} 
-.move-btn{background:#16a34a;color:black;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;}
-input[type='number']{width:70px;padding:5px;}
-.email-actions button{margin-right:6px;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;}
-.whatsapp{background:#25D366;color:black;}
-.gmail{background:#EA4335;color:black;}
+
+* { box-sizing: border-box; }
+body{
+  margin:0;
+  font-family:'Inter', system-ui, -apple-system, sans-serif;
+  background:var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.topbar{
+  background:var(--card);
+  padding:16px 24px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.topbar h1{margin:0; font-size: 18px; color: var(--primary);}
+
+.topbar-actions { display: flex; gap: 12px; }
+
+.btn{
+  background:var(--primary);
+  color:white;
+  border:none;
+  padding:10px 16px;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight: 600;
+  font-size: 13px;
+  transition: opacity 0.2s;
+}
+
+.btn:hover { opacity: 0.9; }
+
+.container{padding:24px; max-width: 1000px; margin: 0 auto;}
+
+.grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap:20px;
+  margin-bottom:32px;
+}
+
+.card{
+  background:var(--card);
+  border-radius:16px;
+  padding:24px;
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.card h3 { color: var(--muted); font-size: 13px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+.card strong { font-size: 24px; color: var(--text); display: block; }
+
+.section-title { font-size: 18px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; color: var(--text); margin-top: 32px; }
+
+.table-container {
+  background: var(--card);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.table{
+  width:100%;
+  border-collapse:collapse;
+  text-align:left;
+}
+
+.table th{
+  background: rgba(0,0,0,0.2);
+  padding:14px 20px;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.table td{
+  padding:16px 20px;
+  border-bottom:1px solid var(--border);
+  font-size: 14px;
+}
+
+.move-btn{
+  background:var(--success);
+  color:white;
+  border:none;
+  padding:6px 12px;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight: 600;
+}
+
+input[type='number']{
+  width:80px;
+  padding:8px;
+  border-radius:6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: white;
+}
+
+.email-actions { display: flex; gap: 8px; }
+.email-actions button{
+  border:none;
+  width: 36px;
+  height: 36px;
+  border-radius:50%;
+  cursor:pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+.whatsapp{background:#25D366; color: white;}
+.gmail{background:#EA4335; color: white;}
+
 .hidden{display:none;}
 
 @media (max-width: 768px) {
-  .topbar { flex-direction: column; gap: 15px; text-align: center; }
-  .topbar div { display: flex; flex-direction: column; width: 100%; gap: 10px; }
-  .btn { width: 100%; }
-  .container { padding: 15px; }
-  .grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
-  .card { padding: 10px; }
-  .card h3 { font-size: 11px; }
-  .card strong { font-size: 14px; }
-  .table { display: block; overflow-x: auto; }
+  .topbar { padding: 12px 16px; flex-direction: column; align-items: stretch; gap: 12px; }
+  .topbar h1 { text-align: center; }
+  .topbar-actions { justify-content: center; }
+  .container { padding: 16px; }
+  .grid { grid-template-columns: 1fr; gap: 12px; }
+  
+  .table-container { border: none; background: transparent; }
+  .table thead { display: none; }
+  .table, .table tbody, .table tr, .table td { display: block; width: 100%; }
+  .table tr { background: var(--card); border-radius: 12px; margin-bottom: 12px; border: 1px solid var(--border); padding: 8px; }
+  .table td { border: none; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; }
+  .table td::before { content: attr(data-label); font-weight: 600; color: var(--muted); font-size: 12px; }
+  
+  .email-actions { justify-content: flex-end; }
 }
+
 </style>
 </head>
 <body>
 
 <div class="topbar">
-  <h1>Daimara Operators Panel</h1>
-  <div>
+  <h1><i class="fas fa-microchip"></i> Operators Panel</h1>
+  <div class="topbar-actions">
     <button class="btn" onclick="createSubWarehouse()">Create Sub-Warehouse</button>
-    <button class="btn" onclick="openPlatform()">Open Platform</button>
+    <button class="btn" onclick="openPlatform()" style="background:#1e293b; border: 1px solid var(--primary);"><i class="fas fa-external-link-alt"></i></button>
   </div>
 </div>
 
@@ -59,48 +176,51 @@ input[type='number']{width:70px;padding:5px;}
 
   <!-- SUMMARY -->
   <div class="grid">
-    <div class="card" onclick="toggleWarehouseView()" style="cursor:pointer;">
+    <div class="card" onclick="toggleWarehouseView()" style="cursor:pointer; border-color: var(--primary);">
       <h3>Main Warehouse Stock</h3>
-      <strong id="totalStock">170 Units</strong>
-      <p style="font-size:12px;color:gray;">(Click to view contents only)</p>
+      <strong id="totalStock">0 Units</strong>
+      <p style="font-size:11px;color:var(--primary); margin-top: 8px;">Tap to toggle inventory details</p>
     </div>
-    <div class="card"><h3>Sub Warehouses</h3><strong id="subCount">0 Active</strong></div>
+    <div class="card">
+      <h3>Active Platforms</h3>
+      <strong id="subCount">0 Active</strong>
+    </div>
   </div>
 
-  <!-- MAIN WAREHOUSE CONTENT ONLY -->
+  <!-- MAIN WAREHOUSE CONTENT -->
   <div id="warehouseSection" class="section hidden">
-    <div class="section-header"><h2>Main Warehouse Contents</h2></div>
-    <table class="table">
-      <thead>
-        <tr><th>Product</th><th>Stock</th><th>Move Qty</th><th>Action</th></tr>
-      </thead>
-      <tbody id="warehouseTable"></tbody>
-    </table>
+    <h2 class="section-title"><i class="fas fa-boxes"></i> Inventory Control</h2>
+    <div class="table-container">
+      <table class="table">
+        <thead>
+          <tr><th>Product</th><th>Stock</th><th>Move Qty</th><th>Action</th></tr>
+        </thead>
+        <tbody id="warehouseTable"></tbody>
+      </table>
+    </div>
   </div>
 
   <!-- SUB WAREHOUSES -->
-  <div class="section">
-    <div class="section-header">
-      <h2>Sub Warehouses Platforms</h2>
-    </div>
-    <div class="grid" id="subWarehouseList"></div>
-  </div>
+  <h2 class="section-title"><i class="fas fa-network-wired"></i> Connected Platforms</h2>
+  <div class="grid" id="subWarehouseList"></div>
 
   <!-- CLIENT EMAILS -->
-  <div class="section">
-    <div class="section-header"><h2>Client Emails</h2></div>
+  <h2 class="section-title"><i class="fas fa-envelope"></i> Customer Communications</h2>
+  <div class="table-container">
     <table class="table">
       <thead>
         <tr><th>Email</th><th>Phone</th><th>Message</th><th>Reply</th></tr>
       </thead>
       <tbody>
         <tr>
-          <td>customer@email.com</td>
-          <td>+254742120329</td>
-          <td>Where is my delivery?</td>
-          <td class="email-actions">
-            <button class="whatsapp" onclick="window.location.href='https://wa.me/254742120329'"><i class="fab fa-whatsapp"></i></button>
-            <button class="gmail" onclick="window.location.href='mailto:omondiphelix2003@gmail.com'"><i class="fas fa-envelope"></i></button>
+          <td data-label="Email">customer@email.com</td>
+          <td data-label="Phone">+254742120329</td>
+          <td data-label="Message">Where is my delivery?</td>
+          <td data-label="Reply">
+            <div class="email-actions">
+              <button class="whatsapp" onclick="window.location.href='https://wa.me/254742120329'"><i class="fab fa-whatsapp"></i></button>
+              <button class="gmail" onclick="window.location.href='mailto:omondiphelix2003@gmail.com'"><i class="fas fa-envelope"></i></button>
+            </div>
           </td>
         </tr>
       </tbody>
@@ -122,10 +242,10 @@ function renderWarehouse(){
   warehouse.forEach(p=>{
     table.innerHTML += `
       <tr>
-        <td>${p.name}</td>
-        <td id="stock-${p.id}">${p.stock}</td>
-        <td><input type="number" id="move-${p.id}" min="1"></td>
-        <td><button class="move-btn" onclick="moveStock(${p.id})">Move</button></td>
+        <td data-label="Product"><strong>${p.name}</strong></td>
+        <td data-label="Stock"><span style="color:var(--success)">${p.stock}</span></td>
+        <td data-label="Move Qty"><input type="number" id="move-${p.id}" min="1"></td>
+        <td data-label="Action"><button class="move-btn" onclick="moveStock(${p.id})">Move</button></td>
       </tr>`;
   });
   updateTotalStock();
@@ -139,15 +259,15 @@ function moveStock(id){
     alert('Invalid quantity'); return;
   }
   product.stock -= qty;
-  if(subWarehouses.length===0){alert('Create a sub warehouse first');return;}
+  if(subWarehouses.length===0){alert('Create a sub warehouse platform first');return;}
   subWarehouses[0].stock.push({name:product.name,qty:qty});
   qtyInput.value='';
   renderWarehouse();
-  alert(qty+' units moved successfully');
+  alert(qty+' units moved to platform successfully');
 }
 
 function createSubWarehouse(){
-  const name = prompt('Enter Sub Warehouse Name:');
+  const name = prompt('Enter Platform/Sub Warehouse Name:');
   if(!name) return;
   subWarehouses.push({name:name,stock:[]});
   renderSubWarehouses();
@@ -157,7 +277,11 @@ function renderSubWarehouses(){
   const list = document.getElementById('subWarehouseList');
   list.innerHTML='';
   subWarehouses.forEach(sw=>{
-    list.innerHTML += `<div class="card"><strong>${sw.name}</strong><br>${sw.stock.length} Products</div>`;
+    list.innerHTML += `
+      <div class="card">
+        <h3>${sw.name}</h3>
+        <strong>${sw.stock.length} Active Items</strong>
+      </div>`;
   });
   document.getElementById('subCount').innerText = subWarehouses.length+' Active';
 }
@@ -167,7 +291,7 @@ function toggleWarehouseView(){
 }
 
 function openPlatform(){
-  alert('Sub Warehouse Platforms Opened');
+  alert('Redirecting to external platforms...');
 }
 
 function updateTotalStock(){

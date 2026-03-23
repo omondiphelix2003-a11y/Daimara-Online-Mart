@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Daimara Stores | Daimara Delivery Services</title>
+<title>Daimara Stores | Delivery Services</title>
 <base target="_self">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
@@ -13,37 +13,46 @@
   --accent:#1e40af;
   --bg:#0f172a;
   --card:#1e293b;
-  --glass: rgba(255, 255, 255, 0.05);
-  --glass-border: rgba(255, 255, 255, 0.1);
+  --text:#f8fafc;
+  --muted:#94a3b8;
+  --border:rgba(255, 255, 255, 0.1);
+  --success:#22c55e;
+  --danger:#ef4444;
+  --sidebar-width: 260px;
 }
 
+* { box-sizing: border-box; }
 body{
   margin:0;
-  font-family:'Inter', sans-serif;
+  font-family:'Inter', system-ui, -apple-system, sans-serif;
   background:var(--bg);
-  color: #e2e8f0;
+  color: var(--text);
   display: flex;
   min-height: 100vh;
 }
 
+/* Sidebar Styles */
 .sidebar {
-  width: 250px;
+  width: var(--sidebar-width);
   background: #041344;
   color: white;
   display: flex;
   flex-direction: column;
-  border-right: 1px solid var(--glass-border);
-  flex-shrink: 0;
+  position: fixed;
+  height: 100vh;
+  z-index: 1000;
+  transition: transform 0.3s ease;
+  border-right: 1px solid var(--border);
 }
 
 .sidebar-header {
-  padding: 20px;
-  border-bottom: 1px solid var(--glass-border);
+  padding: 24px;
+  border-bottom: 1px solid var(--border);
   text-align: center;
 }
 
 .sidebar-nav {
-  padding: 10px 0;
+  padding: 20px 0;
   flex: 1;
 }
 
@@ -51,244 +60,225 @@ body{
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 20px;
-  color: #e2e8f0;
+  padding: 12px 24px;
+  color: var(--text);
   text-decoration: none;
-  transition: 0.3s;
+  transition: all 0.2s;
 }
 
 .sidebar-nav a:hover {
-  background: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
   color: var(--primary);
 }
 
+/* Main Content Layout */
 .main-wrapper {
   flex: 1;
+  margin-left: var(--sidebar-width);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  min-width: 0;
+  transition: margin 0.3s ease;
 }
 
 .topbar{
-  background:var(--primary);
-  color:rgb(0, 0, 0);
+  background:var(--card);
   padding:16px 24px;
   display:flex;
   justify-content:space-between;
   align-items:center;
-  border-bottom: 1px solid var(--glass-border);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
-.container{
-  padding:24px;
-  flex: 1;
-  overflow-y: auto;
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 20px;
+  cursor: pointer;
 }
+
+.container{padding:24px; max-width: 1200px; margin: 0 auto; width: 100%;}
 
 .grid{
   display:grid;
-  grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap:20px;
-  margin-bottom:25px;
+  margin-bottom:32px;
 }
 
 .card{
   background:var(--card);
-  border-radius:12px;
-  padding:20px;
-  box-shadow:0 6px 15px rgba(0, 0, 0, 0.904);
+  border-radius:16px;
+  padding:24px;
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-.section{
-  margin-top:30px;color: #064e1f;
-}
+.card h3 { color: var(--muted); font-size: 13px; margin-bottom: 8px; text-transform: uppercase; }
+.card strong { font-size: 24px; display: block; }
+
+.section-title { font-size: 18px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; margin-top: 32px; }
 
 .table-container {
-  max-width: 100%;
-  overflow-x: auto;
-  overflow-y: auto;
-  max-height: 500px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  background: var(--card);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  margin-bottom: 24px;
 }
 
 .table{
   width:100%;
   border-collapse:collapse;
-  background:white;
-  border-radius:12px;
-  overflow:hidden;
+  text-align:left;
 }
 
-.table th, .table td{
-  padding:12px;
-  border-bottom:1px solid #eee;
-  text-align:left;
-  color: black;
+.table th{
+  background: rgba(0,0,0,0.2);
+  padding:14px 20px;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.table td{
+  padding:16px 20px;
+  border-bottom:1px solid var(--border);
+  font-size: 14px;
+  color: var(--text);
 }
 
 .action-btn{
   border:none;
-  padding:8px 12px;
-  border-radius:6px;
+  padding:8px 16px;
+  border-radius:8px;
   cursor:pointer;
   color:white;
+  font-weight: 600;
+  font-size: 12px;
 }
 
-.dispatch{background:#2564ebd8}
-.delivered{background:#16a34ae0}
+.dispatch{background:var(--primary)}
+.delivered{background:var(--success)}
 
 #reader{
   width:100%;
   max-width:400px;
-  margin-top:20px;
-  border-radius: 5px;
+  margin: 20px auto;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
-.scan-result{
-  margin-top:15px;
-  font-weight:bold;
-}
-
-/* MODAL STYLES */
 .modal {
   display: none;
   position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(4px);
   z-index: 2000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.8);
   align-items: center;
   justify-content: center;
   padding: 20px;
 }
+
 .modal-content {
-  background: #fff;
-  padding: 30px;
-  border-radius: 12px;
-  max-width: 600px;
+  background: var(--card);
+  padding: 24px;
+  border-radius: 20px;
   width: 100%;
+  max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
-  position: relative;
+  border: 1px solid var(--border);
 }
-.close-modal {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  font-size: 24px;
-  cursor: pointer;
-  color: #666;
-  border: none;
-  background: none;
-}
-.receipt { color: #333; }
-.receipt-header { text-align: center; margin-bottom: 20px; border-bottom: 2px dashed #ddd; padding-bottom: 15px; }
-.receipt-header h1 { color: var(--primary); margin: 0; }
-.receipt-info { margin-bottom: 20px; line-height: 1.6; }
-.receipt-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-.receipt-table th { text-align: left; border-bottom: 1px solid #eee; padding: 10px 0; }
-.receipt-table td { padding: 10px 0; border-bottom: 1px solid #f9f9f9; }
-.status-badge {
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: bold;
-  text-transform: uppercase;
-  margin-left: 10px;
-}
-.badge-red { background: #fee2e2; color: #ef4444; border: 1px solid #fecaca; }
-.badge-green { background: #dcfce7; color: #22c55e; border: 1px solid #bbf7d0; }
-.receipt-total { text-align: right; font-size: 20px; font-weight: bold; border-top: 2px solid #333; padding-top: 10px; }
-.dispatch-confirm-btn {
-  display: block;
-  width: 100%;
-  margin-top: 20px;
-  padding: 15px;
-  background: var(--accent);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 18px;
+
+/* Receipt Styles */
+.receipt { background: white; color: #1e293b; padding: 24px; border-radius: 12px; }
+.receipt h1 { color: #0f172a; font-size: 20px; margin-bottom: 8px; text-align: center; }
+.receipt-info { font-size: 13px; line-height: 1.6; border-bottom: 2px dashed #e2e8f0; padding-bottom: 16px; margin-bottom: 16px; }
+
+@media (max-width: 1024px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .main-wrapper { margin-left: 0; }
+  .menu-toggle { display: block; }
 }
 
 @media (max-width: 768px) {
-  .topbar { flex-direction: column; gap: 10px; text-align: center; }
-  .container { padding: 10px; }
-  .grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
-  .card { padding: 10px; }
-  .card h3 { font-size: 11px; }
-  .card strong { font-size: 14px; }
-  .table th, .table td { padding: 8px; font-size: 13px; }
-  .action-btn { padding: 6px 10px; font-size: 12px; }
+  .container { padding: 16px; }
+  .grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+  .card { padding: 16px; }
+  .card strong { font-size: 18px; }
+  
+  .table-container { border: none; background: transparent; }
+  .table thead { display: none; }
+  .table tr { display: block; background: var(--card); border-radius: 12px; margin-bottom: 12px; border: 1px solid var(--border); padding: 8px; }
+  .table td { display: flex; justify-content: space-between; align-items: center; border: none; padding: 8px 12px; }
+  .table td::before { content: attr(data-label); font-weight: 600; color: var(--muted); font-size: 12px; }
+}
+
+@media (max-width: 480px) {
+  .grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
 <body>
 
-<div class="sidebar">
+<aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
-    <h3>Daimara Delivery</h3>
+    <h2 style="font-size: 20px; color: var(--primary);">DAIMARA</h2>
   </div>
-  <div class="sidebar-nav">
-    <a href="index.html" target="_self"><i class="fas fa-home"></i> Home</a>
-    <a href="#" onclick="location.reload()"><i class="fas fa-sync"></i> Refresh Dashboard</a>
-    <a href="client end money valt.html" target="_self"><i class="fas fa-vault"></i> VaultPro</a>
-    <a href="contact.html" target="_self"><i class="fas fa-headset"></i> Support</a>
-  </div>
-</div>
+  <nav class="sidebar-nav">
+    <a href="index.html"><i class="fas fa-home"></i> Home</a>
+    <a href="#" onclick="location.reload()"><i class="fas fa-sync"></i> Refresh</a>
+    <a href="client end money valt.html"><i class="fas fa-wallet"></i> VaultPro</a>
+    <a href="contact.html"><i class="fas fa-headset"></i> Support</a>
+    <a href="#" onclick="adminLogout()" style="color:var(--danger); margin-top: auto;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  </nav>
+</aside>
 
 <div class="main-wrapper">
-<div class="topbar">
-  <a href="index.html" class="logo" style="color:black;text-decoration: solid;">Daimara Delivery Services</a>
-  <div style="display:flex; gap:10px; align-items:center;">
-    <button onclick="refreshPlatformEarnings()" style="background:#ef4444; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer;" title="Reset Platform Earnings">
-      <i class="fas fa-sync"></i> Reset Earnings
-    </button>
-  </div>
-</div>
+  <header class="topbar">
+    <button class="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+    <h1 style="font-size: 18px;">Delivery Services</h1>
+    <button onclick="refreshPlatformEarnings()" class="btn btn-danger" style="background:var(--danger); padding: 8px 12px;">Reset</button>
+  </header>
 
-<!-- DETAILS MODAL -->
-<div id="details-modal" class="modal">
-  <div class="modal-content">
-    <button class="close-modal" onclick="closeModal()">&times;</button>
-    <div id="modal-body"></div>
-  </div>
-</div>
-
-<div class="container">
-
-  <!-- SUMMARY -->
-  <div class="grid">
-    <div class="card">
-      <h3>Orders Ready for Dispatch</h3>
-      <strong id="summary-ready">0</strong>
-    </div>
-    <div class="card">
-      <h3>Out for Delivery</h3>
-      <strong id="summary-out">0</strong>
-    </div>
-    <div class="card">
-      <h3>Delivered Today</h3>
-      <strong id="summary-delivered">0</strong>
-    </div>
-    <div class="card" style="background: #16a34a; color: white;">
-      <h3>Total Profit</h3>
-      <strong id="summary-profit">KES 0</strong>
+  <div id="details-modal" class="modal">
+    <div class="modal-content">
+      <div id="modal-body"></div>
+      <button onclick="closeModal()" class="action-btn" style="width:100%; margin-top:16px; background:var(--bg);">Close</button>
     </div>
   </div>
 
-  <!-- DISPATCH LIST -->
-  <div class="section">
-    <h2>Dispatch Packed Orders</h2>
+  <div class="container">
+    <div class="grid">
+      <div class="card">
+        <h3>Ready</h3>
+        <strong id="summary-ready">0</strong>
+      </div>
+      <div class="card">
+        <h3>In Transit</h3>
+        <strong id="summary-out">0</strong>
+      </div>
+      <div class="card">
+        <h3>Delivered</h3>
+        <strong id="summary-delivered">0</strong>
+      </div>
+      <div class="card" style="border-color: var(--success);">
+        <h3 style="color: var(--success);">Earnings</h3>
+        <strong id="summary-profit" style="color: var(--success);">KES 0</strong>
+      </div>
+    </div>
+
+    <h2 class="section-title"><i class="fas fa-truck-loading"></i> Pending Dispatch</h2>
     <div class="table-container">
-      <table class="table">
+      <table class="table" id="dispatch-table">
         <thead>
           <tr>
             <th>Order ID</th>
@@ -298,305 +288,124 @@ body{
             <th>Action</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td>#DM2042</td>
-            <td>Peter Otieno</td>
-            <td>Karen</td>
-            <td>Packed</td>
-            <td><button class="action-btn dispatch">Send to Delivery</button></td>
-          </tr>
-          <tr>
-            <td>#DM2043</td>
-            <td>Grace Njeri</td>
-            <td>Kilimani</td>
-            <td>Out for Delivery</td>
-            <td><button class="action-btn delivered">Mark Delivered</button></td>
-          </tr>
-        </tbody>
+        <tbody id="dispatch-tbody"></tbody>
       </table>
     </div>
-  </div>
 
-  <!-- QR CODE SCANNER -->
-  <div class="section">
-    <h2>Scan Client Receipt QR Code</h2>
-    <p>Scan the client's receipt QR code to confirm delivery.</p>
-    <div id="reader"></div>
-    <div class="scan-result" id="result">Waiting for scan...</div>
+    <h2 class="section-title"><i class="fas fa-qrcode"></i> Delivery Confirmation</h2>
+    <div class="card" style="text-align: center;">
+      <p style="color: var(--muted); margin-bottom: 16px;">Scan client QR code to verify delivery</p>
+      <div id="reader"></div>
+      <div id="result" style="margin-top: 16px; font-weight: bold; color: var(--primary);">Ready for scan...</div>
+    </div>
   </div>
-
-</div>
 </div>
 
 <script src="data-manager.js"></script>
 <script>
+    function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+    function closeModal() { document.getElementById('details-modal').style.display = 'none'; }
+    function adminLogout() { DataManager.logout(); window.location.href = 'login.html'; }
+
     function refreshPlatformEarnings() {
-      if (confirm("Are you sure you want to reset all platform earnings to zero? This cannot be undone.")) {
-        const res = DataManager.resetPlatformEarnings();
-        if (res.success) {
-            alert(res.message);
-            location.reload();
-        }
+      if (confirm("Reset all platform earnings to zero?")) {
+        if (DataManager.resetPlatformEarnings().success) location.reload();
       }
     }
-function checkAccess() {
-  const user = DataManager.getCurrentUser();
-  if (!user) {
-    alert("Please login first.");
-    window.location.href = "login.html";
-    return false;
-  }
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const viewUserEmail = urlParams.get('viewUserEmail');
+    const urlParams = new URLSearchParams(window.location.search);
+    const viewUserEmail = urlParams.get('viewUserEmail');
 
-  // Allow admin to view any delivery page if they have the email param
-  if (user.role === 'admin' && viewUserEmail) {
-    return true;
-  }
-
-  if (user.role !== 'delivery') {
-    alert("Access denied. This page is for delivery personnel only.");
-    window.location.href = "index.html";
-    return false;
-  }
-  return true;
-}
-
-// Get the email to view (for admin impersonation)
-const urlParams = new URLSearchParams(window.location.search);
-const viewUserEmail = urlParams.get('viewUserEmail');
-
-if (checkAccess()) {
-  document.addEventListener('DOMContentLoaded', () => {
-    renderDeliveryData();
-    // Auto refresh every 30 seconds to catch new assignments
-    setInterval(renderDeliveryData, 30000);
-  });
-}
-
-function renderDeliveryData() {
-  const orders = DataManager.getScopedData('delivery_orders', [], viewUserEmail);
-  const earnings = DataManager.getScopedData('delivery_earnings', { total: 0 }, viewUserEmail);
-  const allGlobalOrders = DataManager.getAllOrders();
-  
-  const today = new Date().toLocaleDateString();
-  
-  // An order is only "Ready" if it's assigned to this person AND all its products are confirmed by operators
-  const readyOrders = orders.filter(o => {
-    if (o.status !== 'assigned' && o.status !== 'Packed') return false;
-    
-    // Check global order for full assignment status
-    const globalOrder = allGlobalOrders.find(go => go.id === o.id);
-    if (!globalOrder) return true; // Fallback
-    
-    const items = globalOrder.items || globalOrder.products || [];
-    const assignedBy = globalOrder.assignedBy || [];
-    return items.every(item => item.owner ? assignedBy.includes(item.owner) : true);
-  });
-
-  const summary = {
-    ready: readyOrders.length,
-    out: orders.filter(o => o.status === 'Out for Delivery').length,
-    delivered: orders.filter(o => {
-      const isCompleted = o.status === 'completed' || o.status === 'Delivered';
-      const isToday = o.date && new Date(o.date).toLocaleDateString() === today;
-      return isCompleted && isToday;
-    }).length,
-    profit: earnings.total || 0
-  };
-
-  // Update Summary
-  document.getElementById('summary-ready').innerText = summary.ready;
-  document.getElementById('summary-out').innerText = summary.out;
-  document.getElementById('summary-delivered').innerText = summary.delivered;
-  document.getElementById('summary-profit').innerText = `KES ${summary.profit.toLocaleString()}`;
-
-  // Update Table
-  const tbody = document.querySelector('.table tbody');
-  tbody.innerHTML = orders.map(o => {
-    const globalOrder = allGlobalOrders.find(go => go.id === o.id);
-    let isFullyAssigned = true;
-    if (globalOrder) {
-      const items = globalOrder.items || globalOrder.products || [];
-      const assignedBy = globalOrder.assignedBy || [];
-      isFullyAssigned = items.every(item => item.owner ? assignedBy.includes(item.owner) : true);
+    function init() {
+      const user = DataManager.getCurrentUser();
+      if (!user) { window.location.href = "login.html"; return; }
+      if (user.role !== 'delivery' && user.role !== 'admin') { window.location.href = "index.html"; return; }
+      
+      renderDeliveryData();
+      setInterval(renderDeliveryData, 30000);
+      initScanner();
     }
 
-    const displayStatus = (o.status === 'assigned' && !isFullyAssigned) ? 'Partially Assigned (Waiting)' : o.status;
-
-    return `
-    <tr>
-      <td>${o.id}</td>
-      <td>${o.client}</td>
-      <td><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(o.destination)}" target="_self" style="color:var(--accent); text-decoration:none;"><i class="fas fa-map-marker-alt"></i> ${o.destination}</a></td>
-      <td>${displayStatus}</td>
-      <td>
-        ${(o.status === 'assigned' || o.status === 'Packed') ? `<button class="action-btn dispatch" onclick="viewReceipt('${o.id}')">View Details & Dispatch</button>` : ''}
-        ${o.status === 'Out for Delivery' ? `<button class="action-btn delivered" onclick="updateStatus('${o.id}', 'completed')">Mark Delivered</button>` : ''}
-        ${(o.status === 'completed' || o.status === 'Delivered' || o.status === 'unfound' || o.status === 'Not Found') ? `
-          <span style="color:${(o.status === 'unfound' || o.status === 'Not Found') ? 'orange' : 'green'}">${o.status}</span>
-          <button onclick="handleDelete('${o.id}')" class="action-btn" style="background:#dc2626; padding:4px 8px; margin-left:10px;">
-            <i class="fas fa-trash"></i>
-          </button>
-        ` : ''}
-      </td>
-    </tr>
-  `;
-  }).join('') || '<tr><td colspan="5" style="text-align:center">No active delivery assignments</td></tr>';
-}
-
-function handleDelete(id) {
-  if (!confirm("Are you sure you want to remove this order from your history?")) return;
-  const result = DataManager.deleteDeliveryOrder(id, viewUserEmail);
-  if (result.success) {
-    renderDeliveryData();
-  }
-}
-
-function updateStatus(id, newStatus) {
-  const result = DataManager.updateOrderStatus(id, newStatus);
-  if (result.success) {
-    renderDeliveryData();
-    closeModal();
-  }
-}
-
-function viewReceipt(orderId) {
-  const orders = DataManager.getScopedData('delivery_orders', [], viewUserEmail);
-  const dOrder = orders.find(o => o.id === orderId);
-  if (!dOrder) return alert("Order not found");
-
-  // Get global order for full details
-  const allOrders = DataManager.getAllOrders();
-  const order = allOrders.find(o => o.id === orderId);
-  if (!order) return alert("Order full details not found");
-
-  const body = document.getElementById('modal-body');
-  const items = order.items || order.products || [];
-  const assignedBy = order.assignedBy || [];
-  const config = DataManager.getSystemConfig();
-
-  let allAssigned = true;
-  const itemsHtml = items.map(item => {
-    // If an item has an owner, check if that owner has assigned it
-    // If it has NO owner, assume it's an admin/general product and it's implicitly assigned by the lead
-    const isAssigned = item.owner ? assignedBy.includes(item.owner) : true;
-    if (!isAssigned) allAssigned = false;
-    
-    const badgeClass = isAssigned ? 'badge-green' : 'badge-red';
-    const badgeText = isAssigned ? 'Ready' : 'Waiting for Operator';
-    
-    return `
-      <tr>
-        <td>
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span>${item.name}</span>
-            <span class="status-badge ${badgeClass}">${badgeText}</span>
-          </div>
-        </td>
-        <td style="text-align:center;">${item.qty || item.quantity || 1}</td>
-      </tr>
-    `;
-  }).join('');
-
-  body.innerHTML = `
-    <div class="receipt">
-      <div class="receipt-header">
-        <h1>DAIMARA ONLINE MART</h1>
-        <p>Delivery Dispatch Receipt</p>
-      </div>
-      <div class="receipt-info">
-        <p><strong>Order ID:</strong> ${order.id}</p>
-        <p><strong>Customer:</strong> ${order.customerName || order.customer?.name}</p>
-        <p><strong>Phone:</strong> ${order.customerPhone || order.customer?.phone || 'N/A'}</p>
-        <p><strong>Destination:</strong> <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(order.deliveryLocation || dOrder.destination)}" target="_self" style="color:var(--accent); text-decoration:none;"><i class="fas fa-map-marker-alt"></i> ${order.deliveryLocation || 'N/A'}</a></p>
-        <p><strong>Date:</strong> ${new Date(order.date).toLocaleString()}</p>
-      </div>
-      <table class="receipt-table">
-        <thead>
-          <tr>
-            <th>Item</th>
-            <th style="text-align:center;">Qty</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${itemsHtml}
-        </tbody>
-      </table>
+    function renderDeliveryData() {
+      const orders = DataManager.getScopedData('delivery_orders', [], viewUserEmail);
+      const earnings = DataManager.getScopedData('delivery_earnings', { total: 0 }, viewUserEmail);
+      const allGlobalOrders = DataManager.getAllOrders();
       
-      ${!allAssigned ? `
-        <div style="background:#fff3cd; color:#856404; padding:10px; border-radius:8px; margin-bottom:15px; font-size:14px; text-align:center;">
-          <i class="fas fa-exclamation-triangle"></i> Some products in this order haven't been assigned by their operators yet.
+      const readyOrders = orders.filter(o => {
+        if (o.status !== 'assigned' && o.status !== 'Packed') return false;
+        const globalOrder = allGlobalOrders.find(go => go.id === o.id);
+        if (!globalOrder) return true;
+        const items = globalOrder.items || globalOrder.products || [];
+        const assignedBy = globalOrder.assignedBy || [];
+        return items.every(item => item.owner ? assignedBy.includes(item.owner) : true);
+      });
+
+      document.getElementById('summary-ready').innerText = readyOrders.length;
+      document.getElementById('summary-out').innerText = orders.filter(o => o.status === 'out_for_delivery' || o.status === 'Dispatched').length;
+      document.getElementById('summary-delivered').innerText = orders.filter(o => (o.status === 'delivered' || o.status === 'completed') && new Date(o.date).toLocaleDateString() === new Date().toLocaleDateString()).length;
+      document.getElementById('summary-profit').innerText = 'KES ' + (earnings.total || 0).toLocaleString();
+
+      const tbody = document.getElementById('dispatch-tbody');
+      tbody.innerHTML = orders.filter(o => o.status !== 'delivered' && o.status !== 'completed').map(o => `
+        <tr>
+          <td data-label="Order ID"><strong>#${o.id.slice(-6)}</strong></td>
+          <td data-label="Client">${o.customerName || 'Client'}</td>
+          <td data-label="Destination">${o.deliveryLocation || 'N/A'}</td>
+          <td data-label="Status">${o.status}</td>
+          <td data-label="Action">
+            ${(o.status === 'assigned' || o.status === 'Packed') ? 
+              `<button class="action-btn dispatch" onclick="showDispatchModal('${o.id}')">Review & Dispatch</button>` : 
+              `<button class="action-btn delivered" onclick="completeDelivery('${o.id}')">Delivered</button>`}
+          </td>
+        </tr>
+      `).join('') || '<tr><td colspan="5" style="text-align:center; padding: 20px;">No pending deliveries</td></tr>';
+    }
+
+    function showDispatchModal(orderId) {
+      const globalOrders = DataManager.getAllOrders();
+      const order = globalOrders.find(o => o.id === orderId);
+      if (!order) return;
+
+      const body = document.getElementById('modal-body');
+      body.innerHTML = `
+        <div class="receipt">
+          <h1>Order #${order.id.slice(-8)}</h1>
+          <div class="receipt-info">
+            <p><strong>Customer:</strong> ${order.customerName}</p>
+            <p><strong>Phone:</strong> ${order.customerPhone}</p>
+            <p><strong>Location:</strong> ${order.deliveryLocation}</p>
+          </div>
+          <button class="action-btn dispatch" style="width:100%; padding:14px;" onclick="dispatchOrder('${orderId}')">Confirm Dispatch</button>
         </div>
-      ` : ''}
+      `;
+      document.getElementById('details-modal').style.display = 'flex';
+    }
 
-      <div class="receipt-total">
-        ${order.paymentMethod === 'Pay After Delivery' ? 
-          `<div style="font-size:0.8em; color:#16a34a;">Delivery Fee (KES ${config.deliveryFee}): PAID UPFRONT</div>
-           COLLECT ON DELIVERY: KES ${(order.grandTotal || order.totalPrice || 0).toLocaleString()}` : 
-          `Total: KES ${(order.grandTotal || order.totalPrice || 0).toLocaleString()}`
+    function dispatchOrder(id) {
+      if (DataManager.updateOrderStatus(id, 'out_for_delivery').success) {
+        closeModal();
+        renderDeliveryData();
+      }
+    }
+
+    function completeDelivery(id) {
+      if (confirm("Mark order as delivered?")) {
+        if (DataManager.updateOrderStatus(id, 'delivered').success) renderDeliveryData();
+      }
+    }
+
+    function initScanner() {
+      const html5QrCode = new Html5Qrcode("reader");
+      html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (decodedText) => {
+        document.getElementById('result').innerText = "Scanned: " + decodedText;
+        if (DataManager.updateOrderStatus(decodedText, 'delivered').success) {
+          alert("Delivery confirmed via scan!");
+          renderDeliveryData();
         }
-      </div>
-      <button class="dispatch-confirm-btn" 
-              onclick="updateStatus('${order.id}', 'Out for Delivery')"
-              ${!allAssigned ? 'disabled style="background:#bdc3c7; cursor:not-allowed;"' : ''}>
-        <i class="fas fa-truck"></i> Confirm Dispatch & Start Delivery
-      </button>
-    </div>
-  `;
-  document.getElementById('details-modal').style.display = 'flex';
-}
+      }).catch(err => console.warn(err));
+    }
 
-function closeModal() {
-  document.getElementById('details-modal').style.display = 'none';
-}
-
-// Close on background click
-window.onclick = function(event) {
-  const modal = document.getElementById('details-modal');
-  if (event.target == modal) closeModal();
-}
-
-function onScanSuccess(decodedText) {
-  const resultDiv = document.getElementById("result");
-  const orders = DataManager.getScopedData('delivery_orders', [], viewUserEmail);
-  
-  // Try to find the order in the delivery person's assigned list
-  // Handle both with and without '#' prefix
-  const dOrder = orders.find(o => o.id === decodedText || o.id === '#' + decodedText);
-  
-  if (!dOrder) {
-    resultDiv.innerText = "Error: QR Code (" + decodedText + ") does not match any assigned order!";
-    resultDiv.style.color = "red";
-    alert("Error: Scanned QR code does not match the receipt details for your assigned orders.");
-    return;
-  }
-
-  // If found, update status
-  const result = DataManager.updateOrderStatus(dOrder.id, 'completed');
-  if (result.success) {
-    resultDiv.innerText = "Success: Order " + dOrder.id + " confirmed and marked as completed!";
-    resultDiv.style.color = "green";
-    renderDeliveryData();
-    alert("Order " + dOrder.id + " marked as completed via scan!");
-  } else {
-    resultDiv.innerText = "Error: Failed to update order status.";
-    resultDiv.style.color = "red";
-    alert("Failed to update order status. Please try again.");
-  }
-}
-
-function onScanError(error) {
-  // console.warn(error);
-}
-
-let html5QrcodeScanner = new Html5QrcodeScanner(
-  "reader", { fps: 10, qrbox: 250 }
-);
-html5QrcodeScanner.render(onScanSuccess, onScanError);
+    init();
 </script>
-
 </body>
 </html>

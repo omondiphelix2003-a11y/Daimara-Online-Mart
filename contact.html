@@ -157,14 +157,14 @@ body {
 
 .contact-container h1 {
   font-size: 25px;
-  color: #2d5c8b;
+  color: var(--primary);
   margin-bottom: 15px;
   font-weight: 700;
 }
 
 .contact-container > p {
   font-size: 18px;
-  color: #7f8c8d;
+  color: #94a3b8;
   margin-bottom: 40px;
 }
 
@@ -176,10 +176,11 @@ body {
 
 /* FORM */
 #contact-form {
-  background: white;
+  background: var(--card);
   padding: 30px;
-  border-radius: 4px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
 }
 
 #contact-form input,
@@ -188,7 +189,9 @@ body {
   padding: 12px;
   margin-bottom: 15px;
   border-radius: 4px;
-  border: 1px solid #bdc3c7;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
   font-family: inherit;
   font-size: 16px;
   transition: all 0.3s ease;
@@ -197,8 +200,8 @@ body {
 #contact-form input:focus,
 #contact-form textarea:focus {
   outline: none;
-  border-color: rgb(233, 157, 17);
-  box-shadow: 0 0 5px rgba(233, 157, 17, 0.3);
+  border-color: var(--primary);
+  box-shadow: 0 0 5px rgba(59, 130, 246, 0.3);
 }
 
 #contact-form textarea {
@@ -209,7 +212,7 @@ body {
 #contact-form button {
   width: 100%;
   padding: 14px;
-  background: linear-gradient(135deg, rgb(233, 157, 17) 0%, #e67e22 100%);
+  background: var(--primary);
   color: white;
   border: none;
   border-radius: 4px;
@@ -221,32 +224,33 @@ body {
 
 #contact-form button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(233, 157, 17, 0.3);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 /* CONTACT INFO */
 .contact-info {
-  background: white;
+  background: var(--card);
   padding: 30px;
-  border-radius: 4px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
 }
 
 .contact-info h3 {
-  color: #2c3e50;
+  color: var(--text);
   margin-bottom: 20px;
   font-size: 22px;
 }
 
 .contact-info p {
-  color: #555;
+  color: #94a3b8;
   margin-bottom: 12px;
   font-size: 16px;
   line-height: 1.8;
 }
 
 .contact-info strong {
-  color: rgb(233, 157, 17);
+  color: var(--primary);
 }
 
 .social-links {

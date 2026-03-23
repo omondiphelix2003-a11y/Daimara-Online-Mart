@@ -281,16 +281,16 @@
           height: auto;
           max-height: calc(100vh - 64px);
           overflow-y: auto;
-          background: white !important;
+          background: #1e293b !important;
           flex-direction: column;
           padding: 20px;
           z-index: 2000;
           transition: 0.3s;
-          border-right: 1px solid #ddd;
-          border-bottom: 1px solid #ddd;
+          border-right: 1px solid #334155;
+          border-bottom: 1px solid #334155;
           justify-content: flex-start;
           gap: 10px;
-          box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+          box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
         .nav-links.active {
           display: flex !important;
@@ -298,9 +298,9 @@
         .nav-links a {
           width: 100%;
           padding: 12px;
-          border-bottom: 1px solid #eee;
+          border-bottom: 1px solid #334155;
           text-align: left;
-          color: black !important;
+          color: white !important;
           font-weight: 600;
           font-size: 14px;
         }
@@ -367,7 +367,7 @@
     </style>
 <base target="_self">
 </head>
-<body class="min-h-screen flex overflow-x-auto">
+<body class="min-h-screen flex overflow-x-hidden">
 
     <!-- Sidebar -->
     <aside class="w-64 bg-slate-900 border-r border-slate-700 flex flex-col z-20">
@@ -803,7 +803,7 @@
                     </div>
                 </div>
                 
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                     <div class="admin-card rounded-xl p-4 text-center">
                         <p class="text-slate-400 text-sm">Total Items</p>
                         <h4 id="warehouseTotal" class="text-2xl font-bold text-white mt-1">0</h4>

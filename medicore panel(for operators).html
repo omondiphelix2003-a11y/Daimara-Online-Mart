@@ -299,7 +299,7 @@
         /* MOBILE NAV STYLES */
         .nav-toggle {
           display: none;
-          background: transparent;
+          background: #1e293b;
           color: white;
           border: 1px solid var(--glass-border);
           padding: 8px 12px;
@@ -311,9 +311,11 @@
           justify-content: center;
           font-size: 20px;
         }
-        .nav-toggle:hover {
-          background: var(--glass);
-          border-color: #3b82f6;
+        
+        @media (max-width: 1024px) {
+            .nav-toggle {
+                display: flex !important;
+            }
         }
 
         .nav-links {
@@ -378,13 +380,17 @@
             aside {
                 position: fixed;
                 left: -256px;
+                top: 0;
+                bottom: 0;
                 transition: left 0.3s ease;
+                z-index: 100;
             }
             aside.open {
                 left: 0;
             }
-            .nav-toggle {
-                display: flex !important;
+            main {
+                margin-left: 0 !important;
+                width: 100% !important;
             }
         }
 
@@ -894,7 +900,7 @@
                     </div>
                 </div>
                 
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                     <div class="admin-card rounded-xl p-4 text-center">
                         <p class="text-slate-400 text-sm">Total Items</p>
                         <h4 id="warehouseTotal" class="text-2xl font-bold text-white mt-1">0</h4>
@@ -1450,6 +1456,10 @@
                 { id: 'W-103', name: 'Loratadine 10mg', type: 'Tablet', price: 350, stock: 250, image: 'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=300&q=80' }
             ]
         };
+
+        function toggleNav() {
+            document.querySelector('aside').classList.toggle('open');
+        }
 
         let currentSection = 'dashboard';
         let selectedConversation = null;

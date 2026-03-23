@@ -178,13 +178,11 @@ body {
   max-width: 1000px;
   margin: 50px auto;
   padding: 40px 20px;
-  background: white;
-  border-radius: 2px;
-   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-     margin-top: 15%;
-
-  
+  background: var(--card);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  margin-top: 100px;
 }
 
 .about-text {
@@ -193,14 +191,14 @@ body {
 
 .about-text h2 {
   margin-bottom: 15px;
-  color: #2c3e50;
+  color: var(--primary);
   font-size: 25px;
   font-weight: bold;
 }
 
 .about-text p {
   margin-bottom: 20px;
-  color: #555;
+  color: #94a3b8;
   line-height: 1.8;
   font-size: 16px;
 }
@@ -211,48 +209,45 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 25px;
   margin-top: 40px;
-  color: black;
-  
 }
 
 .stat {
-  background: linear-gradient(135deg, rgb(233, 157, 17) 0%, #e67e22 100%);
+  background: var(--card);
   padding: 30px;
   border-radius: 10px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.938);
+  box-shadow: var(--shadow);
   text-align: center;
-  transition: all 0.6s ease;
-  color: rgb(0, 0, 0); 
-  
+  transition: all 0.3s ease;
+  border: 1px solid var(--border);
+  border-bottom: 4px solid var(--primary);
 }
 
 .stat:hover {
-  transform: translateY(5px);
-  border-top: 6px solid rgb(233, 157, 17);
-  background-color: #f9f9f9;
+  transform: translateY(-5px);
+  background-color: var(--bg);
 }
 
 .stat h3 {
   font-size: 32px;
   margin-bottom: 10px;
-  color: #2c3e50;
+  color: var(--text);
 }
 
 .stat p {
-  color: white;
+  color: #94a3b8;
   font-size: 18px;
 }
 
 /* WHY US */
 .why-us {
   padding: 60px 20px;
-  background: white;
+  background: var(--bg);
   text-align: center;
 }
 
 .why-us h2 {
   font-size: 33px;
-  color: #2c3e50;
+  color: var(--text);
   margin-bottom: 40px;
   position: relative;
   display: inline-block;
@@ -262,11 +257,11 @@ body {
   content: '';
   position: absolute;
   bottom: -10px;
-  left: 36%;
-  transform: translateY(-50%);
+  left: 50%;
+  transform: translateX(-50%);
   width: 100px;
   height: 4px;
-  background: rgb(233, 157, 17);
+  background: var(--primary);
   border-radius: 2px;
 }
 
@@ -280,30 +275,30 @@ body {
 }
 
 .why-card {
-  background: #f9f9f9;
+  background: var(--card);
   padding: 30px;
   border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow);
   transition: all 0.3s ease;
+  border: 1px solid var(--border);
 }
 
 .why-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  border-top: 4px solid rgb(233, 157, 17);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  border-top: 4px solid var(--primary);
 }
 
 .why-card h3 {
-  color: rgb(233, 157, 17);
+  color: var(--primary);
   margin-bottom: 15px;
   font-size: 20px;
 }
 
 .why-card p {
-  color: #666;
-  font-size: 18px;
+  color: #94a3b8;
+  font-size: 16px;
   line-height: 1.6;
-  font-weight: none;
 }
 
 /* FOOTER */

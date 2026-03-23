@@ -17,21 +17,21 @@
       --border: #334155;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-    body { background: var(--bg); color: var(--text); min-height: 100vh; padding: 20px; overflow-x: hidden; width: 100%; margin: 0; }
-    .container { width: 100%; max-width: 800px; margin: 0 auto; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; padding: 16px; overflow-x: hidden; width: 100%; margin: 0; }
+    .container { width: 100%; max-width: 600px; margin: 0 auto; }
     
-    /* Horizontal scrolling for wide content */
-    .logs-card, .modal-content, #withdrawal-requests { 
-      max-width: 100%; 
-      overflow-x: auto; 
-      -webkit-overflow-scrolling: touch; 
-    }
-    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
     .agent-info { background: var(--card); padding: 20px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 20px; }
-    .balance-card { background: linear-gradient(135deg, #1e40af, #3b82f6); padding: 30px; border-radius: 16px; text-align: center; margin-bottom: 30px; }
-    .balance-amount { font-size: 36px; font-weight: 800; margin: 10px 0; }
+    .balance-card { background: linear-gradient(135deg, #1e40af, #3b82f6); padding: 30px; border-radius: 16px; text-align: center; margin-bottom: 24px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+    .balance-amount { font-size: clamp(28px, 8vw, 36px); font-weight: 800; margin: 10px 0; }
     
-    .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+    .actions-grid { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
+      gap: 16px; 
+      margin-bottom: 24px; 
+    }
+    
     .action-btn { 
       position: relative;
       background: var(--card); 
@@ -44,10 +44,10 @@
       flex-direction: column; 
       align-items: center; 
       gap: 10px; 
-      transition: 0.3s; 
+      transition: all 0.2s; 
       width: 100%;
     }
-    .action-btn:hover { background: #334155; transform: translateY(-2px); }
+    .action-btn:hover { background: #334155; transform: translateY(-2px); border-color: var(--primary); }
     .action-btn i { font-size: 24px; color: var(--primary); }
 
     .notif-badge {
@@ -57,10 +57,10 @@
       background: var(--danger);
       color: white;
       font-size: 10px;
-      min-width: 18px;
-      height: 18px;
-      padding: 2px 5px;
-      border-radius: 10px;
+      min-width: 20px;
+      height: 20px;
+      padding: 2px;
+      border-radius: 50%;
       border: 2px solid var(--bg);
       font-weight: bold;
       display: none;
@@ -69,83 +69,84 @@
       z-index: 10;
     }
 
-    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; }
-    .modal-content { background: var(--card); padding: 30px; border-radius: 16px; width: 90%; max-width: 400px; border: 1px solid var(--border); }
-    input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid var(--border); background: #0f172a; color: white; }
-    button.submit-btn { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+    .modal-content { background: var(--card); padding: 24px; border-radius: 20px; width: 100%; max-width: 400px; border: 1px solid var(--border); max-height: 90vh; overflow-y: auto; }
     
-    .logs-card { background: var(--card); padding: 20px; border-radius: 16px; border: 1px solid var(--border); }
-    .log-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
-    .log-type { font-weight: 600; }
-    .log-amount-credit { color: var(--success); }
-    .log-amount-debit { color: var(--danger); }
-
-    @media (max-width: 480px) {
-      .agent-info { padding: 15px; }
-      .agent-info > div { flex-direction: column; gap: 10px; }
-      .agent-info h3 { font-size: 16px; }
-      .balance-amount { font-size: 28px; }
-      .actions-grid { grid-template-columns: 1fr; }
+    input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 12px; border: 1px solid var(--border); background: #0f172a; color: white; font-size: 16px; }
+    input:focus { border-color: var(--primary); outline: none; }
+    
+    button.submit-btn { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; }
+    
+    .logs-card { background: var(--card); padding: 20px; border-radius: 16px; border: 1px solid var(--border); margin-top: 20px; }
+    
+    /* Transaction Item Styles (Mobile Optimized) */
+    .tx-item {
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
     }
-
-    @media (orientation: landscape) and (max-height: 500px) {
-      .balance-card { padding: 15px; }
-      .action-btn { padding: 10px; flex-direction: row; }
-      .action-btn i { font-size: 18px; }
+    .tx-item:last-child { border-bottom: none; }
+    
+    @media (max-width: 400px) {
+      .actions-grid { grid-template-columns: 1fr; }
+      body { padding: 12px; }
     }
   </style>
 </head>
 <body data-manual-sync="true">
   <div class="container">
     <header>
-      <h1>Agent Portal</h1>
-      <button onclick="location.href='index.html'" style="background:none; border:none; color:var(--muted); cursor:pointer;"><i class="fas fa-sign-out-alt"></i> Exit Portal</button>
+      <h1 style="font-size: 24px;">Agent Portal</h1>
+      <button onclick="location.href='index.html'" style="background:none; border:none; color:var(--muted); cursor:pointer; font-size: 14px;"><i class="fas fa-sign-out-alt"></i> Exit</button>
     </header>
 
     <div class="agent-info">
-      <div style="display:flex; justify-content:space-between;">
+      <div style="display:flex; justify-content:space-between; align-items: center;">
         <div>
-          <p style="color:var(--muted); font-size:12px;">AGENT NAME</p>
-          <h3 id="display-biz-name">Loading...</h3>
+          <p style="color:var(--muted); font-size:11px; font-weight: 600; text-transform: uppercase;">Agent Name</p>
+          <h3 id="display-biz-name" style="font-size: 18px;">Loading...</h3>
         </div>
         <div style="text-align:right;">
-          <p style="color:var(--muted); font-size:12px;">AGENT NUMBER</p>
-          <h3 id="display-agent-no" style="color:var(--primary);">...</h3>
+          <p style="color:var(--muted); font-size:11px; font-weight: 600; text-transform: uppercase;">Agent No.</p>
+          <h3 id="display-agent-no" style="color:var(--primary); font-size: 18px;">...</h3>
         </div>
       </div>
     </div>
 
     <div class="balance-card">
-      <p style="opacity:0.8;">Available Float Balance</p>
+      <p style="opacity:0.9; font-size: 14px;">Available Float Balance</p>
       <div class="balance-amount">KSH <span id="float-balance">0.00</span></div>
-      <p style="font-size:12px; opacity:0.6;">Daimara Stores Verified Agent</p>
+      <p style="font-size:11px; opacity:0.7;">Daimara Stores Verified Agent</p>
     </div>
 
     <div class="actions-grid">
       <button class="action-btn" onclick="openAction('deposit')">
         <i class="fas fa-hand-holding-usd"></i>
-        <span>Process Deposit</span>
+        <span>Deposit</span>
       </button>
       <button class="action-btn" onclick="openAction('withdraw')">
         <div class="notif-badge" id="withdrawal-badge">0</div>
         <i class="fas fa-money-bill-wave"></i>
-        <span>Process Withdrawal</span>
+        <span>Withdraw</span>
       </button>
       <button class="action-btn" onclick="openAction('transfer')">
         <i class="fas fa-exchange-alt"></i>
-        <span>Transfer to Vault</span>
+        <span>To Vault</span>
       </button>
       <button class="action-btn" onclick="openAction('logs')">
         <div class="notif-badge" id="logs-badge">0</div>
         <i class="fas fa-history"></i>
-        <span>Track Transactions</span>
+        <span>History</span>
       </button>
     </div>
 
-    <div class="logs-card" id="logs-section" style="display:none; max-width: 100%; overflow-x: auto;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-        <h3>Track Transactions</h3>
-        <button onclick="document.getElementById('logs-section').style.display='none'" style="background:none; border:none; color:var(--muted); cursor:pointer;">&times;</button>
+    <div class="logs-card" id="logs-section" style="display:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h3 style="font-size: 18px;">Transaction History</h3>
+        <button onclick="document.getElementById('logs-section').style.display='none'" style="background:none; border:none; color:var(--muted); cursor:pointer; font-size: 20px;">&times;</button>
       </div>
       <div id="logs-list"></div>
     </div>
@@ -154,15 +155,16 @@
   <!-- ACTION MODAL -->
   <div id="action-modal" class="modal">
     <div class="modal-content">
-      <h2 id="modal-title" style="margin-bottom:20px;">Action</h2>
+      <h2 id="modal-title" style="margin-bottom:20px; font-size: 20px;">Action</h2>
       <form onsubmit="handleAction(event)">
-        <input type="password" id="auth-pin" required maxlength="4" placeholder="Enter Agent PIN to Confirm" style="text-align:center; letter-spacing:0.5em; border: 2px solid var(--primary); background: rgba(59, 130, 246, 0.1);">
+        <label style="font-size: 12px; color: var(--muted); display: block; margin-bottom: 4px;">Security PIN</label>
+        <input type="password" id="auth-pin" required maxlength="4" placeholder="Enter 4-Digit PIN" style="text-align:center; letter-spacing:0.5em; border: 2px solid var(--primary); background: rgba(59, 130, 246, 0.1); font-weight: bold;">
         <div id="modal-fields"></div>
-        <div style="text-align: right; margin-bottom: 10px;">
-          <a href="#" onclick="openForgotPin()" style="color: var(--primary); font-size: 12px; text-decoration: none;">Forgot PIN?</a>
+        <div style="text-align: right; margin: 12px 0;">
+          <a href="#" onclick="openForgotPin()" style="color: var(--primary); font-size: 13px; text-decoration: none;">Forgot PIN?</a>
         </div>
-        <button type="submit" class="submit-btn">Confirm Transaction</button>
-        <button type="button" onclick="closeModal()" style="width:100%; background:none; color:var(--muted); border:none; margin-top:10px; cursor:pointer;">Cancel</button>
+        <button type="submit" class="submit-btn">Confirm</button>
+        <button type="button" onclick="closeModal()" style="width:100%; background:none; color:var(--muted); border:none; margin-top:12px; cursor:pointer; font-size: 14px;">Cancel</button>
       </form>
     </div>
   </div>
@@ -170,13 +172,13 @@
   <!-- FORGOT PIN MODAL -->
   <div id="forgot-pin-modal" class="modal">
     <div class="modal-content">
-      <h2>Reset Portal PIN</h2>
-      <p style="color:var(--muted); font-size:12px; margin-bottom:15px;">Enter your ID number used during registration to set a new PIN.</p>
+      <h2 style="font-size: 20px; margin-bottom: 8px;">Reset Portal PIN</h2>
+      <p style="color:var(--muted); font-size:13px; margin-bottom:20px;">Enter your ID number to set a new PIN.</p>
       <form onsubmit="handleResetPin(event)">
         <input type="text" id="reset-id-num" required placeholder="Registration ID Number">
-        <input type="password" id="new-pin" required maxlength="4" placeholder="Enter New 4-Digit PIN" style="text-align:center; letter-spacing:0.5em;">
+        <input type="password" id="new-pin" required maxlength="4" placeholder="New 4-Digit PIN" style="text-align:center; letter-spacing:0.5em;">
         <button type="submit" class="submit-btn">Reset PIN</button>
-        <button type="button" onclick="closeForgotModal()" style="width:100%; background:none; color:var(--muted); border:none; margin-top:10px; cursor:pointer;">Cancel</button>
+        <button type="button" onclick="closeForgotModal()" style="width:100%; background:none; color:var(--muted); border:none; margin-top:12px; cursor:pointer; font-size: 14px;">Cancel</button>
       </form>
     </div>
   </div>
@@ -189,40 +191,24 @@
     function init() {
       const user = DataManager.getCurrentUser();
       if (!user) { location.href = 'index.html'; return; }
-
       agentData = DataManager.getAgentByUserId(user.id);
-
       if (!agentData || agentData.status !== 'approved') {
-        alert("Unauthorized. Access denied.");
+        alert("Unauthorized access.");
         location.href = 'index.html';
         return;
       }
-
-      document.getElementById('display-biz-name').innerText = agentData.businessName || agentData.details?.company || "Agent";
+      document.getElementById('display-biz-name').innerText = agentData.businessName || "Agent";
       document.getElementById('display-agent-no').innerText = agentData.agentNumber;
-      
       refreshBalance();
       updateWithdrawalBadge();
       updateLogBadge();
-
-      // Listen for data updates (cross-tab sync)
-      window.addEventListener('dataUpdated', () => {
-        refreshBalance();
-        updateWithdrawalBadge();
-        updateLogBadge();
-        if (document.getElementById('logs-section').style.display === 'block') {
-          renderLogs();
-        }
-      });
 
       window.addEventListener('storage', (e) => {
         if (e.key === 'daimara_sync_timestamp' || e.key.includes('ecommerce_')) {
           refreshBalance();
           updateWithdrawalBadge();
           updateLogBadge();
-          if (document.getElementById('logs-section').style.display === 'block') {
-            renderLogs();
-          }
+          if (document.getElementById('logs-section').style.display === 'block') renderLogs();
         }
       });
     }
@@ -230,50 +216,28 @@
     function refreshBalance() {
       const balance = DataManager.getAgentFloat(agentData.agentNumber);
       document.getElementById('float-balance').innerText = balance.toLocaleString(undefined, {minimumFractionDigits:2});
-      // Also update logs if visible
-      if (document.getElementById('logs-section').style.display === 'block') {
-        renderLogs();
-      }
     }
 
     function updateWithdrawalBadge() {
       const reqs = DataManager.getWithdrawalRequests(agentData.agentNumber).filter(r => r.status === 'pending');
       const badge = document.getElementById('withdrawal-badge');
-      
-      // Get last viewed timestamp for withdrawals
       const lastViewed = localStorage.getItem(`agent_last_viewed_withdrawals_${agentData.agentNumber}`) || 0;
       const newReqs = reqs.filter(r => new Date(r.timestamp).getTime() > parseInt(lastViewed));
-
-      if (newReqs.length > 0) {
-        badge.innerText = newReqs.length;
-        badge.style.display = 'flex';
-      } else {
-        badge.style.display = 'none';
-      }
+      if (newReqs.length > 0) { badge.innerText = newReqs.length; badge.style.display = 'flex'; }
+      else { badge.style.display = 'none'; }
     }
 
     function updateLogBadge() {
       const allLogs = DataManager.getAgentTransactions(agentData.agentNumber);
       const badge = document.getElementById('logs-badge');
-      
       const lastViewed = localStorage.getItem(`agent_last_viewed_logs_${agentData.agentNumber}`) || 0;
       const newLogs = allLogs.filter(l => new Date(l.timestamp).getTime() > parseInt(lastViewed));
-
-      if (newLogs.length > 0) {
-        badge.innerText = newLogs.length;
-        badge.style.display = 'flex';
-      } else {
-        badge.style.display = 'none';
-      }
+      if (newLogs.length > 0) { badge.innerText = newLogs.length; badge.style.display = 'flex'; }
+      else { badge.style.display = 'none'; }
     }
 
     function openAction(type) {
       currentAction = type;
-      const modal = document.getElementById('action-modal');
-      const title = document.getElementById('modal-title');
-      const fields = document.getElementById('modal-fields');
-      fields.innerHTML = '';
-      
       if (type === 'logs') {
         localStorage.setItem(`agent_last_viewed_logs_${agentData.agentNumber}`, Date.now().toString());
         updateLogBadge();
@@ -281,14 +245,14 @@
         document.getElementById('logs-section').style.display = 'block';
         return;
       }
-
       if (type === 'withdraw') {
-        // Clear badge when opening withdrawal section
         localStorage.setItem(`agent_last_viewed_withdrawals_${agentData.agentNumber}`, Date.now().toString());
         updateWithdrawalBadge();
       }
-
-      modal.style.display = 'flex';
+      document.getElementById('action-modal').style.display = 'flex';
+      const fields = document.getElementById('modal-fields');
+      const title = document.getElementById('modal-title');
+      fields.innerHTML = '';
       
       if (type === 'deposit') {
         title.innerText = 'Process Deposit';
@@ -299,229 +263,124 @@
       } else if (type === 'withdraw') {
         title.innerText = 'Process Withdrawal';
         fields.innerHTML = `
-          <p style="font-size:12px; color:var(--muted); margin-bottom:10px;">Enter Agent PIN above first, then click Accept on a request.</p>
-          <div id="withdrawal-requests" style="max-height:200px; overflow-y:auto; margin-bottom:10px;"></div>
+          <p style="font-size:12px; color:var(--muted); margin: 10px 0;">Accept a pending request below:</p>
+          <div id="withdrawal-requests"></div>
         `;
         renderWithdrawalRequests();
       } else if (type === 'transfer') {
-        title.innerText = 'Transfer to VaultPro';
+        title.innerText = 'To VaultPro';
         fields.innerHTML = `
           <input type="number" id="tx-amount" required placeholder="Amount to Transfer">
-          <p style="font-size:12px; color:var(--muted);">Transfer float funds back to your VaultPro account</p>
+          <p style="font-size:12px; color:var(--muted); text-align:center;">Funds will move to your main Vault account</p>
         `;
       }
     }
 
-    function closeModal() {
-      document.getElementById('action-modal').style.display = 'none';
-    }
-
-    function openForgotPin() {
-      closeModal();
-      document.getElementById('forgot-pin-modal').style.display = 'flex';
-    }
-
-    function closeForgotModal() {
-      document.getElementById('forgot-pin-modal').style.display = 'none';
-    }
+    function closeModal() { document.getElementById('action-modal').style.display = 'none'; }
+    function openForgotPin() { closeModal(); document.getElementById('forgot-pin-modal').style.display = 'flex'; }
+    function closeForgotModal() { document.getElementById('forgot-pin-modal').style.display = 'none'; }
 
     function handleResetPin(e) {
       e.preventDefault();
       const idNum = document.getElementById('reset-id-num').value.trim();
       const newPin = document.getElementById('new-pin').value;
-      
       if (newPin.length !== 4) { alert("PIN must be 4 digits"); return; }
-
       const res = DataManager.resetAgentPin(agentData.agentNumber, idNum, newPin);
       if (res.success) {
-        alert("PIN Reset Successful! You can now use your new PIN.");
-        // Reload agent data to get new pin
-        const user = DataManager.getCurrentUser();
-        agentData = DataManager.getAgentByUserId(user.id);
+        alert("PIN Reset Successful!");
+        agentData = DataManager.getAgentByUserId(DataManager.getCurrentUser().id);
         closeForgotModal();
-      } else {
-        alert("Error: " + res.message);
-      }
+      } else { alert("Error: " + res.message); }
     }
 
     function handleAction(e) {
       e.preventDefault();
       const pin = document.getElementById('auth-pin').value;
       const agentPin = agentData.pin || agentData.details?.pin || '1234'; 
-      if (pin !== agentPin) {
-        alert("Incorrect Portal PIN!");
-        return;
-      }
-
+      if (pin !== agentPin) { alert("Incorrect PIN!"); return; }
       const currentFloat = DataManager.getAgentFloat(agentData.agentNumber);
 
       if (currentAction === 'deposit') {
         const phone = document.getElementById('client-phone').value;
         const amount = parseFloat(document.getElementById('tx-amount').value);
-
         if (isNaN(amount) || amount <= 0) { alert("Invalid amount!"); return; }
-        
-        if (currentFloat <= 0) { alert("Float balance is zero! Deposit cannot be processed."); return; }
-        if (currentFloat < amount) { alert("Insufficient float balance to process this deposit!"); return; }
-
-        // Logic: Agent Float Decr, Client VaultPro Incr
-        const users = DataManager.getAllUsers() || [];
-        const client = users.find(u => u.phone === phone);
-        if (!client) { alert("Client phone number not registered!"); return; }
-
-        // Update Client Vault
+        if (currentFloat < amount) { alert("Insufficient float!"); return; }
+        const client = (DataManager.getAllUsers() || []).find(u => u.phone === phone);
+        if (!client) { alert("Client not found!"); return; }
         DataManager.updateVaultBalance(client.id, amount, `Deposit via Agent ${agentData.agentNumber}`);
-
-        // Update Agent Float
         DataManager.updateAgentFloat(agentData.agentNumber, -amount, `Deposit to ${phone}`);
-        
-        alert("Deposit processed successfully!");
-
+        alert("Deposit successful!");
+        closeModal();
       } else if (currentAction === 'transfer') {
         const amount = parseFloat(document.getElementById('tx-amount').value);
         if (isNaN(amount) || amount <= 0) { alert("Invalid amount!"); return; }
-        
-        if (currentFloat <= 0) { alert("Float balance is zero! Transfer cannot be processed."); return; }
-        if (currentFloat < amount) { alert("Insufficient float balance to process this transfer!"); return; }
-
-        // Logic: Agent Float Decr, Agent's own VaultPro Incr
-        DataManager.updateVaultBalance(agentData.userId, amount, `Float Transfer from Agent Portal`);
-        DataManager.updateAgentFloat(agentData.agentNumber, -amount, `Transfer to VaultPro`);
-
-        alert("Transfer completed!");
+        if (currentFloat < amount) { alert("Insufficient float!"); return; }
+        DataManager.updateVaultBalance(agentData.userId, amount, `Float Transfer Back`);
+        DataManager.updateAgentFloat(agentData.agentNumber, -amount, `Transfer to Vault`);
+        alert("Transfer successful!");
+        closeModal();
       }
-
       refreshBalance();
-      closeModal();
     }
 
     function renderWithdrawalRequests() {
       const container = document.getElementById('withdrawal-requests');
       const reqs = DataManager.getWithdrawalRequests(agentData.agentNumber).filter(r => r.status === 'pending');
-      
       if (reqs.length === 0) {
-        container.innerHTML = '<p style="text-align:center; padding:10px; color:var(--muted);">No pending requests found.</p>';
+        container.innerHTML = '<p style="text-align:center; padding:20px; color:var(--muted); font-size:13px;">No pending requests</p>';
       } else {
         container.innerHTML = reqs.map(r => `
-          <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:12px; margin-bottom:10px; border:1px solid var(--border);">
-            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-              <span>${r.clientName}<br><small style="color:var(--muted);">${r.clientPhone}</small></span>
+          <div style="background:rgba(255,255,255,0.05); padding:16px; border-radius:12px; margin-bottom:12px; border:1px solid var(--border);">
+            <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
+              <span><strong>${r.clientName}</strong><br><small style="color:var(--muted);">${r.clientPhone}</small></span>
               <span style="font-weight:bold; color:var(--primary);">KSH ${r.amount.toLocaleString()}</span>
             </div>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-              <button onclick="handleWithdrawalRequest('${r.id}', 'accepted')" style="padding:8px; background:var(--success); color:white; border:none; border-radius:6px; cursor:pointer;">Accept</button>
-              <button onclick="handleWithdrawalRequest('${r.id}', 'declined')" style="padding:8px; background:var(--danger); color:white; border:none; border-radius:6px; cursor:pointer;">Decline</button>
+              <button onclick="handleWithdrawalRequest('${r.id}', 'accepted')" style="padding:10px; background:var(--success); color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Accept</button>
+              <button onclick="handleWithdrawalRequest('${r.id}', 'declined')" style="padding:10px; background:var(--danger); color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">Decline</button>
             </div>
           </div>
         `).join('');
       }
-      
-      // Still keep manual input just in case
-      container.innerHTML += `
-        <div style="margin-top:20px; border-top:1px solid var(--border); padding-top:10px;">
-          <p style="font-size:11px; color:var(--muted); margin-bottom:5px;">Or process manual withdrawal:</p>
-          <input type="tel" id="withdraw-client-phone" placeholder="Enter Client Phone">
-          <input type="number" id="withdraw-amount" placeholder="Enter Requested Amount">
-          <button type="button" onclick="processManualWithdrawal()" style="width:100%; padding:8px; background:#334155; color:white; border:none; border-radius:4px; font-size:12px; cursor:pointer;">Process Manually</button>
-        </div>
-      `;
     }
 
     function handleWithdrawalRequest(reqId, status) {
-      // Use PIN from the modal instead of prompt
       const pin = document.getElementById('auth-pin').value;
       const agentPin = agentData.pin || agentData.details?.pin || '1234';
-      
-      if (!pin) {
-        alert("Please enter your Portal PIN in the input field above first!");
-        return;
-      }
-
-      if (pin !== agentPin) {
-        alert("Incorrect Portal PIN!");
-        return;
-      }
-
+      if (!pin) { alert("Enter your PIN above first!"); return; }
+      if (pin !== agentPin) { alert("Incorrect PIN!"); return; }
       const res = DataManager.updateWithdrawalStatus(reqId, status);
       if (res.success) {
-        alert(`Withdrawal ${status} successfully!`);
+        alert(`Withdrawal ${status}!`);
         refreshBalance();
         renderWithdrawalRequests();
         if (status === 'accepted') closeModal();
-      } else {
-        alert("Error: " + res.message);
-      }
-    }
-
-    function processManualWithdrawal() {
-      const pin = document.getElementById('auth-pin').value;
-      const agentPin = agentData.pin || agentData.details?.pin || '1234';
-      if (pin !== agentPin) { alert("Incorrect Portal PIN!"); return; }
-
-      const phone = document.getElementById('withdraw-client-phone').value;
-      const amount = parseFloat(document.getElementById('withdraw-amount').value);
-      
-      if (isNaN(amount) || amount <= 0) { alert("Invalid amount!"); return; }
-
-      const users = DataManager.getAllUsers() || [];
-      const client = users.find(u => u.phone === phone);
-      if (!client) { alert("Client not found!"); return; }
-
-      const clientBalance = DataManager.getVaultBalance(client.id);
-      if (clientBalance < amount) { alert("Client has insufficient funds in VaultPro!"); return; }
-
-      // Manual withdrawal:
-      // 1. Decrease client balance
-      DataManager.updateVaultBalance(client.id, -amount, `Manual Withdrawal via Agent ${agentData.agentNumber}`);
-      
-      // 2. Increase agent float
-      DataManager.updateAgentFloat(agentData.agentNumber, amount, `Manual Withdrawal for ${phone}`);
-
-      alert("Withdrawal processed! You can now give the client cash.");
-      refreshBalance();
-      closeModal();
+      } else { alert("Error: " + res.message); }
     }
 
     function renderLogs() {
-      // Get Float Transactions
-      const allLogs = DataManager.getAgentTransactions(agentData.agentNumber);
-      
+      const allLogs = DataManager.getAgentTransactions(agentData.agentNumber).reverse();
       const list = document.getElementById('logs-list');
-      
-      const header = `
-        <div style="display:grid; grid-template-columns: 1fr 2fr 1.5fr 1fr; gap: 10px; padding: 10px; border-bottom: 2px solid var(--border); font-size: 11px; font-weight: bold; color: var(--muted); text-transform: uppercase;">
-          <div>Type</div>
-          <div>Description</div>
-          <div>Date</div>
-          <div style="text-align: right;">Amount</div>
-        </div>
-      `;
-
-      list.innerHTML = header + (allLogs.map(l => {
-        const amount = parseFloat(l.amount || 0);
-        const isCredit = amount >= 0;
-        const color = isCredit ? 'var(--success)' : 'var(--danger)';
-        const bg = isCredit ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)';
-        
+      list.innerHTML = allLogs.map(l => {
+        const isCredit = parseFloat(l.amount) >= 0;
         return `
-        <div style="display:grid; grid-template-columns: 1fr 2fr 1.5fr 1fr; gap: 10px; padding: 12px 10px; border-bottom: 1px solid var(--border); font-size: 13px; align-items: center;">
-          <div style="display: flex; flex-direction: column; gap: 4px;">
-            <span style="display: inline-flex; width: 24px; height: 24px; border-radius: 6px; align-items: center; justify-content: center; background: ${bg}; color: ${color};">
-              <i class="fas ${isCredit ? 'fa-arrow-down' : 'fa-arrow-up'}" style="font-size: 10px;"></i>
-            </span>
+          <div class="tx-item">
+            <div style="display:flex; gap:12px; align-items:center;">
+              <div style="width:36px; height:36px; border-radius:10px; background:${isCredit ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)'}; color:${isCredit ? 'var(--success)' : 'var(--danger)'}; display:flex; align-items:center; justify-content:center;">
+                <i class="fas ${isCredit ? 'fa-arrow-down' : 'fa-arrow-up'}" style="font-size:14px;"></i>
+              </div>
+              <div>
+                <div style="font-size:14px; font-weight:600;">${l.description}</div>
+                <div style="font-size:11px; color:var(--muted);">${new Date(l.timestamp).toLocaleString([], {dateStyle:'short', timeStyle:'short'})}</div>
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-weight:bold; color:${isCredit ? 'var(--success)' : 'var(--danger)'};">${isCredit ? '+' : '-'}${Math.abs(l.amount).toLocaleString()}</div>
+              <div style="font-size:10px; color:var(--muted);">Bal: ${parseFloat(l.balance).toLocaleString()}</div>
+            </div>
           </div>
-          <div style="font-weight: 500;">
-            ${l.description}
-            <div style="font-size: 10px; color: var(--muted); margin-top: 2px;">BAL: KSH ${parseFloat(l.balance || 0).toLocaleString()}</div>
-          </div>
-          <div style="color: var(--muted); font-size: 11px;">
-            ${new Date(l.timestamp).toLocaleDateString()}<br>${new Date(l.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-          </div>
-          <div style="text-align: right; font-weight: bold; color: ${color};">
-            ${isCredit ? '+' : '-'}${Math.abs(amount).toLocaleString()}
-          </div>
-        </div>
-      `}).join('') || '<p style="text-align:center; padding:20px; color:var(--muted);">No transactions recorded yet.</p>');
+        `;
+      }).join('') || '<p style="text-align:center; padding:40px; color:var(--muted);">No transactions found</p>';
     }
 
     init();
