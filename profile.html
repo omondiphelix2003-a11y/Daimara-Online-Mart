@@ -1879,9 +1879,9 @@ function showTab(tabName, element) {
   const targetTab = document.getElementById(tabName);
   if (targetTab) {
     targetTab.classList.add("active");
-    // Scroll the clicked section into view
+    // Scroll to top
     setTimeout(() => {
-      targetTab.scrollIntoView({ behavior: "smooth", block: "start" });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }, 100);
   }
 

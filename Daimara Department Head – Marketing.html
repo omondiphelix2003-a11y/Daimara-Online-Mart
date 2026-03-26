@@ -227,6 +227,9 @@ function showTab(tabId, el) {
   document.getElementById(tabId).classList.add('active');
   document.querySelectorAll('.sidebar a').forEach(a => a.classList.remove('active'));
   el.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  const main = document.querySelector('.main');
+  if (main) main.scrollTop = 0;
   if (window.innerWidth <= 1024) toggleSidebar();
 }
 

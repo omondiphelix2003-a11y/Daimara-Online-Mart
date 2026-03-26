@@ -378,10 +378,12 @@
         <h2><i class="fas fa-shopping-bag"></i> DAIMARA</h2>
       </div>
       <nav class="nav-links">
+        <a href="index.html"><i class="fas fa-home"></i> Home</a>
         <a onclick="switchTab('dashboard')" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
         <a onclick="switchTab('orders')"><i class="fas fa-shopping-cart"></i> Orders</a>
         <a onclick="switchTab('warehouse')"><i class="fas fa-warehouse"></i> Warehouse</a>
         <a onclick="switchTab('profits')"><i class="fas fa-chart-line"></i> Profit/Loss</a>
+        <a href="client end money valt.html"><i class="fas fa-university"></i> VaultPro</a>
         <a id="agent-portal-link" style="display:none;"><i class="fas fa-user-tie"></i> Agent Portal</a>
         <a onclick="adminLogout()" style="color:var(--danger); margin-top: auto;"><i class="fas fa-sign-out-alt"></i> Logout</a>
       </nav>
@@ -492,6 +494,7 @@
         <div class="content-card">
           <div class="card-header">
             <h2 style="font-size: 18px;">Inventory Management</h2>
+            <button class="btn btn-primary" onclick="window.location.href='add-product.html'"><i class="fas fa-plus"></i> Add Product</button>
           </div>
           <div class="table-responsive">
             <table id="warehouse-table">
@@ -628,7 +631,10 @@
       
       document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
       const el = Array.from(document.querySelectorAll('.nav-links a')).find(a => a.textContent.toLowerCase().includes(tabId));
-      if (el) el.classList.add('active');
+      if (el) {
+        el.classList.add('active');
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
 
       const titles = {
         'dashboard': '<i class="fas fa-tachometer-alt"></i> Dashboard Overview',
@@ -638,6 +644,13 @@
       };
       document.getElementById('tab-title').innerHTML = titles[tabId];
       
+      // Bring content into view
+      setTimeout(() => {
+        const targetTab = document.getElementById(tabId + '-tab');
+        if (targetTab) {
+          targetTab.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
       loadTabData(tabId);
       if (window.innerWidth <= 1024) toggleSidebar();
     }

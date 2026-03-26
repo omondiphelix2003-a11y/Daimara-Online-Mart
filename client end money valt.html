@@ -235,7 +235,7 @@
             position: fixed;
             inset: 0;
             background: var(--darker);
-            z-index: 100;
+            z-index: 9999;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -608,7 +608,7 @@
     <div id="toast-container"></div>
 
     <script>
-        const app = {
+        window.app = {
             state: {
                 user: null,
                 balance: 0,
@@ -753,18 +753,18 @@
             },
 
             navigate(pageId) {
-                if (pageId === 'transactions') {
-                    localStorage.setItem(`vault_last_viewed_txs_${this.state.user.id}`, Date.now().toString());
-                    this.updateNotifBadge();
-                } else if (pageId === 'balance') {
-                    localStorage.setItem(`vault_last_viewed_balance_${this.state.user.id}`, Date.now().toString());
-                    this.updateNotifBadge();
+                console.log('Navigating to:', pageId);
+                
+                if (this.state.user) {
+                    if (pageId === 'transactions') {
+                        localStorage.setItem(`vault_last_viewed_txs_${this.state.user.id}`, Date.now().toString());
+                        this.updateNotifBadge();
+                    } else if (pageId === 'balance') {
+                        localStorage.setItem(`vault_last_viewed_balance_${this.state.user.id}`, Date.now().toString());
+                        this.updateNotifBadge();
+                    }
                 }
 
-                if (!this.state.isUnlocked && pageId !== 'balance') {
-                    // Optional: force unlock for other pages if needed
-                }
-                
                 document.querySelectorAll('.nav-item').forEach(el => {
                     if(el.dataset.page === pageId) {
                         el.classList.add('active');
@@ -775,16 +775,36 @@
                     }
                 });
 
-                document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
-                const target = document.getElementById(`view-${pageId}`);
-                target.classList.remove('hidden');
-                
-                target.classList.remove('animate-enter');
-                void target.offsetWidth;
-                target.classList.add('animate-enter');
+                document.querySelectorAll('.view-section').forEach(el => {
+                    el.classList.add('hidden');
+                    // Ensure flex/hidden compatibility
+                    el.style.display = 'none';
+                });
 
-                if (pageId === 'transactions') this.renderTransactions();
+                const target = document.getElementById(`view-${pageId}`);
+                if (target) {
+                    target.classList.remove('hidden');
+                    // Handle specific display types if needed
+                    if (pageId === 'transactions') {
+                        target.style.display = 'flex';
+                    } else {
+                        target.style.display = 'block';
+                    }
+                    
+                    target.classList.remove('animate-enter');
+                    void target.offsetWidth;
+                    target.classList.add('animate-enter');
+
+                    if (pageId === 'transactions') this.renderTransactions();
+                }
                 
+                // Auto scroll to top of content
+                const contentArea = document.getElementById('content-area');
+                if (contentArea) {
+                    contentArea.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
                 // Close sidebar on mobile
                 document.body.classList.remove('sidebar-active');
             },

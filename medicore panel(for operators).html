@@ -1833,9 +1833,13 @@
             if (target) {
                 target.style.display = 'block';
                 target.classList.remove('hidden');
-                // Scroll both content area and window to top
-                contentArea.scrollTop = 0;
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                // Scroll section into view
+                setTimeout(() => {
+                    const targetSection = document.getElementById(section);
+                    if (targetSection) {
+                        targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 100);
             }
             
             // Update sidebar
@@ -1844,7 +1848,10 @@
                 l.getAttribute('onclick')?.includes(`'${section}'`) || 
                 l.getAttribute('onclick')?.includes(`"${section}"`)
             );
-            if (activeLink) activeLink.classList.add('active');
+            if (activeLink) {
+                activeLink.classList.add('active');
+                activeLink.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
             
             // Update title
             const titles = {

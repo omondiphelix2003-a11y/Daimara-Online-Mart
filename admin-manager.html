@@ -36,6 +36,18 @@
     .nav-links a:hover { background: rgba(255, 255, 255, 0.05); color: #ffffff; }
     .nav-links a.active { background: var(--primary); color: #ffffff; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
     .nav-links i { width: 20px; font-size: 18px; }
+    .nav-badge {
+      background: var(--danger);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 10px;
+      margin-left: auto;
+      min-width: 18px;
+      text-align: center;
+      display: none;
+    }
     .sidebar-footer { padding: 20px; border-top: 1px solid var(--border); }
     .logout-btn { background: var(--danger); color: white; border: none; font-size: 15px; width: 100%; padding: 12px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 600; transition: 0.2s; }
     .logout-btn:hover { background: #e11d48; }
@@ -253,6 +265,7 @@
       <h2>DAIMARA ADMIN</h2>
     </div>
     <ul class="nav-links">
+      <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
       <li><a href="#" class="active" onclick="showTab('dashboard', this)"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
       <li><a href="#" onclick="showTab('orders', this)"><i class="fas fa-shopping-cart"></i> Orders</a></li>
       <li><a href="#" onclick="showTab('warehouse', this)"><i class="fas fa-warehouse"></i> Warehouse</a></li>
@@ -261,8 +274,8 @@
       <li><a href="#" onclick="showTab('profits', this)"><i class="fas fa-chart-line"></i> Profits & Loss</a></li>
       <li><a href="#" onclick="showTab('users', this)"><i class="fas fa-users"></i> User Signups</a></li>    
       <li><a href="#" onclick="showTab('transactions', this)"><i class="fas fa-money-check-alt"></i> M-Pesa Transactions</a></li>
-      <li><a href="#" onclick="showTab('page-reviews', this)"><i class="fas fa-id-card"></i> Page Reviews</a></li>
-      <li><a href="#" onclick="showTab('agent-reviews', this)"><i class="fas fa-user-tie"></i> Agent Portal Review</a></li>
+      <li><a href="#" onclick="showTab('page-reviews', this)"><i class="fas fa-id-card"></i> Page Reviews <span id="page-review-badge" class="nav-badge">0</span></a></li>
+      <li><a href="#" onclick="showTab('agent-reviews', this)"><i class="fas fa-user-tie"></i> Agent Portal Review <span id="agent-review-badge" class="nav-badge">0</span></a></li>
       <li><a href="#" onclick="showTab('admin-vault', this)"><i class="fas fa-vault"></i> Admin VaultPro</a></li>
       <li><a href="Daimara Department Head – Marketing.html"><i class="fas fa-bullhorn"></i> Marketing Department</a></li>
     <li><a href="Daimara-operator(disabled).html"><i class="fas fa-headset"></i></i> Operator Dept</a></li>
@@ -652,6 +665,7 @@
       if (el) {
         document.querySelectorAll('.nav-links a').forEach(link => link.classList.remove('active'));
         el.classList.add('active');
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
 
       const titleMap = {
@@ -670,10 +684,12 @@
       document.getElementById('tab-title').innerText = titleMap[tabId];
       
       // Bring content into view
-      const contentArea = document.querySelector('.main-content');
-      if (contentArea) {
-        contentArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+      setTimeout(() => {
+        const targetTab = document.getElementById(tabId);
+        if (targetTab) {
+          targetTab.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
       
       // Load specific tab data
       loadTabData(tabId);
@@ -745,7 +761,26 @@
     }
 
     // RENDER FUNCTIONS
+    function updateReviewBadges() {
+      const pageRequests = DataManager.getPageRegistrations() || [];
+      const pendingPages = pageRequests.filter(r => r.status === 'pending').length;
+      const pageBadge = document.getElementById('page-review-badge');
+      if (pageBadge) {
+        pageBadge.innerText = pendingPages;
+        pageBadge.style.display = pendingPages > 0 ? 'inline-block' : 'none';
+      }
+
+      const agentRequests = DataManager.getAgentRegistrations() || [];
+      const pendingAgents = agentRequests.filter(a => a.status === 'pending').length;
+      const agentBadge = document.getElementById('agent-review-badge');
+      if (agentBadge) {
+        agentBadge.innerText = pendingAgents;
+        agentBadge.style.display = pendingAgents > 0 ? 'inline-block' : 'none';
+      }
+    }
+
     function renderDashboard() {
+      updateReviewBadges();
       const stats = DataManager.getAdminDashboardStats();
       // Use platform earnings (commission + deductions) instead of gross revenue
       // NEW: Permanent platform earnings (archived) + current active orders
@@ -960,6 +995,7 @@
     }
 
     function renderPageReviews() {
+      updateReviewBadges();
       const regs = DataManager.getPageRegistrations() || [];
       const tbody = document.querySelector('#page-reviews-table tbody');
       if (!tbody) return;
@@ -1022,6 +1058,7 @@
     }
 
     function renderAgentReviews() {
+      updateReviewBadges();
       const agents = DataManager.getAgentRegistrations();
       const tbody = document.querySelector('#agent-reviews-table tbody');
       if (!tbody) return;

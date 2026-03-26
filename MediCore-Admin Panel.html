@@ -1315,7 +1315,13 @@
             
             // Update sidebar
             document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
-            event.target.closest('.sidebar-link').classList.add('active');
+            if (event && event.target) {
+                const activeLink = event.target.closest('.sidebar-link');
+                if (activeLink) {
+                    activeLink.classList.add('active');
+                    activeLink.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }
             
             // Update title
             const titles = {
@@ -1334,6 +1340,14 @@
             document.getElementById('pageTitle').textContent = titles[section] || 'Dashboard';
             currentSection = section;
             
+            // Scroll section into view
+            setTimeout(() => {
+                const targetSection = document.getElementById(section);
+                if (targetSection) {
+                    targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 100);
+
             // Refresh data for section
             if (section === 'inventory') renderInventory();
             if (section === 'orders') renderOrders();
