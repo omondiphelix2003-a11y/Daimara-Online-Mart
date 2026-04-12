@@ -6,7 +6,130 @@
     <title>The Genre Scores | Ultimate Soccer Hub</title>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
+    <style>
+:root {
+    --primary: #c41e3a;
+    --primary-dark: #8b0000;
+    --bg-dark: #0a1628;
+    --text-light: #fff;
+    --text-muted: #8899ac;
+}
+
+body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-light);
+}
+
+img {
+    border-radius: 2px;
+}
+
+.hero {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: linear-gradient(rgba(10, 22, 40, 0.8), rgba(10, 22, 40, 0.8)), url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1920&q=80') center/cover;
+}
+
+.hero-subtitle {
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.hero-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 4rem;
+}
+
+.hero-title span { color: var(--primary); }
+
+.btn-primary, .submit-btn {
+    background: var(--primary);
+    color: white;
+    padding: 1rem 2rem;
+    border: none;
+    cursor: pointer;
+    border-radius: 2px;
+    font-weight: bold;
+}
+
+.btn-secondary {
+    background: transparent;
+    border: 2px solid white;
+    color: white;
+    padding: 1rem 2rem;
+    cursor: pointer;
+    border-radius: 2px;
+    margin-left: 10px;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.9);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-container {
+    background: #1a2a42;
+    padding: 2rem;
+    border-radius: 2px;
+    width: 400px;
+    position: relative;
+}
+
+.modal-close {
+    position: absolute;
+    top: 10px; right: 10px;
+    background: none; border: none; color: white; font-size: 2rem; cursor: pointer;
+}
+
+.form-container h2 { text-align: center; margin-bottom: 1.5rem; }
+.form-group { margin-bottom: 1.5rem; }
+.form-group label { display: block; margin-bottom: 0.5rem; text-align: left; max-width: 320px; margin: 0 auto 0.5rem; }
+.form-group label i { color: black; margin-right: 5px; }
+.form-group input { width: 100%; max-width: 320px; display: block; margin: 0 auto; padding: 0.8rem; background: #0a1628; border: 1px solid #333; color: white; }
+.submit-btn { width: 100%; max-width: 320px; display: block; margin: 0 auto; }
+.switch-text { margin-top: 1rem; text-align: center; }
+.switch-text a { color: var(--primary); }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    .hero-content {
+        padding: 1.5rem;
+    }
+    .hero-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        align-items: center;
+    }
+    .btn-secondary {
+        margin-left: 0;
+        width: 100%;
+        max-width: 320px;
+    }
+    .btn-primary {
+        width: 100%;
+        max-width: 320px;
+    }
+    .modal-container {
+        width: 90%;
+        padding: 1.5rem;
+    }
+}
+    </style>
 </head>
 <body>
     <nav class="main-nav" style="background: transparent; border-bottom: none; position: absolute; top: 0; left: 0; right: 0; z-index: 100; padding: 1.5rem 2.5rem;">
@@ -71,7 +194,94 @@
         </div>
     </div>
 
-    <script src="js/storage.js"></script>
+    <script>
+const Storage = {
+    // Default initial data
+    defaults: {
+        users: [
+            {
+                id: 1,
+                name: 'Admin',
+                email: 'omondiphelix2003@gmail.com',
+                password: 'admin', // You can change this
+                role: 'admin'
+            }
+        ],
+        matches: [
+            {
+                id: 1,
+                home: 'Liverpool',
+                away: 'Arsenal',
+                time: '15:00',
+                date: new Date().toISOString().split('T')[0],
+                status: 'live', // live, upcoming, finished
+                score: '2 - 1',
+                image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&q=80',
+                isLive: true
+            }
+        ],
+        news: [
+            {
+                id: 1,
+                title: 'Champions League Final Preview',
+                content: 'Everything you need to know about the upcoming final...',
+                image: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=600&q=80',
+                type: 'news' // news or highlight
+            }
+        ],
+        transactions: [], // Admin saved transaction codes: { code: 'ABC123XYZ', status: 'valid' }
+        league_table: [
+            { pos: 1, name: 'Liverpool', logo: '', p: 28, w: 20, d: 4, l: 4, gd: 42, pts: 64 },
+            { pos: 2, name: 'Arsenal', logo: '', p: 28, w: 19, d: 4, l: 5, gd: 38, pts: 61 }
+        ],
+        finance_data: {
+            totalRevenue: 0,
+            withdrawals: []
+        }
+    },
+
+    init() {
+        for (const key in this.defaults) {
+            if (!localStorage.getItem(key)) {
+                this.set(key, this.defaults[key]);
+            }
+        }
+    },
+
+    get(key) {
+        const data = localStorage.getItem(key);
+        try {
+            return data ? JSON.parse(data) : null;
+        } catch (e) {
+            return null;
+        }
+    },
+
+    set(key, value) {
+        localStorage.setItem(key, JSON.stringify(value));
+    },
+
+    update(key, id, newData) {
+        const list = this.get(key) || [];
+        const index = list.findIndex(item => item.id === id);
+        if (index !== -1) {
+            list[index] = { ...list[index], ...newData };
+            this.set(key, list);
+            return true;
+        }
+        return false;
+    },
+
+    delete(key, id) {
+        const list = this.get(key) || [];
+        const newList = list.filter(item => item.id !== id);
+        this.set(key, newList);
+    }
+};
+
+// Auto-init on script load
+Storage.init();
+    </script>
     <script>
         let authMode = 'signup';
         let shouldRedirectToSub = false;
