@@ -368,9 +368,7 @@ img {
 /* Responsive adjustments */
 @media (max-width: 992px) {
     .main-nav {
-        flex-direction: column;
-        padding: 1.5rem;
-        gap: 1.5rem;
+        padding: 1rem;
     }
     .nav-links {
         gap: 1rem;
@@ -382,19 +380,78 @@ img {
 }
 
 @media (max-width: 768px) {
-    .sub-nav {
-        flex-direction: column;
+    .main-nav {
+        flex-direction: row;
+        padding: 0.8rem 1rem;
         gap: 1.5rem;
-        align-items: center;
-        text-align: center;
+        overflow-x: auto;
+        white-space: nowrap;
+        justify-content: flex-start;
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none;  /* IE and Edge */
     }
+    .main-nav::-webkit-scrollbar {
+        display: none; /* Chrome, Safari and Opera */
+    }
+
+    .logo {
+        flex-shrink: 0;
+        transition: 0.3s;
+    }
+
+    .nav-links {
+        gap: 1.5rem;
+        flex-shrink: 0;
+        flex-wrap: nowrap;
+        margin: 0;
+        padding: 0;
+    }
+
+    .user-actions {
+        flex-shrink: 0;
+        gap: 10px;
+    }
+
+    .sub-nav {
+        flex-direction: row !important;
+        overflow-x: auto;
+        white-space: nowrap;
+        justify-content: flex-start !important;
+        padding: 1rem;
+        gap: 1rem !important;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        position: sticky;
+        top: 60px; /* Offset for main-nav */
+        background: var(--bg-dark);
+        z-index: 90;
+        margin-bottom: 1rem;
+    }
+    .sub-nav::-webkit-scrollbar {
+        display: none;
+    }
+
     .sub-nav div {
-        justify-content: center;
+        display: flex !important;
+        gap: 10px;
+        flex-shrink: 0;
     }
+    
+    .sub-nav button {
+        flex-shrink: 0;
+        padding: 0.6rem 1rem;
+    }
+
+    #realTimeClock {
+        flex-shrink: 0;
+    }
+
     .advert-carousel {
         width: 100%;
         max-width: 350px;
+        margin: 0 auto 1rem;
     }
+
     .video-container {
         height: 300px;
     }
@@ -415,27 +472,40 @@ img {
     .social-links {
         justify-content: center;
     }
-    .nav-links {
-        flex-wrap: wrap;
-        justify-content: center;
-    }
     .news-grid {
         grid-template-columns: 1fr;
+    }
+
+    /* Sticky Behavior Classes */
+    body.scrolled-past-ad .logo {
+        display: none;
+    }
+    
+    body.scrolled-past-ad .main-nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    body.scrolled-past-ad .sub-nav {
+        position: fixed;
+        top: 55px; /* Adjust based on main-nav height */
+        left: 0;
+        right: 0;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    body.scrolled-past-ad .content-container {
+        padding-top: 130px; /* Prevent content jump */
     }
 }
 
 @media (max-width: 480px) {
-    .nav-links {
-        gap: 0.5rem;
-    }
     .nav-links a {
-        font-size: 0.75rem;
-    }
-    .user-actions span {
-        display: none;
-    }
-    .sub-nav button {
-        padding: 0.6rem 1rem;
         font-size: 0.8rem;
     }
 }
@@ -967,7 +1037,39 @@ Storage.init();
             window.addEventListener('beforeunload', () => {
                 setOffline();
             });
+
+            // Handle Sticky Navigation on Mobile
+            window.addEventListener('scroll', handleMobileSticky);
         };
+
+        function handleMobileSticky() {
+            if (window.innerWidth > 768) {
+                document.body.classList.remove('scrolled-past-ad');
+                return;
+            }
+
+            const adSection = document.getElementById('advertSection');
+            const mainNav = document.querySelector('.main-nav');
+            const subNav = document.querySelector('.sub-nav');
+            
+            if (!adSection) return;
+
+            const adRect = adSection.getBoundingClientRect();
+            const adBottom = adRect.bottom + window.scrollY;
+            const currentScroll = window.scrollY;
+
+            // When scroll reaches bottom of advert section
+            if (currentScroll >= adBottom) {
+                document.body.classList.add('scrolled-past-ad');
+                // Ensure sub-nav is positioned right below main-nav
+                if (mainNav && subNav) {
+                    subNav.style.top = mainNav.offsetHeight + 'px';
+                }
+            } else {
+                document.body.classList.remove('scrolled-past-ad');
+                if (subNav) subNav.style.top = '0';
+            }
+        }
 
         function updateBranding() {
             const branding = Storage.get('site_branding') || { name: 'THE GENRE SCORES', logo: '', hideName: false };
