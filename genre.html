@@ -450,27 +450,36 @@ img {
     }
 
     .sub-nav {
-        flex-direction: row !important;
-        overflow-x: auto;
-        white-space: nowrap;
-        justify-content: flex-start !important;
+        flex-direction: column !important;
+        overflow-x: hidden;
         padding: 1rem;
         gap: 1rem !important;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
         position: sticky;
         top: 60px;
         background: var(--bg-dark);
         z-index: 90;
         margin-bottom: 1rem;
     }
+
+    .sub-nav-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        width: 100%;
+    }
+
+    #prevMatchBtn { grid-column: 1; }
+    #todayMatchBtn { grid-column: 2; }
+    #tomorrowMatchBtn { grid-column: 1; }
+    #realTimeClock { grid-column: 2; }
+    #viewTableBtn { grid-column: 1 / span 2; width: 100%; }
+
     .sub-nav::-webkit-scrollbar {
         display: none;
     }
 
     .sub-nav div {
         display: flex !important;
-        gap: 10px;
         flex-shrink: 0;
     }
     
@@ -572,15 +581,16 @@ img {
                     </div>
                 </div>
 
-                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <!-- Sub Nav Buttons Container -->
+                <div class="sub-nav-grid">
                     <button id="prevMatchBtn" onclick="filterMatches('previous')">Watch Previous Match</button>
-                    <button class="active" onclick="filterMatches('today')">Match Today</button>
-                    <button onclick="filterMatches('upcoming')">Match Tomorrow</button>
+                    <button id="todayMatchBtn" class="active" onclick="filterMatches('today')">Match Today</button>
+                    <button id="tomorrowMatchBtn" onclick="filterMatches('upcoming')">Match Tomorrow</button>
+                    <div id="realTimeClock" style="font-family: 'Oswald', sans-serif; color: var(--primary); font-weight: bold; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 8px; background: rgba(0,0,0,0.2); padding: 5px 15px; border-radius: 2px; border: 1px solid var(--border);">
+                        <i class="fas fa-clock"></i> <span id="clockDisplay">00:00:00</span>
+                    </div>
+                    <button id="viewTableBtn" style="display:none" onclick="document.getElementById('leagueTableHeader').scrollIntoView({behavior: 'smooth'})">View Table</button>
                 </div>
-                <div id="realTimeClock" style="font-family: 'Oswald', sans-serif; color: var(--primary); font-weight: bold; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.2); padding: 5px 15px; border-radius: 25%; border: 1px solid var(--border);">
-                    <i class="fas fa-clock"></i> <span id="clockDisplay">00:00:00</span>
-                </div>
-                <button id="viewTableBtn" style="display:none" onclick="document.getElementById('leagueTableHeader').scrollIntoView({behavior: 'smooth'})">View Table</button>
             </div>
             <div class="matches-grid" id="matchesGrid">
                 <!-- Populated by JS -->
