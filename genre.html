@@ -450,10 +450,14 @@ img {
     }
 
     .sub-nav {
-        flex-direction: column !important;
-        overflow-x: hidden;
+        flex-direction: row !important;
+        overflow-x: auto;
+        white-space: nowrap;
+        justify-content: flex-start !important;
         padding: 1rem;
         gap: 1rem !important;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
         position: sticky;
         top: 60px;
         background: var(--bg-dark);
@@ -462,17 +466,17 @@ img {
     }
 
     .sub-nav-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
+        display: flex;
         gap: 10px;
-        width: 100%;
+        align-items: center;
+        flex-shrink: 0;
     }
 
-    #prevMatchBtn { grid-column: 1; }
-    #todayMatchBtn { grid-column: 2; }
-    #tomorrowMatchBtn { grid-column: 1; }
-    #realTimeClock { grid-column: 2; }
-    #viewTableBtn { grid-column: 1 / span 2; width: 100%; }
+    #prevMatchBtn, #todayMatchBtn, #tomorrowMatchBtn, #realTimeClock, #viewTableBtn {
+        grid-column: auto;
+        width: auto;
+        flex-shrink: 0;
+    }
 
     .sub-nav::-webkit-scrollbar {
         display: none;
@@ -567,14 +571,14 @@ img {
                 </div>
             </div>
 
-            <div class="sub-nav" style="align-items: center; justify-content: flex-start; gap: 2rem;">
+            <div class="sub-nav" style="flex-direction: column; align-items: flex-start; gap: 1rem;">
                 <!-- Advert Carousel Section -->
-                <div id="advertSection" style="display: none; flex-shrink: 0; position: relative;">
+                <div id="advertSection" style="display: none; width: 100%; position: relative;">
                     <!-- Scroll Trigger Button -->
-                    <button id="scrollToButtons" title="Explore Menu" style="position: absolute; top: 10px; right: 10px; z-index: 20; background: rgba(196, 30, 58, 0.8); color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,0.3); transition: 0.3s;" onclick="document.getElementById('prevMatchBtn').scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'start'})">
+                    <button id="scrollToButtons" title="Explore Menu" style="position: absolute; top: 10px; right: 10px; z-index: 20; background: rgba(196, 30, 58, 0.8); color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,0.3); transition: 0.3s;" onclick="document.querySelector('.sub-nav-grid').scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'start'})">
                         <i class="fas fa-chevron-right"></i>
                     </button>
-                    <div class="advert-carousel">
+                    <div class="advert-carousel" style="max-width: none; width: 100%;">
                         <div id="advertSlider" class="advert-slider">
                             <!-- Dynamic Advert Images -->
                         </div>
@@ -582,14 +586,14 @@ img {
                 </div>
 
                 <!-- Sub Nav Buttons Container -->
-                <div class="sub-nav-grid">
-                    <button id="prevMatchBtn" onclick="filterMatches('previous')">Watch Previous Match</button>
-                    <button id="todayMatchBtn" class="active" onclick="filterMatches('today')">Match Today</button>
-                    <button id="tomorrowMatchBtn" onclick="filterMatches('upcoming')">Match Tomorrow</button>
-                    <div id="realTimeClock" style="font-family: 'Oswald', sans-serif; color: var(--primary); font-weight: bold; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 8px; background: rgba(0,0,0,0.2); padding: 5px 15px; border-radius: 2px; border: 1px solid var(--border);">
+                <div class="sub-nav-grid" style="display: flex; gap: 10px; overflow-x: auto; width: 100%; padding-bottom: 5px; scrollbar-width: none; -ms-overflow-style: none;">
+                    <button id="prevMatchBtn" style="flex-shrink: 0;" onclick="filterMatches('previous')">Watch Previous Match</button>
+                    <button id="todayMatchBtn" style="flex-shrink: 0;" class="active" onclick="filterMatches('today')">Match Today</button>
+                    <button id="tomorrowMatchBtn" style="flex-shrink: 0;" onclick="filterMatches('upcoming')">Match Tomorrow</button>
+                    <div id="realTimeClock" style="flex-shrink: 0; font-family: 'Oswald', sans-serif; color: var(--primary); font-weight: bold; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 8px; background: rgba(0,0,0,0.2); padding: 5px 15px; border-radius: 2px; border: 1px solid var(--border);">
                         <i class="fas fa-clock"></i> <span id="clockDisplay">00:00:00</span>
                     </div>
-                    <button id="viewTableBtn" style="display:none" onclick="document.getElementById('leagueTableHeader').scrollIntoView({behavior: 'smooth'})">View Table</button>
+                    <button id="viewTableBtn" style="flex-shrink: 0; display:none" onclick="document.getElementById('leagueTableHeader').scrollIntoView({behavior: 'smooth'})">View Table</button>
                 </div>
             </div>
             <div class="matches-grid" id="matchesGrid">
