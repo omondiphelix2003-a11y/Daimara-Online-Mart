@@ -43,8 +43,35 @@ img {
 .logo span { color: var(--primary); }
 
 .nav-links { list-style: none; display: flex; gap: 2rem; }
-.nav-links a { text-decoration: none; color: var(--text-muted); font-weight: 500; text-transform: uppercase; }
-.nav-links a.active { color: var(--primary); }
+.nav-links a { 
+    text-decoration: none; 
+    color: var(--text-muted); 
+    font-weight: 500; 
+    text-transform: uppercase;
+    background: #000000;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    transition: 0.3s;
+}
+.nav-links a.active { color: var(--primary); border-color: var(--primary); }
+
+.user-actions button {
+    background: #000000;
+    color: var(--text-light);
+    border: 1px solid var(--border);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Oswald', sans-serif;
+    text-transform: uppercase;
+    transition: 0.3s;
+}
+
+.user-actions button:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
 
 .sub-nav {
     display: flex;
@@ -80,7 +107,7 @@ img {
 
 /* Advert Carousel */
 .advert-carousel {
-    width: 350px;
+    width: 100%;
     height: 180px;
     position: relative;
     overflow: hidden;
@@ -96,14 +123,14 @@ img {
 }
 
 .advert-slider img {
-    width: 350px;
+    width: 100%;
     height: 180px;
     object-fit: cover;
     flex-shrink: 0;
-    border-radius: 0; /* Let container handle radius */
+    border-radius: 0;
 }
 
-.content-container { padding: 2rem; max-width: 1200px; margin: 0 auto; }
+.content-container { padding: 1rem; max-width: 1200px; margin: 0 auto; }
 
 .match-card {
     background: var(--bg-card);
@@ -126,13 +153,19 @@ img {
 
 .video-container {
     background: #000;
-    height: 500px;
+    width: 100%;
+    aspect-ratio: 16 / 9;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 2px;
     overflow: hidden;
     position: relative;
+}
+
+.live-video iframe, .prev-video iframe {
+    width: 100%;
+    height: 100%;
 }
 
 .payment-overlay {
@@ -449,6 +482,12 @@ img {
         gap: 10px;
     }
 
+    .animated-text {
+        font-size: 1.2rem;
+        padding: 0 1rem;
+        text-align: center;
+    }
+
     .sub-nav {
         flex-direction: row !important;
         overflow-x: auto;
@@ -556,7 +595,7 @@ img {
             <div class="user-actions">
                 <img id="navProfilePic" src="https://via.placeholder.com/35" alt="" class="nav-profile-pic">
                 <span id="navUserName">User</span>
-                <button onclick="logout()" style="margin-left: 1rem;">Logout</button>
+                <button onclick="logout()">Logout</button>
             </div>
         </div>
     </nav>
@@ -571,20 +610,16 @@ img {
                 </div>
             </div>
 
-            <div class="sub-nav" style="flex-direction: column; align-items: flex-start; gap: 1rem;">
-                <!-- Advert Carousel Section -->
-                <div id="advertSection" style="display: none; width: 100%; position: relative;">
-                    <!-- Scroll Trigger Button -->
-                    <button id="scrollToButtons" title="Explore Menu" style="position: absolute; top: 10px; right: 10px; z-index: 20; background: rgba(196, 30, 58, 0.8); color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 10px rgba(0,0,0,0.3); transition: 0.3s;" onclick="document.querySelector('.sub-nav-grid').scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'start'})">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
-                    <div class="advert-carousel" style="max-width: none; width: 100%;">
-                        <div id="advertSlider" class="advert-slider">
-                            <!-- Dynamic Advert Images -->
-                        </div>
+            <!-- Advert Carousel Section -->
+            <div id="advertSection" style="display: none; width: 100%; margin-bottom: 1rem; border-radius: 2px; overflow: hidden;">
+                <div class="advert-carousel" style="max-width: none; width: 100%;">
+                    <div id="advertSlider" class="advert-slider">
+                        <!-- Dynamic Advert Images -->
                     </div>
                 </div>
+            </div>
 
+            <div class="sub-nav">
                 <!-- Sub Nav Buttons Container -->
                 <div class="sub-nav-grid" style="display: flex; gap: 10px; overflow-x: auto; width: 100%; padding-bottom: 5px; scrollbar-width: none; -ms-overflow-style: none;">
                     <button id="prevMatchBtn" style="flex-shrink: 0;" onclick="filterMatches('previous')">Watch Previous Match</button>
@@ -639,7 +674,7 @@ img {
                 </div>
                 <!-- If paid and clicked, show video -->
                 <div id="liveVideo" class="live-video" style="display:none; width: 100%; height: 100%;">
-                    <iframe id="liveIframe" width="100%" height="500" src="" frameborder="0" allowfullscreen></iframe>
+                    <iframe id="liveIframe" width="100%" height="100%" src="" frameborder="0" allowfullscreen></iframe>
                 </div>
             </div>
         </section>
@@ -659,7 +694,7 @@ img {
                 </div>
                 <!-- If paid and clicked, show video -->
                 <div id="prevVideo" class="live-video" style="display:none; width: 100%; height: 100%;">
-                    <iframe id="prevIframe" width="100%" height="500" src="" frameborder="0" allowfullscreen></iframe>
+                    <iframe id="prevIframe" width="100%" height="100%" src="" frameborder="0" allowfullscreen></iframe>
                 </div>
             </div>
         </section>
@@ -888,16 +923,16 @@ Storage.init();
                 return;
             }
             
-            section.style.display = 'flex';
+            section.style.display = 'block';
             slider.innerHTML = adverts.map(ad => `
-                <img src="${ad.image}">
+                <img src="${ad.image}" style="width: 100%; height: 180px; object-fit: cover;">
             `).join('');
             
             // Sliding Logic
             if (adverts.length > 1) {
                 let currentIndex = 0;
                 setInterval(() => {
-                    const slideWidth = section.offsetWidth > 350 ? 350 : section.offsetWidth;
+                    const slideWidth = section.offsetWidth;
                     currentIndex = (currentIndex + 1) % adverts.length;
                     slider.style.transform = `translateX(-${currentIndex * slideWidth}px)`;
                 }, 3000); // Slide every 3 seconds
