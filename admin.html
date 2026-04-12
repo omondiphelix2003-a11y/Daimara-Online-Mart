@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Genre Scores | Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar">
+            <div id="sidebarBranding" style="display: flex; align-items: center; gap: 10px; margin-bottom: 2.5rem; padding: 0 0.5rem; font-family: 'Oswald', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
+                <!-- Populated by JS -->
+            </div>
+            <nav>
+                <a href="genre.html" style="color: var(--secondary);"><i class="fas fa-external-link-alt"></i> Back to Website</a>
+                <a href="#" class="active" onclick="showSection('dashboard')"><i class="fas fa-chart-line"></i> Dashboard</a>
+                <a href="#" onclick="showSection('matches')"><i class="fas fa-futbol"></i> Matches</a>
+                <a href="#" onclick="showSection('transactions')"><i class="fas fa-credit-card"></i> M-Pesa Codes</a>
+                <a href="#" onclick="showSection('users')"><i class="fas fa-users"></i> Manage Users</a>
+                <a href="#" onclick="showSection('news')"><i class="fas fa-newspaper"></i> News & Highlights</a>
+                <a href="#" onclick="showSection('table')"><i class="fas fa-table"></i> League Table</a>
+                <a href="#" onclick="showSection('liveSettings')"><i class="fas fa-video"></i> Live Stream Settings</a>
+                <a href="#" onclick="showSection('previousSettings')"><i class="fas fa-history"></i> Previous Match Settings</a>
+                <a href="#" onclick="showSection('managePreviousMatches')"><i class="fas fa-list-ul"></i> Manage Previous Matches</a>
+                <a href="#" onclick="showSection('subscriptions')"><i class="fas fa-dollar-sign"></i> Subscription Amounts</a>
+                <a href="#" onclick="showSection('branding')"><i class="fas fa-paint-brush"></i> Website Branding</a>
+                <a href="#" onclick="showSection('adverts')"><i class="fas fa-ad"></i> Manage Adverts</a>
+                <a href="#" onclick="showSection('socialLinks')"><i class="fas fa-info-circle"></i> Footer Info</a>
+                <a href="#" onclick="showSection('finance')"><i class="fas fa-wallet"></i> Manage Revenue</a>
+                <hr style="margin: 10px 0; border: 0; border-top: 1px solid rgba(255,255,255,0.05);">
+                <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <!-- Dashboard Overview -->
+            <section id="dashboardSection" class="admin-section">
+                <h1>Dashboard Overview</h1>
+                <div class="stats-grid">
+                    <div class="stat-card">Total Users: <span id="userCount">0</span></div>
+                    <div class="stat-card">Active Matches: <span id="matchCount">0</span></div>
+                    <div class="stat-card">Pending Codes: <span id="codeCount">0</span></div>
+                    <div class="stat-card" style="border-top: 3px solid var(--secondary);">Total Revenue: <span id="revenueTotal" style="color: var(--secondary); font-weight: bold;">KES 0</span></div>
+                </div>
+            </section>
+
+            <!-- Matches Management -->
+            <section id="matchesSection" class="admin-section" style="display:none">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h1>Manage Matches</h1>
+                    <div style="display: flex; align-items: center; gap: 10px; background: var(--bg-card); padding: 5px 15px; border-radius: 4px; border: 1px solid var(--border);">
+                        <label for="toggleAddMatch" style="cursor: pointer; font-size: 0.9rem; color: var(--text-muted);"><i class="fas fa-plus-circle"></i> Add New Match</label>
+                        <input type="checkbox" id="toggleAddMatch" onchange="toggleAddMatchForm()" style="cursor: pointer; width: 18px; height: 18px; accent-color: var(--secondary);">
+                    </div>
+                </div>
+                <div class="form-container" id="matchFormContainer" style="display: none;">
+                    <form onsubmit="addMatch(event)" id="matchForm">
+                        <input type="hidden" id="mId">
+                        <div class="form-row">
+                            <input type="text" id="mHome" placeholder="Home Team" required>
+                            <div style="flex: 1; display: flex; align-items: center; gap: 5px;">
+                                <input type="file" id="mHomeLogoInput" accept="image/*" style="font-size: 10px;" onchange="handleMatchPhoto(event, 'Home')">
+                                <input type="hidden" id="mHomeLogo">
+                                <div id="mHomeLogoPreview"></div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <input type="text" id="mAway" placeholder="Away Team" required>
+                            <div style="flex: 1; display: flex; align-items: center; gap: 5px;">
+                                <input type="file" id="mAwayLogoInput" accept="image/*" style="font-size: 10px;" onchange="handleMatchPhoto(event, 'Away')">
+                                <input type="hidden" id="mAwayLogo">
+                                <div id="mAwayLogoPreview"></div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <input type="date" id="mDate" required>
+                            <input type="time" id="mTime" required>
+                        </div>
+                        <div class="form-row">
+                            <input type="text" id="mScore" placeholder="Score (e.g. 0 - 0)">
+                            <select id="mStatus">
+                                <option value="upcoming">Upcoming</option>
+                                <option value="live">Live</option>
+                                <option value="finished">Finished</option>
+                            </select>
+                        </div>
+                        <div class="form-buttons">
+                            <button type="submit" id="matchSubmitBtn">Add Match</button>
+                            <button type="button" id="matchCancelBtn" style="display:none" onclick="resetMatchForm()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+                <div id="adminMatchesList" class="list-container"></div>
+            </section>
+
+            <!-- News & Highlights Management -->
+            <section id="newsSection" class="admin-section" style="display:none">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h1>Manage News & Highlights</h1>
+                    <div style="display: flex; align-items: center; gap: 10px; background: var(--bg-card); padding: 5px 15px; border-radius: 4px; border: 1px solid var(--border);">
+                        <label for="toggleAddNews" style="cursor: pointer; font-size: 0.9rem; color: var(--text-muted);"><i class="fas fa-plus-circle"></i> Add News</label>
+                        <input type="checkbox" id="toggleAddNews" onchange="toggleForm('toggleAddNews', 'newsFormContainer')" style="cursor: pointer; width: 18px; height: 18px; accent-color: var(--secondary);">
+                    </div>
+                </div>
+                <div class="form-container" id="newsFormContainer" style="display: none;">
+                    <form onsubmit="addNews(event)" id="newsForm">
+                        <input type="hidden" id="nId">
+                        <div class="form-group">
+                            <label>News Title</label>
+                            <input type="text" id="nTitle" placeholder="Enter headline" required>
+                        </div>
+                        <div class="form-group">
+                            <label>News Image (Upload)</label>
+                            <input type="file" id="nPhotoInput" accept="image/*" onchange="handleNewsPhoto(event)">
+                            <input type="hidden" id="nImage">
+                            <div id="nImagePreview" style="margin-top: 10px;"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Content</label>
+                            <textarea id="nContent" placeholder="Enter news content" rows="4" required style="width: 100%; background: #0f1f35; color: white; border: 1px solid #2a3a52; padding: 10px; border-radius: 5px;"></textarea>
+                        </div>
+                        <div class="form-buttons">
+                            <button type="submit" id="newsSubmitBtn">Add News</button>
+                            <button type="button" id="newsCancelBtn" onclick="resetNewsForm()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+                <div id="adminNewsList" class="list-container"></div>
+            </section>
+
+            <!-- Users Management -->
+            <section id="usersSection" class="admin-section" style="display:none">
+                <h1>Registered Users</h1>
+                <div class="users-table-container" style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 4px; overflow: hidden;">
+                        <thead style="background: rgba(196, 30, 58, 0.2); text-align: left;">
+                            <tr>
+                                <th style="padding: 1rem;">User</th>
+                                <th style="padding: 1rem;">Unique ID</th>
+                                <th style="padding: 1rem;">Email</th>
+                                <th style="padding: 1rem;">Last Login</th>
+                                <th style="padding: 1rem;">Subscription</th>
+                                <th style="padding: 1rem;">Location</th>
+                                <th style="padding: 1rem;">Status</th>
+                                <th style="padding: 1rem;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminUsersList"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Transaction Codes -->
+            <section id="transactionsSection" class="admin-section" style="display:none">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h1>M-Pesa Transaction Codes</h1>
+                    <div style="display: flex; align-items: center; gap: 10px; background: var(--bg-card); padding: 5px 15px; border-radius: 4px; border: 1px solid var(--border);">
+                        <label for="toggleAddCode" style="cursor: pointer; font-size: 0.9rem; color: var(--text-muted);"><i class="fas fa-plus-circle"></i> Add New Code</label>
+                        <input type="checkbox" id="toggleAddCode" onchange="toggleForm('toggleAddCode', 'codeFormContainer')" style="cursor: pointer; width: 18px; height: 18px; accent-color: var(--secondary);">
+                    </div>
+                </div>
+                <div id="codeFormContainer" style="display: none;">
+                    <form onsubmit="addCode(event)">
+                        <input type="text" id="tCode" placeholder="Enter Transaction Code" required oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')" style="text-transform: uppercase;">
+                        <select id="tDuration">
+                            <option value="1">Daily (30 KES)</option>
+                            <option value="7">Weekly (150 KES)</option>
+                            <option value="30">Monthly (500 KES)</option>
+                        </select>
+                        <button type="submit">Save Code</button>
+                    </form>
+                </div>
+
+                <div style="margin-top: 2rem; background: var(--bg-card); padding: 1.5rem; border-radius: 4px; border: 1px solid var(--border); max-width: 400px;">
+                    <h3 style="margin-bottom: 1rem; color: var(--secondary); font-size: 1.1rem;"><i class="fas fa-store"></i> Edit Payment Till Number</h3>
+                    <div class="form-group">
+                        <label>Till Number</label>
+                        <input type="text" id="adminTillNumber" placeholder="555666">
+                    </div>
+                    <button class="btn-primary" onclick="saveTillNumber()" style="width: 100%;"><i class="fas fa-save"></i> Save Till Number</button>
+                </div>
+
+                <div id="adminCodesList" class="list-container"></div>
+            </section>
+
+            <!-- League Table Editor -->
+            <section id="tableSection" class="admin-section" style="display:none">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h1>Edit League Table</h1>
+                    <div style="display: flex; align-items: center; gap: 10px; background: var(--bg-card); padding: 5px 15px; border-radius: 4px; border: 1px solid var(--border);">
+                        <label for="toggleTableEditor" style="cursor: pointer; font-size: 0.9rem; color: var(--text-muted);"><i class="fas fa-edit"></i> Open Editor</label>
+                        <input type="checkbox" id="toggleTableEditor" onchange="toggleForm('toggleTableEditor', 'tableEditorContainer')" style="cursor: pointer; width: 18px; height: 18px; accent-color: var(--secondary);">
+                    </div>
+                </div>
+                <div class="table-editor-container" id="tableEditorContainer" style="display: none; background: var(--bg-card); padding: 1.5rem; border-radius: 4px;">
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 1.5rem;">
+                        <thead style="background: rgba(196, 30, 58, 0.2); text-align: left;">
+                            <tr>
+                                <th style="padding: 10px;">Pos</th>
+                                <th style="padding: 10px;">Logo</th>
+                                <th style="padding: 10px;">Team</th>
+                                <th style="padding: 10px;">P</th>
+                                <th style="padding: 10px;">W</th>
+                                <th style="padding: 10px;">D</th>
+                                <th style="padding: 10px;">L</th>
+                                <th style="padding: 10px;">GD</th>
+                                <th style="padding: 10px;">Pts</th>
+                                <th style="padding: 10px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableEditorBody"></tbody>
+                    </table>
+                    <div class="form-buttons">
+                        <button class="btn-primary" onclick="addTableRow()"><i class="fas fa-plus"></i> Add Row</button>
+                        <button class="btn-primary" style="background: #00d4aa; color: #000;" onclick="saveTable()"><i class="fas fa-save"></i> Save Changes</button>
+                        <button class="btn-primary" style="background: rgba(255,255,255,0.1); color: white;" onclick="closeTableEditor()">Cancel</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Subscription Amounts Management -->
+            <section id="subscriptionsSection" class="admin-section" style="display:none">
+                <h1>Edit Subscription Amounts</h1>
+                <div class="form-container" style="max-width: 600px;">
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar-day"></i> VIP (Daily) Amount (KES)</label>
+                        <input type="number" id="subVip" placeholder="30">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar-week"></i> Pro (Weekly) Amount (KES)</label>
+                        <input type="number" id="subPro" placeholder="150">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar-alt"></i> Premium (Monthly) Amount (KES)</label>
+                        <input type="number" id="subPremium" placeholder="500">
+                    </div>
+                    <button class="btn-primary" onclick="saveSubscriptionAmounts()"><i class="fas fa-save"></i> Save Plan Prices</button>
+                </div>
+            </section>
+
+            <!-- Live Stream Settings -->
+            <section id="liveSettingsSection" class="admin-section" style="display:none">
+                <h1>Live Stream Settings</h1>
+                <div class="form-container" style="max-width: 600px;">
+                    <div class="form-group">
+                        <label><i class="fab fa-twitch"></i> Video URL (Twitch Channel/Link)</label>
+                        <input type="text" id="liveVideoUrl" placeholder="https://www.twitch.tv/channel_name">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-font"></i> Overlay Animated Text</label>
+                        <input type="text" id="liveOverlayText" placeholder="Click to watch the live match">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-image"></i> Overlay Image (Upload)</label>
+                        <input type="file" accept="image/*" onchange="handleLiveOverlayPhoto(event)">
+                        <input type="hidden" id="liveOverlayImage">
+                        <div id="liveOverlayPreview"></div>
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                        <input type="checkbox" id="liveEmbedAsIframe" style="width: auto; cursor: pointer;">
+                        <label for="liveEmbedAsIframe" style="margin-bottom: 0; cursor: pointer;"><i class="fas fa-code"></i> Embed as Iframe (Check to embed, uncheck to open in same tab)</label>
+                    </div>
+                    <button class="btn-primary" onclick="saveLiveSettings()"><i class="fas fa-save"></i> Save Stream Settings</button>
+                </div>
+            </section>
+
+            <!-- Previous Match Settings -->
+            <section id="previousSettingsSection" class="admin-section" style="display:none">
+                <h1>Previous Match Settings</h1>
+                <div class="form-container" style="max-width: 600px;">
+                    <div class="form-group">
+                        <label><i class="fab fa-youtube"></i> Video URL (YouTube Embed Link)</label>
+                        <input type="text" id="prevVideoUrl" placeholder="https://www.youtube.com/embed/...">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-font"></i> Overlay Animated Text</label>
+                        <input type="text" id="prevOverlayText" placeholder="Click to watch the previous match">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-image"></i> Overlay Image (Upload)</label>
+                        <input type="file" accept="image/*" onchange="handlePrevOverlayPhoto(event)">
+                        <input type="hidden" id="prevOverlayImage">
+                        <div id="prevOverlayPreview"></div>
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                        <input type="checkbox" id="prevEmbedAsIframe" style="width: auto; cursor: pointer;">
+                        <label for="prevEmbedAsIframe" style="margin-bottom: 0; cursor: pointer;"><i class="fas fa-code"></i> Embed as Iframe (Check to embed, uncheck to open in same tab - Applies to all previous matches)</label>
+                    </div>
+                    <button class="btn-primary" onclick="savePrevSettings()"><i class="fas fa-save"></i> Save Previous Match Settings</button>
+                </div>
+            </section>
+
+            <!-- Advert Management Section -->
+            <section id="advertsSection" class="admin-section" style="display:none">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h1>Manage Adverts (Sliding Images)</h1>
+                    <div id="addAdvertBtnContainer" style="display: flex; align-items: center; gap: 10px; background: var(--bg-card); padding: 5px 15px; border-radius: 4px; border: 1px solid var(--border);">
+                        <label for="toggleAddAdvert" style="cursor: pointer; font-size: 0.9rem; color: var(--text-muted);"><i class="fas fa-plus-circle"></i> Add New Advert</label>
+                        <input type="checkbox" id="toggleAddAdvert" onchange="toggleForm('toggleAddAdvert', 'advertFormContainer')" style="cursor: pointer; width: 18px; height: 18px; accent-color: var(--secondary);">
+                    </div>
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem;"><i class="fas fa-info-circle"></i> You can add up to 6 adverts. These will slide automatically in the genre page.</p>
+                
+                <div style="background: var(--bg-card); padding: 15px; border-radius: 4px; border: 1px solid var(--border); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 15px;">
+                    <label for="hideAdverts" style="cursor: pointer; color: var(--text-light); font-weight: 500;">
+                        <i class="fas fa-eye-slash"></i> Check to Hide Adverts in Genre.html
+                    </label>
+                    <input type="checkbox" id="hideAdverts" onchange="toggleAdvertVisibility()" style="cursor: pointer; width: 20px; height: 20px; accent-color: var(--secondary);">
+                </div>
+                
+                <div class="form-container" id="advertFormContainer" style="display: none; margin-bottom: 2rem;">
+                    <form onsubmit="addAdvert(event)" id="advertForm">
+                        <input type="hidden" id="adId">
+                        <div class="form-group">
+                            <label><i class="fas fa-image"></i> Advert Image (Recommended: 300x150)</label>
+                            <input type="file" id="adPhotoInput" accept="image/*" onchange="handleAdvertPhoto(event)" required>
+                            <input type="hidden" id="adImage">
+                            <div id="adImagePreview" style="margin-top: 10px;"></div>
+                        </div>
+                        <div class="form-buttons">
+                            <button type="submit" id="advertSubmitBtn">Add Advert</button>
+                            <button type="button" onclick="resetAdvertForm()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="adminAdvertsList" class="list-container">
+                    <!-- Dynamic Adverts -->
+                </div>
+            </section>
+
+            <!-- Manage Previous Matches List -->
+            <section id="managePreviousMatchesSection" class="admin-section" style="display:none">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h1>Manage Previous Matches</h1>
+                    <div style="display: flex; align-items: center; gap: 10px; background: var(--bg-card); padding: 5px 15px; border-radius: 4px; border: 1px solid var(--border);">
+                        <label for="toggleAddPrevMatch" style="cursor: pointer; font-size: 0.9rem; color: var(--text-muted);"><i class="fas fa-plus-circle"></i> Add Previous Match</label>
+                        <input type="checkbox" id="toggleAddPrevMatch" onchange="toggleForm('toggleAddPrevMatch', 'prevMatchFormContainer')" style="cursor: pointer; width: 18px; height: 18px; accent-color: var(--secondary);">
+                    </div>
+                </div>
+                <div class="form-container" id="prevMatchFormContainer" style="display: none;">
+                    <form onsubmit="addPrevMatch(event)" id="prevMatchForm">
+                        <input type="hidden" id="pmId">
+                        <div class="form-row">
+                            <input type="text" id="pmHome" placeholder="Home Team" required>
+                            <input type="text" id="pmAway" placeholder="Away Team" required>
+                        </div>
+                        <div class="form-row">
+                            <div style="flex: 1; display: flex; flex-direction: column; gap: 5px;">
+                                <label style="font-size: 0.8rem; color: var(--text-muted);">Home Logo</label>
+                                <input type="file" accept="image/*" onchange="handlePrevMatchLogo(event, 'Home')">
+                                <input type="hidden" id="pmHomeLogo">
+                                <div id="pmHomeLogoPreview"></div>
+                            </div>
+                            <div style="flex: 1; display: flex; flex-direction: column; gap: 5px;">
+                                <label style="font-size: 0.8rem; color: var(--text-muted);">Away Logo</label>
+                                <input type="file" accept="image/*" onchange="handlePrevMatchLogo(event, 'Away')">
+                                <input type="hidden" id="pmAwayLogo">
+                                <div id="pmAwayLogoPreview"></div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <input type="text" id="pmScore" placeholder="Score (e.g. 2 - 1)" required>
+                            <input type="date" id="pmDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Video URL (YouTube/Direct)</label>
+                            <input type="text" id="pmVideoUrl" placeholder="Enter video link" required>
+                        </div>
+                        <div class="form-buttons">
+                            <button type="submit" id="prevMatchSubmitBtn">Add Previous Match</button>
+                            <button type="button" onclick="resetPrevMatchForm()">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+                <div id="adminPrevMatchesList" class="list-container"></div>
+            </section>
+
+            <!-- Footer Info Section -->
+            <section id="socialLinksSection" class="admin-section" style="display:none">
+                <h1>Manage Footer Info</h1>
+                <div class="form-container" style="max-width: 600px;">
+                    <h3 style="margin-bottom: 1rem; color: var(--secondary); border-bottom: 1px solid var(--border); padding-bottom: 5px;">Social Platforms</h3>
+                    <div class="form-group">
+                        <label><i class="fab fa-facebook"></i> Facebook URL</label>
+                        <input type="text" id="socialFb" placeholder="https://facebook.com/yourpage">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fab fa-twitter"></i> Twitter URL</label>
+                        <input type="text" id="socialTw" placeholder="https://twitter.com/yourhandle">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fab fa-instagram"></i> Instagram URL</label>
+                        <input type="text" id="socialIg" placeholder="https://instagram.com/yourprofile">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fab fa-tiktok"></i> TikTok URL</label>
+                        <input type="text" id="socialTk" placeholder="https://tiktok.com/@youraccount">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fab fa-youtube"></i> YouTube URL</label>
+                        <input type="text" id="socialYt" placeholder="https://youtube.com/@yourchannel">
+                    </div>
+
+                    <h3 style="margin: 2rem 0 1rem; color: var(--secondary); border-bottom: 1px solid var(--border); padding-bottom: 5px;">Contact Information</h3>
+                    <div class="form-group">
+                        <label><i class="fas fa-envelope"></i> Support Email</label>
+                        <input type="email" id="contactEmail" placeholder="support@thegenrescores.com">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-phone-alt"></i> Support Phone</label>
+                        <input type="text" id="contactPhone" placeholder="+254 700 000 000">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-map-marker-alt"></i> Location</label>
+                        <input type="text" id="contactLocation" placeholder="Nairobi, Kenya">
+                    </div>
+
+                    <button class="btn-primary" onclick="saveSocialLinks()"><i class="fas fa-save"></i> Save Footer Info</button>
+                </div>
+            </section>
+
+            <!-- Website Branding -->
+            <section id="brandingSection" class="admin-section" style="display:none">
+                <h1>Website Branding</h1>
+                <div class="form-container" style="max-width: 600px;">
+                    <div class="form-group">
+                        <label><i class="fas fa-globe"></i> Website Name</label>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="text" id="siteName" placeholder="The Genre Scores" style="flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 5px; background: rgba(0,0,0,0.2); padding: 5px 10px; border-radius: 4px; white-space: nowrap;">
+                                <label for="hideName" style="margin-bottom: 0; font-size: 0.8rem; cursor: pointer;">Hide Name</label>
+                                <input type="checkbox" id="hideName" style="width: 16px; height: 16px; margin: 0; cursor: pointer;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-envelope"></i> Admin Access Email</label>
+                        <input type="email" id="adminEmailField" placeholder="omondiphelix2003@gmail.com">
+                        <small style="color: var(--text-muted); display: block; margin-top: 5px;"><i class="fas fa-info-circle"></i> This email will have full access to this panel.</small>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-image"></i> Website Logo (Upload)</label>
+                        <input type="file" accept="image/*" onchange="handleBrandingLogo(event)">
+                        <input type="hidden" id="siteLogo">
+                        <div id="siteLogoPreview"></div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-desktop"></i> Landing Page Background Image (Upload)</label>
+                        <input type="file" accept="image/*" onchange="handleLandingBg(event)">
+                        <input type="hidden" id="landingBg">
+                        <div id="landingBgPreview"></div>
+                    </div>
+                    <button class="btn-primary" onclick="saveBranding()"><i class="fas fa-save"></i> Save Branding</button>
+                </div>
+            </section>
+
+            <!-- Finance / Revenue Management -->
+            <section id="financeSection" class="admin-section" style="display:none">
+                <h1>Manage Revenue</h1>
+                <div class="stats-grid" style="margin-bottom: 2rem;">
+                    <div class="stat-card" style="border-top: 4px solid var(--secondary);">
+                        <small style="color: var(--text-muted); display: block; margin-bottom: 5px;">Current Balance</small>
+                        <span id="financeBalance" style="font-size: 2rem; color: var(--secondary); font-weight: bold;">KES 0</span>
+                    </div>
+                </div>
+
+                <div class="form-container" style="max-width: 500px; margin-bottom: 2.5rem;">
+                    <h3 style="margin-bottom: 1rem; color: var(--secondary);"><i class="fas fa-minus-circle"></i> Withdraw Funds</h3>
+                    <div class="form-group">
+                        <label>Amount to Withdraw (KES)</label>
+                        <input type="number" id="withdrawAmount" placeholder="Enter amount">
+                    </div>
+                    <div class="form-group">
+                        <label>Withdrawal Reason / Description</label>
+                        <input type="text" id="withdrawReason" placeholder="e.g. Server Maintenance">
+                    </div>
+                    <button class="btn-primary" onclick="handleWithdrawal()"><i class="fas fa-hand-holding-usd"></i> Confirm Withdrawal</button>
+                </div>
+
+                <h3>Withdrawal History</h3>
+                <div class="list-container" id="withdrawalHistory">
+                    <!-- Dynamic Withdrawal History -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script>
+        // Security Check
+        const brandingData = Storage.get('site_branding') || { adminEmail: 'omondiphelix2003@gmail.com' };
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (!currentUser || currentUser.email !== (brandingData.adminEmail || 'omondiphelix2003@gmail.com')) {
+            alert('Access Denied!');
+            window.location.href = 'index.html';
+        }
+
+        window.onload = () => {
+            renderStats();
+            renderAdminMatches();
+            renderAdminNews();
+            renderAdminUsers();
+            renderAdminCodes();
+            renderSubscriptionSettings();
+            renderTableEditor();
+            renderLiveSettings();
+            renderPreviousSettings();
+            renderAdminPrevMatches();
+            renderBranding();
+            renderAdminAdverts();
+            renderSocialLinksSettings();
+            renderFinance();
+
+            // Refresh matches every second for "instant" countdowns and status transitions
+            setInterval(renderAdminMatches, 1000);
+            setInterval(renderAdminUsers, 5000); // Instant update for online/offline status
+        };
+
+        function handleAdvertPhoto(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('adImage').value = e.target.result;
+                document.getElementById('adImagePreview').innerHTML = `<img src="${e.target.result}" style="width: 200px; height: 100px; object-fit: cover; border-radius: 4px;">`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function addAdvert(e) {
+            e.preventDefault();
+            const adverts = Storage.get('adverts') || [];
+            const id = document.getElementById('adId').value;
+            
+            if (!id && adverts.length >= 6) {
+                alert('You can only have up to 6 adverts.');
+                return;
+            }
+
+            const adData = {
+                id: id ? parseInt(id) : Date.now(),
+                image: document.getElementById('adImage').value
+            };
+
+            if (id) {
+                const idx = adverts.findIndex(a => a.id === parseInt(id));
+                adverts[idx] = adData;
+            } else {
+                adverts.push(adData);
+            }
+
+            Storage.set('adverts', adverts);
+            resetAdvertForm();
+            renderAdminAdverts();
+            alert('Advert saved successfully!');
+        }
+
+        function toggleAdvertVisibility() {
+            const hide = document.getElementById('hideAdverts').checked;
+            const branding = Storage.get('site_branding') || {};
+            branding.hideAdverts = hide;
+            Storage.set('site_branding', branding);
+            alert(`Adverts are now ${hide ? 'HIDDEN' : 'VISIBLE'} on the genre page.`);
+        }
+
+        function renderAdminAdverts() {
+            const adverts = Storage.get('adverts') || [];
+            const branding = Storage.get('site_branding') || {};
+            const list = document.getElementById('adminAdvertsList');
+            const addBtn = document.getElementById('addAdvertBtnContainer');
+            
+            if (document.getElementById('hideAdverts')) {
+                document.getElementById('hideAdverts').checked = !!branding.hideAdverts;
+            }
+
+            // Hide add button if 6 ads reached
+            if (adverts.length >= 6) {
+                addBtn.style.display = 'none';
+            } else {
+                addBtn.style.display = 'flex';
+            }
+
+            list.innerHTML = adverts.map(ad => `
+                <div class="admin-item">
+                    <div class="item-info">
+                        <img src="${ad.image}" style="width: 100px; height: 50px; object-fit: cover; border-radius: 4px; margin-right: 15px;">
+                        <strong>Advert ${adverts.indexOf(ad) + 1}</strong>
+                    </div>
+                    <div class="item-actions">
+                        <button onclick="editAdvert(${ad.id})"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="delete-btn" onclick="deleteItem('adverts', ${ad.id}, renderAdminAdverts)"><i class="fas fa-trash"></i> Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function editAdvert(id) {
+            const adverts = Storage.get('adverts') || [];
+            const ad = adverts.find(a => a.id === id);
+            if (!ad) return;
+
+            document.getElementById('adId').value = ad.id;
+            document.getElementById('adImage').value = ad.image;
+            document.getElementById('adImagePreview').innerHTML = `<img src="${ad.image}" style="width: 200px; height: 100px; object-fit: cover; border-radius: 4px;">`;
+            document.getElementById('advertSubmitBtn').textContent = 'Update Advert';
+            document.getElementById('adPhotoInput').required = false;
+            
+            document.getElementById('toggleAddAdvert').checked = true;
+            document.getElementById('advertFormContainer').style.display = 'block';
+            document.getElementById('advertFormContainer').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetAdvertForm() {
+            document.getElementById('advertForm').reset();
+            document.getElementById('adId').value = '';
+            document.getElementById('adImage').value = '';
+            document.getElementById('adImagePreview').innerHTML = '';
+            document.getElementById('advertSubmitBtn').textContent = 'Add Advert';
+            document.getElementById('adPhotoInput').required = true;
+            document.getElementById('toggleAddAdvert').checked = false;
+            document.getElementById('advertFormContainer').style.display = 'none';
+        }
+
+        function showSection(id) {
+            document.querySelectorAll('.admin-section').forEach(s => s.style.display = 'none');
+            document.getElementById(id + 'Section').style.display = 'block';
+
+            // Update sidebar active state
+            document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('active'));
+            const activeLink = Array.from(document.querySelectorAll('.sidebar nav a')).find(a => a.getAttribute('onclick') && a.getAttribute('onclick').includes(`'${id}'`));
+            if (activeLink) activeLink.classList.add('active');
+            
+            // Re-render specifically if needed
+            if (id === 'news') renderAdminNews();
+            if (id === 'users') renderAdminUsers();
+            if (id === 'subscriptions') renderSubscriptionSettings();
+            if (id === 'liveSettings') renderLiveSettings();
+            if (id === 'previousSettings') renderPreviousSettings();
+            if (id === 'managePreviousMatches') renderAdminPrevMatches();
+            if (id === 'branding') renderBranding();
+            if (id === 'socialLinks') renderSocialLinksSettings();
+        }
+
+        function renderBranding() {
+            const branding = Storage.get('site_branding') || { name: 'THE GENRE SCORES', logo: '', adminEmail: 'omondiphelix2003@gmail.com', landingBg: '', hideName: false };
+            
+            // Update Form Inputs
+            document.getElementById('siteName').value = branding.name || 'THE GENRE SCORES';
+            document.getElementById('adminEmailField').value = branding.adminEmail || 'omondiphelix2003@gmail.com';
+            document.getElementById('siteLogo').value = branding.logo || '';
+            document.getElementById('landingBg').value = branding.landingBg || '';
+            document.getElementById('hideName').checked = !!branding.hideName;
+
+            // Update Sidebar Branding (Mimicking genre.html style)
+            const sidebarBranding = document.getElementById('sidebarBranding');
+            if (sidebarBranding) {
+                let logoHtml = '';
+                if (branding.logo) {
+                    logoHtml += `<img src="${branding.logo}" style="height: 110px; width: 200px; object-fit: cover; border-radius: 2px;">`;
+                }
+                
+                // Name is hidden here as per requirements
+                sidebarBranding.innerHTML = logoHtml;
+            }
+
+            // Update Form Previews
+            if (branding.logo) {
+                document.getElementById('siteLogoPreview').innerHTML = `<img src="${branding.logo}" style="height: 110px; width: 200px; object-fit: cover; border-radius: 4px;">`;
+            } else {
+                document.getElementById('siteLogoPreview').innerHTML = '<small style="color: var(--text-muted);">No logo uploaded</small>';
+            }
+
+            if (branding.landingBg) {
+                document.getElementById('landingBgPreview').innerHTML = `<img src="${branding.landingBg}" style="width: 100%; max-height: 150px; object-fit: cover; border-radius: 5px;">`;
+            } else {
+                document.getElementById('landingBgPreview').innerHTML = '<small style="color: var(--text-muted);">No background uploaded (Default will be used)</small>';
+            }
+        }
+
+        function handleBrandingLogo(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('siteLogo').value = e.target.result;
+                document.getElementById('siteLogoPreview').innerHTML = `<img src="${e.target.result}" style="height: 110px; width: 200px; object-fit: cover; border-radius: 4px;">`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function handleLandingBg(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('landingBg').value = e.target.result;
+                document.getElementById('landingBgPreview').innerHTML = `<img src="${e.target.result}" style="width: 100%; max-height: 150px; object-fit: cover; border-radius: 5px;">`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function saveBranding() {
+            const branding = {
+                name: document.getElementById('siteName').value || 'THE GENRE SCORES',
+                adminEmail: document.getElementById('adminEmailField').value || 'omondiphelix2003@gmail.com',
+                logo: document.getElementById('siteLogo').value,
+                landingBg: document.getElementById('landingBg').value,
+                hideName: document.getElementById('hideName').checked
+            };
+            Storage.set('site_branding', branding);
+            renderBranding();
+            alert('Branding saved! Website will update automatically. If you changed the admin email, you will need to log in with the new email next time.');
+        }
+
+        function saveSocialLinks() {
+            const socialLinks = {
+                fb: document.getElementById('socialFb').value,
+                tw: document.getElementById('socialTw').value,
+                ig: document.getElementById('socialIg').value,
+                tk: document.getElementById('socialTk').value,
+                yt: document.getElementById('socialYt').value,
+                email: document.getElementById('contactEmail').value,
+                phone: document.getElementById('contactPhone').value,
+                location: document.getElementById('contactLocation').value
+            };
+            Storage.set('social_links', socialLinks);
+            alert('Footer info saved successfully!');
+        }
+
+        function renderSocialLinksSettings() {
+            const socialLinks = Storage.get('social_links') || { fb: '#', tw: '#', ig: '#', tk: '#', yt: '#', email: '', phone: '', location: '' };
+            document.getElementById('socialFb').value = socialLinks.fb || '';
+            document.getElementById('socialTw').value = socialLinks.tw || '';
+            document.getElementById('socialIg').value = socialLinks.ig || '';
+            document.getElementById('socialTk').value = socialLinks.tk || '';
+            document.getElementById('socialYt').value = socialLinks.yt || '';
+            document.getElementById('contactEmail').value = socialLinks.email || '';
+            document.getElementById('contactPhone').value = socialLinks.phone || '';
+            document.getElementById('contactLocation').value = socialLinks.location || '';
+        }
+
+        function renderSubscriptionSettings() {
+            const pricing = Storage.get('subscription_pricing') || { vip: 30, pro: 150, premium: 500 };
+            document.getElementById('subVip').value = pricing.vip;
+            document.getElementById('subPro').value = pricing.pro;
+            document.getElementById('subPremium').value = pricing.premium;
+            updateCodeDurationOptions();
+        }
+
+        function updateCodeDurationOptions() {
+            const pricing = Storage.get('subscription_pricing') || { vip: 30, pro: 150, premium: 500 };
+            const select = document.getElementById('tDuration');
+            if (select) {
+                select.innerHTML = `
+                    <option value="1">Daily (${pricing.vip} KES)</option>
+                    <option value="7">Weekly (${pricing.pro} KES)</option>
+                    <option value="30">Monthly (${pricing.premium} KES)</option>
+                `;
+            }
+        }
+
+        function saveSubscriptionAmounts() {
+            const pricing = {
+                vip: parseInt(document.getElementById('subVip').value) || 30,
+                pro: parseInt(document.getElementById('subPro').value) || 150,
+                premium: parseInt(document.getElementById('subPremium').value) || 500
+            };
+            Storage.set('subscription_pricing', pricing);
+            updateCodeDurationOptions();
+            alert('Subscription prices saved! These will update automatically for users.');
+        }
+
+        function renderLiveSettings() {
+            const settings = Storage.get('live_settings') || { url: '', text: 'Click to watch the live match', image: '', embedAsIframe: true };
+            document.getElementById('liveVideoUrl').value = settings.url || '';
+            document.getElementById('liveOverlayText').value = settings.text || 'Click to watch the live match';
+            document.getElementById('liveOverlayImage').value = settings.image || '';
+            document.getElementById('liveEmbedAsIframe').checked = settings.embedAsIframe !== false;
+            if (settings.image) {
+                document.getElementById('liveOverlayPreview').innerHTML = `<img src="${settings.image}" style="width: 200px; border-radius: 5px;">`;
+            }
+        }
+
+        function handleLiveOverlayPhoto(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('liveOverlayImage').value = e.target.result;
+                document.getElementById('liveOverlayPreview').innerHTML = `<img src="${e.target.result}" style="width: 200px; border-radius: 5px;">`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function saveLiveSettings() {
+            const settings = {
+                url: document.getElementById('liveVideoUrl').value,
+                text: document.getElementById('liveOverlayText').value,
+                image: document.getElementById('liveOverlayImage').value,
+                embedAsIframe: document.getElementById('liveEmbedAsIframe').checked
+            };
+            Storage.set('live_settings', settings);
+            alert('Live Stream settings saved!');
+        }
+
+        function renderPreviousSettings() {
+            const settings = Storage.get('previous_settings') || { url: '', text: 'Click to watch the previous match', image: '', embedAsIframe: true };
+            document.getElementById('prevVideoUrl').value = settings.url || '';
+            document.getElementById('prevOverlayText').value = settings.text || 'Click to watch the previous match';
+            document.getElementById('prevOverlayImage').value = settings.image || '';
+            document.getElementById('prevEmbedAsIframe').checked = settings.embedAsIframe !== false;
+            if (settings.image) {
+                document.getElementById('prevOverlayPreview').innerHTML = `<img src="${settings.image}" style="width: 200px; border-radius: 5px;">`;
+            } else {
+                document.getElementById('prevOverlayPreview').innerHTML = '';
+            }
+        }
+
+        function handlePrevOverlayPhoto(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('prevOverlayImage').value = e.target.result;
+                document.getElementById('prevOverlayPreview').innerHTML = `<img src="${e.target.result}" style="width: 200px; border-radius: 5px;">`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function savePrevSettings() {
+            const settings = {
+                url: document.getElementById('prevVideoUrl').value,
+                text: document.getElementById('prevOverlayText').value,
+                image: document.getElementById('prevOverlayImage').value,
+                embedAsIframe: document.getElementById('prevEmbedAsIframe').checked
+            };
+            Storage.set('previous_settings', settings);
+            alert('Previous Match settings saved!');
+        }
+
+        function renderAdminPrevMatches() {
+            const matches = Storage.get('previous_matches_list') || [];
+            const list = document.getElementById('adminPrevMatchesList');
+            if (!list) return;
+            
+            list.innerHTML = matches.map(m => `
+                <div class="list-item">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div style="text-align: right;">
+                            <div>${m.home}</div>
+                            <small>${m.date}</small>
+                        </div>
+                        <div style="background: var(--primary); padding: 2px 8px; border-radius: 4px; font-weight: bold;">${m.score}</div>
+                        <div>${m.away}</div>
+                    </div>
+                    <div class="item-actions">
+                        <button onclick="editPrevMatch(${m.id})"><i class="fas fa-edit"></i></button>
+                        <button onclick="deleteItem('previous_matches_list', ${m.id}, renderAdminPrevMatches)" style="color: #ff4444;"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addPrevMatch(e) {
+            e.preventDefault();
+            const matches = Storage.get('previous_matches_list') || [];
+            const id = document.getElementById('pmId').value;
+            
+            const matchData = {
+                id: id ? parseInt(id) : Date.now(),
+                home: document.getElementById('pmHome').value,
+                away: document.getElementById('pmAway').value,
+                homeLogo: document.getElementById('pmHomeLogo').value,
+                awayLogo: document.getElementById('pmAwayLogo').value,
+                score: document.getElementById('pmScore').value,
+                date: document.getElementById('pmDate').value,
+                videoUrl: document.getElementById('pmVideoUrl').value
+            };
+
+            if (id) {
+                const idx = matches.findIndex(m => m.id === parseInt(id));
+                matches[idx] = matchData;
+            } else {
+                matches.push(matchData);
+            }
+
+            Storage.set('previous_matches_list', matches);
+            resetPrevMatchForm();
+            renderAdminPrevMatches();
+        }
+
+        function resetPrevMatchForm() {
+            document.getElementById('prevMatchForm').reset();
+            document.getElementById('pmId').value = '';
+            document.getElementById('pmHomeLogo').value = '';
+            document.getElementById('pmAwayLogo').value = '';
+            document.getElementById('pmHomeLogoPreview').innerHTML = '';
+            document.getElementById('pmAwayLogoPreview').innerHTML = '';
+            document.getElementById('prevMatchSubmitBtn').textContent = 'Add Previous Match';
+            document.getElementById('prevMatchFormContainer').style.display = 'none';
+            document.getElementById('toggleAddPrevMatch').checked = false;
+        }
+
+        function handlePrevMatchLogo(event, team) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('pm' + team + 'Logo').value = e.target.result;
+                document.getElementById('pm' + team + 'LogoPreview').innerHTML = `<img src="${e.target.result}" style="height: 30px; width: 30px; object-fit: cover; border-radius: 50%;">`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function editPrevMatch(id) {
+            const matches = Storage.get('previous_matches_list') || [];
+            const match = matches.find(m => m.id === id);
+            if (!match) return;
+
+            document.getElementById('pmId').value = match.id;
+            document.getElementById('pmHome').value = match.home;
+            document.getElementById('pmAway').value = match.away;
+            document.getElementById('pmHomeLogo').value = match.homeLogo || '';
+            document.getElementById('pmAwayLogo').value = match.awayLogo || '';
+            
+            if (match.homeLogo) {
+                document.getElementById('pmHomeLogoPreview').innerHTML = `<img src="${match.homeLogo}" style="height: 30px; width: 30px; object-fit: cover; border-radius: 50%;">`;
+            } else {
+                document.getElementById('pmHomeLogoPreview').innerHTML = '';
+            }
+            
+            if (match.awayLogo) {
+                document.getElementById('pmAwayLogoPreview').innerHTML = `<img src="${match.awayLogo}" style="height: 30px; width: 30px; object-fit: cover; border-radius: 50%;">`;
+            } else {
+                document.getElementById('pmAwayLogoPreview').innerHTML = '';
+            }
+            
+            document.getElementById('pmScore').value = match.score;
+            document.getElementById('pmDate').value = match.date;
+            document.getElementById('pmVideoUrl').value = match.videoUrl;
+
+            document.getElementById('prevMatchSubmitBtn').textContent = 'Update Previous Match';
+            document.getElementById('prevMatchFormContainer').style.display = 'block';
+            document.getElementById('toggleAddPrevMatch').checked = true;
+            document.getElementById('managePreviousMatchesSection').scrollIntoView();
+        }
+
+        function renderStats() {
+            const users = Storage.get('users') || [];
+            const finance = Storage.get('finance_data') || { totalRevenue: 0, withdrawals: [] };
+            
+            // Calculate current balance (Total - Withdrawals)
+            const totalWithdrawals = finance.withdrawals.reduce((sum, w) => sum + w.amount, 0);
+            const balance = finance.totalRevenue - totalWithdrawals;
+
+            document.getElementById('userCount').textContent = users.length;
+            document.getElementById('matchCount').textContent = (Storage.get('matches') || []).length;
+            document.getElementById('codeCount').textContent = (Storage.get('transactions') || []).filter(t => t.status === 'valid').length;
+            document.getElementById('revenueTotal').textContent = 'KES ' + balance.toLocaleString();
+        }
+
+        function renderAdminUsers() {
+            const users = Storage.get('users') || [];
+            const list = document.getElementById('adminUsersList');
+            const now = new Date().getTime();
+            
+            list.innerHTML = users.map(u => {
+                const isOnline = u.lastSeen && (now - u.lastSeen < 20000); // Online if seen in last 20 seconds
+                const lastLoginDate = u.lastLogin ? new Date(u.lastLogin).toLocaleString() : 'N/A';
+                const subStatus = (u.subscription && new Date(u.expiry) > new Date()) ? u.subscription : 'None';
+                
+                return `
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 1rem; display: flex; align-items: center;">
+                            <img src="${u.photo || 'https://via.placeholder.com/30'}" style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px;">
+                            ${u.name}
+                        </td>
+                        <td style="padding: 1rem;"><strong style="color: var(--secondary)">${u.uid || 'N/A'}</strong></td>
+                        <td style="padding: 1rem;">${u.email}</td>
+                        <td style="padding: 1rem;"><small>${lastLoginDate}</small></td>
+                        <td style="padding: 1rem; color: ${subStatus !== 'None' ? '#00d4aa' : 'var(--text-muted)'}">${subStatus}</td>
+                        <td style="padding: 1rem;">${u.location || 'Unknown'}</td>
+                        <td style="padding: 1rem;">
+                            <span style="color: ${isOnline ? '#00d4aa' : '#8899ac'}">
+                                <i class="fas fa-circle" style="font-size: 8px;"></i> ${isOnline ? 'Online' : 'Offline'}
+                            </span>
+                        </td>
+                        <td style="padding: 1rem;">
+                            <button onclick="deleteItem('users', ${u.id}, renderAdminUsers)" style="background: none; border: none; color: #ff4444; cursor: pointer;"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function addNews(e) {
+            e.preventDefault();
+            const news = Storage.get('news') || [];
+            const nId = document.getElementById('nId').value;
+            const photo = document.getElementById('nImage').value;
+
+            if (!photo && !nId) {
+                alert('Please upload an image first');
+                return;
+            }
+            
+            const newsData = {
+                id: nId ? parseInt(nId) : Date.now(),
+                title: document.getElementById('nTitle').value,
+                image: photo || (nId ? news.find(n => n.id === parseInt(nId)).image : ''),
+                content: document.getElementById('nContent').value,
+                date: new Date().toISOString()
+            };
+
+            if (nId) {
+                const idx = news.findIndex(n => n.id === parseInt(nId));
+                news[idx] = newsData;
+            } else {
+                news.push(newsData);
+            }
+
+            Storage.set('news', news);
+            resetNewsForm();
+            renderAdminNews();
+        }
+
+        function handleNewsPhoto(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('nImage').value = e.target.result;
+                document.getElementById('nImagePreview').innerHTML = `<img src="${e.target.result}" style="width: 100px; height: 60px; object-fit: cover; border-radius: 5px;">`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function resetNewsForm() {
+            document.getElementById('newsForm').reset();
+            document.getElementById('nId').value = '';
+            document.getElementById('nImage').value = '';
+            document.getElementById('nImagePreview').innerHTML = '';
+            document.getElementById('newsSubmitBtn').textContent = 'Add News';
+            
+            // Hide the form and uncheck the checkbox
+            document.getElementById('toggleAddNews').checked = false;
+            document.getElementById('newsFormContainer').style.display = 'none';
+        }
+
+        function editNews(id) {
+            const news = Storage.get('news') || [];
+            const n = news.find(n => n.id === id);
+            if (n) {
+                document.getElementById('nId').value = n.id;
+                document.getElementById('nTitle').value = n.title;
+                document.getElementById('nImage').value = n.image;
+                document.getElementById('nImagePreview').innerHTML = `<img src="${n.image}" style="width: 100px; height: 60px; object-fit: cover; border-radius: 5px;">`;
+                document.getElementById('nContent').value = n.content;
+                
+                document.getElementById('newsSubmitBtn').textContent = 'Update News';
+                
+                // Show the form and check the checkbox
+                document.getElementById('toggleAddNews').checked = true;
+                document.getElementById('newsFormContainer').style.display = 'block';
+                window.scrollTo(0, 0);
+            }
+        }
+
+        function renderAdminNews() {
+            const news = Storage.get('news') || [];
+            const list = document.getElementById('adminNewsList');
+            list.innerHTML = news.map(n => `
+                <div class="admin-item">
+                    <div class="item-info">
+                        <strong><i class="fas fa-heading"></i> ${n.title}</strong>
+                        <small><i class="fas fa-calendar-alt"></i> ${new Date(n.date).toLocaleDateString()}</small>
+                    </div>
+                    <div class="item-actions">
+                        <button class="edit-btn" onclick="editNews(${n.id})"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="delete-btn" onclick="deleteItem('news', ${n.id}, renderAdminNews)"><i class="fas fa-trash"></i> Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleForm(checkboxId, containerId) {
+            const checkbox = document.getElementById(checkboxId);
+            const container = document.getElementById(containerId);
+            if (checkbox.checked) {
+                container.style.display = 'block';
+            } else {
+                container.style.display = 'none';
+                if (checkboxId === 'toggleAddMatch') resetMatchForm();
+            }
+        }
+
+        function toggleAddMatchForm() {
+            toggleForm('toggleAddMatch', 'matchFormContainer');
+        }
+
+        function addMatch(e) {
+            e.preventDefault();
+            const matches = Storage.get('matches') || [];
+            const mId = document.getElementById('mId').value;
+            
+            const matchData = {
+                id: mId ? parseInt(mId) : Date.now(),
+                home: document.getElementById('mHome').value,
+                homeLogo: document.getElementById('mHomeLogo').value || (mId ? (matches.find(m => m.id === parseInt(mId)) || {}).homeLogo : ''),
+                away: document.getElementById('mAway').value,
+                awayLogo: document.getElementById('mAwayLogo').value || (mId ? (matches.find(m => m.id === parseInt(mId)) || {}).awayLogo : ''),
+                date: document.getElementById('mDate').value,
+                time: document.getElementById('mTime').value,
+                status: document.getElementById('mStatus').value,
+                score: document.getElementById('mScore').value || '0 - 0',
+                isLive: document.getElementById('mStatus').value === 'live'
+            };
+
+            if (mId) {
+                const idx = matches.findIndex(m => m.id === parseInt(mId));
+                if (idx !== -1) matches[idx] = matchData;
+            } else {
+                matches.push(matchData);
+            }
+
+            Storage.set('matches', matches);
+            resetMatchForm();
+            renderAdminMatches();
+            renderStats();
+        }
+
+        function handleMatchPhoto(event, type) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById(`m${type}Logo`).value = e.target.result;
+                document.getElementById(`m${type}LogoPreview`).innerHTML = `<img src="${e.target.result}" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;">`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function resetMatchForm() {
+            document.getElementById('matchForm').reset();
+            document.getElementById('mId').value = '';
+            document.getElementById('mHomeLogo').value = '';
+            document.getElementById('mAwayLogo').value = '';
+            document.getElementById('mHomeLogoPreview').innerHTML = '';
+            document.getElementById('mAwayLogoPreview').innerHTML = '';
+            document.getElementById('matchSubmitBtn').textContent = 'Add Match';
+            document.getElementById('matchCancelBtn').style.display = 'none';
+            
+            // Hide the form and uncheck the checkbox when resetting/canceling
+            document.getElementById('toggleAddMatch').checked = false;
+            document.getElementById('matchFormContainer').style.display = 'none';
+        }
+
+        function editMatch(id) {
+            const matches = Storage.get('matches') || [];
+            const match = matches.find(m => m.id === id);
+            if (match) {
+                document.getElementById('mId').value = match.id;
+                document.getElementById('mHome').value = match.home;
+                document.getElementById('mHomeLogo').value = match.homeLogo || '';
+                document.getElementById('mHomeLogoPreview').innerHTML = match.homeLogo ? `<img src="${match.homeLogo}" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;">` : '';
+                
+                document.getElementById('mAway').value = match.away;
+                document.getElementById('mAwayLogo').value = match.awayLogo || '';
+                document.getElementById('mAwayLogoPreview').innerHTML = match.awayLogo ? `<img src="${match.awayLogo}" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;">` : '';
+                
+                document.getElementById('mDate').value = match.date;
+                document.getElementById('mTime').value = match.time;
+                document.getElementById('mStatus').value = match.status;
+                document.getElementById('mScore').value = match.score;
+                
+                document.getElementById('matchSubmitBtn').textContent = 'Update Match';
+                document.getElementById('matchCancelBtn').style.display = 'inline-block';
+                
+                // Show the form and check the checkbox when editing
+                document.getElementById('toggleAddMatch').checked = true;
+                document.getElementById('matchFormContainer').style.display = 'block';
+                
+                window.scrollTo(0, 0);
+            }
+        }
+
+        function renderAdminMatches() {
+            let matches = Storage.get('matches') || [];
+            const list = document.getElementById('adminMatchesList');
+            if (!list) return; // Prevent errors if we're not on matches section
+            const now = new Date();
+            let changed = false;
+
+            // First pass: Handle status transitions automatically
+            matches.forEach(m => {
+                const matchTime = new Date(m.date + ' ' + m.time);
+                const diffMs = matchTime - now;
+                
+                // Auto-transition to live if time passed
+                if (m.status === 'upcoming' && diffMs <= 0) {
+                    m.status = 'live';
+                    m.isLive = true;
+                    changed = true;
+                }
+            });
+
+            // Second pass: Sort matches (Finished always at bottom)
+            matches.sort((a, b) => {
+                const aStatusWeight = (a.status === 'finished') ? 2 : (a.status === 'live' ? 0 : 1);
+                const bStatusWeight = (b.status === 'finished') ? 2 : (b.status === 'live' ? 0 : 1);
+                
+                if (aStatusWeight !== bStatusWeight) {
+                    return aStatusWeight - bStatusWeight;
+                }
+                
+                // If same status, sort by date/time
+                return new Date(a.date + ' ' + a.time) - new Date(b.date + ' ' + b.time);
+            });
+
+            // Third pass: Render HTML
+            list.innerHTML = matches.map(m => {
+                const matchTime = new Date(m.date + ' ' + m.time);
+                const diffMs = matchTime - now;
+                const diffMins = Math.floor(diffMs / 60000);
+                const diffSecs = Math.floor((diffMs % 60000) / 1000);
+                
+                let countdownHtml = '';
+                
+                // If it's upcoming and within 1 hour (60 mins)
+                if (m.status === 'upcoming' && diffMins >= 0 && diffMins < 60) {
+                    const timeText = diffMins > 0 ? `${diffMins}m ${diffSecs}s` : `${diffSecs}s`;
+                    countdownHtml = `<div style="color: var(--primary); font-weight: bold; margin-top: 5px; font-size: 0.85rem;">
+                        <i class="fas fa-hourglass-start"></i> match starting in ${timeText}
+                    </div>`;
+                }
+
+                return `
+                    <div class="admin-item">
+                        <div class="item-info">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <img src="${m.homeLogo || 'https://via.placeholder.com/20'}" style="width: 25px; height: 25px; object-fit: cover; border-radius: 50%;">
+                                <strong>${m.home}</strong> vs 
+                                <strong>${m.away}</strong>
+                                <img src="${m.awayLogo || 'https://via.placeholder.com/20'}" style="width: 25px; height: 25px; object-fit: cover; border-radius: 50%;">
+                            </div>
+                            <small>
+                                <i class="fas fa-clock"></i> ${m.date} ${m.time} | 
+                                <i class="fas fa-info-circle"></i> <span style="color: ${m.status === 'live' ? 'var(--secondary)' : (m.status === 'finished' ? 'var(--text-muted)' : 'inherit')}">${m.status}</span> | 
+                                <i class="fas fa-poll-h"></i> Score: ${m.score}
+                            </small>
+                            ${countdownHtml}
+                        </div>
+                        <div class="item-actions">
+                            <button class="edit-btn" onclick="editMatch(${m.id})"><i class="fas fa-edit"></i> Edit</button>
+                            <button class="delete-btn" onclick="deleteItem('matches', ${m.id}, renderAdminMatches)"><i class="fas fa-trash"></i> Delete</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            if (changed) {
+                Storage.set('matches', matches);
+                renderStats();
+            }
+        }
+
+        function addCode(e) {
+            e.preventDefault();
+            const codes = Storage.get('transactions') || [];
+            const pricing = Storage.get('subscription_pricing') || { vip: 30, pro: 150, premium: 500 };
+            const duration = parseInt(document.getElementById('tDuration').value);
+            
+            // Map duration to price
+            let amount = 0;
+            if (duration === 1) amount = pricing.vip;
+            else if (duration === 7) amount = pricing.pro;
+            else if (duration === 30) amount = pricing.premium;
+
+            const newCode = {
+                id: Date.now(),
+                code: document.getElementById('tCode').value.toUpperCase(),
+                duration: duration,
+                status: 'valid'
+            };
+            codes.push(newCode);
+            Storage.set('transactions', codes);
+
+            // Update Finance Data
+            const finance = Storage.get('finance_data') || { totalRevenue: 0, withdrawals: [] };
+            finance.totalRevenue += amount;
+            Storage.set('finance_data', finance);
+
+            renderAdminCodes();
+            renderStats();
+            renderFinance();
+            e.target.reset();
+
+            // Hide form and uncheck checkbox
+            document.getElementById('toggleAddCode').checked = false;
+            document.getElementById('codeFormContainer').style.display = 'none';
+        }
+
+        function renderAdminCodes() {
+            const codes = Storage.get('transactions') || [];
+            const list = document.getElementById('adminCodesList');
+            const branding = Storage.get('site_branding') || {};
+            
+            if (document.getElementById('adminTillNumber')) {
+                document.getElementById('adminTillNumber').value = branding.tillNumber || '555666';
+            }
+
+            list.innerHTML = codes.map(c => `
+                <div class="admin-item">
+                    <div class="item-info">
+                        <strong><i class="fas fa-key"></i> ${c.code}</strong>
+                        <small><i class="fas fa-clock"></i> ${c.duration} days | Status: <span style="color: ${c.status === 'valid' ? 'var(--secondary)' : '#ff4444'}">${c.status}</span></small>
+                    </div>
+                    <div class="item-actions">
+                        <button class="delete-btn" onclick="deleteItem('transactions', ${c.id}, renderAdminCodes)"><i class="fas fa-trash"></i> Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function saveTillNumber() {
+            const till = document.getElementById('adminTillNumber').value.trim();
+            if (!till) {
+                alert('Please enter a till number');
+                return;
+            }
+            const branding = Storage.get('site_branding') || {};
+            branding.tillNumber = till;
+            Storage.set('site_branding', branding);
+            alert('Till Number saved successfully!');
+        }
+
+        function deleteItem(key, id, callback) {
+            if (confirm('Are you sure?')) {
+                // If we are deleting a transaction, revoke the user's subscription
+                if (key === 'transactions') {
+                    const codes = Storage.get('transactions') || [];
+                    const codeToDelete = codes.find(c => c.id === id);
+                    if (codeToDelete && codeToDelete.status === 'used' && codeToDelete.usedBy) {
+                        const users = Storage.get('users') || [];
+                        const userIdx = users.findIndex(u => u.email === codeToDelete.usedBy);
+                        if (userIdx !== -1) {
+                            users[userIdx].subscription = null;
+                            users[userIdx].expiry = null;
+                            Storage.set('users', users);
+                        }
+                    }
+                }
+                
+                Storage.delete(key, id);
+                callback();
+                renderStats();
+            }
+        }
+
+        function renderTableEditor() {
+            const table = Storage.get('league_table') || [];
+            const tbody = document.getElementById('tableEditorBody');
+            tbody.innerHTML = table.map((t, i) => `
+                <tr style="border-bottom: 1px solid var(--border);">
+                    <td style="padding: 5px;"><input type="number" style="width: 40px; padding: 5px;" value="${t.pos || (i+1)}" onchange="updateTableVal(${i}, 'pos', this.value)"></td>
+                    <td style="padding: 5px;">
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <img src="${t.logo || 'https://via.placeholder.com/25'}" id="logoPrev_${i}" style="width: 25px; height: 25px; object-fit: cover; border-radius: 50%;">
+                            <input type="file" accept="image/*" style="width: 80px; font-size: 10px;" onchange="handleTeamLogo(event, ${i})">
+                        </div>
+                    </td>
+                    <td style="padding: 5px;"><input type="text" style="width: 100px; padding: 5px;" value="${t.name || ''}" onchange="updateTableVal(${i}, 'name', this.value)"></td>
+                    <td style="padding: 5px;"><input type="number" style="width: 40px; padding: 5px;" value="${t.p || 0}" onchange="updateTableVal(${i}, 'p', this.value)"></td>
+                    <td style="padding: 5px;"><input type="number" style="width: 40px; padding: 5px;" value="${t.w || 0}" onchange="updateTableVal(${i}, 'w', this.value)"></td>
+                    <td style="padding: 5px;"><input type="number" style="width: 40px; padding: 5px;" value="${t.d || 0}" onchange="updateTableVal(${i}, 'd', this.value)"></td>
+                    <td style="padding: 5px;"><input type="number" style="width: 40px; padding: 5px;" value="${t.l || 0}" onchange="updateTableVal(${i}, 'l', this.value)"></td>
+                    <td style="padding: 5px;"><input type="number" style="width: 40px; padding: 5px;" value="${t.gd || 0}" onchange="updateTableVal(${i}, 'gd', this.value)"></td>
+                    <td style="padding: 5px;"><input type="number" style="width: 40px; padding: 5px;" value="${t.pts || 0}" onchange="updateTableVal(${i}, 'pts', this.value)"></td>
+                    <td style="padding: 5px;"><button onclick="deleteTableRow(${i})" style="background: none; border: none; color: #ff4444; cursor: pointer;"><i class="fas fa-minus-circle"></i></button></td>
+                </tr>
+            `).join('');
+        }
+
+        function handleTeamLogo(event, index) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const base64Image = e.target.result;
+                const table = Storage.get('league_table') || [];
+                table[index].logo = base64Image;
+                Storage.set('league_table', table);
+                document.getElementById(`logoPrev_${index}`).src = base64Image;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function addTableRow() {
+            const table = Storage.get('league_table') || [];
+            table.push({ pos: table.length + 1, logo: '', name: '', p: 0, w: 0, d: 0, l: 0, gd: 0, pts: 0 });
+            Storage.set('league_table', table);
+            renderTableEditor();
+        }
+
+        function deleteTableRow(index) {
+            const table = Storage.get('league_table') || [];
+            table.splice(index, 1);
+            Storage.set('league_table', table);
+            renderTableEditor();
+        }
+
+        function updateTableVal(index, key, val) {
+            const table = Storage.get('league_table');
+            table[index][key] = (key === 'name') ? val : parseInt(val);
+            Storage.set('league_table', table);
+        }
+
+        function handleWithdrawal() {
+            const amount = parseInt(document.getElementById('withdrawAmount').value);
+            const reason = document.getElementById('withdrawReason').value.trim();
+            const finance = Storage.get('finance_data') || { totalRevenue: 0, withdrawals: [] };
+            
+            const totalWithdrawals = finance.withdrawals.reduce((sum, w) => sum + w.amount, 0);
+            const currentBalance = finance.totalRevenue - totalWithdrawals;
+
+            if (!amount || amount <= 0) {
+                alert('Please enter a valid amount');
+                return;
+            }
+            if (amount > currentBalance) {
+                alert('Insufficient funds! Current balance is KES ' + currentBalance);
+                return;
+            }
+            if (!reason) {
+                alert('Please provide a reason for withdrawal');
+                return;
+            }
+
+            const withdrawal = {
+                id: Date.now(),
+                amount: amount,
+                reason: reason,
+                date: new Date().toISOString()
+            };
+
+            finance.withdrawals.push(withdrawal);
+            Storage.set('finance_data', finance);
+            
+            document.getElementById('withdrawAmount').value = '';
+            document.getElementById('withdrawReason').value = '';
+            
+            renderFinance();
+            renderStats();
+            alert('Withdrawal successful!');
+        }
+
+        function renderFinance() {
+            const finance = Storage.get('finance_data') || { totalRevenue: 0, withdrawals: [] };
+            const totalWithdrawals = finance.withdrawals.reduce((sum, w) => sum + w.amount, 0);
+            const balance = finance.totalRevenue - totalWithdrawals;
+
+            const balanceDisplay = document.getElementById('financeBalance');
+            const historyList = document.getElementById('withdrawalHistory');
+
+            if (balanceDisplay) balanceDisplay.textContent = 'KES ' + balance.toLocaleString();
+            
+            if (historyList) {
+                if (finance.withdrawals.length === 0) {
+                    historyList.innerHTML = '<p style="color: var(--text-muted);">No withdrawals yet.</p>';
+                    return;
+                }
+
+                historyList.innerHTML = finance.withdrawals.sort((a,b) => b.id - a.id).map(w => `
+                    <div class="admin-item">
+                        <div class="item-info">
+                            <strong style="color: #ff4444;">- KES ${w.amount.toLocaleString()}</strong>
+                            <small>${w.reason}</small>
+                            <small style="color: var(--text-muted); font-size: 0.7rem;">${new Date(w.date).toLocaleString()}</small>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function saveTable() {
+            alert('League Table saved successfully!');
+            renderTableEditor();
+            closeTableEditor();
+        }
+
+        function closeTableEditor() {
+            document.getElementById('toggleTableEditor').checked = false;
+            document.getElementById('tableEditorContainer').style.display = 'none';
+        }
+
+        window.addEventListener('storage', (e) => {
+            // Instant refresh for all settings when changed in another tab
+            if (e.key === 'users') {
+                const users = JSON.parse(e.newValue || '[]');
+                const updatedUser = users.find(u => u.email === currentUser.email);
+                if (updatedUser) {
+                    localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+                    Object.assign(currentUser, updatedUser);
+                }
+                renderAdminUsers();
+                renderStats();
+            }
+            if (e.key === 'matches') renderAdminMatches();
+            if (e.key === 'news') renderAdminNews();
+            if (e.key === 'transactions') renderAdminCodes();
+            if (e.key === 'league_table') renderTableEditor();
+            if (e.key === 'site_branding') {
+                renderBranding();
+                renderAdminAdverts();
+            }
+            if (e.key === 'social_links') renderSocialLinksSettings();
+            if (e.key === 'subscription_pricing') renderSubscriptionSettings();
+            if (e.key === 'finance_data') {
+                renderFinance();
+                renderStats();
+            }
+        });
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

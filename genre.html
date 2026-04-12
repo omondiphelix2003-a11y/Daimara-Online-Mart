@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Genre Scores | Basecamp</title>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/genre.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <div class="logo" id="siteLogoContainer" style="display: flex; align-items: center; gap: 10px;">
+            <!-- Dynamic Logo -->
+        </div>
+        <ul class="nav-links">
+            <li><a href="#" class="active" onclick="showSection('matches')">Home</a></li>
+            <li><a href="#" onclick="showSection('live')">Live Match</a></li>
+            <li><a href="#" onclick="showSection('subscription')">Subscribe</a></li>
+            <li><a href="#" onclick="showSection('news')">News</a></li>
+            <li><a href="#" onclick="showSection('profile')">Profile</a></li>
+            <li id="adminNavLink" style="display:none"><a href="admin.html" style="color: gold;"><i class="fas fa-user-shield"></i> Admin Panel</a></li>
+        </ul>
+        <div class="user-actions">
+            <img id="navProfilePic" src="https://via.placeholder.com/35" alt="" class="nav-profile-pic">
+            <span id="navUserName">User</span>
+            <button onclick="logout()" style="margin-left: 1rem;">Logout</button>
+        </div>
+    </nav>
+
+    <main class="content-container">
+        <!-- Matches Section -->
+        <section id="matchesSection" class="content-section">
+            <div class="sub-nav" style="align-items: center; justify-content: flex-start; gap: 2rem;">
+                <!-- Advert Carousel Section -->
+                <div id="advertSection" style="display: none; flex-shrink: 0;">
+                    <div class="advert-carousel">
+                        <div id="advertSlider" class="advert-slider">
+                            <!-- Dynamic Advert Images -->
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <button onclick="filterMatches('previous')">Watch Previous Match</button>
+                    <button class="active" onclick="filterMatches('today')">Match Today</button>
+                    <button onclick="filterMatches('upcoming')">Match Tomorrow</button>
+                </div>
+                <div id="realTimeClock" style="font-family: 'Oswald', sans-serif; color: var(--primary); font-weight: bold; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.2); padding: 5px 15px; border-radius: 25%; border: 1px solid var(--border);">
+                    <i class="fas fa-clock"></i> <span id="clockDisplay">00:00:00</span>
+                </div>
+                <button id="viewTableBtn" style="display:none" onclick="document.getElementById('leagueTableHeader').scrollIntoView({behavior: 'smooth'})">View Table</button>
+            </div>
+            <div class="matches-grid" id="matchesGrid">
+                <!-- Populated by JS -->
+            </div>
+
+            <!-- League Table (Visible for Subscribed) -->
+            <div id="leagueTableContainer" style="display:none; margin-top: 3rem;">
+                <h2 id="leagueTableHeader" style="font-family: 'Oswald', sans-serif; margin-bottom: 1.5rem; border-left: 4px solid var(--primary); padding-left: 1rem; scroll-margin-top: 100px;">League Table</h2>
+                <div style="background: #000000; padding: 1rem; border-radius: 4px; overflow-x: auto; border: 1px solid var(--border);">
+                    <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
+                        <thead style="background: rgba(196, 30, 58, 0.2); text-align: left;">
+                            <tr>
+                                <th style="padding: 12px; width: 50px;">Pos</th>
+                                <th style="padding: 12px; width: 60px;">Logo</th>
+                                <th style="padding: 12px;">Team</th>
+                                <th style="padding: 12px;">P</th>
+                                <th style="padding: 12px;">W</th>
+                                <th style="padding: 12px;">D</th>
+                                <th style="padding: 12px;">L</th>
+                                <th style="padding: 12px;">GD</th>
+                                <th style="padding: 12px;">Pts</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leagueTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Live Match Section -->
+        <section id="liveSection" class="content-section" style="display:none">
+            <div id="videoContainer" class="video-container">
+                <!-- If not paid, show payment page -->
+                <div id="livePaymentOverlay" class="payment-overlay">
+                    <h2>Premium Content</h2>
+                    <p>You need an active subscription to watch matches.</p>
+                    <button class="btn-primary" onclick="showSection('subscription')">Subscribe Now</button>
+                </div>
+                <!-- If paid, show overlay first -->
+                <div id="liveClickOverlay" class="click-overlay" style="display:none" onclick="startStream('live')">
+                    <span class="animated-text" id="liveOverlayText">Click to watch the live match</span>
+                </div>
+                <!-- If paid and clicked, show video -->
+                <div id="liveVideo" class="live-video" style="display:none; width: 100%; height: 100%;">
+                    <iframe id="liveIframe" width="100%" height="500" src="" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
+        </section>
+
+        <!-- Previous Match Section -->
+        <section id="previousSection" class="content-section" style="display:none">
+            <div id="prevVideoContainer" class="video-container">
+                <!-- If not paid, show payment page -->
+                <div id="prevPaymentOverlay" class="payment-overlay">
+                    <h2>Premium Content</h2>
+                    <p>You need an active subscription to watch matches.</p>
+                    <button class="btn-primary" onclick="showSection('subscription')">Subscribe Now</button>
+                </div>
+                <!-- If paid, show overlay first -->
+                <div id="prevClickOverlay" class="click-overlay" style="display:none" onclick="startStream('previous')">
+                    <span class="animated-text" id="prevOverlayText">Click to watch the previous match</span>
+                </div>
+                <!-- If paid and clicked, show video -->
+                <div id="prevVideo" class="live-video" style="display:none; width: 100%; height: 100%;">
+                    <iframe id="prevIframe" width="100%" height="500" src="" frameborder="0" allowfullscreen></iframe>
+                </div>
+            </div>
+        </section>
+
+        <!-- Subscription Section -->
+        <section id="subscriptionSection" class="content-section" style="display:none">
+            <div class="subscription-container">
+                <h2>Choose Your Plan</h2>
+                <div class="plans-grid" id="plansGrid">
+                    <!-- Dynamic Plans -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Payment Page -->
+        <section id="paymentSection" class="content-section" style="display:none">
+            <div class="payment-card">
+                <h2>M-Pesa Payment</h2>
+                <div class="payment-details">
+                    <p>Customer: <strong id="paymentUserName">Name</strong></p>
+                    <p>Plan: <strong id="paymentPlanName">Plan</strong></p>
+                    <p>Amount to Pay: <strong id="paymentAmount">KES 0</strong></p>
+                </div>
+                <div class="mpesa-steps">
+                    <p>1. Go to M-Pesa menu</p>
+                    <p>2. Select Lipa na M-Pesa</p>
+                    <p>3. Select Buy Goods and Services</p>
+                    <p>4. Enter Till Number: <strong id="paymentTillNumber">555666</strong> <i class="fas fa-copy" onclick="copyTillNumber()" style="cursor: pointer; color: var(--primary); margin-left: 5px;" title="Copy Till Number"></i></p>
+                    <p>5. Enter Amount: <strong id="stepAmount">0</strong></p>
+                    <p>6. Enter your PIN and complete</p>
+                </div>
+                <div style="text-align: right; margin: -10px 0 20px;">
+                    <a href="https://awj8.adj.st/open-app?adj_t=1hap4275" target="_blank" style="color: #43a047; font-size: 14px; font-weight: bold; text-decoration: solid;"> 
+                        <i class="fas fa-credit-card"></i> Click here to open your M-pesa App
+                    </a>
+                </div>
+                <div class="form-group">
+                    <label>Enter M-Pesa Transaction Code</label>
+                    <input type="text" id="mpesaCode" placeholder="e.g. QKJ7H8K9L0" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')" style="text-transform: uppercase;">
+                    <button class="btn-primary" id="verifyPaymentBtn" onclick="verifyPayment()">Verify Payment</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- News Section -->
+        <section id="newsSection" class="content-section" style="display:none">
+            <div class="news-grid" id="newsGrid">
+                <!-- Populated by JS -->
+            </div>
+        </section>
+
+        <!-- Profile Section -->
+        <section id="profileSection" class="content-section" style="display:none">
+            <div class="profile-card">
+                <div class="profile-image-container">
+                    <img id="profileDisplay" src="https://via.placeholder.com/150" alt="Profile Picture">
+                    <div class="upload-overlay" onclick="document.getElementById('photoInput').click()">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                </div>
+                <input type="file" id="photoInput" style="display:none" accept="image/*" onchange="handlePhotoUpload(event)">
+                <div id="editProfileArea" style="display:none; margin-top: 1rem; text-align: left;">
+                    <div class="form-group">
+                        <label style="font-size: 0.8rem; color: var(--text-muted);">Full Name</label>
+                        <input type="text" id="editProfileName" placeholder="Your Name">
+                    </div>
+                    <button class="btn-primary" style="width: 100%;" onclick="saveProfile()">Save Changes</button>
+                </div>
+                <h2 id="profileName">User Name</h2>
+                <p id="profileEmail">user@example.com</p>
+                <div style="margin: 1rem 0; padding: 10px; background: rgba(196, 30, 58, 0.05); border-left: 3px solid var(--primary); font-size: 0.85rem; color: var(--text-muted); text-align: left;">
+                    <i class="fas fa-shield-alt" style="color: var(--primary); margin-right: 5px;"></i>
+                    <strong>Account Security:</strong> Please save your Unique User ID below. You will need it to verify your identity if you ever need to reset your password.
+                </div>
+                <div id="profileUidContainer" style="margin-bottom: 1rem; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 10px;">
+                    <small style="color: var(--text-muted);">User ID: </small>
+                    <strong id="profileUid" style="color: var(--primary); letter-spacing: 1px;">GEN-XXXXX</strong>
+                    <i class="fas fa-copy" style="cursor: pointer; color: var(--text-muted);" title="Copy ID" onclick="copyUid()"></i>
+                </div>
+                <div class="form-group" style="margin-top: 1rem; text-align: left;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <label style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0;">Update Current Location</label>
+                        <input type="checkbox" id="toggleLocationEdit" onchange="document.getElementById('locationEditArea').style.display = this.checked ? 'block' : 'none'" style="cursor: pointer; width: auto; margin-bottom: 0;">
+                    </div>
+                    <div id="locationEditArea" style="display:none; margin-top: 10px;">
+                        <input type="text" id="profileLocation" placeholder="Your Location" style="margin-bottom: 5px;">
+                        <button class="btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem;" onclick="saveLocation()">Update Location</button>
+                    </div>
+                </div>
+                <div class="subscription-status">
+                    Status: <span id="subStatus">No Active Plan</span>
+                </div>
+                <button class="btn-secondary" style="margin-top: 1rem;" id="editProfileBtn" onclick="toggleEditProfile()">Edit Profile</button>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>About The Genre Scores</h3>
+                <p>The ultimate hub for soccer enthusiasts. Watch live matches, catch up on highlights, and stay updated with the latest scores anywhere, anytime.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <p><i class="fas fa-envelope" style="color: var(--primary); margin-right: 10px;"></i> <span id="footerEmail">support@thegenrescores.com</span></p>
+                <p><i class="fas fa-phone-alt" style="color: var(--primary); margin-right: 10px;"></i> <span id="footerPhone">+254 700 000 000</span></p>
+                <p><i class="fas fa-map-marker-alt" style="color: var(--primary); margin-right: 10px;"></i> <span id="footerLocation">Nairobi, Kenya</span></p>
+            </div>
+            <div class="footer-section">
+                <h3>Follow Us</h3>
+                <div class="social-links" id="footerSocialLinks">
+                    <a href="#" id="footerFb"><i class="fab fa-facebook"></i></a>
+                    <a href="#" id="footerTw"><i class="fab fa-twitter"></i></a>
+                    <a href="#" id="footerIg"><i class="fab fa-instagram"></i></a>
+                    <a href="#" id="footerTk"><i class="fab fa-tiktok"></i></a>
+                    <a href="#" id="footerYt"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 The Genre Scores. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/storage.js"></script>
+    <script>
+        let currentUser = null;
+        let selectedPlanData = null;
+
+        function renderAdverts() {
+            const adverts = Storage.get('adverts') || [];
+            const branding = Storage.get('site_branding') || {};
+            const section = document.getElementById('advertSection');
+            const slider = document.getElementById('advertSlider');
+            
+            if (adverts.length === 0 || branding.hideAdverts) {
+                section.style.display = 'none';
+                return;
+            }
+            
+            section.style.display = 'flex';
+            slider.innerHTML = adverts.map(ad => `
+                <img src="${ad.image}">
+            `).join('');
+            
+            // Sliding Logic
+            if (adverts.length > 1) {
+                let currentIndex = 0;
+                setInterval(() => {
+                    currentIndex = (currentIndex + 1) % adverts.length;
+                    slider.style.transform = `translateX(-${currentIndex * 350}px)`;
+                }, 3000); // Slide every 3 seconds
+            }
+        }
+
+        function renderFooterSocialLinks() {
+            const links = Storage.get('social_links') || { fb: '#', tw: '#', ig: '#', tk: '#', yt: '#', email: 'support@thegenrescores.com', phone: '+254 700 000 000', location: 'Nairobi, Kenya' };
+            const fb = document.getElementById('footerFb');
+            const tw = document.getElementById('footerTw');
+            const ig = document.getElementById('footerIg');
+            const tk = document.getElementById('footerTk');
+            const yt = document.getElementById('footerYt');
+            const email = document.getElementById('footerEmail');
+            const phone = document.getElementById('footerPhone');
+            const loc = document.getElementById('footerLocation');
+
+            if (fb) fb.href = links.fb || '#';
+            if (tw) tw.href = links.tw || '#';
+            if (ig) ig.href = links.ig || '#';
+            if (tk) tk.href = links.tk || '#';
+            if (yt) yt.href = links.yt || '#';
+            
+            if (email) email.textContent = links.email || 'support@thegenrescores.com';
+            if (phone) phone.textContent = links.phone || '+254 700 000 000';
+            if (loc) loc.textContent = links.location || 'Nairobi, Kenya';
+            
+            // Set target="_blank" if not default #
+            [fb, tw, ig, tk, yt].forEach(el => {
+                if (el && el.getAttribute('href') !== '#') {
+                    el.target = "_blank";
+                }
+            });
+        }
+
+        const formatDate = (dateStr) => {
+            const date = new Date(dateStr);
+            const d = date.getDate().toString().padStart(2, '0');
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const m = months[date.getMonth()];
+            const y = date.getFullYear();
+            return `${d} ${m} ${y}`;
+        };
+
+        const getEmbedUrl = (url) => {
+            if (!url) return "";
+
+            // Twitch Support
+            if (url.includes("twitch.tv/") || (!url.includes("youtube.com") && !url.includes("youtu.be") && !url.includes(".") && url.length > 0)) {
+                let channel = url;
+                if (url.includes("twitch.tv/")) {
+                    if (url.includes("channel=")) {
+                        channel = url.split("channel=")[1].split("&")[0];
+                    } else {
+                        const parts = url.split("twitch.tv/");
+                        if (parts.length > 1) {
+                            channel = parts[1].split("?")[0].split("/")[0];
+                        }
+                    }
+                }
+                const parent = window.location.hostname || "localhost";
+                return `https://player.twitch.tv/?channel=${channel}&parent=${parent}&autoplay=true`;
+            }
+            
+            if (url.includes("embed/")) return url;
+            
+            let videoId = "";
+            if (url.includes("v=")) {
+                videoId = url.split("v=")[1].split("&")[0];
+            } else if (url.includes("youtu.be/")) {
+                videoId = url.split("youtu.be/")[1].split("?")[0];
+            } else if (url.includes("shorts/")) {
+                videoId = url.split("shorts/")[1].split("?")[0];
+            }
+            
+            return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1` : url;
+        };
+
+        window.onload = () => {
+            updateBranding();
+            const storedUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (!storedUser) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Sync user data from global storage in case admin changed something
+            const users = Storage.get('users') || [];
+            currentUser = users.find(u => u.email === storedUser.email);
+            if (!currentUser) {
+                logout(); // User deleted
+                return;
+            }
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+            // Show admin link if admin
+            const branding = Storage.get('site_branding') || { adminEmail: 'omondiphelix2003@gmail.com' };
+            if (currentUser.email === (branding.adminEmail || 'omondiphelix2003@gmail.com')) {
+                document.getElementById('adminNavLink').style.display = 'block';
+            }
+
+            document.getElementById('navUserName').textContent = currentUser.name;
+            document.getElementById('profileName').textContent = currentUser.name;
+            document.getElementById('profileEmail').textContent = currentUser.email;
+            updateSubStatus();
+            updateProfileDisplay();
+            renderMatches('today');
+            renderLeagueTable();
+            renderNews();
+            renderPlans();
+            renderAdverts();
+            renderFooterSocialLinks();
+
+            // Check for redirect section from landing page
+            const redirect = localStorage.getItem('redirectSection');
+            if (redirect) {
+                showSection(redirect);
+                localStorage.removeItem('redirectSection');
+            }
+
+            // Automatic updates when storage changes (from another tab)
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'genre_scores_db') {
+                    // Update current user if it changed (subscription revocation)
+                    const data = JSON.parse(e.newValue || '{}');
+                    if (data.users) {
+                        const updatedUser = data.users.find(u => u.email === currentUser.email);
+                        if (updatedUser) {
+                            currentUser = updatedUser;
+                            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                            updateSubStatus();
+                            updateProfileDisplay();
+                        } else {
+                            logout(); // User deleted
+                        }
+                    }
+                    
+                    // Refresh data based on current visible section
+                    const currentSection = Array.from(document.querySelectorAll('.content-section'))
+                        .find(s => s.style.display === 'block')?.id.replace('Section', '');
+                    
+                    if (currentSection === 'matches') {
+                        renderMatches('today');
+                        renderLeagueTable();
+                    }
+                    if (currentSection === 'news') renderNews();
+                    if (currentSection === 'live' || e.key === 'live_settings') checkSectionAccess('live');
+                    if (e.key === 'site_branding') updateBranding();
+                    if (e.key === 'subscription_pricing') renderPlans();
+                    renderAdverts();
+                    renderFooterSocialLinks();
+                }
+            });
+
+            // Heartbeat for online status
+            updateLastSeen();
+            setInterval(updateLastSeen, 15000); // More frequent heartbeat (15s)
+            window.addEventListener('beforeunload', () => setOffline());
+
+            // Refresh matches every second for "instant" countdowns and status transitions
+            setInterval(() => {
+                // Update real-time clock if visible
+                const clock = document.getElementById('clockDisplay');
+                if (clock) {
+                    clock.textContent = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                }
+
+                // Always run renderMatches to handle background status transitions and storage updates
+                const activeBtn = document.querySelector('.sub-nav button.active');
+                if (activeBtn) {
+                    const filter = activeBtn.textContent.includes('Today') ? 'today' : (activeBtn.textContent.includes('Tomorrow') ? 'upcoming' : 'previous');
+                    renderMatches(filter);
+                } else {
+                    renderMatches('today');
+                }
+            }, 1000);
+
+            // Detect tab close / exit immediately
+            window.addEventListener('beforeunload', () => {
+                setOffline();
+            });
+        };
+
+        function updateBranding() {
+            const branding = Storage.get('site_branding') || { name: 'THE GENRE SCORES', logo: '', hideName: false };
+            const container = document.getElementById('siteLogoContainer');
+            
+            if (container) {
+                let logoHtml = '';
+                if (branding.logo) {
+                    logoHtml += `<img src="${branding.logo}" style="height: 110px; width: 200px; object-fit: cover; border-radius: 2px;">`;
+                }
+                
+                // Name is hidden here as per requirements
+                container.innerHTML = logoHtml;
+            }
+        }
+
+        function setOffline() {
+            if (!currentUser) return;
+            const users = Storage.get('users') || [];
+            const idx = users.findIndex(u => u.email === currentUser.email);
+            if (idx !== -1) {
+                users[idx].lastSeen = 0; // Immediate offline
+                Storage.set('users', users);
+            }
+        }
+
+        function updateLastSeen() {
+            if (!currentUser) return;
+            const users = Storage.get('users') || [];
+            const idx = users.findIndex(u => u.email === currentUser.email);
+            if (idx !== -1) {
+                const now = Date.now();
+                users[idx].lastSeen = now;
+                currentUser.lastSeen = now;
+                Storage.set('users', users);
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            }
+        }
+
+        function saveLocation() {
+            const loc = document.getElementById('profileLocation').value.trim();
+            if (!loc) return;
+            
+            currentUser.location = loc;
+            const users = Storage.get('users') || [];
+            const idx = users.findIndex(u => u.email === currentUser.email);
+            if (idx !== -1) {
+                users[idx].location = loc;
+                Storage.set('users', users);
+            }
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            // Hide edit area and uncheck
+            const toggle = document.getElementById('toggleLocationEdit');
+            if (toggle) {
+                toggle.checked = false;
+                document.getElementById('locationEditArea').style.display = 'none';
+            }
+            
+            alert('Location updated!');
+        }
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
+            const target = document.getElementById(sectionId + 'Section');
+            if (target) target.style.display = 'block';
+            
+            // Update active nav link
+            document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+            const navLink = document.querySelector(`[onclick="showSection('${sectionId}')"]`);
+            if (navLink) navLink.classList.add('active');
+
+            // Refresh data on every section switch to ensure "instant" updates from admin
+            if (sectionId === 'matches') {
+                const activeBtn = document.querySelector('.sub-nav button.active');
+                let filter = 'today';
+                if (activeBtn) {
+                    if (activeBtn.textContent.includes('Tomorrow')) filter = 'upcoming';
+                    else if (activeBtn.textContent.includes('Previous')) filter = 'previous';
+                }
+                renderMatches(filter);
+                renderLeagueTable();
+            }
+            if (sectionId === 'news') renderNews();
+            if (sectionId === 'live') {
+                checkSectionAccess('live');
+            }
+            if (sectionId === 'previous') {
+                checkSectionAccess('previous');
+            }
+        }
+
+        function filterMatches(type) {
+            renderMatches(type);
+            document.querySelectorAll('.sub-nav button').forEach(b => {
+                b.classList.remove('active');
+                if (type === 'today' && b.textContent.includes('Today')) b.classList.add('active');
+                if (type === 'upcoming' && b.textContent.includes('Tomorrow')) b.classList.add('active');
+                if (type === 'previous' && b.textContent.includes('Previous')) b.classList.add('active');
+            });
+        }
+
+        function selectPlan(name, price, days) {
+            selectedPlanData = { name, price, days };
+            const nameEl = document.getElementById('paymentUserName');
+            const planEl = document.getElementById('paymentPlanName');
+            const amountEl = document.getElementById('paymentAmount');
+            const verifyBtn = document.getElementById('verifyPaymentBtn');
+            const stepAmount = document.getElementById('stepAmount');
+            const tillEl = document.getElementById('paymentTillNumber');
+            const branding = Storage.get('site_branding') || {};
+
+            const planColors = {
+                'VIP': 'chocolate',
+                'Pro': '#000',
+                'Premium': '#c41e3a'
+            };
+            const color = planColors[name] || 'var(--primary)';
+
+            nameEl.textContent = currentUser.name;
+            nameEl.style.color = color;
+            
+            planEl.textContent = name;
+            planEl.style.color = color;
+            
+            amountEl.textContent = 'KES ' + price;
+            amountEl.style.color = color;
+            
+            stepAmount.textContent = price;
+            stepAmount.style.color = color;
+
+            if (tillEl) {
+                tillEl.textContent = branding.tillNumber || '555666';
+                tillEl.style.color = color;
+            }
+            
+            if (verifyBtn) {
+                verifyBtn.style.background = color;
+                verifyBtn.style.borderColor = color;
+            }
+
+            showSection('payment');
+        }
+
+        function checkSectionAccess(type) {
+            const branding = Storage.get('site_branding') || { adminEmail: 'omondiphelix2003@gmail.com' };
+            const isAdmin = currentUser.email === (branding.adminEmail || 'omondiphelix2003@gmail.com');
+            const isSubscribed = currentUser.subscription && new Date(currentUser.expiry) > new Date();
+            
+            const prefix = type === 'previous' ? 'prev' : 'live';
+            const settingsKey = type === 'previous' ? 'previous_settings' : 'live_settings';
+            const defaultText = type === 'previous' ? 'Click to watch the previous match' : 'Click to watch the live match';
+            
+            const paymentOverlay = document.getElementById(prefix + 'PaymentOverlay');
+            const clickOverlay = document.getElementById(prefix + 'ClickOverlay');
+            const overlayText = document.getElementById(prefix + 'OverlayText');
+            const videoArea = document.getElementById(prefix + 'Video');
+            const iframe = document.getElementById(prefix + 'Iframe');
+
+            if (isAdmin || isSubscribed) {
+                paymentOverlay.style.display = 'none';
+                
+                const settings = Storage.get(settingsKey) || { url: '', text: defaultText, image: '' };
+                
+                clickOverlay.style.display = 'flex';
+                clickOverlay.style.backgroundImage = settings.image ? `url(${settings.image})` : 'linear-gradient(45deg, #0a1628, #1a2a42)';
+                overlayText.textContent = settings.text || defaultText;
+                
+                videoArea.style.display = 'none';
+                iframe.src = ""; // Reset iframe
+            } else {
+                paymentOverlay.style.display = 'flex';
+                clickOverlay.style.display = 'none';
+                videoArea.style.display = 'none';
+            }
+        }
+
+        function startStream(type, customUrl = null) {
+            const prefix = type === 'previous' ? 'prev' : 'live';
+            const settingsKey = type === 'previous' ? 'previous_settings' : 'live_settings';
+            const settings = Storage.get(settingsKey);
+            
+            const url = customUrl || (settings ? settings.url : null);
+            
+            if (!url) {
+                alert(type === 'previous' ? 'No previous match video available.' : 'No live match at the moment.');
+                return;
+            }
+            
+            const clickOverlay = document.getElementById(prefix + 'ClickOverlay');
+            const videoArea = document.getElementById(prefix + 'Video');
+            const iframe = document.getElementById(prefix + 'Iframe');
+
+            const embedAsIframe = (settings && settings.embedAsIframe === false) ? false : true;
+
+            if (embedAsIframe) {
+                const embedUrl = getEmbedUrl(url);
+                clickOverlay.style.display = 'none';
+                videoArea.style.display = 'block';
+                iframe.src = embedUrl;
+            } else {
+                window.location.href = url;
+            }
+        }
+
+        function playMatchVideo(match) {
+            const branding = Storage.get('site_branding') || { adminEmail: 'omondiphelix2003@gmail.com' };
+            const isAdmin = currentUser.email === (branding.adminEmail || 'omondiphelix2003@gmail.com');
+            const isSubscribed = currentUser.subscription && new Date(currentUser.expiry) > new Date();
+            const hasPremiumAccess = isSubscribed && currentUser.subscription === 'Premium';
+
+            if (isAdmin || hasPremiumAccess) {
+                showSection('previous');
+                
+                const settings = Storage.get('previous_settings') || { text: 'Click to watch the previous match', image: '' };
+                const overlay = document.getElementById('prevClickOverlay');
+                const overlayText = document.getElementById('prevOverlayText');
+                
+                overlay.style.display = 'flex';
+                overlay.style.backgroundImage = settings.image ? `url(${settings.image})` : 'linear-gradient(45deg, #0a1628, #1a2a42)';
+                overlayText.textContent = `${match.home} vs ${match.away} - Watch Replay`;
+                
+                // Set click handler to play this specific video
+                overlay.onclick = () => startStream('previous', match.videoUrl);
+                
+                document.getElementById('prevVideo').style.display = 'none';
+                document.getElementById('prevIframe').src = "";
+                document.getElementById('prevPaymentOverlay').style.display = 'none';
+            } else {
+                showSection('previous');
+                document.getElementById('prevPaymentOverlay').style.display = 'flex';
+                document.getElementById('prevClickOverlay').style.display = 'none';
+                
+                // Update text to be specific about Premium
+                const overlayTitle = document.querySelector('#prevPaymentOverlay h2');
+                const overlayDesc = document.querySelector('#prevPaymentOverlay p');
+                if (overlayTitle) overlayTitle.textContent = 'Premium Access Only';
+                if (overlayDesc) overlayDesc.textContent = 'Previous matches are available for Premium members only.';
+            }
+        }
+
+        function verifyPayment() {
+            const code = document.getElementById('mpesaCode').value.trim().toUpperCase();
+            if (!code) {
+                alert('Please enter a code');
+                return;
+            }
+
+            const transactions = Storage.get('transactions') || [];
+            const validTransaction = transactions.find(t => t.code === code && t.status === 'valid');
+
+            if (validTransaction) {
+                // Use selected plan data or fallback to transaction duration
+                const duration = selectedPlanData ? selectedPlanData.days : (validTransaction.duration || 1);
+                const planName = selectedPlanData ? selectedPlanData.name : 'VIP';
+                
+                const expiry = new Date();
+                expiry.setDate(expiry.getDate() + duration);
+
+                currentUser.subscription = planName;
+                currentUser.expiry = expiry.toISOString();
+                
+                // Mark code as used
+                validTransaction.status = 'used';
+                validTransaction.usedBy = currentUser.email;
+                validTransaction.plan = planName;
+                Storage.set('transactions', transactions);
+
+                // Update user
+                const users = Storage.get('users');
+                const idx = users.findIndex(u => u.email === currentUser.email);
+                users[idx] = currentUser;
+                Storage.set('users', users);
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+                alert(`Payment verified! Your ${planName} membership is now active.`);
+                updateSubStatus();
+                showSection('live');
+            } else {
+                alert('Invalid or already used transaction code. Please try again after 3 minutes .contact our support team if this error keeps on showing.');
+            }
+        }
+
+        function updateSubStatus() {
+            const branding = Storage.get('site_branding') || { adminEmail: 'omondiphelix2003@gmail.com' };
+            const statusEl = document.getElementById('subStatus');
+            const plansGrid = document.querySelector('.plans-grid');
+            const subContainer = document.querySelector('.subscription-container');
+            const isAdmin = currentUser.email === (branding.adminEmail || 'omondiphelix2003@gmail.com');
+
+            if (isAdmin) {
+                statusEl.textContent = 'Admin Status: Full Access';
+                statusEl.style.color = 'gold';
+                if (plansGrid) plansGrid.style.display = 'none';
+                if (subContainer) {
+                    let activeMsg = document.getElementById('activeSubMsg');
+                    if (!activeMsg) {
+                        activeMsg = document.createElement('div');
+                        activeMsg.id = 'activeSubMsg';
+                        activeMsg.style.padding = '2rem';
+                        activeMsg.style.background = 'rgba(255, 215, 0, 0.1)';
+                        activeMsg.style.borderRadius = '10px';
+                        activeMsg.style.marginTop = '2rem';
+                        subContainer.appendChild(activeMsg);
+                    }
+                    activeMsg.innerHTML = `
+                        <i class="fas fa-user-shield" style="font-size: 3rem; color: gold; margin-bottom: 1rem;"></i>
+                        <h3>Admin Access</h3>
+                        <p>You have full access to all matches and premium content without a subscription.</p>
+                    `;
+                    activeMsg.style.display = 'block';
+                }
+                return;
+            }
+            
+            if (currentUser.subscription && new Date(currentUser.expiry) > new Date()) {
+                const expiryDate = formatDate(currentUser.expiry);
+                statusEl.textContent = `${currentUser.subscription} Status Active until ${expiryDate}`;
+                statusEl.style.color = '#00d4aa';
+                
+                // Hide subscription buttons if active
+                if (plansGrid) plansGrid.style.display = 'none';
+                
+                // Show a message in subscription section
+                if (subContainer) {
+                    let activeMsg = document.getElementById('activeSubMsg');
+                    if (!activeMsg) {
+                        activeMsg = document.createElement('div');
+                        activeMsg.id = 'activeSubMsg';
+                        activeMsg.style.padding = '2rem';
+                        activeMsg.style.background = 'rgba(0, 212, 170, 0.1)';
+                        activeMsg.style.borderRadius = '10px';
+                        activeMsg.style.marginTop = '2rem';
+                        subContainer.appendChild(activeMsg);
+                    }
+                    activeMsg.innerHTML = `
+                        <i class="fas fa-check-circle" style="font-size: 3rem; color: #00d4aa; margin-bottom: 1rem;"></i>
+                        <h3>You have an active ${currentUser.subscription} subscription</h3>
+                        <p>Valid until: <strong>${expiryDate}</strong></p>
+                        <p>You can enjoy all live matches and premium content.</p>
+                    `;
+                    activeMsg.style.display = 'block';
+                }
+            } else {
+                statusEl.textContent = 'No Active Plan';
+                statusEl.style.color = '#ff4444';
+                
+                // Show subscription buttons if expired
+                if (plansGrid) plansGrid.style.display = 'grid';
+                
+                // Hide active subscription message
+                const activeMsg = document.getElementById('activeSubMsg');
+                if (activeMsg) activeMsg.style.display = 'none';
+            }
+        }
+
+        function renderLeagueTable() {
+            const branding = Storage.get('site_branding') || { adminEmail: 'omondiphelix2003@gmail.com' };
+            const container = document.getElementById('leagueTableContainer');
+            const viewBtn = document.getElementById('viewTableBtn');
+            const isAdmin = currentUser.email === (branding.adminEmail || 'omondiphelix2003@gmail.com');
+            const isSubscribed = currentUser.subscription && new Date(currentUser.expiry) > new Date();
+
+            if (isAdmin || isSubscribed) {
+                container.style.display = 'block';
+                if (viewBtn) viewBtn.style.display = 'block';
+                const tableData = Storage.get('league_table') || [];
+                const tbody = document.getElementById('leagueTableBody');
+                tbody.innerHTML = tableData.map(t => `
+                    <tr style="border-bottom: 1px solid var(--border); background: #000000;">
+                        <td style="padding: 12px;">${t.pos}</td>
+                        <td style="padding: 12px;">
+                            <img src="${t.logo || 'https://via.placeholder.com/40'}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%; border: 1px solid var(--border); display: block;">
+                        </td>
+                        <td style="padding: 12px; font-weight: bold;">${t.name}</td>
+                        <td style="padding: 12px;">${t.p}</td>
+                        <td style="padding: 12px;">${t.w}</td>
+                        <td style="padding: 12px;">${t.d}</td>
+                        <td style="padding: 12px;">${t.l}</td>
+                        <td style="padding: 12px;">${t.gd}</td>
+                        <td style="padding: 12px; color: var(--primary); font-weight: bold;">${t.pts}</td>
+                    </tr>
+                `).join('');
+            } else {
+                container.style.display = 'none';
+                if (viewBtn) viewBtn.style.display = 'none';
+            }
+        }
+
+        const getLocalDateStr = (date) => {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        };
+
+        function renderMatches(filter) {
+            let matches = Storage.get('matches') || [];
+            const grid = document.getElementById('matchesGrid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            const now = new Date();
+            let changed = false;
+
+            // First pass: Handle status transitions automatically
+            matches.forEach(m => {
+                const matchTime = new Date(m.date + ' ' + m.time);
+                const diffMs = matchTime - now;
+                
+                // Auto-transition to live if time passed
+                if (m.status === 'upcoming' && diffMs <= 0) {
+                    m.status = 'live';
+                    m.isLive = true;
+                    changed = true;
+                }
+            });
+
+            // Second pass: Sort matches (Live > Upcoming > Finished)
+            matches.sort((a, b) => {
+                const aStatusWeight = (a.status === 'live') ? 0 : ((a.status === 'upcoming') ? 1 : 2);
+                const bStatusWeight = (b.status === 'live') ? 0 : ((b.status === 'upcoming') ? 1 : 2);
+                
+                if (aStatusWeight !== bStatusWeight) {
+                    return aStatusWeight - bStatusWeight;
+                }
+                
+                return new Date(a.date + ' ' + a.time) - new Date(b.date + ' ' + b.time);
+            });
+
+            const todayStr = getLocalDateStr(now);
+            
+            // Get tomorrow's date string
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const tomorrowStr = getLocalDateStr(tomorrow);
+
+            let filtered = [];
+            if (filter === 'previous') {
+                filtered = Storage.get('previous_matches_list') || [];
+            } else {
+                filtered = matches.filter(m => {
+                    if (filter === 'today') return m.date === todayStr;
+                    if (filter === 'upcoming') return m.date === tomorrowStr; // Only show tomorrow's matches
+                    return true;
+                });
+            }
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '<p style="text-align:center; width:100%; grid-column: 1/-1;">No matches available at the moment.</p>';
+                return;
+            }
+
+            filtered.forEach(m => {
+                const matchTime = new Date(m.date + ' ' + (m.time || '00:00'));
+                const diffMs = matchTime - now;
+                const diffMins = Math.floor(diffMs / 60000);
+                const diffSecs = Math.floor((diffMs % 60000) / 1000);
+                
+                let countdownHtml = '';
+                
+                // If it's upcoming and within 1 hour (60 mins)
+                if (m.status === 'upcoming' && diffMins >= 0 && diffMins < 60) {
+                    const timeText = diffMins > 0 ? `${diffMins}m ${diffSecs}s` : `${diffSecs}s`;
+                    countdownHtml = `<div class="countdown-timer" style="color: var(--primary); font-weight: bold; margin-top: 10px; font-size: 0.9rem; animation: pulse 1s infinite;">
+                        <i class="fas fa-hourglass-start"></i> match starting in ${timeText}
+                    </div>`;
+                }
+
+                const card = document.createElement('div');
+                card.className = 'match-card';
+                
+                if (filter === 'previous') {
+                    card.onclick = () => playMatchVideo(m);
+                } else if (m.isLive) {
+                    card.classList.add('live');
+                    card.style.borderColor = '#ff4444';
+                    card.style.position = 'relative';
+                    card.onclick = () => showSection('live');
+                } else if (m.status === 'finished') {
+                    card.style.cursor = 'pointer';
+                    card.onclick = () => showSection('previous');
+                }
+
+                card.innerHTML = `
+                    <div class="match-teams" style="display: flex; align-items: center; gap: 15px; justify-content: center; width: 100%;">
+                        <div style="flex: 1; text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 10px;">
+                            <span>${m.home}</span>
+                            <img src="${m.homeLogo || 'https://via.placeholder.com/30'}" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;">
+                        </div>
+                        <div style="background: var(--primary); padding: 5px 15px; border-radius: 5px; font-weight: bold; min-width: 60px; text-align: center;">
+                            ${m.score}
+                        </div>
+                        <div style="flex: 1; text-align: left; display: flex; align-items: center; justify-content: flex-start; gap: 10px;">
+                            <img src="${m.awayLogo || 'https://via.placeholder.com/30'}" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;">
+                            <span>${m.away}</span>
+                        </div>
+                    </div>
+                    <div class="match-info" style="margin-top: 10px; width: 100%; text-align: center; border-top: 1px solid var(--border); padding-top: 10px;">
+                        ${formatDate(m.date)} ${m.time ? '| ' + m.time : ''} | 
+                        <span class="status-text" style="color: ${m.status === 'live' ? '#ff4444' : 'inherit'}">${(m.status || 'FINISHED').toUpperCase()}</span>
+                    </div>
+                    ${countdownHtml}
+                    ${m.isLive ? '<span class="live-badge" style="position: absolute; top: 10px; right: 10px;">LIVE</span>' : ''}
+                `;
+                grid.appendChild(card);
+            });
+
+            if (changed) {
+                Storage.set('matches', matches);
+            }
+        }
+
+        function renderPlans() {
+            const pricing = Storage.get('subscription_pricing') || { vip: 30, pro: 150, premium: 500 };
+            const grid = document.getElementById('plansGrid');
+            if (!grid) return;
+            
+            grid.innerHTML = `
+                <div class="plan-card plan-vip">
+                    <i class="fas fa-crown" style="font-size: 3rem; color: chocolate; margin-bottom: 1rem;"></i>
+                    <h3 style="color: chocolate;">VIP</h3>
+                    <div class="plan-duration">24 Hours Access</div>
+                    <div class="plan-price">KES ${pricing.vip}</div>
+                    <ul style="list-style: none; padding: 0; margin: 1.5rem 0; text-align: left; color: var(--text-muted); font-size: 0.9rem;">
+                        <li style="margin-bottom: 8px;"><i class="fas fa-check" style="color: chocolate; margin-right: 8px;"></i> Live Matches</li>
+                        <li style="margin-bottom: 8px;"><i class="fas fa-check" style="color: chocolate; margin-right: 8px;"></i> Football Table</li>
+                        <li style="margin-bottom: 8px; opacity: 0.5;"><i class="fas fa-times" style="margin-right: 8px;"></i> News Updates</li>
+                        <li style="margin-bottom: 8px; opacity: 0.5;"><i class="fas fa-times" style="margin-right: 8px;"></i> Previous Matches</li>
+                    </ul>
+                    <button class="btn-primary" style="background: chocolate;" onclick="selectPlan('VIP', ${pricing.vip}, 1)">Select Plan</button>
+                </div>
+                <div class="plan-card plan-pro">
+                    <i class="fas fa-star" style="font-size: 3rem; color: #000; margin-bottom: 1rem;"></i>
+                    <h3 style="color: #000;">Pro</h3>
+                    <div class="plan-duration">7 Days Access</div>
+                    <div class="plan-price">KES ${pricing.pro}</div>
+                    <ul style="list-style: none; padding: 0; margin: 1.5rem 0; text-align: left; color: var(--text-muted); font-size: 0.9rem;">
+                        <li style="margin-bottom: 8px;"><i class="fas fa-check" style="color: #000; margin-right: 8px;"></i> Live Matches</li>
+                        <li style="margin-bottom: 8px;"><i class="fas fa-check" style="color: #000; margin-right: 8px;"></i> Football Table</li>
+                        <li style="margin-bottom: 8px;"><i class="fas fa-check" style="color: #000; margin-right: 8px;"></i> News Updates</li>
+                        <li style="margin-bottom: 8px; opacity: 0.5;"><i class="fas fa-times" style="margin-right: 8px;"></i> Previous Matches</li>
+                    </ul>
+                    <button class="btn-primary" style="background: #000; color: #fff;" onclick="selectPlan('Pro', ${pricing.pro}, 7)">Select Plan</button>
+                </div>
+                <div class="plan-card plan-premium">
+                    <i class="fas fa-gem" style="font-size: 3rem; color: #c41e3a; margin-bottom: 1rem;"></i>
+                    <h3 style="color: #c41e3a;">Premium</h3>
+                    <div class="plan-duration">30 Days Access</div>
+                    <div class="plan-price">KES ${pricing.premium}</div>
+                    <ul style="list-style: none; padding: 0; margin: 1.5rem 0; text-align: left; color: var(--text-muted); font-size: 0.9rem;">
+                        <li style="margin-bottom: 8px;"><i class="fas fa-check" style="color: #c41e3a; margin-right: 8px;"></i> Live Matches</li>
+                        <li style="margin-bottom: 8px;"><i class="fas fa-check" style="color: #c41e3a; margin-right: 8px;"></i> Football Table</li>
+                        <li style="margin-bottom: 8px;"><i class="fas fa-check" style="color: #c41e3a; margin-right: 8px;"></i> News Updates</li>
+                        <li style="margin-bottom: 8px;"><i class="fas fa-check" style="color: #c41e3a; margin-right: 8px;"></i> Previous Matches</li>
+                    </ul>
+                    <button class="btn-primary" style="background: #c41e3a;" onclick="selectPlan('Premium', ${pricing.premium}, 30)">Select Plan</button>
+                </div>
+            `;
+        }
+
+        function renderNews() {
+            const news = Storage.get('news') || [];
+            const grid = document.getElementById('newsGrid');
+            grid.innerHTML = '';
+            
+            // Access control for News (Pro and Premium only)
+            const isSubscribed = currentUser.subscription && new Date(currentUser.expiry) > new Date();
+            const hasNewsAccess = isSubscribed && (currentUser.subscription === 'Pro' || currentUser.subscription === 'Premium');
+            const branding = Storage.get('site_branding') || { adminEmail: 'omondiphelix2003@gmail.com' };
+            const isAdmin = currentUser.email === (branding.adminEmail || 'omondiphelix2003@gmail.com');
+
+            if (!isAdmin && !hasNewsAccess) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 3rem; background: var(--bg-card); border-radius: 4px;">
+                        <i class="fas fa-lock" style="font-size: 3rem; color: #c41e3a; margin-bottom: 1rem;"></i>
+                        <h3>News Access Restricted</h3>
+                        <p>News updates are available for Pro and Premium members only.</p>
+                        <button class="btn-primary" style="margin-top: 1rem; background: #c41e3a;" onclick="showSection('subscription')">Upgrade Plan</button>
+                    </div>
+                `;
+                return;
+            }
+
+            news.forEach(n => {
+                const card = document.createElement('div');
+                card.className = 'news-card';
+                card.innerHTML = `
+                    <img src="${n.image}" alt="${n.title}">
+                    <h3>${n.title}</h3>
+                    <p>${n.content.substring(0, 100)}...</p>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function handlePhotoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const base64Image = e.target.result;
+                currentUser.photo = base64Image;
+                
+                // Update Storage
+                const users = Storage.get('users') || [];
+                const idx = users.findIndex(u => u.email === currentUser.email);
+                if (idx !== -1) {
+                    users[idx].photo = base64Image;
+                    Storage.set('users', users);
+                }
+                
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                updateProfileDisplay();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function updateProfileDisplay() {
+            const photo = currentUser.photo || 'https://via.placeholder.com/150';
+            document.getElementById('profileDisplay').src = photo;
+            document.getElementById('navProfilePic').src = photo;
+            document.getElementById('profileName').textContent = currentUser.name;
+            document.getElementById('navUserName').textContent = currentUser.name;
+            
+            const uidDisplay = document.getElementById('profileUid');
+            if (uidDisplay) uidDisplay.textContent = currentUser.uid || 'N/A';
+            
+            const nameInput = document.getElementById('editProfileName');
+            if (nameInput) nameInput.value = currentUser.name || '';
+
+            const locInput = document.getElementById('profileLocation');
+            if (locInput) locInput.value = currentUser.location || '';
+        }
+
+        function copyUid() {
+            const uid = currentUser.uid;
+            if (uid) {
+                navigator.clipboard.writeText(uid).then(() => {
+                    alert('User ID copied to clipboard: ' + uid);
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                });
+            }
+        }
+
+        function toggleEditProfile() {
+            const area = document.getElementById('editProfileArea');
+            const btn = document.getElementById('editProfileBtn');
+            if (area.style.display === 'none') {
+                area.style.display = 'block';
+                btn.textContent = 'Cancel Edit';
+            } else {
+                area.style.display = 'none';
+                btn.textContent = 'Edit Profile';
+            }
+        }
+
+        function saveProfile() {
+            const newName = document.getElementById('editProfileName').value.trim();
+            if (!newName) {
+                alert('Name cannot be empty');
+                return;
+            }
+
+            currentUser.name = newName;
+            
+            // Update Storage
+            const users = Storage.get('users') || [];
+            const idx = users.findIndex(u => u.email === currentUser.email);
+            if (idx !== -1) {
+                users[idx].name = newName;
+                Storage.set('users', users);
+            }
+            
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            updateProfileDisplay();
+            toggleEditProfile();
+            alert('Profile updated successfully!');
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+
+        function copyTillNumber() {
+            const till = document.getElementById('paymentTillNumber').textContent;
+            navigator.clipboard.writeText(till).then(() => {
+                alert('Till Number ' + till + ' copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

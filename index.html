@@ -1,1117 +1,303 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Daimara Stores | Home</title>
-  <base target="_self">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-    
-:root{
-      --primary:#3b82f6;
-      --dark:#0f172a;
-      --bg:#0f172a;
-      --card:#1e293b;
-      --text:#e2e8f0;
-      --border:#334155;
-      --shadow:0 4px 6px -1px rgba(0, 0, 0, 0.3);      --glass: rgba(255, 255, 255, 0.05);
-      --glass-border: rgba(255, 255, 255, 0.1);    }
-
-
-    *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter', sans-serif}
-    body{background:#0f172a; font-size: 16px; padding-bottom: 80px; color: #e2e8f0; width: 100%; overflow-x: hidden;}
-    
-    @media (max-width: 768px) {
-      body { font-size: 14px; }
-      .ad-bar { padding: 0.5rem 1rem; font-size: 18px; }
-      .navbar { padding: 10px; }
-      .nav-center { display: none; }
-      .logo { font-size: 18px; }
-    }
-    
-    @media (orientation: landscape) and (max-height: 500px) {
-      .ad-bar { display: none; }
-      .navbar { top: 0; padding: 5px 10px; }
-      body { padding-top: 60px; }
-    }
-    
-    /* Horizontal scrolling for wide content */
-    .table-responsive, .scroll-x, .category-grid, .product-grid {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      max-width: 100%;
-    }
-
-/* PARA */
-.para{
- color: #e2e8f0;
-}
-
-/* ADVERTISEMENT BAR */
-    .ad-bar{
-      background:#082c6170;
-      color:#ffffff;
-      text-align:center;
-      padding:0.7rem 3rem;
-      font-size:22px;
-      font-weight:600;
-      position:sticky;
-      top:0;
-      z-index:1001;
-      animation: adBarPulse 4s infinite ease-in-out, adBarFlicker 3s infinite;
-    }
-
-    @keyframes adBarPulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
-
-    /*@keyframes adBarFlicker {
-      0%, 100% { opacity: 1; }
-      41% { opacity: 1; }
-      42% { opacity: 0.4; }
-      43% { opacity: 1; }
-      45% { opacity: 0.4; }
-      46% { opacity: 1; }
-    }*/
-
-div.h3{text-align: center; color: #082b61; font-size: 22px;
-   margin-top: 20px; margin-bottom: 20px;padding-top: 12px;}
-
-    /* NAVBAR */
-    .navbar{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:10px 20px;background:var(--glass);color:#fff;
-    position: fixed;
-    top: 40px;
-    left: 0;
-    width: 100%;
-    background-color: var(--glass);
-    z-index: 1000;
-    flex-wrap: wrap;
-     margin-top: 9px;
-     padding-top: 24px;
-     padding-bottom: 24px;
-     border-bottom: 1px solid var(--glass-border);
-     backdrop-filter: blur(12px);
-     -webkit-backdrop-filter: blur(12px);
-    }
-    .logo{color:white;font-size:20px;font-weight:bold;
-    display: flex;
-    align-items: center;
-    transition: color 0.3s;
-    cursor: pointer;
-    }
-    .nav-center{display:flex;align-items:center;gap:15px; margin-left: auto; margin-right: auto;}
-    .nav-center a{color:#3b82f6;text-decoration:none;font-size:20px;}
-    .nav-icons a{color:#e2e8f0;margin-left:10px;font-size:22px}
-
-.nav-center a:hover,
-.nav-center a.active {
-  color: #ffffff;
-}
-
-.nav-icons a:hover {
-  color:#3b82f6;
-}
-
-.cart-icon-container {
-  position: relative;
-  display: inline-block;
-}
-
-.cart-badge {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  background: red;
-  color: white;
-  border-radius: 50%;
-  padding: 2px 6px;
-  font-size: 12px;
-  font-weight: bold;
-  display: none;
-}
-
-@media (max-width: 768px) {
-  .logo {font-size: 18px;}
-  .nav-center { gap: 10px; }
-  .nav-center a { font-size: 16px; }
-  .nav-icons a { font-size: 18px; }
-  .navbar { padding: 8px 10px; top: 40px; }
-}
-
-
-   .search-container {
- position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
-      width: 90%; max-width: 300px; z-index: 1001;margin-top: -15px;
- }
-
-
-#search-input {
-  width: 100%;
-  padding: 8px 20px;
-  border: 1px solid #334155;
-  background-color: #1e293b;
-  border-radius: 4px;
-  color:#e2e8f0;
-   font-size: 16px;
-     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.726);
-}
-
-#search-input::placeholder {
-  color: #94a3b8;
- justify-items: center;
- opacity: 1; /* Ensure color is fully opaque */
-}
-
-#search-btn {
-  position: absolute;
-  right: -6px;
-  top: -4px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  
-}
-
-#search-results {
-  position: absolute;
-  top: 45px;
-  width: 100%;
-  background: #1e293b;
-  border: 1px solid #334155;
-  border-radius: 4px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.452);
-  display: none;
-  z-index: 1001;
-  font-size: 19px;
-  max-height: 300px;
-  overflow-y: auto;
-  left: 0;
-}
-
-#search-results div {
-  padding: 10px;
-  border-bottom: 1px solid #334155;
-  cursor: pointer;
-  color: #e2e8f0;
-  font-size: 19px;
-  transition: 0.2s;
-  background-color: #1e293b;
-}
-
-#search-results div:hover {
-  background: #0f172a;
-  color: #3b82f6;
-}
-
-#search-results strong {
-  color: #3b82f6;
-}
-
- 
-     /* SLIDER */
-        .slider {
-            width: 100%; max-width: 1350px; aspect-ratio: 16/9; max-height: 400px;
-            margin: 30px auto; overflow: hidden; border-radius: none;margin-top: 100px;
-        }
-        .slide { display: none; height: 100%; }
-        .slide img { width: 100%; height: 100%; object-fit: cover; }
-
-    
-    @media (max-width: 768px) {
-      .slider { margin-top: 180px; }
-    }
-
-
-    /* DELIVERY SECTIONS */
-    section{padding:20px 15px}
-    h2{color: #e2e8f0;text-align:center;margin-bottom:50px; font-size: 2.0rem;}
-    
-
-    /* DELIVERY */
-    .delivery{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin-top: -22px;}
-    
-    @media (max-width: 768px) {
-      .delivery {
-        display: flex !important;
-        overflow-x: auto;
-        scroll-behavior:smooth ;
-        gap: 15px;
-        padding: 10px 5px;
-        -webkit-overflow-scrolling: touch ;
-        scrollbar-width: none; /* Hide scrollbar Firefox */
-      }
-      .delivery::-webkit-scrollbar { display: none;} /* Hide scrollbar Chrome/Safari */
-      .delivery-card {
-        flex: 0 0 280px; /* Fixed width for horizontal scroll */
-      }
-    }
-
-    .delivery-card{
-      background:#1e293b;padding:15px;border-radius:4px;border:1px solid #334155;
-      box-shadow:0 5px 15px rgba(0, 0, 0, 0.397);text-align:center;}
-      .delivery-card img{width:100%;height: 300px;;aspect-ratio:1/1;object-fit:cover;border-radius: 2px;margin-top: 12px;margin-bottom: 12px;}
-      
-    
-    .delivery-card i{font-size:25px;margin-bottom:15px;color:#3b82f6}
-    button{
-      margin-top:10px;padding:8px 15px;border:none;border-radius:4px;
-      background:#0f172a;color:rgb(233, 157, 17);cursor:pointer;border:1px solid #FF6A00;
-    }
-    button:hover{border:1px solid #3b82f6;}
-
-    
-    /* VIDEO SECTION */
-    .video-box{
-      display:flex;
-      justify-content:center;
-      padding:1rem;
-      width: 100%;
-      overflow: hidden;
-      margin-top: -22px;
-    }
-
-    video{
-      width:100%;
-      max-width:1200px;
-      height: auto;
-      border-radius:4px;
-      box-shadow:var(--shadow);
-    }
-
-    /* PRODUCTS GRID */
-    .products {
-      display:grid;
-      grid-template-columns:repeat(auto-fill, minmax(180px, 1fr));
-      gap:20px;
-      padding:10px;
-      margin-top: -22px;
-    }
-    
-    .product{
-      background:linear-gradient(145deg, #1e293b, #0f172a);
-      border-radius:4px;overflow:hidden;box-shadow:0 5px 15px rgba(0, 0, 0, 0.329);
-      transition:all 0.3s ease;cursor:pointer;border:1px solid #334155;
-      display:flex;flex-direction:column;
-      width: 100%;
-    }
-
-    .product:hover{
-      transform:translateY(-4px) scale(1.02);
-      box-shadow:0 20px 40px -15px rgba(59, 130, 246, 0.3);
-      border-color: rgb(233, 157, 17);
-    }
-
-    .product img{
-      width:100%;height:180px;object-fit:cover;border-radius:4px 4px 0 0;display:block;margin:0;
-      padding:0;transition:transform 0.4s ease;
-    }
-
-    /*.product:hover img{
-      transform:scale(1.05);
-    }*/
-
-    .product-details{
-      padding:12px;flex-grow:1;display:flex;flex-direction:column;
-    }
-
-    .product h4{
-      font-size:16px;margin:0 0 5px 0;color:#e2e8f0;font-weight:600;flex-grow:1;margin-top: 12px;
-      margin-left: 5px;
-    }
-
-    .product p{
-      color:#3b82f6;font-size:18px;font-weight:bold;margin:5px 0;margin-left: 5px;
-    }
-
-    .product button{
-      width:100%;margin-top:10px;padding:10px;border:none;border-radius:0 0 4px 4px;
-       background-color: #000000;
-      color: rgb(233, 157, 17);
-      cursor:pointer;font-size:14px;font-weight:600;
-      transition:all 0.3s ease;box-shadow:0 2px 8px rgba(0, 0, 0, 0.3);border-top:1px solid #FF6A00;
-    }
-
-    .product button:hover{
-      background-color:#ffffff;color:#000000;transform:translateY(-2px);box-shadow:0 8px 15px rgba(59, 130, 246, 0.3);
-    }
-
-    /* FOOTER */
-    .footer {
-      background: #0f172a;
-      padding: 15px;
-      text-align: center;
-      position: static;
-      width: 100%;
-      margin-top:60px;
-      border-top: 1px solid #334155;
-      display: none; /* Hidden by default on large screens */
-    }
-    .footer p {
-      color: #e2e8f0;
-      font-size: 14px;
-      font-weight: bold;
-    }
-
-    @media (max-width: 768px) {
-      .footer { display: block; } /* Show on tablet/mobile */
-      .products {
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-        gap: 8px;
-        padding: 5px;
-      }
-      .product img { height: 100px; }
-      .product h4 { font-size: 11px; }
-      .product p { font-size: 13px; }
-      .product button { padding: 5px; font-size: 11px; }
-      
-      /* BOTTOM NAV */
-      .bottom-nav {
-        display: flex !important;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background: #000;
-        height: 60px;
-        justify-content: space-around;
-        align-items: center;
-        z-index: 2000;
-        border-top: 2px solid var(--primary);
-      }
-    }
-    
-    @media (min-width: 769px) {
-      .bottom-nav {
-        display: none !important;
-      }
-    }
-
-    /* LOADING STATE */
-    .loading-grid{
-      display:grid;grid-template-columns:repeat(auto-fill, minmax(250px, 1fr));gap:1.5rem;
-    }
-
-    .skeleton{
-      background:linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);background-size:200% 100%;
-      animation:loading 1.5s infinite;border-radius:4px;height:300px;
-    }
-
-    @keyframes loading{
-      0%{background-position:200% 0;}
-      100%{background-position:-200% 0;}
-    }
-
-    /* TOAST NOTIFICATION */
-    .toast{
-      position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(100px);
-      background:var(--dark);color:white;padding:1rem 1.5rem;border-radius:4px;
-      box-shadow:0 10px 25px rgba(0,0,0,0.2);display:flex;align-items:center;
-      gap:0.75rem;opacity:0;transition:all 0.3s;z-index:2000;font-weight:500;
-    }
-
-    .toast.show{
-      transform:translateX(-50%) translateY(0);
-      opacity:1;
-    }
-
-    /* RESPONSIVE BREAKPOINTS */
-    @media (max-width: 768px) {
-      body { font-size: 16px; padding-bottom: 80px; }
-      .navbar { top: 35px; flex-direction: row; height: 60px; padding: 10px; 
-        justify-content: space-between; align-items: center; }
-      .nav-center, .nav-icons { display: none !important; }
-      .search-container { top: 73px; width: 95%;margin-left: 34px; }
-      .slider { margin-top: 100px; }
-      
-      /* BOTTOM NAV */
-      .bottom-nav {
-        display: flex !important;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        background: #000;
-        height: 60px;
-        justify-content: space-around;
-        align-items: center;
-        z-index: 5000;
-        border-top: 2px solid var(--primary);
-      }
-      .bottom-nav a {
-        color: white;
-        text-decoration: none;
-        font-size: 20px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        flex: 1;
-        height: 100%;
-        justify-content: center;
-      }
-      .bottom-nav a.active { color: var(--primary); }
-      .bottom-nav a span { font-size: 10px; margin-top: 4px; }
-    }
-    
-    @media (min-width: 769px) {
-      .bottom-nav {
-        display: none !important;
-      }
-    }
-    /* HORIZONTAL SCROLL FOR LONG TEXT */
-    .scrollable-text {
-      overflow-x: auto;
-      white-space: nowrap;
-      /*-webkit-overflow-scrolling: touch;*/
-    }
-    
-    @media (max-width: 480px) {
-      .ad-bar { font-size: 12px; padding: 0.5rem;}
-      .navbar { top: 23px; height: 50px;padding-top: 13px;padding-bottom: 13px; }
-      .search-container { top: 54px;max-width: 200px;margin-left: 88px; }
-      .slider { margin-top: 80px; }
-      .delivery-card img { height: 150px; }
-      .products {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 8px;
-        padding: 5px;
-      }
-     
-      /* DELIVERY SECTIONS */
-    section{padding:20px 15px}
-    h2{color: #e2e8f0;text-align:center;margin-bottom:50px; font-size: 1.7rem;}
-     
-      /* VIDEO SECTION */
-    .video-box{
-      display:flex;
-      justify-content:center;
-      padding:1rem;
-      width: 110%;
-      overflow: hidden;
-      margin-left: -14px;
-    }
-
-    video{
-      width:100%;
-      max-width:1200px;
-      height: auto;
-      border-radius:4px;
-      box-shadow:var(--shadow);
-    }
-    }
-
-    /* DARK MODE */
-    @media (prefers-color-scheme:dark){
-      :root{
-        --bg:#1F2937;
-        --card:#1F2937;
-        --text:#f9fafb;
-        --border:#374151;
-      }
-
-      .skeleton{
-        background:linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
-      }
-    }
-
-    /* REDUCED MOTION */
-    @media (prefers-reduced-motion:reduce){
-      *{
-        animation-duration:0.01ms !important;
-        animation-iteration-count:1 !important;
-        transition-duration:0.01ms !important;
-      }
-    }
-    /* PRODUCT DETAILS MODAL */
-    .product-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(15, 23, 42, 0.171);
-      z-index: 2000;
-      overflow-y: auto;
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      padding: 20px;
-    }
-    .product-modal.show { display: block; }
-    .modal-container {
-      max-width: 1000px;
-      margin: 40px auto;
-      background: rgba(15, 23, 42, 0.171);
-      border-radius: 4px;
-      overflow: hidden;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      /*box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);*/
-      position: relative;
-    }
-    .modal-close {
-      position: absolute;
-      top: 32px;
-      right: 32px;
-      width: 40px;
-      height: 40px;
-      background: rgba(0,0,0,0.5);
-      /*border: 1px solid rgba(255,255,255,0.1);*/
-      color: white;
-      border-radius: 4;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      z-index: 10;
-      transition: 0.3s;
-    }
-    .modal-close:hover { background: #3b82f6; }
-    .modal-gallery { padding: 30px;  }
-    .main-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 4px; margin-bottom: 15px; /*border: 1px solid #334155;*/ }
-    .thumb-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-    .thumb-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 4px; cursor: pointer; 
-      border: 2px solid transparent; transition: 0.3s; }
-    .thumb-img:hover, .thumb-img.active { border-color: #3b82f6; }
-    .modal-info { padding: 40px; display: flex; flex-direction: column; gap: 20px; background: rgba(15, 23, 42, 0.171); }
-    .modal-info h2 { text-align: left; margin-bottom: 5px; font-size: 2rem; color: #ffffff; }
-    .modal-price { font-size: 1.8rem; color: #3b82f6; font-weight: bold; }
-    .modal-desc { color: #94a3b8; line-height: 1.6; font-size: 1rem; }
-    .modal-meta { display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem; color: #d4c3c3; 
-      border-top: 1px solid #334155; padding-top: 15px; }
-    .size-selector { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
-    .size-option {
-      padding: 8px 16px;
-      border: 1px solid #475569;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      transition: 0.3s;
-      background: rgba(15, 23, 42, 0.171);
-    }
-    .size-option:hover { border-color: #3b82f6; color: #3b82f6; }
-    .size-option.selected { background: rgba(15, 23, 42, 0.171); border-color: #3b82f6; color: white; }
-    .related-products { padding: 30px; border-top: 1px solid #334155; grid-column: span 2; }
-    .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; }
-    
-    @media (max-width: 768px) {
-      .modal-container { grid-template-columns: 1fr; margin: 0; border-radius: 0; }
-      .modal-info { padding: 25px; }
-      .related-products { grid-column: span 1;margin-bottom: 24px; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Genre Scores | Ultimate Soccer Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+    <nav class="main-nav" style="background: transparent; border-bottom: none; position: absolute; top: 0; left: 0; right: 0; z-index: 100; padding: 1.5rem 2.5rem;">
+        <div class="logo" id="siteLogoContainer" style="display: flex; align-items: center; gap: 10px; font-family: 'Oswald', sans-serif; font-size: 1.8rem; font-weight: bold; color: white;">
+            <!-- Dynamic Logo -->
+        </div>
+    </nav>
+    <!-- Hero Section -->
+    <section class="hero" id="heroSection">
+        <div class="hero-bg"></div>
+        <div class="hero-content">
+            <div class="hero-subtitle" id="heroSiteName">The Genre Scores</div>
+            <h1 class="hero-title">WATCH LIVE SOCCER <span>ANYWHERE, ANYTIME</span></h1>
+            <p class="hero-description">
+                Join the ultimate soccer community. Watch live matches, get latest scores, and stay updated with highlights.
+            </p>
+            <div class="hero-buttons">
+                <button class="btn-primary" onclick="openAuthModal('signup', true)">Create a Genre Account Now</button>
+                <button class="btn-secondary" onclick="openAuthModal('login')">Login</button>
+            </div>
+            <div style="margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
+                <i class="fas fa-envelope" style="color: #000000; margin-right: 5px;"></i> <span id="indexSupportEmail">support@thegenrescores.com</span>
+            </div>
+        </div>
+    </section>
 
-
- <!-- ADVERTISEMENT BAR -->
-  <div class="ad-bar">
-    <i class="fas fa-bullhorn"></i> Advertise with us! Contact sales@daimara.com
-  </div>
-
-      <nav class="navbar">
-      <a class="logo">
-        <span style="font-size:21px;color:white;margin-left:10px;margin-left: -3px;">Daimara <span style="color: #3b82f6;">Stores</span></span>
-      </a>
-
-      
-
-  <div class="nav-center" id="homeNav">
-    <a href="store.html"> <i class="fa fa-shopping-bag desktop-only"></i></a>
-    <a href="about.html"><i class="fas fa-info-circle desktop-only"></i></a>
-    <a href="contact.html"><i class="fas fa-phone desktop-only"></i></a>
-
-
-    <!--<input type="text" placeholder="Search products..." />-->
-  </div>
-
-  <div class="nav-icons" id="nav-icons-container">
-    <a href="login.html" id="userIconLink"><i class="fa fa-user"></i></a>
-    <a href="cart.html" title="Cart" class="cart-icon-container">
-      <i class="fa fa-shopping-cart"></i>
-      <span class="cart-badge" id="cartBadge">0</span>
-    </a>
-  </div>
-</nav>
-
-<div class="search-container">
-  <input type="text" id="search-input" placeholder="Search products...">
-  <!--<button id="search-btn">🔍</button>-->
-  <div id="search-results"></div>
-</div>
-
-
-
-<!-- SLIDESHOW -->
-<div class="slider" id="main-slider">
-  <div class="slide"><img src="https://picsum.photos/1200/400?1"></div>
-  <div class="slide"><img src="https://picsum.photos/1200/400?2"></div>
-  <div class="slide"><img src="https://picsum.photos/1200/400?3"></div>
-</div>
-
-<!-- DELIVERY OPTIONS -->
-<section>
-  <h2>Fast Home <span style="color:#3b82f6">Delivery</span></h2>
-  
-  <div class="delivery">
-      
-      <div class="delivery-card">
-       <i class="fa fa-tint"style="color:#87CEEB"></i>
-       <h3 style="color: #000000de;font-size: 18px;">Water Refilling & Delivery</h3>
-       <div class="product-card"><img src="https://images.unsplash.com/photo-1548839140-29a749e1cf4d?w=400&h=300&fit=crop" alt="Water"></div>
-       <p style="color: #3b82f6;font-size: 13px;">Clean and <span style="color: white;">safe water delivered</span> to your doorstep.</p>
-       <a href="drinking.html"><button>Order Now</button></a>
-      </div>
-     
-      <div class="delivery-card i">
-       <i class="fa fa-fire"style="color:#FF6A00"></i>
-       <h3 style="color: #000000de;font-size: 18px;">Gas Refilling & Delivery</h3>
-       <div class="product-card"><img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400&h=300&fit=crop" alt="Gas"></div>
-       <p style="color: #3b82f6;font-size: 13px;">Quick and <span style="color: white;">reliable gas refilling</span> service.</p>
-       <a href="gas-refill.html"><button>Order Now</button></a>
-      </div>
-
-      
-      <div class="delivery-card i">
-       <i class="fa-solid fa-mortar-pestle"class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center
-        text-white font-bold text-xl shadow-lg shadow-blue-500/30"></i>
-       <h3 style="color: #000000de;font-size: 18px;">MediCore Pharmacy</h3>
-       <div class="product-card"><img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400&h=300&fit=crop" alt="Gas"></div>
-       <p style="color: #3b82f6;font-size: 13px;">Smart Pharmacy Care <span style="color: white;">with live Chat Support system</span> & Fast Medicine Delivery.</p>
-       <a href="MediCore Pharmacy.html"><button>Order Now</button></a>
-      </div>
-    
-  </div>
-</section>
-
-<!-- VIDEO AD -->
-<section>
-  
-  <h2>Featured <span style="color:#3b82f6">Promotion</span></h2>
-  
-  <div class="video-box" id="featured-promotion-home" style="position: relative;">
-    <video id="promo-video-home" autoplay muted loop style="width: 100%; max-width: 1400px; border-radius: 4px;">
-      <source src="video2.mp4" type="video/mp4">
-    </video>
-    <div class="video-controls-overlay" style="position: absolute; bottom: 20px; right: 40px; background: none; 
-    padding: 10px; border-radius: 30px; display: flex; align-items: center; gap: 10px;">
-        <i class="fas fa-volume-up" style="color: rgb(247, 247, 247); font-size: 20px;"></i>
-        <input type="range" id="volume-slider-home" min="0" max="1" step="0.1" value="0" style="width: 100px; cursor: pointer;">
+    <!-- Auth Modal -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal-container">
+            <button class="modal-close" onclick="closeAuthModal()">&times;</button>
+            <div class="form-container">
+                <h2 id="modalTitle">Create Account</h2>
+                <form id="authForm" onsubmit="handleAuth(event)">
+                    <div id="credentialsReminder" style="display:none; background: rgba(196, 30, 58, 0.1); padding: 10px; border-radius: 4px; margin-bottom: 1rem; font-size: 0.8rem; color: var(--primary); text-align: center;">
+                        <i class="fas fa-info-circle"></i> Please save your credentials and unique User ID for future access.
+                    </div>
+                    <div class="form-group" id="nameGroup">
+                        <label><i class="fas fa-user"></i> Full Name</label>
+                        <input type="text" id="userName" placeholder="Enter your name">
+                    </div>
+                    <div id="signupFields">
+                        <div class="form-group">
+                            <label><i class="fas fa-envelope"></i> Email</label>
+                            <input type="email" id="userEmail" required placeholder="Enter your email">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-map-marker-alt"></i> Your Location (e.g. City, Country)</label>
+                            <input type="text" id="userLocation" placeholder="Enter your current location">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label id="passwordLabel"><i class="fas fa-lock"></i> Password</label>
+                        <input type="password" id="userPassword" required placeholder="Enter password">
+                    </div>
+                    <div id="forgotPasswordContainer" style="text-align: right; margin-top: -10px; margin-bottom: 10px; display: none;">
+                        <a href="#" onclick="openAuthModal('forgot')" style="color: var(--primary); font-size: 0.9rem; text-decoration: none;">Forgot Password?</a>
+                    </div>
+                    <button type="submit" class="submit-btn" id="submitBtn">Sign Up</button>
+                </form>
+                <p class="switch-text" id="switchText">Already have an account? <a href="#" onclick="toggleAuthMode()">Login</a></p>
+            </div>
+        </div>
     </div>
-  </div>
 
-</section>
+    <script src="js/storage.js"></script>
+    <script>
+        let authMode = 'signup';
+        let shouldRedirectToSub = false;
 
- <!-- RANDOM PRODUCTS -->
-  <section>
-    <h2>Trending <span style="color:#3b82f6">Products</span></h2>
-    <div class="products" id="random-products">
-      <div class="loading-grid">
-        <div class="skeleton"></div>
-        <div class="skeleton"></div>
-        <div class="skeleton"></div>
-        <div class="skeleton"></div>
-      </div>
-    </div>
-  </section>
+        function openAuthModal(mode, redirectSub = false) {
+            authMode = mode;
+            shouldRedirectToSub = redirectSub;
+            const modal = document.getElementById('authModal');
+            const title = document.getElementById('modalTitle');
+            const submitBtn = document.getElementById('submitBtn');
+            const nameGroup = document.getElementById('nameGroup');
+            const signupFields = document.getElementById('signupFields');
+            const switchText = document.getElementById('switchText');
+            const passwordLabel = document.getElementById('passwordLabel');
+            const forgotPasswordContainer = document.getElementById('forgotPasswordContainer');
+            const reminder = document.getElementById('credentialsReminder');
 
-
-  <div id="productDetailsModal" class="product-modal">
-    <div class="modal-container">
-      <div class="modal-close" onclick="closeProductDetails()"><i class="fas fa-times"></i></div>
-      
-      <div class="modal-gallery">
-        <img id="modalMainImg" src="" class="main-img" alt="Product">
-        <div id="modalThumbGrid" class="thumb-grid"></div>
-      </div>
-      
-      <div class="modal-info">
-        <div>
-          <h2 id="modalTitle">Product Name</h2>
-          <p id="modalCategory" style="font-size: 0.9rem; color: #3b82f6;"></p>
-        </div>
-        
-        <div class="modal-price" id="modalPrice">Ksh 0.00</div>
-        
-        <div id="modalStars" class="stars" style="margin-bottom: 10px;"></div>
-        
-        <div class="modal-desc" id="modalDesc">
-          Detailed description goes here...
-        </div>
-        
-        <div id="sizeSection" style="display:none;">
-          <h4 style="font-size: 0.9rem; margin-bottom: 5px;">Select Size:</h4>
-          <div id="modalSizes" class="size-selector"></div>
-        </div>
-        
-        <div class="modal-meta">
-          <p><strong>Supplier:</strong> <span id="modalSupplier">N/A</span></p>
-          <p><strong>SKU:</strong> <span id="modalSKU">N/A</span></p>
-          <p><strong>Availability:</strong> <span id="modalStock" style="color: #10b981;">In Stock</span></p>
-        </div>
-        
-        <div style="display: flex; gap: 15px; margin-top: 10px;">
-          <button id="modalAddToCartBtn" style="flex: 1; padding: 15px; background: #3b82f6; color: white; border: none; font-weight: bold; font-size: 1rem; cursor: pointer; border-radius: 10px;">
-            <i class="fas fa-cart-plus"></i> ADD TO CART
-          </button>
-          <a href="cart.html" style="padding: 15px; background: #1e293b; color: white; border: 1px solid #334155; border-radius: 10px; display: flex; align-items: center; justify-content: center; width: 60px;">
-            <i class="fas fa-shopping-cart"></i>
-          </a>
-        </div>
-      </div>
-      
-      <div class="related-products">
-        <h3 style="border-bottom: 1px solid #334155; padding-bottom: 10px; margin-bottom: 20px;">Related Products</h3>
-        <div id="relatedGrid" class="related-grid"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- TOAST -->
-  <div id="toast" class="toast">
-    <i class="fas fa-check-circle" style="color:#3b82f6;font-size:1.2rem"></i>
-    <span id="toast-msg">Item added to cart!</span>
-  </div>
-
-<script src="data-manager.js"></script>
-<script src="auth-check.js"></script>
-<script>
-  // SLIDER
-  let slideIndex = 0;
-  function initSlideshow() {
-    const campaigns = DataManager.getAllCampaigns();
-    const homeSlides = campaigns.filter(c => c.adType === 'slideshow' && c.targetPage === 'home');
-    const slider = document.getElementById('main-slider');
-    
-    if (homeSlides.length > 0) {
-      slider.innerHTML = homeSlides.map(c => `
-        <div class="slide"><img src="${c.media}"></div>
-      `).join('');
-    }
-    
-    const slides = document.querySelectorAll('.slide');
-    if (slides.length === 0) return;
-
-    function showSlides(){
-      slides.forEach(s => s.style.display='none');
-      slideIndex = (slideIndex + 1) > slides.length ? 1 : slideIndex + 1;
-      slides[slideIndex-1].style.display='block';
-      setTimeout(showSlides, 3000);
-    }
-    showSlides();
-  }
-
-  // FEATURED PROMOTION (VIDEO)
-  function initHomePromotion() {
-    const campaigns = DataManager.getAllCampaigns();
-    const promo = campaigns.find(c => c.adType === 'video' && c.videoAudioType === 'audioated');
-    const video = document.getElementById('promo-video-home');
-    const volumeSlider = document.getElementById('volume-slider-home');
-    
-    if (promo && video) {
-      video.src = promo.media;
-    }
-
-    if (video && volumeSlider) {
-      volumeSlider.addEventListener('input', (e) => {
-        video.volume = e.target.value;
-        video.muted = (video.volume === 0);
-      });
-    }
-  }
-
-  window.addEventListener('DOMContentLoaded', () => {
-    initSlideshow();
-    initHomePromotion();
-  });
-
-  // PRODUCT DETAILS MODAL LOGIC
-  let currentProduct = null;
-  let selectedSize = null;
-
-  window.openProductDetails = function(id) {
-    const all = getAllFlattened();
-    const product = all.find(p => p.id === id);
-    if (!product) return;
-    
-    currentProduct = product;
-    selectedSize = null;
-    
-    const modal = document.getElementById('productDetailsModal');
-    document.getElementById('modalTitle').innerText = product.name;
-    document.getElementById('modalCategory').innerText = `${product.category} > ${product.subcategory}`;
-    document.getElementById('modalPrice').innerText = `Ksh ${product.price.toLocaleString()}`;
-    document.getElementById('modalDesc').innerText = product.description || 'No description available.';
-    document.getElementById('modalSupplier').innerText = product.supplier || 'Daimara Official';
-    document.getElementById('modalSKU').innerText = product.sku || 'N/A';
-    document.getElementById('modalMainImg').src = product.image || 'https://picsum.photos/400/400';
-    
-    // Stars
-    const starsEl = document.getElementById('modalStars');
-    if (starsEl) {
-      starsEl.innerHTML = '';
-      const rating = product.rating || 0;
-      for (let i = 1; i <= 5; i++) {
-        const isFull = i <= Math.floor(rating);
-        const isHalf = !isFull && i <= Math.ceil(rating) && (rating % 1 !== 0);
-        
-        if (isFull) {
-          starsEl.innerHTML += '<i class="fas fa-star" style="color:#fbbf24; font-size:1.2rem; margin-right:5px;"></i>';
-        } else if (isHalf) {
-          starsEl.innerHTML += '<i class="fas fa-star-half-alt" style="color:#fbbf24; font-size:1.2rem; margin-right:5px;"></i>';
-        } else {
-          starsEl.innerHTML += '<i class="far fa-star" style="color:#fbbf24; font-size:1.2rem; margin-right:5px;"></i>';
+            if (mode === 'login') {
+                title.textContent = 'Welcome Back';
+                submitBtn.textContent = 'Login';
+                nameGroup.style.display = 'none';
+                reminder.style.display = 'none';
+                if (passwordLabel) {
+                    passwordLabel.parentElement.style.display = 'block';
+                    passwordLabel.innerHTML = `<i class="fas fa-lock"></i> Password`;
+                }
+                if (forgotPasswordContainer) forgotPasswordContainer.style.display = 'block';
+                if (signupFields) signupFields.innerHTML = `
+                    <div class="form-group">
+                        <label><i class="fas fa-envelope"></i> Email</label>
+                        <input type="email" id="userEmail" required placeholder="Enter your email">
+                    </div>
+                `;
+                switchText.innerHTML = `New here? <a href="#" onclick="toggleAuthMode()">Sign Up</a>`;
+            } else if (mode === 'forgot') {
+                title.textContent = 'Reset Password';
+                submitBtn.textContent = 'Verify Details';
+                nameGroup.style.display = 'none';
+                reminder.style.display = 'none';
+                if (passwordLabel) {
+                    passwordLabel.parentElement.style.display = 'none';
+                    passwordLabel.innerHTML = `<i class="fas fa-lock"></i> New Password`;
+                }
+                if (forgotPasswordContainer) forgotPasswordContainer.style.display = 'none';
+                if (signupFields) signupFields.innerHTML = `
+                    <div class="form-group">
+                        <label><i class="fas fa-envelope"></i> Email</label>
+                        <input type="email" id="userEmail" required placeholder="Enter your registered email">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-id-card"></i> Unique User ID</label>
+                        <input type="text" id="userIdInput" required placeholder="Enter your Unique ID (e.g. GEN-XXXX)">
+                    </div>
+                `;
+                switchText.innerHTML = `Remembered? <a href="#" onclick="openAuthModal('login')">Login</a>`;
+            } else {
+                title.textContent = 'Create Account';
+                submitBtn.textContent = 'Sign Up';
+                nameGroup.style.display = 'block';
+                reminder.style.display = 'block';
+                if (passwordLabel) {
+                    passwordLabel.parentElement.style.display = 'block';
+                    passwordLabel.innerHTML = `<i class="fas fa-lock"></i> Password`;
+                }
+                if (forgotPasswordContainer) forgotPasswordContainer.style.display = 'none';
+                if (signupFields) signupFields.innerHTML = `
+                    <div class="form-group">
+                        <label><i class="fas fa-envelope"></i> Email</label>
+                        <input type="email" id="userEmail" required placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-map-marker-alt"></i> Your Location (e.g. City, Country)</label>
+                        <input type="text" id="userLocation" placeholder="Enter your current location">
+                    </div>
+                `;
+                switchText.innerHTML = `Already have an account? <a href="#" onclick="toggleAuthMode()">Login</a>`;
+            }
+            modal.style.display = 'flex';
         }
-      }
-      if (rating > 0) {
-        starsEl.innerHTML += `<span style="color:#94a3b8; margin-left:10px; font-size:0.9rem;">(${rating.toFixed(1)})</span>`;
-      }
-    }
 
-    // Thumbs
-    const thumbGrid = document.getElementById('modalThumbGrid');
-    thumbGrid.innerHTML = '';
-    const allPhotos = [product.image, ...(product.otherImages || product.otherPhotos || [])].filter(Boolean);
-    allPhotos.forEach((photo, idx) => {
-      const img = document.createElement('img');
-      img.src = photo;
-      img.className = `thumb-img ${idx === 0 ? 'active' : ''}`;
-      img.onclick = () => {
-        document.getElementById('modalMainImg').src = photo;
-        document.querySelectorAll('.thumb-img').forEach(t => t.classList.remove('active'));
-        img.classList.add('active');
-      };
-      thumbGrid.appendChild(img);
-    });
+        function closeAuthModal() {
+            document.getElementById('authModal').style.display = 'none';
+            shouldRedirectToSub = false;
+        }
 
-    // Sizes
-    const sizeSection = document.getElementById('sizeSection');
-    const sizesContainer = document.getElementById('modalSizes');
-    if (product.sizes && product.sizes.length > 0) {
-      sizeSection.style.display = 'block';
-      sizesContainer.innerHTML = '';
-      product.sizes.forEach(size => {
-        const span = document.createElement('span');
-        span.className = 'size-option';
-        span.innerText = size;
-        span.onclick = () => {
-          selectedSize = size;
-          document.querySelectorAll('.size-option').forEach(s => s.classList.remove('selected'));
-          span.classList.add('selected');
+        function toggleAuthMode() {
+            openAuthModal(authMode === 'signup' ? 'login' : 'signup', shouldRedirectToSub);
+        }
+
+        function handleAuth(event) {
+            event.preventDefault();
+            const email = document.getElementById('userEmail').value;
+            const password = document.getElementById('userPassword').value;
+            const name = document.getElementById('userName') ? document.getElementById('userName').value : '';
+            const location = document.getElementById('userLocation') ? document.getElementById('userLocation').value : '';
+            const userIdInput = document.getElementById('userIdInput') ? document.getElementById('userIdInput').value : '';
+
+            const users = Storage.get('users') || [];
+
+            if (authMode === 'signup') {
+                if (users.find(u => u.email === email)) {
+                    alert('User already exists!');
+                    return;
+                }
+                // Generate Unique ID: GEN-XXXXX (5 random letters/numbers)
+                const uid = 'GEN-' + Math.random().toString(36).substr(2, 5).toUpperCase();
+                
+                const newUser = { 
+                    id: Date.now(), 
+                    uid: uid,
+                    name, 
+                    email, 
+                    password, 
+                    role: 'user', 
+                    subscription: null,
+                    lastLogin: new Date().toISOString(),
+                    location: location || 'Unknown',
+                    lastSeen: Date.now()
+                };
+                users.push(newUser);
+                Storage.set('users', users);
+                localStorage.setItem('currentUser', JSON.stringify(newUser));
+                
+                alert('Account created successfully! Your Unique ID is: ' + uid + '. Please save it.');
+                
+                if (shouldRedirectToSub) {
+                    localStorage.setItem('redirectSection', 'subscription');
+                }
+                window.location.href = 'genre.html';
+            } else if (authMode === 'forgot') {
+                const user = users.find(u => u.email === email && u.uid === userIdInput);
+                const passwordGroup = document.getElementById('userPassword').parentElement;
+                const submitBtn = document.getElementById('submitBtn');
+
+                if (submitBtn.textContent === 'Reset Password') {
+                    // Actual reset step
+                    const userIdx = users.findIndex(u => u.email === email && u.uid === userIdInput);
+                    if (userIdx !== -1) {
+                        users[userIdx].password = password;
+                        Storage.set('users', users);
+                        alert('Password reset successful! You can now login.');
+                        openAuthModal('login');
+                    }
+                    return;
+                }
+
+                if (user) {
+                    // Verification success
+                    passwordGroup.style.display = 'block';
+                    document.getElementById('passwordLabel').textContent = 'Enter New Password';
+                    submitBtn.textContent = 'Reset Password';
+                    // Disable inputs to prevent changes during reset
+                    document.getElementById('userEmail').disabled = true;
+                    document.getElementById('userIdInput').disabled = true;
+                } else {
+                    alert('Details do not match our records. Please check your email and Unique ID.');
+                }
+            } else {
+                const userIdx = users.findIndex(u => u.email === email && u.password === password);
+                if (userIdx !== -1) {
+                    const user = users[userIdx];
+                    user.lastLogin = new Date().toISOString();
+                    user.lastSeen = Date.now();
+                    users[userIdx] = user;
+                    Storage.set('users', users);
+                    
+                    localStorage.setItem('currentUser', JSON.stringify(user));
+                    if (shouldRedirectToSub) {
+                        localStorage.setItem('redirectSection', 'subscription');
+                    }
+                    window.location.href = 'genre.html';
+                } else {
+                    alert('Invalid credentials!');
+                }
+            }
+        }
+
+        // Check if already logged in
+        window.onload = () => {
+            updateBranding();
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            if (user) {
+                window.location.href = 'genre.html';
+            }
         };
-        sizesContainer.appendChild(span);
-      });
-    } else {
-      sizeSection.style.display = 'none';
-    }
 
-    // Related Products
-    const relatedGrid = document.getElementById('relatedGrid');
-    const related = all.filter(p => p.subcategory === product.subcategory && p.id !== product.id).slice(0, 4);
-    relatedGrid.innerHTML = '';
-    related.forEach(p => {
-      relatedGrid.innerHTML += `
-        <div class="product" onclick="openProductDetails('${p.id}')" style="font-size: 14px;">
-          <img src="${p.image || 'https://picsum.photos/200/200'}" style="height: 120px;">
-          <h4 style="font-size: 12px; margin: 5px;">${p.name}</h4>
-          <p style="font-size: 14px; margin: 5px;">Ksh ${p.price}</p>
-        </div>
-      `;
-    });
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'genre_scores_db') {
+                updateBranding();
+            }
+        });
 
-    // Add to Cart
-    document.getElementById('modalAddToCartBtn').onclick = () => {
-      if (product.sizes && product.sizes.length > 0 && !selectedSize) {
-        alert('Please select a size first');
-        return;
-      }
-      const itemToCart = { ...product, selectedSize: selectedSize };
-      const res = DataManager.addToCart(itemToCart);
-      if (res.success) {
-        showToast(`${product.name} added to cart!`);
-      } else {
-        alert(res.message || 'Error adding to cart');
-      }
-      
-      // Redirect or show cart
-      setTimeout(() => {
-        closeProductDetails();
-      }, 1000);
-    };
+        function updateBranding() {
+            const branding = Storage.get('site_branding') || { name: 'THE GENRE SCORES', logo: '', landingBg: '', hideName: false };
+            const socialLinks = Storage.get('social_links') || { email: 'support@thegenrescores.com' };
+            const container = document.getElementById('siteLogoContainer');
+            const heroName = document.getElementById('heroSiteName');
+            const heroSection = document.getElementById('heroSection');
+            const emailSpan = document.getElementById('indexSupportEmail');
+            
+            if (emailSpan) {
+                emailSpan.textContent = socialLinks.email || 'support@thegenrescores.com';
+            }
 
-    modal.classList.add('show');
-    document.body.style.overflow = 'hidden';
-  };
+            if (container) {
+                let logoHtml = '';
+                
+                if (!branding.hideName) {
+                    // Split name to colorize the last word like the original design
+                    const parts = (branding.name || '').split(' ');
+                    const last = parts.pop();
+                    const main = parts.join(' ');
+                    logoHtml += `<div>${main} <span style="color: #c41e3a;">${last}</span></div>`;
+                }
+                container.innerHTML = logoHtml;
+            }
+            
+            if (heroName) {
+                heroName.textContent = branding.name;
+                heroName.style.display = branding.hideName ? 'none' : 'block';
+            }
 
-  window.closeProductDetails = function() {
-    document.getElementById('productDetailsModal').classList.remove('show');
-    document.body.style.overflow = 'auto';
-  };
-
-  function showToast(msg) {
-    const toast = document.getElementById('toast');
-    if (toast) {
-      document.getElementById('toast-msg').innerText = msg;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 3000);
-    } else {
-      alert(msg);
-    }
-  }
-
-  function getAllFlattened(){
-    const all = DataManager.getAllProducts();
-    return Object.keys(all).reduce((acc,k)=> acc.concat(all[k]||[]), []);
-  }
-
-  // RANDOM PRODUCTS (from DataManager)
-  (function(){
-    const rndContainer = document.getElementById('random-products');
-
-    window.addToCartById = function(id, e){
-      if(e) e.stopPropagation();
-      const res = DataManager.addToCart(id);
-      if (res.success) {
-        showToast(`${res.product.name} added to cart!`);
-      } else {
-        alert(res.message || 'Error adding to cart');
-      }
-    };
-
-    function renderRandom(n=4){
-      if(!rndContainer) return;
-      const all = getAllFlattened();
-      if(all.length === 0){ rndContainer.innerHTML = '<p>No products available yet.</p>'; return; }
-      const shuffled = all.slice().sort(()=>0.5-Math.random()).slice(0,n);
-      rndContainer.innerHTML = '';
-      shuffled.forEach(p => {
-        const img = p.image || 'https://picsum.photos/300/200';
-        rndContainer.innerHTML += `
-          <div class="product" onclick="openProductDetails('${p.id}')">
-            <img src="${img}">
-            <h4>${p.name}</h4>
-            <p>Ksh ${p.price}</p>
-            <button onclick="addToCartById('${p.id}', event)">Add to Cart</button>
-          </div>`;
-      });
-    }
-
-    renderRandom(50);
-  })();
-
-// DELIVERY AUTO-SCROLL
-  (function() {
-    const delivery = document.querySelector('.delivery');
-    if (!delivery) return;
-
-    let isScrolling = false;
-    let scrollInterval;
-    let resumeTimeout;
-
-    function startAutoScroll() {
-      if (window.innerWidth > 768) return; // Only for small screens
-      scrollInterval = setInterval(() => {
-        if (!isScrolling) {
-          delivery.scrollLeft += 1;
-          if (delivery.scrollLeft >= (delivery.scrollWidth - delivery.clientWidth)) {
-            delivery.scrollLeft = 0;
-          }
+            if (heroSection && branding.landingBg) {
+                heroSection.style.backgroundImage = `linear-gradient(rgba(10, 22, 40, 0.8), rgba(10, 22, 40, 0.8)), url('${branding.landingBg}')`;
+            }
         }
-      }, 30);
-    }
-
-    delivery.addEventListener('scroll', () => {
-      isScrolling = true;
-      clearTimeout(resumeTimeout);
-      resumeTimeout = setTimeout(() => {
-        isScrolling = false;
-      }, 2000);
-
-    });
-
-    delivery.addEventListener('touchstart', () => {
-      isScrolling = true;
-      clearTimeout(resumeTimeout);
-    });
-
-    startAutoScroll();
-
-  })();
-
-  // Search functionality
-const searchInput = document.getElementById('search-input');
-const searchBtn = document.getElementById('search-btn');
-const searchResults = document.getElementById('search-results');
-
-function performSearch() {
-  const query = searchInput.value.trim().toLowerCase();
-  if (!query) {
-    searchResults.style.display = 'none';
-    return;
-  }
-
-  const allProducts = [];
-  const products = DataManager.getAllProducts();
-  Object.values(products).forEach(categoryList => {
-    allProducts.push(...categoryList);
-  });
-
-  const results = allProducts.filter(p => 
-    p.name.toLowerCase().includes(query) || 
-    (p.description && p.description.toLowerCase().includes(query))
-  );
-
-  if (results.length > 0) {
-    searchResults.innerHTML = results.map(p => {
-      let url = 'store.html?search=' + encodeURIComponent(p.name);
-      if (p.subcategory === 'Gas') url = 'gas-refill.html';
-      if (p.subcategory === 'Water') url = 'water refil.html';
-      
-      return `
-        <div onclick="window.location.href='${url}'">
-          <strong>${p.name}</strong><br>
-          <span style="font-size: 12px; color: #666;">Ksh ${p.price}</span>
-        </div>
-      `;
-    }).join('');
-    searchResults.style.display = 'block';
-  } else {
-    searchResults.innerHTML = '<div style="padding: 10px;">No products found</div>';
-    searchResults.style.display = 'block';
-  }
-}
-
-searchInput.addEventListener('input', performSearch);
-searchBtn.addEventListener('click', () => {
-  const query = searchInput.value.trim();
-  if (query) {
-    window.location.href = `store.html?search=${encodeURIComponent(query)}`;
-  }
-});
-
-// Close search results when clicking outside
-document.addEventListener('click', (e) => {
-  if (!searchInput.contains(e.target) && !searchResults.contains(e.target) && !searchBtn.contains(e.target)) {
-    searchResults.style.display = 'none';
-  }
-});
-
-
-</script>
-<div class="bottom-nav">
-  <a href="store.html" class="active"><i class="fa fa-shopping-bag"></i><span>Store</span></a>
-  <a href="about.html"><i class="fas fa-info-circle"></i><span>About</span></a>
-  <a href="contact.html"><i class="fas fa-phone"></i><span>Contact</span></a>
-  <a href="cart.html" style="position:relative;">
-    <i class="fa fa-shopping-cart"></i>
-    <span class="cart-badge" id="bottomCartBadge" style="position:absolute; top:-5px; right:15px; background:red; color:white; border-radius:50%; padding:2px 5px; font-size:10px; display:none;">0</span>
-    <span>Cart</span>
-  </a>
-  <a href="profile.html"><i class="fa fa-user"></i><span>Profile</span></a>
-</div>
+    </script>
 </body>
 </html>
