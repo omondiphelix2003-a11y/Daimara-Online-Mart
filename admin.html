@@ -1265,6 +1265,7 @@ Storage.init();
         }
 
         function showSection(id) {
+            window.scrollTo(0, 0);
             document.querySelectorAll('.admin-section').forEach(s => s.style.display = 'none');
             document.getElementById(id + 'Section').style.display = 'block';
 

@@ -97,6 +97,8 @@ img {
 .form-group label { display: block; margin-bottom: 0.5rem; text-align: left; max-width: 320px; margin: 0 auto 0.5rem; }
 .form-group label i { color: black; margin-right: 5px; }
 .form-group input { width: 100%; max-width: 320px; display: block; margin: 0 auto; padding: 0.8rem; background: #0a1628; border: 1px solid #333; color: white; }
+.password-wrapper { position: relative; max-width: 320px; margin: 0 auto; }
+.password-wrapper i.toggle-password { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted); z-index: 10; }
 .submit-btn { width: 100%; max-width: 320px; display: block; margin: 0 auto; }
 .switch-text { margin-top: 1rem; text-align: center; }
 .switch-text a { color: var(--primary); }
@@ -182,7 +184,10 @@ img {
                     </div>
                     <div class="form-group">
                         <label id="passwordLabel"><i class="fas fa-lock"></i> Password</label>
-                        <input type="password" id="userPassword" required placeholder="Enter password">
+                        <div class="password-wrapper">
+                            <input type="password" id="userPassword" required placeholder="Enter password" style="padding-right: 40px; margin: 0;">
+                            <i class="fas fa-eye toggle-password" id="togglePasswordBtn" onclick="togglePasswordVisibility('userPassword', 'togglePasswordBtn')"></i>
+                        </div>
                     </div>
                     <div id="forgotPasswordContainer" style="text-align: right; margin-top: -10px; margin-bottom: 10px; display: none;">
                         <a href="#" onclick="openAuthModal('forgot')" style="color: var(--primary); font-size: 0.9rem; text-decoration: none;">Forgot Password?</a>
@@ -369,6 +374,20 @@ Storage.init();
 
         function toggleAuthMode() {
             openAuthModal(authMode === 'signup' ? 'login' : 'signup', shouldRedirectToSub);
+        }
+
+        function togglePasswordVisibility(inputId, btnId) {
+            const input = document.getElementById(inputId);
+            const btn = document.getElementById(btnId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                btn.classList.remove('fa-eye');
+                btn.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                btn.classList.remove('fa-eye-slash');
+                btn.classList.add('fa-eye');
+            }
         }
 
         function handleAuth(event) {
