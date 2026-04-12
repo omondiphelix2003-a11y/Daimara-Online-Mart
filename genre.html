@@ -678,7 +678,7 @@ img {
                     <p>6. Enter your PIN and complete</p>
                 </div>
                 <div style="text-align: right; margin: -10px 0 20px;">
-                    <a href="https://awj8.adj.st/open-app?adj_t=1hap4275" target="_blank" style="color: #43a047; font-size: 14px; font-weight: bold; text-decoration: solid;"> 
+                    <a href="javascript:void(0)" onclick="openMpesaApp()" style="color: #43a047; font-size: 14px; font-weight: bold; text-decoration: solid;"> 
                         <i class="fas fa-credit-card"></i> Click here to open your M-pesa App
                     </a>
                 </div>
@@ -1791,6 +1791,25 @@ Storage.init();
             }).catch(err => {
                 console.error('Failed to copy: ', err);
             });
+        }
+
+        function openMpesaApp() {
+            const adjustLink = "https://awj8.adj.st/open-app?adj_t=1hap4275";
+            const playStoreLink = "https://play.google.com/store/apps/details?id=com.safaricom.mpesa.lifestyle";
+            
+            // Attempt to open via Adjust (Official Safaricom deep link)
+            const start = Date.now();
+            window.location.href = adjustLink;
+            
+            // Fallback to Play Store if the app doesn't open within 2.5 seconds
+            setTimeout(() => {
+                if (Date.now() - start < 3000) {
+                    // If the page is still visible, the app likely didn't open
+                    if (!document.hidden) {
+                        window.location.href = playStoreLink;
+                    }
+                }
+            }, 2500);
         }
     </script>
 </body>
