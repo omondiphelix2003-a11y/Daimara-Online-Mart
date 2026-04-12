@@ -316,6 +316,7 @@ Storage.init();
                 if (passwordLabel) {
                     passwordLabel.parentElement.style.display = 'block';
                     passwordLabel.innerHTML = `<i class="fas fa-lock"></i> Password`;
+                    document.getElementById('userPassword').required = true;
                 }
                 if (forgotPasswordContainer) forgotPasswordContainer.style.display = 'block';
                 if (signupFields) signupFields.innerHTML = `
@@ -333,6 +334,8 @@ Storage.init();
                 if (passwordLabel) {
                     passwordLabel.parentElement.style.display = 'none';
                     passwordLabel.innerHTML = `<i class="fas fa-lock"></i> New Password`;
+                    document.getElementById('userPassword').required = false;
+                    document.getElementById('userPassword').disabled = false;
                 }
                 if (forgotPasswordContainer) forgotPasswordContainer.style.display = 'none';
                 if (signupFields) signupFields.innerHTML = `
@@ -345,6 +348,7 @@ Storage.init();
                         <input type="text" id="userIdInput" required placeholder="Enter your Unique ID (e.g. GEN-XXXX)">
                     </div>
                 `;
+                document.getElementById('userEmail').disabled = false;
                 switchText.innerHTML = `Remembered? <a href="#" onclick="openAuthModal('login')">Login</a>`;
             } else {
                 title.textContent = 'Create Account';
@@ -354,6 +358,7 @@ Storage.init();
                 if (passwordLabel) {
                     passwordLabel.parentElement.style.display = 'block';
                     passwordLabel.innerHTML = `<i class="fas fa-lock"></i> Password`;
+                    document.getElementById('userPassword').required = true;
                 }
                 if (forgotPasswordContainer) forgotPasswordContainer.style.display = 'none';
                 if (signupFields) signupFields.innerHTML = `
@@ -455,6 +460,7 @@ Storage.init();
                     // Verification success
                     passwordGroup.style.display = 'block';
                     document.getElementById('passwordLabel').textContent = 'Enter New Password';
+                    document.getElementById('userPassword').required = true;
                     submitBtn.textContent = 'Reset Password';
                     // Disable inputs to prevent changes during reset
                     document.getElementById('userEmail').disabled = true;
