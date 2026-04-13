@@ -56,6 +56,21 @@ img {
 }
 .nav-links a.active { color: var(--primary); border-color: var(--primary); }
 
+.nav-scroll-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex: 1;
+    margin-left: 2rem;
+}
+
+.user-actions {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-shrink: 0;
+}
+
 .user-actions button {
     background: #000000;
     color: var(--text-light);
@@ -66,11 +81,24 @@ img {
     font-family: 'Oswald', sans-serif;
     text-transform: uppercase;
     transition: 0.3s;
+    white-space: nowrap;
 }
 
 .user-actions button:hover {
     border-color: var(--primary);
     color: var(--primary);
+}
+
+.nav-toggle {
+    display: none;
+    background: none;
+    border: 1px solid var(--border);
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 4px;
+    z-index: 101;
 }
 
 .subnav-wrapper {
@@ -462,6 +490,30 @@ img {
     }
 }
 
+/* Tablet Navbar Fix */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .main-nav {
+        padding: 1rem 1.5rem;
+    }
+    .nav-scroll-container {
+        margin-left: 1rem;
+        gap: 1rem;
+    }
+    .nav-links {
+        gap: 0.8rem;
+    }
+    .nav-links a {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+    }
+    .user-actions {
+        gap: 0.8rem;
+    }
+    #navUserName {
+        display: none; /* Hide name on tablets to save space */
+    }
+}
+
 /* Scroll Info Bar */
 .scroll-info-bar {
     background: rgba(196, 30, 58, 0.1);
@@ -493,43 +545,58 @@ img {
         padding: 0.8rem 1rem;
         display: flex;
         align-items: center;
-        gap: 15px;
-        justify-content: flex-start;
+        justify-content: space-between; /* Space out logo and toggle */
+        position: relative;
+    }
+
+    .nav-toggle {
+        display: block;
     }
 
     .nav-scroll-container {
-        display: flex;
-        align-items: center;
+        display: none; /* Hide by default on mobile */
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: #0f1f35;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1rem;
         gap: 1.5rem;
-        overflow-x: auto;
-        white-space: nowrap;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-        flex: 1;
-    }
-    .nav-scroll-container::-webkit-scrollbar {
-        display: none;
+        border-bottom: 2px solid var(--primary);
+        z-index: 100;
+        margin-left: 0;
+        overflow-y: auto;
+        max-height: 80vh;
     }
 
-    .logo {
-        flex-shrink: 0;
-        transition: 0.3s;
+    .nav-scroll-container.active {
+        display: flex;
     }
 
     .nav-links {
-        display: flex;
-        gap: 1.5rem;
-        flex-shrink: 0;
-        margin: 0;
-        padding: 0;
-        list-style: none;
+        flex-direction: column;
+        width: 100%;
+        gap: 0.8rem !important;
+    }
+
+    .nav-links li {
+        width: 100%;
+    }
+
+    .nav-links a {
+        display: block;
+        width: 100%;
+        padding: 0.8rem;
+        box-sizing: border-box;
     }
 
     .user-actions {
-        display: flex;
-        align-items: center;
-        flex-shrink: 0;
-        gap: 10px;
+        width: 100%;
+        padding: 1rem 0;
+        border-top: 1px solid var(--border);
+        justify-content: space-between;
     }
 
     .animated-text {
@@ -640,7 +707,10 @@ img {
         <div class="logo" id="siteLogoContainer" style="display: flex; align-items: center; gap: 10px;">
             <!-- Dynamic Logo -->
         </div>
-        <div class="nav-scroll-container">
+        <button class="nav-toggle" id="navToggle" onclick="toggleMobileMenu()">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="nav-scroll-container" id="navScrollContainer">
             <ul class="nav-links">
                 <li><a href="#" class="active" onclick="showSection('matches')">Home</a></li>
                 <li><a href="#" onclick="showSection('live')">Live Match</a></li>
@@ -1268,8 +1338,24 @@ Storage.init();
             alert('Location updated!');
         }
 
+        function toggleMobileMenu() {
+            const container = document.getElementById('navScrollContainer');
+            const toggle = document.getElementById('navToggle');
+            const isOpen = container.classList.toggle('active');
+            toggle.innerHTML = isOpen ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+        }
+
         function showSection(sectionId) {
             window.scrollTo(0, 0);
+            
+            // Close mobile menu if open
+            const container = document.getElementById('navScrollContainer');
+            const toggle = document.getElementById('navToggle');
+            if (container.classList.contains('active')) {
+                container.classList.remove('active');
+                toggle.innerHTML = '<i class="fas fa-bars"></i>';
+            }
+
             document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
             const target = document.getElementById(sectionId + 'Section');
             if (target) target.style.display = 'block';
