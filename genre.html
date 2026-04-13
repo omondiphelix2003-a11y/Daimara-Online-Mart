@@ -542,11 +542,21 @@ img {
 
 @media (max-width: 768px) {
     .main-nav {
-        padding: 0.8rem 1rem;
+        padding: 0.2rem 0.5rem; /* Reduced padding for thinner navbar and left alignment */
         display: flex;
         align-items: center;
         justify-content: space-between; /* Space out logo and toggle */
         position: relative;
+    }
+
+    .logo {
+        margin-left: -10px; /* Pull logo more to the left */
+        margin-top: -5px; /* Move logo higher up */
+    }
+
+    .logo img {
+        height: 60px !important; /* Scale down logo for mobile to fit thinner nav */
+        width: auto !important;
     }
 
     .nav-toggle {
